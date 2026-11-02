@@ -1,7 +1,7 @@
 # P1 木の雛形の資源と0.1% potまでの時間（G1、2026-10-09）
 
 [P1資源効率計画](../../../docs/plans/p1-efficiency.jp.md)のG1。GTO Wizard（GTOW）の公開情報
-（[調査](gtow-trees.en.md)）に沿って小さくしたSRP・3BP・4BPの木と、従来の同梱例（全streetで33・75%、raise 3x）を
+に沿って小さくしたSRP・3BP・4BPの木と、従来の同梱例（全streetで33・75%、raise 3x）を
 同じ機械・同じsourceで0.1% potまで解き、木の大きさ・時間・peak memory・EVを比べた。結果から同梱例を置き換えた。
 
 再現状態: **verified**（config、VM script、全runのprogress・run.json・`/usr/bin/time -v`を保存）。

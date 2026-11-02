@@ -173,6 +173,9 @@ pub struct ShapeNode {
     pub num_children: u16,
 }
 
+/// Maximum number of nodes on a public-tree path, including the root.
+pub const MAX_TREE_DEPTH: usize = 512;
+
 /// Why a [`TreeShape`] describes no compiled tree.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ShapeError(pub &'static str);
@@ -192,10 +195,8 @@ struct ShapeCursor {
 }
 
 impl PublicTree {
-    /// Compiles a builder-owned tree, panicking if a node has no children or
-    /// exceeds the child-count or node-index limits, or a reach map reference
-    /// or input dimension is invalid.
-    pub fn compile(spec: TreeSpec) -> PublicTree {
+    /// Compiles a builder-owned tree, rejecting invalid dimensions and limits.
+    pub fn compile(spec: TreeSpec) -> Result<PublicTree, ShapeError> {
         let mut tree = PublicTree {
             nodes: Vec::new(),
             deals: Vec::new(),
@@ -214,7 +215,7 @@ impl PublicTree {
         tree.storage_spans.push(StorageSpan::default());
         tree.subtree_has_chance.push(false);
         let root_dims = tree.root_dims;
-        tree.fill(0, &spec.root, root_dims);
+        tree.fill(0, &spec.root, root_dims, 1)?;
         // Release push-growth slack: a solve keeps this tree resident and the
         // product memory estimate counts exactly its elements.
         tree.nodes.shrink_to_fit();
@@ -226,7 +227,7 @@ impl PublicTree {
         tree.subtree_has_chance.shrink_to_fit();
         tree.masks.shrink_to_fit();
         tree.transitions.shrink_to_fit();
-        tree
+        Ok(tree)
     }
 
     /// Heap bytes allocated by this tree's vectors, by capacity.
@@ -420,7 +421,16 @@ impl PublicTree {
 
     /// Recursively fills `slot` from `temp`, reserving contiguous child
     /// blocks. `dims` is the per-player private-state dimension on the path.
-    fn fill(&mut self, slot: usize, temp: &TempNode, dims: PerPlayer<u32>) {
+    fn fill(
+        &mut self,
+        slot: usize,
+        temp: &TempNode,
+        dims: PerPlayer<u32>,
+        depth: usize,
+    ) -> Result<(), ShapeError> {
+        if depth > MAX_TREE_DEPTH {
+            return Err(ShapeError("tree path exceeds the maximum depth of 512"));
+        }
         let start = self.storage_len;
         let sref_start = self.storage_refs.len() as u32;
         let mut has_chance = matches!(temp, TempNode::Chance { .. });
@@ -442,7 +452,9 @@ impl PublicTree {
             } => {
                 self.tags[slot] = *tag;
                 let num_actions = children.len();
-                assert!(num_actions >= 1, "action node must have children");
+                if num_actions == 0 {
+                    return Err(ShapeError("action node must have children"));
+                }
                 let num_hands = dims[*player] as usize;
                 let aux = self.storage_refs.len() as u32;
                 let storage_ref = StorageRef {
@@ -451,11 +463,18 @@ impl PublicTree {
                     num_hands: num_hands as u32,
                     index: aux,
                 };
-                self.storage_len += num_actions * num_hands;
+                self.storage_len = self
+                    .storage_len
+                    .checked_add(
+                        num_actions
+                            .checked_mul(num_hands)
+                            .ok_or(ShapeError("storage size overflow"))?,
+                    )
+                    .ok_or(ShapeError("storage size overflow"))?;
                 self.storage_refs.push(storage_ref);
                 self.storage_nodes.push(slot as NodeId);
 
-                let first_child = self.reserve_children(num_actions);
+                let first_child = self.reserve_children(num_actions)?;
                 self.nodes[slot] = Node {
                     kind: NodeKind::Action,
                     player: *player,
@@ -464,14 +483,16 @@ impl PublicTree {
                     aux,
                 };
                 for (i, child) in children.iter().enumerate() {
-                    self.fill(first_child as usize + i, child, dims);
+                    self.fill(first_child as usize + i, child, dims, depth + 1)?;
                     has_chance |= self.subtree_has_chance[first_child as usize + i];
                 }
             }
             TempNode::Chance { deals, tag } => {
                 self.tags[slot] = *tag;
-                assert!(!deals.is_empty(), "chance node must have deals");
-                let first_child = self.reserve_children(deals.len());
+                if deals.is_empty() {
+                    return Err(ShapeError("chance node must have deals"));
+                }
+                let first_child = self.reserve_children(deals.len())?;
                 let aux = self.deals.len() as u32;
                 for (weight, maps, _) in deals {
                     self.deals.push(Deal {
@@ -488,10 +509,10 @@ impl PublicTree {
                 };
                 for (i, (_, maps, child)) in deals.iter().enumerate() {
                     let child_dims = PerPlayer::new(
-                        self.mapped_dim(maps[Player::P0], dims[Player::P0]),
-                        self.mapped_dim(maps[Player::P1], dims[Player::P1]),
+                        self.checked_mapped_dim(maps[Player::P0], dims[Player::P0])?,
+                        self.checked_mapped_dim(maps[Player::P1], dims[Player::P1])?,
                     );
-                    self.fill(first_child as usize + i, child, child_dims);
+                    self.fill(first_child as usize + i, child, child_dims, depth + 1)?;
                 }
             }
         }
@@ -502,27 +523,28 @@ impl PublicTree {
             sref_end: self.storage_refs.len() as u32,
         };
         self.subtree_has_chance[slot] = has_chance;
+        Ok(())
     }
 
-    fn reserve_children(&mut self, n: usize) -> u32 {
-        assert!(
-            u16::try_from(n).is_ok(),
-            "node exceeds the child count limit"
-        );
-        assert!(
-            self.nodes
-                .len()
-                .checked_add(n)
-                .is_some_and(|end| end <= u32::MAX as usize),
-            "tree exceeds the node index limit"
-        );
+    fn reserve_children(&mut self, n: usize) -> Result<u32, ShapeError> {
+        if u16::try_from(n).is_err() {
+            return Err(ShapeError("node exceeds the child count limit"));
+        }
+        if !self
+            .nodes
+            .len()
+            .checked_add(n)
+            .is_some_and(|end| end <= u32::MAX as usize)
+        {
+            return Err(ShapeError("tree exceeds the node index limit"));
+        }
         let first = self.nodes.len() as u32;
         self.nodes.extend((0..n).map(|_| placeholder_node()));
         self.tags.extend((0..n).map(|_| 0));
         self.storage_spans
             .extend((0..n).map(|_| StorageSpan::default()));
         self.subtree_has_chance.extend((0..n).map(|_| false));
-        first
+        Ok(first)
     }
 
     /// Dimension one player's reach vector maps into across a chance deal.
@@ -681,14 +703,35 @@ mod tests {
                 action(Player::P0, (0..=u16::MAX).map(|_| terminal(0)).collect())
             };
             assert!(
-                std::panic::catch_unwind(|| PublicTree::compile(TreeSpec {
+                PublicTree::compile(TreeSpec {
                     root,
                     masks: Vec::new(),
                     transitions: Vec::new(),
                     root_dims: PerPlayer::new(1, 1),
-                }))
+                })
                 .is_err()
             );
+        }
+    }
+
+    #[test]
+    fn compile_rejects_invalid_reach_map_dimensions_and_references() {
+        for map in [
+            ReachMap::Mask(0),
+            ReachMap::Mask(1),
+            ReachMap::Transition(0),
+        ] {
+            let root = TempNode::Chance {
+                deals: vec![(1.0, PerPlayer::new(map, ReachMap::Identity), terminal(0))],
+                tag: 0,
+            };
+            let result = PublicTree::compile(TreeSpec {
+                root,
+                masks: vec![vec![1.0]],
+                transitions: Vec::new(),
+                root_dims: PerPlayer::new(2, 2),
+            });
+            assert!(result.is_err());
         }
     }
 
@@ -713,7 +756,8 @@ mod tests {
             masks: Vec::new(),
             transitions: Vec::new(),
             root_dims: PerPlayer::new(2, 2),
-        });
+        })
+        .unwrap();
 
         let root_node = tree.node(0);
         assert_eq!(root_node.kind, NodeKind::Chance);
@@ -810,6 +854,7 @@ mod tests {
             ],
             root_dims: PerPlayer::new(3, 2),
         })
+        .unwrap()
     }
 
     #[test]

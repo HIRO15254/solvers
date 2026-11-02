@@ -46,6 +46,28 @@ fn text(path: &Path) -> &str {
     path.to_str().unwrap()
 }
 
+#[test]
+fn validate_lock_sum_uses_solver_tolerance_and_identifies_hands() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("lock.toml");
+    std::fs::write(
+        &config,
+        format!("{RIVER}\n[[profile.lock]]\nnode = 'root'\nhands = 'JhJd'\nstrategy = {{ check = 0.9999995 }}\n"),
+    )
+    .unwrap();
+    ok(&["validate", text(&config)]);
+    std::fs::write(
+        &config,
+        format!("{RIVER}\n[[profile.lock]]\nnode = 'root'\nhands = 'JhJd'\nconfidence = 0.5\nstrategy = {{ check = 0.5 }}\n"),
+    )
+    .unwrap();
+    let output = cli(&["validate", text(&config)]);
+    assert_eq!(output.status.code(), Some(2));
+    let error = String::from_utf8_lossy(&output.stderr);
+    assert!(error.contains("NLH003"), "{error}");
+    assert!(error.contains("JhJd"), "{error}");
+}
+
 fn normalized_solution(path: &Path) -> Vec<u8> {
     let mut payload = hu_postflop::sol::read_sol(&path.join("solution.sol")).unwrap();
     payload.meta.wall_secs = 0.0;
@@ -1161,6 +1183,28 @@ threads = 1
         hash(&base.replace("threads = 1", "threads = 2"))
     );
     assert_ne!(hash(base), hash(&base.replace("stack = 100", "stack = 50")));
+}
+
+#[test]
+fn validate_writes_profile_in_document_order() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("input.toml");
+    let effective = temp.path().join("effective.toml");
+    std::fs::write(
+        &config,
+        format!("{RIVER}\n[[profile.lock]]\nnode = 'root'\nstrategy = {{ check = 1.0 }}\n"),
+    )
+    .unwrap();
+    ok(&[
+        "validate",
+        text(&config),
+        "--write-effective",
+        text(&effective),
+    ]);
+    let result = std::fs::read_to_string(effective).unwrap();
+    let lock = result.split("[[profile.lock]]").nth(1).unwrap();
+    assert!(lock.find("node =").unwrap() < lock.find("strategy =").unwrap());
+    assert!(lock.find("strategy =").unwrap() < lock.find("confidence =").unwrap());
 }
 
 #[test]

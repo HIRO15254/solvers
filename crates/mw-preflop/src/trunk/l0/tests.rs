@@ -2338,21 +2338,11 @@ fn trunk_solver_converges_four_players_with_solver_k4_approximation() {
 }
 
 #[test]
-#[ignore = "report three-way payoff correction statistics on uniform B3/B4 profiles"]
-fn three_way_correction_statistics_b3_b4() {
+#[ignore = "report three-way payoff correction statistics on a uniform B3 profile"]
+fn three_way_correction_statistics_b3() {
     use super::leaves::ThreeTerms;
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
-    for (name, file) in [
-        ("B3", "6max_20bb_checkdown.toml"),
-        (
-            "B4 Simple",
-            "6max_100bb_nl50_partial_simple_reference_checkdown.toml",
-        ),
-        (
-            "B4 General",
-            "6max_100bb_nl50_partial_reference_checkdown.toml",
-        ),
-    ] {
+    for (name, file) in [("B3", "6max_20bb_checkdown.toml")] {
         let path = root.join("examples/bench").join(file);
         let game = game_from_config(&std::fs::read_to_string(&path).unwrap(), &path).unwrap();
         let tree = Tree::build(&game).unwrap();

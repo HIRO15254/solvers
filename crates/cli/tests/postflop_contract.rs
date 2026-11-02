@@ -739,3 +739,146 @@ fn inspect_equity_tracks_the_current_board_and_invalidates_cached_values() {
         "returning to root must restore turn equity"
     );
 }
+
+#[test]
+fn inspect_refuses_equity_for_cardless_isomorphic_runouts() {
+    use std::io::Write;
+    use std::process::Stdio;
+    let directory = tempfile::tempdir().unwrap();
+    let input = directory.path().join("config.toml");
+    let config = CONFIG
+        .replace("2c 7d 9h Js Qs", "2s 7s Ks")
+        .replace(" / BB x, BTN x / BB x, BTN x", "")
+        .replace("AsAh", "AA")
+        .replace("KsKh", "QQ")
+        .replace(
+            "river when unopened { force bet [50%] }",
+            "flop when unopened { replace bet [a] } turn, river { checkdown }",
+        )
+        .replace("max_iterations = 20", "max_iterations = 2");
+    std::fs::write(&input, config).unwrap();
+    let mut child = Command::new(env!("CARGO_BIN_EXE_solvers"))
+        .args(["inspect", input.to_str().unwrap()])
+        .env("NO_COLOR", "1")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    let mut commands = String::from("eq\n");
+    for pos in 0..49 {
+        commands.push_str(&format!("root\ngo 1\ngo 1\ngo {pos}\neq\n"));
+    }
+    commands.push_str("quit\n");
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(commands.as_bytes())
+        .unwrap();
+    let output = child.wait_with_output().unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    assert!(
+        stdout.contains("oop equity vs ip at current node"),
+        "{stdout}"
+    );
+    assert!(
+        stdout.contains("represents several suit-isomorphic cards"),
+        "{stdout}"
+    );
+    assert!(
+        stdout.contains("parent street node or on a branch with a concrete card"),
+        "{stdout}"
+    );
+}
+
+#[test]
+fn compare_refuses_different_utility_units_even_cross_game() {
+    let cash_dir = tempfile::tempdir().unwrap();
+    let icm_dir = tempfile::tempdir().unwrap();
+    let cash = solve(CONFIG, cash_dir.path());
+    let icm = solve(
+        &format!(
+            "{CONFIG}\n[economics]\nkind = \"tournament\"\npayouts = [100.0, 60.0, 0.0]\noutside_field = [200.0]\n"
+        ),
+        icm_dir.path(),
+    );
+    let cash_sol = cash.join("solution.sol");
+    let icm_sol = icm.join("solution.sol");
+    for cross in [false, true] {
+        let mut args = vec![
+            "compare",
+            cash_sol.to_str().unwrap(),
+            icm_sol.to_str().unwrap(),
+        ];
+        if cross {
+            args.push("--cross-game");
+        }
+        let output = invoke(&args);
+        assert!(!output.status.success());
+        assert!(String::from_utf8_lossy(&output.stderr).contains("different utility units"));
+    }
+}
+
+#[test]
+fn compare_and_ev_omit_unreachable_locked_hands() {
+    let directory = tempfile::tempdir().unwrap();
+    let original = solve(
+        &CONFIG.replace("force bet", "replace bet"),
+        directory.path(),
+    );
+    let locked = directory.path().join("locked");
+    ok(&[
+        "relock",
+        original.to_str().unwrap(),
+        "--out",
+        locked.to_str().unwrap(),
+        "--node",
+        "root",
+        "--strategy",
+        "check=1",
+    ]);
+    let original_sol = original.join("solution.sol");
+    let locked_sol = locked.join("solution.sol");
+    let comparison = ok(&[
+        "compare",
+        original_sol.to_str().unwrap(),
+        locked_sol.to_str().unwrap(),
+    ]);
+    let report: serde_json::Value = serde_json::from_slice(&comparison.stdout).unwrap();
+    assert!(report["excluded_strategy_hands"].as_u64().unwrap() > 0);
+    assert!(report["excluded_ev_hands"].as_u64().unwrap() > 0);
+    let ev = export(&locked, "ev", "r10");
+    assert!(ev.as_array().unwrap().is_empty(), "{ev}");
+}
+
+#[test]
+fn compare_refuses_different_trees_even_cross_game() {
+    let left_dir = tempfile::tempdir().unwrap();
+    let right_dir = tempfile::tempdir().unwrap();
+    let left = solve(&CONFIG.replace("force bet", "replace bet"), left_dir.path());
+    let right = solve(
+        &CONFIG.replace("force bet [50%]", "replace bet [50%, 100%]"),
+        right_dir.path(),
+    );
+    let left_sol = left.join("solution.sol");
+    let right_sol = right.join("solution.sol");
+    for cross in [false, true] {
+        let mut args = vec![
+            "compare",
+            left_sol.to_str().unwrap(),
+            right_sol.to_str().unwrap(),
+        ];
+        if cross {
+            args.push("--cross-game");
+        }
+        let output = invoke(&args);
+        assert!(!output.status.success());
+        assert!(String::from_utf8_lossy(&output.stderr).contains("different trees"));
+    }
+}

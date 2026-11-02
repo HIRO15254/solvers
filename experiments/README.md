@@ -3,6 +3,8 @@
 現在の作業とLinearへの入口は[開発状態](../docs/status.jp.md)、製品の品質目標と利用者決定は
 [製品定義](../docs/products.jp.md)を参照する。ここは根拠の索引であり、作業状態や公開契約の正本ではない。
 [文書の優先順位](../docs/README.md)に従い、入力・製品・CLIの規範を優先する。
+GTO Wizard由来の参照入力・観測値はlocal-onlyで配布しない（`packaging/gtow-local-only.json`）。
+過去の実験scriptや記録にその入力を使うものがあり、公開checkout単体では再実行できない。
 
 ## 現在の実装を支える実験
 

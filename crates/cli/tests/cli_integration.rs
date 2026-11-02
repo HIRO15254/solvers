@@ -517,6 +517,19 @@ fn solve_checkpoint_and_metrics_smoke() {
     let manifest: serde_json::Value =
         serde_json::from_slice(&std::fs::read(run.join("manifest.json")).unwrap()).unwrap();
     assert_eq!(manifest["cliVersion"], env!("CARGO_PKG_VERSION"));
+    let (events, _) = runfiles::read_events(&run.join("events.jsonl"), 0).unwrap();
+    let reason = events
+        .iter()
+        .find_map(|event| match &event.payload {
+            runfiles::RunEventPayload::Stop { reason } => Some(reason.as_str()),
+            _ => None,
+        })
+        .expect("solver stop event");
+    assert_eq!(manifest["completion"].as_str(), Some(reason));
+    assert!(matches!(
+        reason,
+        "target-reached" | "max-iterations" | "time-limit" | "cancelled"
+    ));
 
     assert!(checkpoint.exists());
     let loaded = hu_postflop::checkpoint::read_checkpoint(&checkpoint).expect("read checkpoint");
@@ -1719,6 +1732,48 @@ fn status_reports_a_canceled_heads_up_run_as_resumable() {
 #[cfg(unix)]
 #[ignore = "spawns and signals a solve; explicit release acceptance only"]
 fn a_canceled_heads_up_solve_closes_as_canceled_and_resumes() {
+    fn wait_for_exit(child: &mut std::process::Child, label: &str) -> std::process::ExitStatus {
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(120);
+        loop {
+            if let Some(status) = child.try_wait().expect("poll child") {
+                return status;
+            }
+            if std::time::Instant::now() >= deadline {
+                let _ = child.kill();
+                let _ = child.wait();
+                panic!("{label} did not exit within 120 seconds; child killed");
+            }
+            std::thread::sleep(std::time::Duration::from_millis(50));
+        }
+    }
+    fn wait_for_progress(child: &mut std::process::Child, run: &std::path::Path, after: u64) {
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(120);
+        loop {
+            let advanced = std::fs::read_to_string(run.join("progress.jsonl"))
+                .ok()
+                .is_some_and(|progress| {
+                    progress.lines().any(|line| {
+                        serde_json::from_str::<serde_json::Value>(line)
+                            .ok()
+                            .and_then(|row| row["iteration"].as_u64())
+                            .is_some_and(|iteration| iteration > after)
+                    })
+                });
+            if advanced {
+                return;
+            }
+            if let Some(status) = child.try_wait().expect("poll child") {
+                panic!("child exited before advancing progress: {status}");
+            }
+            if std::time::Instant::now() >= deadline {
+                let _ = child.kill();
+                let _ = child.wait();
+                panic!("child did not advance progress within 120 seconds; child killed");
+            }
+            std::thread::sleep(std::time::Duration::from_millis(50));
+        }
+    }
+
     let dir = temp_dir("hu-cancel-resume");
     let config = dir.join("long.toml");
     std::fs::write(
@@ -1738,12 +1793,10 @@ fn a_canceled_heads_up_solve_closes_as_canceled_and_resumes() {
         .stdout(std::process::Stdio::null())
         .spawn()
         .expect("spawn solve");
-    while !run.join("progress.jsonl").exists() {
-        std::thread::sleep(std::time::Duration::from_millis(50));
-    }
+    wait_for_progress(&mut child, &run, 0);
     unsafe { libc::kill(child.id() as libc::pid_t, libc::SIGINT) };
     // A cooperative stop exits 130 (cli-reference exit codes).
-    assert_eq!(child.wait().expect("wait for solve").code(), Some(130));
+    assert_eq!(wait_for_exit(&mut child, "solve").code(), Some(130));
 
     let manifest: serde_json::Value =
         serde_json::from_str(&std::fs::read_to_string(run.join("manifest.json")).unwrap()).unwrap();
@@ -1757,9 +1810,9 @@ fn a_canceled_heads_up_solve_closes_as_canceled_and_resumes() {
         .stdout(std::process::Stdio::null())
         .spawn()
         .expect("spawn resume");
-    std::thread::sleep(std::time::Duration::from_millis(500));
+    wait_for_progress(&mut resumed, &run, before);
     unsafe { libc::kill(resumed.id() as libc::pid_t, libc::SIGINT) };
-    assert_eq!(resumed.wait().expect("wait for resume").code(), Some(130));
+    assert_eq!(wait_for_exit(&mut resumed, "resume").code(), Some(130));
 
     let after = last_progress_iteration(&run);
     assert!(

@@ -331,6 +331,7 @@ mod tests {
             transitions: Vec::new(),
             root_dims: PerPlayer::new(2, 2),
         })
+        .unwrap()
     }
 
     #[test]
@@ -376,7 +377,8 @@ mod tests {
             masks: Vec::new(),
             transitions: Vec::new(),
             root_dims: PerPlayer::new(2, 2),
-        });
+        })
+        .unwrap();
 
         let p0 = vec![0.4f32, 0.6];
         let p1 = vec![1.0f32, 1.0];
@@ -408,7 +410,8 @@ mod tests {
             masks: vec![mask],
             transitions: Vec::new(),
             root_dims: PerPlayer::new(3, 3),
-        });
+        })
+        .unwrap();
 
         let p0 = vec![0.2f32, 0.5, 0.8];
         let p1 = vec![1.0f32, 1.0, 1.0];
@@ -439,7 +442,8 @@ mod tests {
             masks: Vec::new(),
             transitions: vec![transition.clone()],
             root_dims: PerPlayer::new(2, 2),
-        });
+        })
+        .unwrap();
 
         let p0 = vec![0.3f32, 0.7];
         let p1 = vec![0.4f32, 0.6];
@@ -468,13 +472,15 @@ mod tests {
             masks: Vec::new(),
             transitions: Vec::new(),
             root_dims: PerPlayer::new(2, 2),
-        });
+        })
+        .unwrap();
         let tree_b = PublicTree::compile(TreeSpec {
             root: make(),
             masks: Vec::new(),
             transitions: Vec::new(),
             root_dims: PerPlayer::new(2, 2),
-        });
+        })
+        .unwrap();
 
         let pairs = pair_subtrees(&tree_a, 0, &tree_b, 0).expect("identical trees must pair");
         assert_eq!(pairs.len(), tree_a.nodes.len());
@@ -489,13 +495,15 @@ mod tests {
             masks: Vec::new(),
             transitions: Vec::new(),
             root_dims: PerPlayer::new(2, 2),
-        });
+        })
+        .unwrap();
         let tree_b = PublicTree::compile(TreeSpec {
             root: action(Player::P0, vec![terminal(0), terminal(1), terminal(2)]),
             masks: Vec::new(),
             transitions: Vec::new(),
             root_dims: PerPlayer::new(2, 2),
-        });
+        })
+        .unwrap();
 
         let err = pair_subtrees(&tree_a, 0, &tree_b, 0).expect_err("child counts differ");
         assert_eq!(err.a, 0);

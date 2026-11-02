@@ -254,8 +254,17 @@ pub fn geometric_allin_target(
     let steps = f64::from(streets.max(1));
     let growth = 1.0 + 2.0 * remaining as f64 / pot_after_call as f64;
     let fraction = (growth.powf(1.0 / steps) - 1.0) / 2.0;
+    // The geometric root is computed in binary floating point, not from a
+    // decimal input. Preserve the historical whole-chip noise allowance here.
+    let exact = pot_after_call as f64 * fraction;
+    let nearest = exact.round();
+    let increment = if (exact - nearest).abs() <= 1e-9 * nearest.abs().max(1.0) {
+        nearest.max(0.0) as u64
+    } else {
+        rounding.snap(exact)
+    };
     called_to
-        .checked_add(rounding.snap(pot_after_call as f64 * fraction))
+        .checked_add(increment)
         .expect("geometric all-in target overflow")
 }
 
@@ -330,7 +339,9 @@ impl SizeContext {
 
     fn width(self, size: SizeSpec, limit: u64) -> u64 {
         match size {
-            SizeSpec::PotAfterCall { fraction } => self.scale(limit, self.pot_after_call, fraction),
+            SizeSpec::PotAfterCall { fraction } => {
+                self.scale_percent(limit, self.pot_after_call, fraction)
+            }
             SizeSpec::ToBb { .. }
             | SizeSpec::ToChips { .. }
             | SizeSpec::StackFraction { .. }
@@ -350,7 +361,18 @@ impl SizeContext {
     /// Snap a scaled chip amount to a whole chip, capped at `limit`: P1's
     /// `u32` range (`limit == u32::MAX`) or P2's `u64` range.
     fn scale(self, limit: u64, amount: u64, factor: f64) -> u64 {
-        self.rounding.snap(amount as f64 * factor).min(limit)
+        crate::decimal::rounded_product(amount, factor, 1, self.rounding)
+            .unwrap_or(u64::MAX)
+            .min(limit)
+    }
+
+    fn scale_percent(self, limit: u64, amount: u64, fraction: f64) -> u64 {
+        let percent = render_percent(fraction)
+            .parse::<f64>()
+            .unwrap_or(f64::INFINITY);
+        crate::decimal::rounded_product(amount, percent, 100, self.rounding)
+            .unwrap_or(u64::MAX)
+            .min(limit)
     }
 
     fn propose(self, size: SizeSpec, limit: u64) -> u64 {
@@ -359,7 +381,7 @@ impl SizeContext {
             SizeSpec::ToBb { value } => scale(self.big_blind, value),
             SizeSpec::ToChips { value } => value.min(limit),
             SizeSpec::PotAfterCall { fraction } => {
-                let increment = scale(self.pot_after_call, fraction);
+                let increment = self.scale_percent(limit, self.pot_after_call, fraction);
                 if limit == u32::MAX as u64 {
                     self.called_to.saturating_add(increment).min(limit)
                 } else {
@@ -371,8 +393,12 @@ impl SizeContext {
             SizeSpec::PreviousBetMultiple { factor } => scale(self.previous_bet, factor),
             SizeSpec::MinRaise => self.minimum,
             SizeSpec::AllIn => self.maximum,
-            SizeSpec::StackFraction { fraction } => scale(self.maximum, fraction),
-            SizeSpec::EffectiveStackFraction { fraction } => scale(self.effective_stack, fraction),
+            SizeSpec::StackFraction { fraction } => {
+                self.scale_percent(limit, self.maximum, fraction)
+            }
+            SizeSpec::EffectiveStackFraction { fraction } => {
+                self.scale_percent(limit, self.effective_stack, fraction)
+            }
             SizeSpec::GeometricAllIn { .. } | SizeSpec::GeometricAllInRemaining => {
                 let streets = match size {
                     SizeSpec::GeometricAllIn { streets } => streets,
@@ -398,6 +424,75 @@ impl SizeContext {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn decimal_size_literals_round_exactly() {
+        let mut context = SizeContext {
+            big_blind: 1,
+            called_to: 0,
+            pot_after_call: 5250,
+            previous_bet: 1505,
+            minimum: 0,
+            maximum: 5250,
+            effective_stack: 5250,
+            streets_remaining: 1,
+            rounding: Rounding::Nearest,
+        };
+        let parse = |text| SizeSpec::parse(text, SizeUnit::Bb).unwrap();
+        assert_eq!(context.threshold_u64(parse("35%")), 1838);
+        assert_eq!(context.threshold_u64(parse("35%stack")), 1838);
+        assert_eq!(context.threshold_u64(parse("35%effective")), 1838);
+        assert_eq!(context.threshold_u64(parse("2.3x")), 3462);
+        context.pot_after_call = 90;
+        assert_eq!(context.threshold_u64(parse("35%")), 32);
+        assert_eq!(
+            parse("35.1%"),
+            SizeSpec::PotAfterCall {
+                fraction: 35.1 / 100.0
+            }
+        );
+        context.pot_after_call = 1_000_000_001;
+        context.rounding = Rounding::Up;
+        assert_eq!(context.threshold_u64(parse("50%")), 500_000_001);
+        context.rounding = Rounding::Down;
+        assert_eq!(context.threshold_u64(parse("50%")), 500_000_000);
+    }
+
+    #[test]
+    fn percentage_literals_preserve_stored_fractions_and_rendering() {
+        for (literal, expected) in [
+            (
+                "33.3%",
+                SizeSpec::PotAfterCall {
+                    fraction: 33.3 / 100.0,
+                },
+            ),
+            (
+                "33.3%stack",
+                SizeSpec::StackFraction {
+                    fraction: 33.3 / 100.0,
+                },
+            ),
+            (
+                "33.3%effective",
+                SizeSpec::EffectiveStackFraction {
+                    fraction: 33.3 / 100.0,
+                },
+            ),
+        ] {
+            let size = SizeSpec::parse(literal, SizeUnit::Bb).unwrap();
+            assert_eq!(size, expected);
+            assert_eq!(size.render(SizeUnit::Bb), literal);
+        }
+    }
+
+    #[test]
+    fn geometric_down_retains_integral_all_in() {
+        assert_eq!(
+            geometric_allin_target(0, 30_000, 20_000, 1, Rounding::Down),
+            20_000
+        );
+    }
 
     #[test]
     fn scaling_preserves_grid_bounds_and_rounding() {

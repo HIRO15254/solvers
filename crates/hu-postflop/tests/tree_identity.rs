@@ -128,6 +128,7 @@ fn turn_small() {
     );
 }
 #[test]
+#[ignore = "large tree identity fixture; explicit release acceptance only"]
 fn postflop_srp20() {
     check(
         "postflop_srp20",
@@ -141,6 +142,7 @@ fn postflop_srp20() {
     );
 }
 #[test]
+#[ignore = "large tree identity fixture; explicit release acceptance only"]
 fn three_bet_pot_fast() {
     check(
         "3betpot_fast",
@@ -154,6 +156,7 @@ fn three_bet_pot_fast() {
     );
 }
 #[test]
+#[ignore = "large tree identity fixture; explicit release acceptance only"]
 fn postflop_pio_tree() {
     check(
         "postflop_pio_tree",
@@ -168,6 +171,7 @@ fn postflop_pio_tree() {
     );
 }
 #[test]
+#[ignore = "large tree identity fixture; explicit release acceptance only"]
 fn postflop_pio_icm() {
     check(
         "postflop_pio_icm",

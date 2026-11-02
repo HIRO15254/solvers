@@ -552,12 +552,12 @@ enum Command {
     Compare {
         left: std::path::PathBuf,
         right: std::path::PathBuf,
-        /// Allow heads-up postflop spot, combo-list and sized-action differences; tree shape
-        /// and stored-node shapes must still match.
+        /// Allow heads-up postflop spot and sized-action differences; topology,
+        /// stored nodes, hand lists and utility units must still match.
         #[cfg_attr(
             feature = "p2",
             arg(
-                long_help = "Allow heads-up postflop spot, combo-list and sized-action differences; tree shape and stored-node shapes must still match. Preflop retains seat/unit checks."
+                long_help = "Allow heads-up postflop spot and sized-action differences; topology, stored nodes, hand lists and utility units must still match. Preflop retains seat/unit checks."
             )
         )]
         #[arg(long)]

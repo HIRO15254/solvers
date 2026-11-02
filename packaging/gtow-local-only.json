@@ -2,6 +2,42 @@
   "policy": "Local research only; not distributed. Files retained on disk with git rm --cached. User decision 2026-10-15: preserve existing Git history as-is; no rewrite.",
   "files": [
     {
+      "path": "examples/bench/6max_100bb_nl50_partial_reference.toml",
+      "reason": "Reference preflop tree containing action menus derived from acquired GTOW solution-node observations."
+    },
+    {
+      "path": "examples/bench/6max_100bb_nl50_partial_reference_checkdown.toml",
+      "reason": "Checkdown benchmark retaining GTOW-derived reference preflop action menus."
+    },
+    {
+      "path": "examples/bench/6max_100bb_nl50_partial_reference_limp.toml",
+      "reason": "Reference preflop tree containing action menus derived from acquired GTOW solution-node observations."
+    },
+    {
+      "path": "examples/bench/6max_100bb_nl50_partial_simple_reference.toml",
+      "reason": "Reference preflop tree containing action menus derived from acquired GTOW solution-node observations."
+    },
+    {
+      "path": "examples/bench/6max_100bb_nl50_partial_simple_reference_checkdown.toml",
+      "reason": "Checkdown benchmark retaining GTOW-derived reference preflop action menus."
+    },
+    {
+      "path": "crates/cli/tests/gtow_limp_reference.rs",
+      "reason": "Test embeds observed GTOW action menus and requires a local-only reference tree."
+    },
+    {
+      "path": "crates/cli/tests/gtow_partial_reference.rs",
+      "reason": "Test embeds observed GTOW action menus and requires a local-only reference tree."
+    },
+    {
+      "path": "crates/cli/tests/gtow_simple_partial_reference.rs",
+      "reason": "Test embeds observed GTOW action menus and requires a local-only reference tree."
+    },
+    {
+      "path": "experiments/p1-efficiency-2026-10/templates-20261009/gtow-trees.en.md",
+      "reason": "Research survey includes GTOW solution action frequencies, EV observations and derived action menus."
+    },
+    {
       "path": "experiments/hu-postflop-reference/cases/ks7h2d-flop/README.md",
       "reason": "Embedded GTOW reference EVs, equities or action-frequency comparison tables."
     },

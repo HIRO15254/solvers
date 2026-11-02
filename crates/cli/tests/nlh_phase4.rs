@@ -79,7 +79,7 @@ fn inspect_resolves_scaled_action_labels() {
 }
 
 #[test]
-fn comparison_requires_combo_and_action_identity_unless_cross_game() {
+fn comparison_requires_hand_identity_even_cross_game() {
     let temp = tempfile::tempdir().unwrap();
     let solve = |name: &str, config: &str| {
         let input = temp.path().join(format!("{name}.toml"));
@@ -92,16 +92,24 @@ fn comparison_requires_combo_and_action_identity_unless_cross_game() {
     let sizes = solve("sizes", &RIVER.replace("3.3bb", "3.4bb"));
     let support = solve("support", &RIVER.replace("JhJd", "JcJs"));
     let weights = solve("weights", &RIVER.replace("JhJd,ThTd", "JhJd:0.5,ThTd"));
-    for (other, mismatch) in [(&sizes, "action labels"), (&support, "hand lists")] {
-        let result = cli(&["compare", path(&original), path(other)], "");
+    let result = cli(&["compare", path(&original), path(&sizes)], "");
+    assert!(!result.status.success());
+    let error = String::from_utf8_lossy(&result.stderr);
+    assert!(error.contains("action labels"), "{error}");
+    assert!(error.contains("--cross-game"), "{error}");
+    ok(
+        &["compare", path(&original), path(&sizes), "--cross-game"],
+        "",
+    );
+    for cross in [false, true] {
+        let mut args = vec!["compare", path(&original), path(&support)];
+        if cross {
+            args.push("--cross-game");
+        }
+        let result = cli(&args, "");
         assert!(!result.status.success());
         let error = String::from_utf8_lossy(&result.stderr);
-        assert!(error.contains(mismatch), "{error}");
-        assert!(error.contains("--cross-game"), "{error}");
-        ok(
-            &["compare", path(&original), path(other), "--cross-game"],
-            "",
-        );
+        assert!(error.contains("hand lists"), "{error}");
     }
     ok(&["compare", path(&original), path(&weights)], "");
     let left = hu_postflop::artifact::load_sol(&original, 0, None).unwrap();

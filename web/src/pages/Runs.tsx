@@ -214,6 +214,16 @@ function eventText(event: RunEvent): string {
   }
 }
 
+export function ResultsButton({ run, hasSolution }: { run: RunSummary; hasSolution: boolean }) {
+  if (run.gameKind !== "hu-postflop" || !isTerminal(run.state) || !hasSolution) return null;
+  return (
+    <Button variant="outline" size="sm" icon="chart-grid-dots"
+      onClick={() => navigate({ page: "results", runId: run.runId })}>
+      Results
+    </Button>
+  );
+}
+
 function RunDetail({ run, meta, onChanged }: { run: RunSummary; meta?: RunMeta; onChanged: () => void }) {
   const [events, setEvents] = useState<RunEvent[]>([]);
   const [progress, setProgress] = useState<HuProgressRow[]>([]);
@@ -320,16 +330,7 @@ function RunDetail({ run, meta, onChanged }: { run: RunSummary; meta?: RunMeta; 
             Resume
           </Button>
         )}
-        {hu && hasSolution && (
-          <Button
-            variant="outline"
-            size="sm"
-            icon="chart-grid-dots"
-            onClick={() => navigate({ page: "results", runId: run.runId })}
-          >
-            Results
-          </Button>
-        )}
+        <ResultsButton run={run} hasSolution={hasSolution} />
       </div>
       {actionError && <Notice variant="destructive" title="Action failed" description={actionError} />}
       {run.failure && <Notice variant="destructive" title="Run failed" description={run.failure} />}

@@ -125,6 +125,9 @@ struct BetState {
 
 /// Builds a [`ToyGame`] with the given rake and utility models applied
 /// through the payoff pipeline.
+///
+/// # Panics
+/// Panics if the toy specification produces an invalid tree.
 pub fn build_toy_game(spec: &ToyGameSpec, pipeline: PayoffPipeline<'_>) -> ToyGame {
     let mut builder = Builder {
         spec,
@@ -154,7 +157,8 @@ pub fn build_toy_game(spec: &ToyGameSpec, pipeline: PayoffPipeline<'_>) -> ToyGa
         masks: builder.masks,
         transitions: Vec::new(),
         root_dims: PerPlayer::new(deck, deck),
-    });
+    })
+    .expect("toy game tree must have valid dimensions");
     let street_norm = normalizer(&tree, spec.deck);
     ToyGame {
         game: CompiledGame {
@@ -374,6 +378,9 @@ impl Builder<'_> {
 
 /// Kuhn poker: 3 cards, ante 1, one round, bet 1, one raise max.
 /// Known game value for the first player: -1/18.
+///
+/// # Panics
+/// Panics if the built-in toy specification produces an invalid tree.
 pub fn kuhn(pipeline: PayoffPipeline<'_>) -> ToyGame {
     let spec = ToyGameSpec {
         name: "kuhn",
@@ -399,6 +406,9 @@ pub fn kuhn(pipeline: PayoffPipeline<'_>) -> ToyGame {
 /// Leduc hold'em: 6 cards (3 ranks x 2 suits), ante 1, two rounds with bets
 /// 2 and 4 and at most two raises each, one community card before round 2.
 /// Known game value for the first player: about -0.0856.
+///
+/// # Panics
+/// Panics if the built-in toy specification produces an invalid tree.
 pub fn leduc(pipeline: PayoffPipeline<'_>) -> ToyGame {
     let rank = |card: usize| card / 2;
     let spec = ToyGameSpec {

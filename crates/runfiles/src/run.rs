@@ -146,6 +146,11 @@ pub struct RunManifest {
     /// Source run identifier for a daemon-created relock.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub relocked_from: Option<String>,
+    /// Durable daemon queue ordering and operation, present while queued.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub queue_sequence: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub queued_command: Option<String>,
     pub state: RunState,
     pub game_kind: String,
     /// The config's `schema` value, or `None` for a config family that does
@@ -179,6 +184,8 @@ impl RunManifest {
             schema_version: RUN_MANIFEST_VERSION,
             run_id: run_id.into(),
             relocked_from: None,
+            queue_sequence: None,
+            queued_command: None,
             state: RunState::Running,
             game_kind: game_kind.into(),
             config_schema,
@@ -296,6 +303,7 @@ pub enum RunEventPayload {
 pub struct RunEventLog {
     file: File,
     next_seq: u64,
+    failed: bool,
 }
 
 impl RunEventLog {
@@ -315,10 +323,16 @@ impl RunEventLog {
         Ok(Self {
             file: open_jsonl_append(&path)?,
             next_seq,
+            failed: false,
         })
     }
 
     pub fn append(&mut self, level: RunEventLevel, payload: RunEventPayload) -> io::Result<()> {
+        if self.failed {
+            return Err(io::Error::other(
+                "run event log disabled after an earlier write failure",
+            ));
+        }
         let event = RunEvent {
             seq: self.next_seq,
             unix_ms: unix_millis(),
@@ -327,8 +341,15 @@ impl RunEventLog {
         };
         let mut line = serde_json::to_string(&event).map_err(io::Error::other)?;
         line.push('\n');
-        self.file.write_all(line.as_bytes())?;
-        self.file.flush()?;
+        if let Err(error) = self
+            .file
+            .write_all(line.as_bytes())
+            .and_then(|()| self.file.flush())
+        {
+            self.failed = true;
+            eprintln!("warning: run event log disabled after write failure: {error}");
+            return Err(error);
+        }
         self.next_seq = self.next_seq.saturating_add(1);
         Ok(())
     }
@@ -664,6 +685,26 @@ mod tests {
         current.finish(RunState::Completed, None);
         assert!(!current.is_stale());
         assert_eq!(current.observed_state(), RunState::Completed);
+    }
+
+    #[test]
+    fn failed_event_write_disables_later_appends() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = RunEventLog::path_in(directory.path());
+        let mut log = RunEventLog::create_or_append(directory.path()).unwrap();
+        log.state(RunState::Running).unwrap();
+        log.file = File::open(&path).unwrap();
+        assert!(log.state(RunState::Completed).is_err());
+        log.file = OpenOptions::new().append(true).open(&path).unwrap();
+        assert!(log.state(RunState::Failed).is_err());
+        let (events, _) = read_events(&path, 0).unwrap();
+        assert_eq!(events.len(), 1);
+        assert_eq!(
+            events[0].payload,
+            RunEventPayload::State {
+                state: RunState::Running
+            }
+        );
     }
 
     #[test]

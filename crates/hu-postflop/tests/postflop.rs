@@ -23,6 +23,36 @@ fn chip_ev() -> PayoffPipeline<'static> {
     }
 }
 
+#[test]
+fn tiny_compatible_mass_returns_input_error() {
+    let mut ip: Range = "AsKs,2c3d".parse().unwrap();
+    let tiny = nlh::combo_index("2c".parse().unwrap(), "3d".parse().unwrap());
+    ip.set_weight(tiny, 1e-20);
+    let config = PostflopConfig {
+        board: parse_cards("4c 5d 7h"),
+        ranges: PerPlayer::new("AsAh".parse().unwrap(), ip),
+        pot: Chips(4),
+        effective_stack: Chips(40),
+        streets: PerStreet {
+            flop: StreetTree::default(),
+            turn: StreetTree::default(),
+            river: StreetTree::default(),
+        },
+        min_bet: Chips(1),
+        chip_rounding: nlh::Rounding::Nearest,
+        scale: nlh::ChipScale::DEFAULT,
+        iso_merging: true,
+        track_node_info: false,
+        preflop_aggressor: None,
+        profile_suit_perms: None,
+    };
+    let error = hu_postflop::try_build_postflop_game(&config, chip_ev())
+        .err()
+        .expect("unresolvable compatible mass must be rejected");
+    assert_eq!(error, hu_postflop::TreeBuildError::NoCompatibleMass);
+    assert!(error.to_string().contains("OOP and IP hands"));
+}
+
 /// Readable common-rule fixtures for donk menus, per-level raises and all-in
 /// sizing. The helper is private to these behavior tests.
 #[derive(Clone, Debug)]

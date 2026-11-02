@@ -229,6 +229,7 @@ mod tests {
             masks: vec![],
             transitions: vec![],
         })
+        .unwrap()
     }
 
     fn check<S: Storage>() {

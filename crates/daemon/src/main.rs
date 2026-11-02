@@ -100,7 +100,7 @@ fn run() -> Result<()> {
         (Some(certificate), Some(key)) => Some(tls::Tls::load(certificate, key)?),
         _ => None,
     };
-    tls::check_exposure(&cli.bind, tls.is_some())?;
+    let addresses = tls::checked_addresses(&cli.bind, tls.is_some())?;
     let ui = ui_dir
         .as_deref()
         .map(static_ui::StaticUi::new)
@@ -114,7 +114,7 @@ fn run() -> Result<()> {
             .unwrap_or_else(generate_token),
         ui,
     }
-    .serve(&cli.bind, tls, cli.open)
+    .serve(&addresses, tls, cli.open)
 }
 
 /// An explicit UI always wins; discovery is relative to the binary, not cwd.

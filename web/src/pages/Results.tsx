@@ -471,6 +471,7 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
               side={side}
               setSide={setSide}
               selectedClass={selectedClass}
+              detailSeat={tab === "range" ? rangeSeat : node.row.actor!}
               seatName={seatName}
               unit={meta?.utilityUnit ?? "BB"}
             />
@@ -736,13 +737,14 @@ function NodeGrid({
   );
 }
 
-function SidePanel({
+export function SidePanel({
   node,
   side,
   setSide,
   selectedClass,
   seatName,
   unit,
+  detailSeat,
 }: {
   node: NodeData;
   side: Side;
@@ -750,6 +752,7 @@ function SidePanel({
   selectedClass: string | null;
   seatName: (seat: Seat) => string;
   unit: string;
+  detailSeat: Seat;
 }) {
   const { row } = node;
   const colors = actionColors(row.actions);
@@ -760,6 +763,8 @@ function SidePanel({
   );
   const handRows = selectedClass ? actorRows.filter((r) => classOf(r.combo) === selectedClass) : [];
   const evByCombo = new Map(node.ev!.filter((v) => v.seat === row.actor).map((v) => [v.combo, v.ev]));
+  const selectedValues = node.ev!.filter((v) => v.seat === detailSeat && selectedClass !== null && classOf(v.combo) === selectedClass);
+  const nonActor = detailSeat !== row.actor;
   const classWeight = handRows.reduce((sum, r) => sum + r.weight, 0);
   const classMix = row.actions.map((_, a) =>
     classWeight > 0 ? handRows.reduce((sum, r) => sum + r.weight * (r.probabilities[a] ?? 0), 0) / classWeight : 0,
@@ -834,14 +839,30 @@ function SidePanel({
             </div>
           </>
         ) : selectedClass === null ? (
-          <EmptyState size="sm" icon="pointer" title="Select a class in the grid to view strategy by combo" />
+          <EmptyState size="sm" icon="pointer" title="Select a class in the grid to view combo details" />
         ) : (
           <>
             <div className="row" style={{ alignItems: "baseline", gap: 12 }}>
               <h2 className="mono class-title">{selectedClass}</h2>
-              <span className="muted">{classWeight.toFixed(2)} combos</span>
+              <span className="muted">{(nonActor ? selectedValues.reduce((sum, v) => sum + v.weight, 0) : classWeight).toFixed(2)} combos</span>
             </div>
-            {handRows.length === 0 ? (
+            {nonActor ? (
+              selectedValues.length === 0 ? <EmptyState size="sm" icon="cards" title="No combos reach this node" /> : (
+                <div className="data-list">
+                  <div className="data-head"><span className="grow">Combo · reach weight</span><span>EV</span></div>
+                  {selectedValues.map((value) => (
+                    <div key={value.combo} className="data-row row" style={{ gap: 10 }}>
+                      <span className="row grow" style={{ gap: 2 }}>
+                        <PlayingCard card={value.combo.slice(0, 2)} small />
+                        <PlayingCard card={value.combo.slice(2, 4)} small />
+                        <span className="mono meta muted">w {value.weight.toFixed(3)}</span>
+                      </span>
+                      <span className="mono num">{value.ev.toFixed(2)}</span>
+                    </div>
+                  ))}
+                </div>
+              )
+            ) : handRows.length === 0 ? (
               <EmptyState size="sm" icon="cards" title="No combos reach this node" />
             ) : (
               <>

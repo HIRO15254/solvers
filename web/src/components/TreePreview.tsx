@@ -32,6 +32,7 @@ interface Dealing {
   from: number;
   via: string[];
   cards: string[];
+  branch: string;
   row: PreviewTreeRow;
 }
 
@@ -60,8 +61,8 @@ function items(tree: HTMLElement): HTMLElement[] {
  * `restOfStreet`): one street at a time as an outline of every decision on
  * it, each action sized as the script's literals read it. An action that
  * closes the street deals the next card; the streets walked stay as tabs
- * above. After an edit the same streets are read again, and the first street
- * alone when the new tree lacks one.
+ * above. Editing the document or chip scale starts the walk again from the
+ * first street.
  */
 export function TreeCard({
   toml,
@@ -88,6 +89,10 @@ export function TreeCard({
   const [focused, setFocused] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [dealError, setDealError] = useState<{ chance: string; message: string } | null>(null);
+  const [dealLoading, setDealLoading] = useState(false);
+  const dealSequence = useRef(0);
+  const config = useRef({ toml, bbChips });
   const sequence = useRef(0);
   const treeRef = useRef<HTMLDivElement>(null);
   const roots = streets.map((street) => street.root);
@@ -95,6 +100,20 @@ export function TreeCard({
   const stacks = useMemo(() => rootStacks(start), [start]);
 
   useEffect(() => {
+    const changed = config.current.toml !== toml || config.current.bbChips !== bbChips;
+    config.current = { toml, bbChips };
+    dealSequence.current += 1;
+    setDealLoading(false);
+    setDealing(null);
+    setDealError(null);
+    if (changed && roots.length > 1) {
+      setLoading(false);
+      setStreets([{ root: "", cards: [], via: [] }]);
+      setRows((all) => all?.slice(0, 1) ?? null);
+      setViewing(0);
+      setFocused(null);
+      return;
+    }
     if (!ready) {
       setLoading(false);
       return;
@@ -125,10 +144,11 @@ export function TreeCard({
     }, 300);
     return () => {
       clearTimeout(timer);
+      dealSequence.current += 1;
       sequence.current += 1;
     };
     // `roots` is read through `rootsKey`.
-  }, [toml, ready, rootsKey]);
+  }, [toml, ready, rootsKey, bbChips]);
 
   const seat = (actor: Seat | null) =>
     actor === null ? "" : roles ? `${roles[actor]} (${actor.toUpperCase()})` : actor.toUpperCase();
@@ -147,15 +167,17 @@ export function TreeCard({
     if (!value) setFocused(null);
   };
 
-  const deal = async (from: number, chance: string, via: string[], cards: string[]) => {
-    setLoading(true);
+  const deal = async (from: number, chance: string, via: string[], cards: string[], branch = chance) => {
+    const id = ++dealSequence.current;
+    setDealLoading(true);
+    setDealError(null);
     try {
       const [row] = await api.tree(toml, [chance]);
-      if (row) setDealing({ from, via, cards, row });
+      if (id === dealSequence.current && row) setDealing({ from, via, cards, row, branch });
     } catch (e) {
-      setError((e as Error).message);
+      if (id === dealSequence.current) setDealError({ chance: branch, message: (e as Error).message });
     } finally {
-      setLoading(false);
+      if (id === dealSequence.current) setDealLoading(false);
     }
   };
 
@@ -165,9 +187,12 @@ export function TreeCard({
     const cards = [...dealing.cards, dealing.row.actions[index] ?? child];
     if (dealing.row.child_kinds[index] === "chance") {
       // An all-in runout: the next card comes straight away.
-      void deal(dealing.from, child, dealing.via, cards);
+      void deal(dealing.from, child, dealing.via, cards, dealing.branch);
       return;
     }
+    dealSequence.current += 1;
+    setDealLoading(false);
+    setDealError(null);
     setStreets([...streets.slice(0, dealing.from + 1), { root: child, cards, via: dealing.via }]);
     if (streets.length !== dealing.from + 2 || streets[dealing.from + 1]?.root !== child) {
       setRows((all) => all?.slice(0, dealing.from + 1) ?? null);
@@ -296,6 +321,9 @@ export function TreeCard({
                   {where === "showdown" && "Showdown"}
                 </span>
               </div>
+              {dealError?.chance === child && (
+                <Notice variant="destructive" title="Cannot deal card" description={dealError.message} />
+              )}
               {next && expanded && group(next, depth + 1)}
             </div>
           );
@@ -314,7 +342,7 @@ export function TreeCard({
         <CardTitle>Tree</CardTitle>
         <CardAction>
           <div className="row" style={{ gap: 2 }}>
-            {loading && <Icon name="loader-2" className="spin muted" />}
+            {(loading || dealLoading) && <Icon name="loader-2" className="spin muted" />}
             {ready && first?.kind === "action" && (
               <>
                 <IconButton icon="chevrons-down" label="Expand all" size="sm" onClick={() => setAll(true)} />
@@ -345,6 +373,9 @@ export function TreeCard({
                     title={step.via.length ? `After ${step.via.join(", ")}` : undefined}
                     disabled={index >= rows.length}
                     onClick={() => {
+                      dealSequence.current += 1;
+                      setDealLoading(false);
+                      setDealError(null);
                       setViewing(index);
                       setDealing(null);
                       setFocused(null);
@@ -391,7 +422,12 @@ export function TreeCard({
                     after <span className="mono">{dealing.via.join(" · ")}</span>
                     {dealing.cards.length > 0 && ` · ${dealing.cards.join(" ")}`}
                   </span>
-                  <Button size="sm" variant="ghost" onClick={() => setDealing(null)}>
+                  <Button size="sm" variant="ghost" onClick={() => {
+                    dealSequence.current += 1;
+                    setDealLoading(false);
+                    setDealError(null);
+                    setDealing(null);
+                  }}>
                     Cancel
                   </Button>
                 </div>

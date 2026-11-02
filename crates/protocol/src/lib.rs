@@ -263,6 +263,10 @@ pub enum ErrorCode {
     /// The run exists but has not produced what was asked for -- a
     /// solution view of a run that has not finished, say.
     Unavailable,
+    /// The JSON request body exceeded the server limit.
+    PayloadTooLarge,
+    /// The daemon has reached its concurrent request limit.
+    ServerBusy,
     /// The daemon failed at something that was not the client's fault.
     Internal,
 }
@@ -285,6 +289,8 @@ impl ErrorResponse {
             | ErrorCode::ConfigNotSelfContained => 400,
             ErrorCode::Conflict => 409,
             ErrorCode::Unavailable => 409,
+            ErrorCode::PayloadTooLarge => 413,
+            ErrorCode::ServerBusy => 503,
             ErrorCode::Internal => 500,
         }
     }
@@ -361,9 +367,27 @@ mod tests {
             (ErrorCode::ConfigNotSelfContained, 400),
             (ErrorCode::Conflict, 409),
             (ErrorCode::Unavailable, 409),
+            (ErrorCode::PayloadTooLarge, 413),
+            (ErrorCode::ServerBusy, 503),
             (ErrorCode::Internal, 500),
         ] {
             assert_eq!(ErrorResponse::new(code, "x").http_status(), status);
+        }
+    }
+
+    #[test]
+    fn resource_limit_errors_have_stable_wire_codes() {
+        for (code, wire) in [
+            (ErrorCode::PayloadTooLarge, "payload-too-large"),
+            (ErrorCode::ServerBusy, "server-busy"),
+        ] {
+            let error = ErrorResponse::new(code, "limit");
+            let json = serde_json::to_value(&error).unwrap();
+            assert_eq!(json["code"], wire);
+            assert_eq!(
+                serde_json::from_value::<ErrorResponse>(json).unwrap(),
+                error
+            );
         }
     }
 

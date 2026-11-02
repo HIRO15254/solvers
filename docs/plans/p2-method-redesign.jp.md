@@ -97,8 +97,8 @@ range weightの積に比例し、heroと各相手のcardが重ならないこと
 | B6 | 2人20bb。Preflopはlimp・open・all-in、Postflopは各streetでbet 50%かall-in（1回まで） | L1の正しさと収束（S4-2a） |
 | B7 | B3のPostflop menuを有効にしたもの（checkdownの規則を除く） | 6maxのL1（S4-2b）、L0のmodeとB3の一致 |
 
-B1・B2・B4〜B7の入力は、使う段階で`examples/bench/`に追加する。S4-2bでは、B4 Simpleの元の木
-（`examples/bench/6max_100bb_nl50_partial_simple_reference.toml`、Postflopあり）も使う。
+B4のGTO Wizard由来の入力はlocal-onlyであり配布しない（`packaging/gtow-local-only.json`）。
+S4-2bで過去に用いたB4 SimpleのPostflopありの木も同様である。
 
 ## 5. 段階と完了条件
 

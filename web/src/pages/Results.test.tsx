@@ -2,7 +2,7 @@ import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type { ProfileReport } from "../api/types";
-import { PotAmount, ProfileDetails } from "./Results";
+import { PotAmount, ProfileDetails, SidePanel } from "./Results";
 
 // The production Cryst bundle requires a browser; these tests exercise the
 // profile text and selection rather than the design system's rendering.
@@ -25,6 +25,32 @@ describe("pot amounts", () => {
     expect(renderToStaticMarkup(<PotAmount value={1.23456789} bbChips={1000} />)).toBe("1.234568 BB");
     expect(renderToStaticMarkup(<PotAmount value={2.5} bbChips={4} />)).toBe("2.5 BB");
   });
+});
+
+it("shows the selected non-acting seat's reach and EV without the actor's strategy", () => {
+  const node = {
+    row: { history: "", kind: "action" as const, street: "flop", actor: "oop" as const, pot: 10,
+      actions: ["check"], children: ["x"], child_kinds: ["action" as const], stored: true },
+    strategy: [{ history: "", actor: "oop" as const, combo: "AsAh", weight: 0.25, probabilities: [1] }],
+    ev: [
+      { history: "", seat: "oop" as const, combo: "AsAh", weight: 0.25, ev: 7 },
+      { history: "", seat: "ip" as const, combo: "AdAc", weight: 0.75, ev: -3 },
+    ],
+  };
+  const render = (detailSeat: "oop" | "ip") => renderToStaticMarkup(
+    <SidePanel node={node} side="hands" setSide={() => {}} selectedClass="AA"
+      detailSeat={detailSeat} seatName={(seat) => seat} unit="BB" />,
+  ).replaceAll("<!-- -->", "");
+  const opponent = render("ip");
+  expect(opponent).toContain("0.75 combos");
+  expect(opponent).toContain("w 0.750");
+  expect(opponent).toContain("-3.00");
+  expect(opponent).not.toContain("7.00");
+  expect(opponent).not.toContain("Strategy");
+  const actor = render("oop");
+  expect(actor).toContain("0.25 combos");
+  expect(actor).toContain("7.00");
+  expect(actor).toContain("Strategy");
 });
 
 const profile: ProfileReport = {

@@ -476,54 +476,82 @@ pub(crate) fn parse_condition<V: Vars>(
     pos: &mut usize,
     dialect: &Dialect<V>,
 ) -> Result<Condition<V>, ScriptError> {
-    parse_or(tokens, pos, dialect)
+    parse_or(tokens, pos, dialect, 0).map(|(condition, _)| condition)
+}
+
+const MAX_CONDITION_DEPTH: usize = 64;
+
+fn depth_error(tokens: &[Token], pos: usize) -> ScriptError {
+    ScriptError {
+        line: line_at(tokens, pos),
+        message: format!("condition depth exceeds {MAX_CONDITION_DEPTH}"),
+    }
 }
 
 fn parse_or<V: Vars>(
     tokens: &[Token],
     pos: &mut usize,
     dialect: &Dialect<V>,
-) -> Result<Condition<V>, ScriptError> {
-    let mut left = parse_and(tokens, pos, dialect)?;
+    nesting: usize,
+) -> Result<(Condition<V>, usize), ScriptError> {
+    let (mut left, mut depth) = parse_and(tokens, pos, dialect, nesting)?;
     while is_punct(tokens, *pos, "||") {
+        let operator_pos = *pos;
         *pos += 1;
-        let right = parse_and(tokens, pos, dialect)?;
+        let (right, right_depth) = parse_and(tokens, pos, dialect, nesting)?;
+        depth = depth.max(right_depth) + 1;
+        if nesting + depth > MAX_CONDITION_DEPTH {
+            return Err(depth_error(tokens, operator_pos));
+        }
         left = Condition::Or(Box::new(left), Box::new(right));
     }
-    Ok(left)
+    Ok((left, depth))
 }
 
 fn parse_and<V: Vars>(
     tokens: &[Token],
     pos: &mut usize,
     dialect: &Dialect<V>,
-) -> Result<Condition<V>, ScriptError> {
-    let mut left = parse_unary(tokens, pos, dialect)?;
+    nesting: usize,
+) -> Result<(Condition<V>, usize), ScriptError> {
+    let (mut left, mut depth) = parse_unary(tokens, pos, dialect, nesting)?;
     while is_punct(tokens, *pos, "&&") {
+        let operator_pos = *pos;
         *pos += 1;
-        let right = parse_unary(tokens, pos, dialect)?;
+        let (right, right_depth) = parse_unary(tokens, pos, dialect, nesting)?;
+        depth = depth.max(right_depth) + 1;
+        if nesting + depth > MAX_CONDITION_DEPTH {
+            return Err(depth_error(tokens, operator_pos));
+        }
         left = Condition::And(Box::new(left), Box::new(right));
     }
-    Ok(left)
+    Ok((left, depth))
 }
 
 fn parse_unary<V: Vars>(
     tokens: &[Token],
     pos: &mut usize,
     dialect: &Dialect<V>,
-) -> Result<Condition<V>, ScriptError> {
+    nesting: usize,
+) -> Result<(Condition<V>, usize), ScriptError> {
     if is_punct(tokens, *pos, "!") {
+        if nesting >= MAX_CONDITION_DEPTH {
+            return Err(depth_error(tokens, *pos));
+        }
         *pos += 1;
-        let inner = parse_unary(tokens, pos, dialect)?;
-        return Ok(Condition::Not(Box::new(inner)));
+        let (inner, depth) = parse_unary(tokens, pos, dialect, nesting + 1)?;
+        return Ok((Condition::Not(Box::new(inner)), depth + 1));
     }
     if is_punct(tokens, *pos, "(") {
+        if nesting >= MAX_CONDITION_DEPTH {
+            return Err(depth_error(tokens, *pos));
+        }
         *pos += 1;
-        let inner = parse_or(tokens, pos, dialect)?;
+        let (inner, depth) = parse_or(tokens, pos, dialect, nesting + 1)?;
         expect_punct(tokens, pos, ")")?;
-        return Ok(inner);
+        return Ok((inner, depth + 1));
     }
-    parse_predicate(tokens, pos, dialect)
+    parse_predicate(tokens, pos, dialect).map(|condition| (condition, 0))
 }
 
 fn parse_predicate<V: Vars>(
@@ -545,11 +573,11 @@ fn parse_predicate<V: Vars>(
 
     if is_word(tokens, *pos, "in") {
         *pos += 1;
-        return parse_membership(tokens, pos, var, line);
+        return parse_membership(tokens, pos, var, line, dialect);
     }
     if let Some(op) = peek_cmp_op(tokens, *pos) {
         *pos += 1;
-        let (value_line, literal) = parse_literal(tokens, pos)?;
+        let (value_line, literal) = parse_literal(tokens, pos, var, dialect)?;
         check_compare_types(var, op, &literal, line, value_line)?;
         return Ok(Condition::Compare {
             var,
@@ -578,6 +606,7 @@ fn parse_membership<V: Vars>(
     pos: &mut usize,
     var: V,
     var_line: usize,
+    dialect: &Dialect<V>,
 ) -> Result<Condition<V>, ScriptError> {
     if var.kind() == VarKind::Bool {
         return Err(ScriptError {
@@ -589,7 +618,7 @@ fn parse_membership<V: Vars>(
     let mut values = Vec::new();
     if !is_punct(tokens, *pos, "]") {
         loop {
-            let (value_line, literal) = parse_literal(tokens, pos)?;
+            let (value_line, literal) = parse_literal(tokens, pos, var, dialect)?;
             check_member_type(var, &literal, value_line)?;
             values.push(literal);
             if is_punct(tokens, *pos, ",") {
@@ -618,7 +647,12 @@ fn peek_cmp_op(tokens: &[Token], pos: usize) -> Option<CmpOp> {
 /// Parses one literal: a quoted string, `true` / `false`, a number, or --
 /// matching multiway -- a bare word that is none of those, which is a text
 /// literal (`high_card == A` works the same as `high_card == "A"`).
-fn parse_literal(tokens: &[Token], pos: &mut usize) -> Result<(usize, Literal), ScriptError> {
+fn parse_literal<V: Vars>(
+    tokens: &[Token],
+    pos: &mut usize,
+    var: V,
+    dialect: &Dialect<V>,
+) -> Result<(usize, Literal), ScriptError> {
     let line = line_at(tokens, *pos);
     match tokens.get(*pos).map(|t| &t.kind) {
         Some(TokenKind::Str(text)) => {
@@ -627,10 +661,20 @@ fn parse_literal(tokens: &[Token], pos: &mut usize) -> Result<(usize, Literal), 
             Ok((line, literal))
         }
         Some(TokenKind::Word(word)) => {
+            if dialect.vars.iter().any(|v| v.name() == word) {
+                return Err(ScriptError {
+                    line,
+                    message: format!("right side must be a literal, not variable {word:?}"),
+                });
+            }
             let literal = if word == "true" {
                 Literal::Bool(true)
             } else if word == "false" {
                 Literal::Bool(false)
+            } else if matches!(var.name(), "high_card" | "low_card")
+                && matches!(word.as_str(), "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9")
+            {
+                Literal::Text(word.clone())
             } else if let Ok(number) = word.parse::<f64>() {
                 if !number.is_finite() {
                     return Err(ScriptError {
@@ -858,6 +902,46 @@ mod tests {
             previous_aggressor: PreviousAggressor::None,
             board: BoardFacts::default(),
         }
+    }
+
+    #[test]
+    fn variable_names_on_right_require_quoting() {
+        for source in ["high_card == low_card", "high_card in [A, low_card]"] {
+            let error = parse(source).unwrap_err();
+            assert!(error.message.contains("low_card"));
+            assert!(error.message.contains("literal"));
+        }
+        assert!(parse("high_card == \"low_card\"").is_ok());
+    }
+
+    #[test]
+    fn numeric_rank_literals_compare_and_match_membership() {
+        let mut context = ctx();
+        context.board = BoardFacts::new(&[
+            "Ah".parse().unwrap(),
+            "Kd".parse().unwrap(),
+            "2c".parse().unwrap(),
+        ]);
+        assert!(parse("low_card == 2").unwrap().eval(&context));
+        assert!(parse("low_card in [3, 2]").unwrap().eval(&context));
+        assert!(!parse("low_card == 3").unwrap().eval(&context));
+        assert!(parse("position == 2").is_err());
+    }
+
+    #[test]
+    fn condition_depth_is_bounded_with_line_numbers() {
+        for source in [
+            format!("\n{}unopened{}", "(".repeat(65), ")".repeat(65)),
+            format!("\n{}unopened", "!".repeat(65)),
+            format!("\n{}", ["unopened"; 66].join(" && ")),
+            format!("\n{}", ["unopened"; 66].join(" || ")),
+        ] {
+            let error = parse(&source).unwrap_err();
+            assert_eq!(error.line, 2);
+            assert!(error.message.contains("depth"), "{}", error.message);
+        }
+        assert!(parse(&format!("{}unopened", "!".repeat(64))).is_ok());
+        assert!(parse(&["unopened"; 65].join(" && ")).is_ok());
     }
 
     #[test]

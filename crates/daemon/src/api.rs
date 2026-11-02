@@ -89,15 +89,15 @@ impl Api {
     pub fn validate(&self, request: &ValidateRequest) -> ApiResult<ValidateResponse> {
         let mut response = self.validate_config(request)?;
         if request.freeze_base_run_id.is_some() {
-            let mut config: toml::Value =
+            let mut config: toml_edit::DocumentMut =
                 response.effective_config_toml.parse().map_err(internal)?;
             if let Some(profile) = config
                 .get_mut("profile")
-                .and_then(toml::Value::as_table_mut)
+                .and_then(toml_edit::Item::as_table_mut)
             {
                 profile.remove("freeze_upstream");
             }
-            response.effective_config_toml = toml::to_string(&config).map_err(internal)?;
+            response.effective_config_toml = config.to_string();
         }
         Ok(response)
     }
@@ -343,7 +343,10 @@ impl Api {
                     ErrorResponse::new(ErrorCode::Conflict, error.to_string())
                 }
             })?;
-        std::fs::write(directory.join(runfiles::RUN_CONFIG_FILE), config).map_err(internal)?;
+        if let Err(error) = std::fs::write(directory.join(runfiles::RUN_CONFIG_FILE), config) {
+            let _ = std::fs::remove_dir_all(&directory);
+            return Err(internal(error));
+        }
 
         let run_id = directory
             .file_name()
@@ -362,20 +365,21 @@ impl Api {
         manifest.state = RunState::Queued;
         manifest.relocked_from = relocked_from.map(str::to_owned);
         manifest.started_unix_ms = None;
-        manifest.write_atomic(&directory).map_err(internal)?;
+        if let Err(error) = manifest.write_atomic(&directory) {
+            let _ = std::fs::remove_dir_all(&directory);
+            return Err(internal(error));
+        }
 
         let started = self
             .jobs
             .submit(&run_id, &directory, JobCommand::Solve)
             .map_err(internal)?;
-        Ok(CreateRunResponse {
-            run_id,
-            state: if started {
-                RunState::Running
-            } else {
-                RunState::Queued
-            },
-        })
+        let state = if started {
+            RunState::Running
+        } else {
+            self.run(&run_id)?.state
+        };
+        Ok(CreateRunResponse { run_id, state })
     }
 
     /// A page of a run's event log, starting at `from` bytes.
@@ -439,13 +443,13 @@ impl Api {
         let started = self
             .jobs
             .submit(run_id, &directory, JobCommand::Resume)
-            .map_err(internal)?;
+            .map_err(|error| ErrorResponse::new(ErrorCode::Conflict, error.to_string()))?;
         Ok(CreateRunResponse {
             run_id: run_id.to_string(),
             state: if started {
                 RunState::Running
             } else {
-                RunState::Queued
+                self.run(run_id)?.state
             },
         })
     }
@@ -581,45 +585,44 @@ impl Api {
         Ok(directory)
     }
 
-    /// Picks up the runs a previous daemon left behind.
-    ///
-    /// Runs that were waiting for a slot are resubmitted: their directories
-    /// are the only record that they were accepted, and a restart that
-    /// dropped them would make "the daemon keeps no state" a lie rather
-    /// than a design (R2, R11).
-    ///
-    /// Runs the previous daemon was *executing* are left alone. A still-live
-    /// child continues; a dead owner is observed as `interrupted`. Continuing
-    /// an interrupted run from its checkpoint requires an explicit request.
+    /// Restores live children before rebuilding the persisted FIFO queue.
     pub fn recover(&self) -> Recovered {
         let mut recovered = Recovered::default();
         let Ok(runs) = self.runs.list() else {
             return recovered;
         };
+        let mut queued = Vec::new();
         for run in runs {
+            let Ok(directory) = self.runs.directory(&run.run_id) else {
+                continue;
+            };
+            let Ok(manifest) = RunManifest::read(&directory) else {
+                continue;
+            };
             match run.state {
-                RunState::Queued => {
-                    let Ok(directory) = self.runs.directory(&run.run_id) else {
-                        continue;
-                    };
-                    if self
-                        .jobs
-                        .submit(&run.run_id, &directory, JobCommand::Solve)
-                        .is_ok()
-                    {
-                        recovered.requeued.push(run.run_id);
-                    }
-                }
+                RunState::Queued => queued.push((run.run_id, directory, manifest)),
+                RunState::Running => self.jobs.restore(&run.run_id, &directory, &manifest),
                 RunState::Interrupted => recovered.interrupted.push(run.run_id),
                 _ => {}
             }
         }
+        queued.sort_by(|a, b| {
+            a.2.queue_sequence
+                .unwrap_or(a.2.created_unix_ms)
+                .cmp(&b.2.queue_sequence.unwrap_or(b.2.created_unix_ms))
+                .then_with(|| a.0.cmp(&b.0))
+        });
+        for (run_id, directory, manifest) in queued {
+            self.jobs.restore(&run_id, &directory, &manifest);
+            recovered.requeued.push(run_id);
+        }
+        self.pump();
         recovered
     }
 
     /// Restarts anything the finished jobs made room for.
     pub fn pump(&self) {
-        let _ = self.jobs.pump();
+        self.jobs.pump();
     }
 }
 

@@ -136,6 +136,7 @@ client は source を解決した effective config を送る。`POST /v1/validat
 例外は`POST /v1/runs/{id}/relock`と、`POST /v1/validate`・`POST /v1/runs`の
 `freezeBaseRunId`である。daemon管理下の停止済みP1 runの`solution.sol`のみを上流固定に使い、
 daemonがpathとSHA-256を解決する。clientが任意pathを指定することはできない。
+validateの応答ではhost pathを含む`freeze_upstream`を除き、それ以外の実効configの節・keyの順序を維持する。
 relockのprofile mergeは`solvers relock --print-config`、solveは通常のjobへ委譲する。
 新runのmanifestと一覧・詳細には元run IDを`relockedFrom`として記録する。
 
@@ -143,8 +144,8 @@ relockのprofile mergeは`solvers relock --print-config`、solveは通常のjob�
 
 job 受理時に `run.toml` と `queued` manifest を書く。起動時は queued run を再投入するが、
 interrupted run を自動 resume しない。queue中の cancel は manifest を atomic に `canceled` に
-更新してから dequeue し、再起動時も再投入しない。未開始なら checkpoint が無いため
-`resumable: false` であり、再計算には新規 run を投入する。
+更新してから dequeue し、再起動時も再投入しない。未開始の新規 run は checkpoint が無いため
+`resumable: false` である。待機中の resume を cancel した場合は元の checkpoint が残る。
 計算の再実行は明示要求を受けて行う。
 
 CLI の `create_or_adopt` は absent/empty directory と、引き取り可能な queued directory を受け付ける。
@@ -187,13 +188,16 @@ queued ──spawn──▶ running ──正常終了──▶ completed
    │                 ├── 失敗 ──────▶ failed
    │                 ├── cancel ────▶ canceled
    │                 └── pid 消滅 ──▶ interrupted
-   └── cancel ──▶ canceled
+   ├── 起動前失敗 ──▶ failed
+   └── cancel ──────▶ canceled
 ```
 
 `interrupted` は owning process が正常な終了状態を書けなかったことを reader が判断した状態。
 実行中の cancel は solver の協調停止を使い、checkpoint の存在と状態を確認して resumable を判断する。
 同じ実行中jobへのcancel再要求は最初の協調停止signalを重複送信しない。
 recording開始後の失敗は`run.json`の書込み失敗を含めてfailedとfailure textをmanifestへ記録する。
+daemonは空きslotを背景schedulerで処理する。queued solveとresumeの順序・commandはmanifestに保存し、再起動時に復元する。旧manifestにqueue情報がない場合は作成時刻とrun IDで順序を決める。再起動前の生存processもslotを占有し、記録したprocess groupへのcancelを受け付ける。起動失敗またはCLIがrunを引き取る前の終了はfailure textと終了時刻を記録して次のjobへ進む。起動中processの識別にはruns root直下の隠しmarkerも使う。
+process生成直後からmarker保存までにdaemonが停止すると、再起動時に重複起動する短い時間窓が残る。
 
 ### 5.3 manifest.json
 
@@ -218,8 +222,8 @@ statusの`eventsOffset`も最後の改行までの完全record境界を返す。
 
 `config new` / `validate` / `line` / `tree` が入力、`solve` / `resume` / `relock` が計算、
 `status` / `watch` / `runs ls` が監視、`inspect` / `evaluate` / `export` / `compare` / `report` が閲覧・評価を担う。
-P1 compareは通常spot・seat別comboリスト・size込みaction labelのidentityも検証し、
-`--cross-game`で形状だけの対応付けを明示する。木/index共有は保存index checksumと復元support・root range・開始streetの一致時だけ行い、右index frameも検証する。
+P1 compareは木・保存node・seat別comboリスト・utility単位を常に検証し、
+`--cross-game`はspotとsize込みaction labelのidentity条件だけを外す。木/index共有は保存index checksumと復元support・root range・開始streetの一致時だけ行い、右index frameも検証する。
 `derive`はP2 runとPreflop line・Flop boardからP1の実効Inputを生成する。
 range計算は`mw_preflop::derive`、共通document組立ては`spot::derive`、
 P1検証は`hu_postflop::prepare`、入出力と表示はCLIにある。daemonにderive endpointは無い。
@@ -280,6 +284,11 @@ clientは`nash_conv / 2`でExploitabilityを表示できる。
 
 認証 token は明示 `--token`、`SOLVERSD_TOKEN`、新規乱数の順で選び、起動時に表示する。
 自動的に client の設定 directory へ保存する動作は持たない。TLS と bind の条件は R7 に従う。
+JSON本文の上限は64 MiBで、超過時はHTTP 413 `payload-too-large`を返す。
+同時処理は認証前も含め64 requestまでで、満杯時はHTTP 503 `server-busy`を返す。
+bind先は一度だけ名前解決し、全候補の公開条件を確認してからその候補のいずれかにbindする。
+同梱のtiny_http patchは未読本文をdrainせず本文付き接続を閉じ、socket読取の無通信timeoutを60秒にする（`third_party/tiny_http/PATCHES.md`）。接続数自体には上限がない。
+
 
 `solversd --ui DIR`はbuild済みSPAを静的配信する。`--ui`省略時は`current_exe`の隣の
 `ui/index.html`がfileとして存在すればその`ui/`を使う。明示`--ui DIR`が常に優先し、
@@ -288,6 +297,8 @@ UI配信時も`/v1`と`/v1/`配下の認証は必須で、それ以外のGET/HEA
 UI directory内のfileを配信する。`/`は`index.html`、
 存在しない拡張子なしpathはSPA fallback、拡張子ありpathは404となる。復号後の`..`・absolute・
 backslash・drive指定を拒否し、canonical pathがDIR外へ出るfileも配信しない。
+この検査とfile openは別操作なので、UI directoryは信頼できる配布物とし、
+信頼できない利用者がdirectoryやその内容を変更できないようにする。
 `index.html`には`Cache-Control: no-cache`を付ける。起動時は従来の3行の後に
 `gui: {scheme}://{host}:{port}/#token={token}`を表示する。fragmentのtokenはpercent-encodeする。UIが無い場合は全requestにtokenが必要である。
 `--open`はlistenと`gui:`表示後、そのtoken付きURLを既定browserへshellを介さず渡す。
@@ -320,6 +331,11 @@ Web GUI（React + TypeScript、Vite）はdaemon HTTPだけを使うclientであ�
 |Runs|`GET /v1/runs`、`/events`、`/artifacts`、`cancel`、`resume`|一覧の`lastProgress`と`progress.jsonl`から`nash_conv / 2`を描く。%pot換算はvalidate結果の開始pot、%prizes換算はconfigのpayout合計を使う。stop eventから終了stateまでを保存中として示す|
 |Results|`/solution/{summary,tree,decision}?node=`（未保存River節点は`&resolve=rivers`）、Exportは`/solution/strategy?format=csv`|`tree`の`children`で節点を辿り、chance nodeはlabelからcardを選ぶ。action nodeの頻度・戦略・EVは`decision`の1 requestで得る。13×13 gridはcombo行を到達weightで重み付けしたclass集計であり、戦略・EVの計算はしない|
 |Guide|なし|各画面の操作手順と、このGUIから撮ったscreenshot（`web/public/guide/*.png`、buildで`dist/guide/`へ写す）を並べる静的な頁|
+
+Setupのbet・raise入力欄の範囲はBBで示す。Rangeのgrid用parserはweightを直接f32に丸め、空白をRustと同じUnicode White_Spaceとして扱う。最終的な入力検証はdaemonが行う。
+SetupのTree previewは文書またはchip scaleの変更時に歩いたstreetを無効化し、最初のstreetから再取得する。card配布は最後の要求だけを反映し、失敗は該当branchに表示する。
+
+ResultsのRange詳細は選択席の`decision.ev`行を使い、手番でない席には戦略を表示しない。RunsのResults buttonは終了済みでsolutionがあるrunに限定する。
 
 P1のprofileはSetupでlock・incentive・frequencyを追加・編集・削除し、同じInput文書に保存する。
 hand selector、action label、confidenceや目標の妥当性はCLIの検証に委ねる。

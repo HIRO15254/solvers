@@ -340,7 +340,7 @@ pub fn bb(amount: u64, scale: nlh::ChipScale) -> String {
 }
 
 /// Translates a canonical displayed history into the builder's chip spelling.
-pub(crate) fn internal_history(history: &str, scale: nlh::ChipScale) -> String {
+pub(crate) fn internal_history(history: &str, scale: nlh::ChipScale) -> Result<String> {
     let mut chars = history.chars().peekable();
     let mut result = String::new();
     while let Some(c) = chars.next() {
@@ -354,22 +354,25 @@ pub(crate) fn internal_history(history: &str, scale: nlh::ChipScale) -> String {
             }
         } else if c == 'r' {
             let mut amount = String::new();
-            while chars
-                .peek()
-                .is_some_and(|c| c.is_ascii_digit() || *c == '.')
-            {
-                amount.push(chars.next().unwrap());
+            while let Some(&c) = chars.peek() {
+                if !c.is_ascii_digit() && c != '.' {
+                    break;
+                }
+                amount.push(c);
+                chars.next();
             }
             let amount = if !scale.is_decimal() && chars.peek() == Some(&'c') {
                 chars.next();
-                nlh::MwChips(amount.parse().expect("display chip amount"))
+                nlh::MwChips(amount.parse().context("invalid display chip amount")?)
             } else {
-                scale.parse_bb(&amount).expect("display history BB amount")
+                scale
+                    .parse_bb(&amount)
+                    .context("invalid display history BB amount")?
             };
             result.push_str(&amount.0.to_string());
         }
     }
-    result
+    Ok(result)
 }
 
 /// Compatibility identity excluding the operational run settings and descriptive metadata.
@@ -383,6 +386,18 @@ pub fn compatibility_hash(effective: &str) -> Result<[u8; 32]> {
         .and_then(toml_edit::Item::as_table_mut)
     {
         solver.remove("cfr_precision");
+    }
+    if document.contains_key("profile") {
+        // Version 0.2.0 serialized this final section through toml::Table,
+        // whose keys are sorted. Preserve those exact bytes for checkpoints.
+        let config: toml::Value = toml::from_str(effective)?;
+        let mut wrapper = toml::Table::new();
+        wrapper.insert("profile".into(), config["profile"].clone());
+        document.remove("profile");
+        let mut text = document.to_string();
+        text.push('\n');
+        text.push_str(&toml::to_string(&wrapper)?);
+        return Ok(runfiles::config_hash(text.as_bytes()));
     }
     Ok(runfiles::config_hash(document.to_string().as_bytes()))
 }
@@ -485,6 +500,16 @@ mod budget_tests {
     use super::*;
     use std::sync::atomic::AtomicBool;
     use std::time::Duration;
+
+    #[test]
+    fn malformed_display_raise_returns_error() {
+        for history in ["xr", "xr1..2c", "xr999999999999999999999999999c"] {
+            assert!(internal_history(history, nlh::ChipScale::DEFAULT).is_err());
+        }
+        let scale = nlh::ChipScale::new(6).unwrap();
+        assert!(internal_history("xr999999999999999999999999999c", scale).is_err());
+        assert_eq!(internal_history("xr12c[9d]", scale).unwrap(), "xr12[9d]");
+    }
 
     const CONFIG: &str = r#"
 schema = "solvers.nlh/v1"

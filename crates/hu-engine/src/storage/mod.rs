@@ -665,8 +665,29 @@ mod tests {
         assert!(scratch.is_empty());
         let mut tiny = [0; 2];
         let values = [f32::from_bits(1), -f32::from_bits(1)];
-        assert_eq!(quantize_block(&values, values[0], &mut tiny), 0.0);
-        assert_eq!(tiny, [i16::MAX, i16::MIN]);
+        let scale = quantize_block(&values, values[0], &mut tiny);
+        assert!(scale > 0.0 && f64::from(scale).recip().is_finite());
+        assert_eq!(tiny, [1, -1]);
+        assert_eq!(tiny.map(|value| value as f32 * scale), values);
+    }
+
+    #[test]
+    fn i16_legacy_zero_scale_dequantizes_to_zero() {
+        let r = make_ref(0, 2, 1, 0);
+        let mut values = [i16::MAX, i16::MIN];
+        let mut scale = 0.0;
+        let mut scratch = Vec::new();
+        update_regrets_i16_impl(
+            &mut values,
+            0,
+            r,
+            &[0.0, 0.0],
+            &discounts(),
+            &mut scale,
+            &mut scratch,
+        );
+        assert_eq!(values, [0, 0]);
+        assert_eq!(scale, 1.0);
     }
 
     #[test]

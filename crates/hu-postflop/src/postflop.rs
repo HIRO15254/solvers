@@ -1363,6 +1363,49 @@ fn node_actions(
     actions
 }
 
+/// Bounded summary of the action line that exceeded the tree depth limit.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct DepthLine {
+    steps: Vec<String>,
+    count: usize,
+}
+
+impl DepthLine {
+    fn prepend(&mut self, action: NodeAction, state: &LineState) {
+        let token = match action {
+            NodeAction::Fold => "f".into(),
+            NodeAction::Check => "x".into(),
+            NodeAction::Call => "c".into(),
+            NodeAction::Wager(additional) => {
+                format!(
+                    "r{}",
+                    state.contrib[state.to_act] + additional - state.street_start
+                )
+            }
+        };
+        self.count += 1;
+        if self.steps.len() == 8 {
+            self.steps.remove(4);
+        }
+        self.steps.push(token);
+    }
+}
+
+impl std::fmt::Display for DepthLine {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for (i, step) in self.steps.iter().rev().enumerate() {
+            if i > 0 {
+                write!(f, " / ")?;
+            }
+            if i == 4 && self.count > 8 {
+                write!(f, "… / ")?;
+            }
+            write!(f, "{step}")?;
+        }
+        write!(f, " ({} steps)", self.count)
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, thiserror::Error)]
 pub enum TreeBuildError {
     #[error("tree rules leave an empty action menu on {street:?} for {player:?}")]
@@ -1371,9 +1414,19 @@ pub enum TreeBuildError {
         "internal invariant: iso permutation maps {player:?} combo {combo} outside root support"
     )]
     SupportNotClosed { player: Player, combo: usize },
+    #[error("OOP and IP hands have no compatible combo mass at numeric precision")]
+    NoCompatibleMass,
+    #[error("tree compilation failed: {0}")]
+    Compile(hu_engine::ShapeError),
+    #[error(
+        "action line {line} on {street:?} exceeds the maximum tree depth of {}",
+        hu_engine::MAX_TREE_DEPTH
+    )]
+    DepthLimit { street: Street, line: DepthLine },
 }
 
-/// Builds a compiled game, rejecting any action menu emptied by tree rules.
+/// Builds a compiled game, returning errors for invalid trees or numerically
+/// unresolvable compatible range mass.
 pub fn try_build_postflop_game(
     config: &PostflopConfig,
     pipeline: PayoffPipeline<'_>,
@@ -1461,6 +1514,7 @@ type SharedRankTables = std::sync::Arc<
 struct Builder<'a> {
     hands: PostflopHands,
     error: Option<TreeBuildError>,
+    depth: usize,
     config: &'a PostflopConfig,
     pipeline: PayoffPipeline<'a>,
     /// Suit permutations preserving both ranges (see
@@ -1491,6 +1545,9 @@ struct Builder<'a> {
 }
 
 /// Builds a postflop subgame through the payoff pipeline.
+///
+/// Panics if construction fails. Use [`try_build_postflop_game`] for input
+/// that has not already been checked by the builder.
 pub fn build_postflop_game(config: &PostflopConfig, pipeline: PayoffPipeline<'_>) -> PostflopGame {
     build_checked(config, pipeline, true).expect("postflop builder invariants")
 }
@@ -1519,6 +1576,7 @@ fn build_checked(
     let mut builder = Builder {
         hands: PostflopHands::new(&config.board, &config.ranges),
         error: None,
+        depth: 0,
         config,
         pipeline,
         sym: game_preserving_perms(config),
@@ -1665,7 +1723,9 @@ fn build_checked(
                 * (all_total - all_card[h.cards[0] as usize] - all_card[h.cards[1] as usize] + r)
         })
         .sum();
-    assert!(normalizer > 0.0, "ranges share no compatible combos");
+    if normalizer <= 0.0 {
+        return Err(TreeBuildError::NoCompatibleMass);
+    }
 
     let tree = PublicTree::compile(TreeSpec {
         root,
@@ -1675,7 +1735,8 @@ fn build_checked(
             evaluator.hands.len(Player::P0) as u32,
             evaluator.hands.len(Player::P1) as u32,
         ),
-    });
+    })
+    .map_err(TreeBuildError::Compile)?;
 
     Ok(PostflopGame {
         game: CompiledGame {
@@ -1727,6 +1788,18 @@ impl Builder<'_> {
     }
 
     fn betting(&mut self, state: LineState, history: &str) -> TempNode {
+        if self.error.is_some() {
+            return TempNode::Terminal { id: 0, tag: 0 };
+        }
+        self.depth += 1;
+        if self.depth >= hu_engine::MAX_TREE_DEPTH {
+            self.error = Some(TreeBuildError::DepthLimit {
+                street: state.street,
+                line: DepthLine::default(),
+            });
+            self.depth -= 1;
+            return TempNode::Terminal { id: 0, tag: 0 };
+        }
         let actor = state.to_act;
         let mut actions: Vec<(String, TempNode)> = Vec::new();
         let menu = node_actions(&state, self.config, &mut self.hits);
@@ -1764,9 +1837,14 @@ impl Builder<'_> {
                 ChildStep::StreetEnd(next) => self.street_end(next, &child_history),
                 ChildStep::Betting(next) => self.betting(next, &child_history),
             };
+            if let Some(TreeBuildError::DepthLimit { line, .. }) = &mut self.error {
+                line.prepend(action, &state);
+                break;
+            }
             actions.push((label, child));
         }
 
+        self.depth -= 1;
         self.finish_action_node(actor, &state, history.to_owned(), actions)
     }
 
@@ -1812,6 +1890,15 @@ impl Builder<'_> {
     /// table, terminal, node tag) is assigned in the order a serial walk
     /// first meets it, so the result is identical to the serial build.
     fn deal_chance(&mut self, state: LineState, history: &str) -> TempNode {
+        self.depth += 1;
+        if self.depth >= hu_engine::MAX_TREE_DEPTH {
+            self.error = Some(TreeBuildError::DepthLimit {
+                street: state.street,
+                line: DepthLine::default(),
+            });
+            self.depth -= 1;
+            return TempNode::Terminal { id: 0, tag: 0 };
+        }
         debug_assert_eq!(
             state.contrib[Player::P0],
             state.contrib[Player::P1],
@@ -1839,6 +1926,7 @@ impl Builder<'_> {
                 .map(|group| self.deal(&state, group, history))
                 .collect()
         };
+        self.depth -= 1;
         TempNode::Chance { deals, tag: 0 }
     }
 
@@ -1884,6 +1972,7 @@ impl Builder<'_> {
         Builder {
             hands: self.hands.clone(),
             error: None,
+            depth: self.depth,
             config: self.config,
             pipeline: PayoffPipeline {
                 rake: self.pipeline.rake,
@@ -2900,6 +2989,14 @@ impl Counting<'_> {
         self.nodes += 1;
         self.action_nodes += 1;
         self.depth += 1;
+        if self.depth >= hu_engine::MAX_TREE_DEPTH as u64 {
+            self.error = Some(TreeBuildError::DepthLimit {
+                street: state.street,
+                line: DepthLine::default(),
+            });
+            self.depth -= 1;
+            return;
+        }
         self.max_depth = self.max_depth.max(self.depth);
 
         let actions = node_actions(&state, self.config, &mut self.hits);
@@ -2922,6 +3019,10 @@ impl Counting<'_> {
                 ChildStep::StreetEnd(next) => self.street_end(next),
                 ChildStep::Betting(next) => self.betting(next),
             }
+            if let Some(TreeBuildError::DepthLimit { line, .. }) = &mut self.error {
+                line.prepend(action, &state);
+                break;
+            }
         }
 
         let elements = num_actions * self.hands.len(state.to_act) as u64;
@@ -2938,6 +3039,14 @@ impl Counting<'_> {
     fn deal_chance(&mut self, state: LineState) {
         self.nodes += 1;
         self.depth += 1;
+        if self.depth >= hu_engine::MAX_TREE_DEPTH as u64 {
+            self.error = Some(TreeBuildError::DepthLimit {
+                street: state.street,
+                line: DepthLine::default(),
+            });
+            self.depth -= 1;
+            return;
+        }
         self.max_depth = self.max_depth.max(self.depth);
         let groups = chance_groups(&state.board, self.config.iso_merging, &self.sym);
         self.deals += groups.len() as u64;
@@ -3124,6 +3233,44 @@ impl Counting<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn deep_min_raise_line_is_rejected_by_count_and_build() {
+        use crate::game::{ChipEv, NoRake};
+        let script = nlh::script::Script::compile(
+            "river { add bet [min] add raise [min] }",
+            &Default::default(),
+            &spot::NLH_V1,
+        )
+        .unwrap();
+        let config = PostflopConfig {
+            board: cards("As Ks Qs 2c 3d"),
+            ranges: PerPlayer::new("AhAd".parse().unwrap(), "JcJd".parse().unwrap()),
+            pot: Chips(2),
+            effective_stack: Chips(2000),
+            streets: PerStreet {
+                river: crate::test_support::from_script(Street::River, &script.rules, 2000),
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+        let error = count_tree(&config, false).err().unwrap();
+        assert!(matches!(error, TreeBuildError::DepthLimit { .. }));
+        let message = error.to_string();
+        assert!(message.contains("…"));
+        assert!(message.contains("steps)"));
+        assert!(!message.contains("Wager"));
+        assert!(!message.contains(" /  ("));
+        assert!(message.len() < 500);
+        let pipeline = PayoffPipeline {
+            rake: &NoRake,
+            utility: &ChipEv,
+        };
+        assert!(matches!(
+            build_checked(&config, pipeline, false),
+            Err(TreeBuildError::DepthLimit { .. })
+        ));
+    }
 
     #[test]
     fn selector_count_excludes_runouts_blocking_selected_hands() {

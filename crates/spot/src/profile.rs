@@ -70,28 +70,14 @@ fn probability(v: &Value, path: &str) -> Result<f64, SpotError> {
     }
     Ok(n)
 }
-fn strategy(t: &Table, path: &str, confidence: f64) -> Result<Vec<(String, f64)>, SpotError> {
+fn strategy(t: &Table, path: &str) -> Result<Vec<(String, f64)>, SpotError> {
     let mut result = Vec::new();
-    let mut sum = 0.0;
     for (action, v) in t {
         if action.trim().is_empty() {
             return Err(value_error(path, "action must not be empty"));
         }
         let p = probability(v, &format!("{path}.{action}"))?;
-        sum += p;
         result.push((action.clone(), p));
-    }
-    if sum > 1.0 + 1e-9 {
-        return Err(value_error(
-            path,
-            "strategy probabilities must sum to at most 1",
-        ));
-    }
-    if confidence < 1.0 && (sum - 1.0).abs() > 1e-9 {
-        return Err(value_error(
-            path,
-            "confidence below 1 requires strategy probabilities to sum to 1",
-        ));
     }
     Ok(result)
 }
@@ -127,7 +113,6 @@ pub(crate) fn parse(t: &Table, config_path: &Path, embedded: bool) -> Result<Pro
             (Some(v), None) => LockStrategy::Uniform(strategy(
                 v.as_table().unwrap(),
                 &format!("{path}.strategy"),
-                confidence,
             )?),
             (None, Some(v)) => {
                 if hands != HandSelector::All {
@@ -156,7 +141,6 @@ pub(crate) fn parse(t: &Table, config_path: &Path, embedded: bool) -> Result<Pro
                         strategy(
                             actions.as_table().unwrap(),
                             &format!("{path}.combos.{combo}"),
-                            confidence,
                         )?,
                     ));
                 }
@@ -271,97 +255,94 @@ pub(crate) fn parse(t: &Table, config_path: &Path, embedded: bool) -> Result<Pro
     }
     Ok(profile)
 }
-fn map(actions: &[(String, f64)]) -> Value {
-    Value::Table(
-        actions
-            .iter()
-            .map(|(k, v)| (k.clone(), Value::Float(*v)))
-            .collect(),
-    )
+fn map(actions: &[(String, f64)]) -> toml_edit::InlineTable {
+    let mut table = toml_edit::InlineTable::new();
+    for (action, probability) in actions {
+        table.insert(action, toml_edit::Value::from(*probability));
+    }
+    table.fmt();
+    table
 }
-fn hand(t: &mut Table, h: &HandSelector) {
+
+fn hand(t: &mut toml_edit::Table, h: &HandSelector) {
     match h {
         HandSelector::All => (),
         HandSelector::Range(s) => {
-            t.insert("hands".into(), Value::String(s.clone()));
+            t.insert("hands", toml_edit::value(s.as_str()));
         }
         HandSelector::Category(s) => {
-            t.insert("category".into(), Value::String(s.clone()));
+            t.insert("category", toml_edit::value(s.as_str()));
         }
     }
 }
+
 pub(crate) fn normalize(p: &ProfileIr) -> String {
+    use toml_edit::{ArrayOfTables, DocumentMut, Item, Table, Value};
+
     let mut root = Table::new();
-    if let Some(f) = &p.freeze_upstream {
+    let mut locks = ArrayOfTables::new();
+    for lock in &p.locks {
         let mut t = Table::new();
-        t.insert("solution".into(), Value::String(f.solution.clone()));
-        if let Some(s) = &f.sha256 {
-            t.insert("sha256".into(), Value::String(s.clone()));
-        }
-        root.insert("freeze_upstream".into(), Value::Table(t));
-    }
-    let locks = p
-        .locks
-        .iter()
-        .map(|l| {
-            let mut t = Table::new();
-            t.insert("node".into(), Value::String(l.node.clone()));
-            hand(&mut t, &l.hands);
-            t.insert("confidence".into(), Value::Float(l.confidence));
-            match &l.strategy {
-                LockStrategy::Uniform(s) => {
-                    t.insert("strategy".into(), map(s));
-                }
-                LockStrategy::PerCombo(c) => {
-                    t.insert(
-                        "combos".into(),
-                        Value::Table(c.iter().map(|(k, v)| (k.clone(), map(v))).collect()),
-                    );
-                }
+        t.insert("node", toml_edit::value(lock.node.as_str()));
+        hand(&mut t, &lock.hands);
+        match &lock.strategy {
+            LockStrategy::Uniform(strategy) => {
+                t.insert("strategy", Item::Value(Value::InlineTable(map(strategy))));
             }
-            Value::Table(t)
-        })
-        .collect::<Vec<_>>();
+            LockStrategy::PerCombo(combos) => {
+                let mut values = toml_edit::InlineTable::new();
+                for (combo, strategy) in combos {
+                    values.insert(combo, Value::InlineTable(map(strategy)));
+                }
+                values.fmt();
+                t.insert("combos", Item::Value(Value::InlineTable(values)));
+            }
+        }
+        t.insert("confidence", toml_edit::value(lock.confidence));
+        locks.push(t);
+    }
     if !locks.is_empty() {
-        root.insert("lock".into(), Value::Array(locks));
+        root.insert("lock", Item::ArrayOfTables(locks));
     }
-    let incentives = p
-        .incentives
-        .iter()
-        .map(|v| {
-            let mut t = Table::new();
-            t.insert("node".into(), Value::String(v.node.clone()));
-            hand(&mut t, &v.hands);
-            t.insert("action".into(), Value::String(v.action.clone()));
-            let (k, n) = match v.amount {
-                IncentiveAmount::PotFraction(n) => ("pot", n),
-                IncentiveAmount::Bb(n) => ("bb", n),
-            };
-            t.insert(k.into(), Value::Float(n));
-            Value::Table(t)
-        })
-        .collect::<Vec<_>>();
+    let mut incentives = ArrayOfTables::new();
+    for incentive in &p.incentives {
+        let mut t = Table::new();
+        t.insert("node", toml_edit::value(incentive.node.as_str()));
+        hand(&mut t, &incentive.hands);
+        t.insert("action", toml_edit::value(incentive.action.as_str()));
+        let (key, amount) = match incentive.amount {
+            IncentiveAmount::PotFraction(n) => ("pot", n),
+            IncentiveAmount::Bb(n) => ("bb", n),
+        };
+        t.insert(key, toml_edit::value(amount));
+        incentives.push(t);
+    }
     if !incentives.is_empty() {
-        root.insert("incentive".into(), Value::Array(incentives));
+        root.insert("incentive", Item::ArrayOfTables(incentives));
     }
-    let frequencies = p
-        .frequencies
-        .iter()
-        .map(|v| {
-            let mut t = Table::new();
-            t.insert("node".into(), Value::String(v.node.clone()));
-            hand(&mut t, &v.hands);
-            t.insert("action".into(), Value::String(v.action.clone()));
-            t.insert("target".into(), Value::Float(v.target));
-            Value::Table(t)
-        })
-        .collect::<Vec<_>>();
+    let mut frequencies = ArrayOfTables::new();
+    for frequency in &p.frequencies {
+        let mut t = Table::new();
+        t.insert("node", toml_edit::value(frequency.node.as_str()));
+        hand(&mut t, &frequency.hands);
+        t.insert("action", toml_edit::value(frequency.action.as_str()));
+        t.insert("target", toml_edit::value(frequency.target));
+        frequencies.push(t);
+    }
     if !frequencies.is_empty() {
-        root.insert("frequency".into(), Value::Array(frequencies));
+        root.insert("frequency", Item::ArrayOfTables(frequencies));
     }
-    let mut wrapper = Table::new();
-    wrapper.insert("profile".into(), Value::Table(root));
-    toml::to_string(&wrapper).expect("profile contains valid TOML")
+    if let Some(freeze) = &p.freeze_upstream {
+        let mut t = Table::new();
+        t.insert("solution", toml_edit::value(freeze.solution.as_str()));
+        if let Some(hash) = &freeze.sha256 {
+            t.insert("sha256", toml_edit::value(hash.as_str()));
+        }
+        root.insert("freeze_upstream", Item::Table(t));
+    }
+    let mut document = DocumentMut::new();
+    document.insert("profile", Item::Table(root));
+    document.to_string()
 }
 
 #[cfg(test)]

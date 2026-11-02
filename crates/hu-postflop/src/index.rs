@@ -27,8 +27,8 @@ use std::collections::HashMap;
 use std::io::{self, Read, Write};
 
 use hu_engine::{
-    CompiledGame, Deal, NodeId, NodeKind, PublicTree, ReachMap, ShapeNode, SparseTransition,
-    TreeShape, parent_array,
+    CompiledGame, Deal, MAX_TREE_DEPTH, NodeId, NodeKind, PublicTree, ReachMap, ShapeNode,
+    SparseTransition, TreeShape, parent_array,
 };
 use nlh::{Card, PerPlayer, Player, Street};
 
@@ -665,11 +665,66 @@ pub(crate) fn write_index(
 /// Reads exactly `len` bytes without trusting `len` for the allocation.
 fn take(input: &mut dyn Read, len: u64) -> Result<Vec<u8>, SolError> {
     let mut bytes = Vec::new();
-    input.take(len).read_to_end(&mut bytes)?;
-    if bytes.len() as u64 != len {
-        return Err(SolError::Malformed("index stream is truncated"));
+    let mut remaining = len;
+    let mut buffer = [0u8; 64 * 1024];
+    while remaining != 0 {
+        let count = remaining.min(buffer.len() as u64) as usize;
+        input.read_exact(&mut buffer[..count]).map_err(truncated)?;
+        bytes
+            .try_reserve(count)
+            .map_err(|_| SolError::Malformed("index column cannot fit in memory"))?;
+        bytes.extend_from_slice(&buffer[..count]);
+        remaining -= count as u64;
     }
     Ok(bytes)
+}
+/// Validate the same sibling-first layout used by `PublicTree::from_shape`
+/// before that function recursively reconstructs it.
+fn validate_shape_depth(nodes: &[ShapeNode]) -> Result<(), SolError> {
+    if nodes.is_empty() {
+        return Err(SolError::Malformed("a tree needs a root"));
+    }
+    let mut cursor = 1usize;
+    let mut pending = vec![(0usize, 1usize)];
+    while let Some((slot, depth)) = pending.pop() {
+        if depth > MAX_TREE_DEPTH {
+            return Err(SolError::Malformed("index tree exceeds the depth limit"));
+        }
+        let count = usize::from(nodes[slot].num_children);
+        let end = cursor
+            .checked_add(count)
+            .filter(|&end| end <= nodes.len())
+            .ok_or(SolError::Malformed("index children run past the last node"))?;
+        for child in (cursor..end).rev() {
+            pending.push((child, depth + 1));
+        }
+        cursor = end;
+    }
+    if cursor != nodes.len() {
+        return Err(SolError::Malformed("index contains unreachable nodes"));
+    }
+    Ok(())
+}
+
+fn valid_label(label: &str, scale: nlh::ChipScale) -> bool {
+    if matches!(label, "check" | "fold" | "call") {
+        return true;
+    }
+    let Some(amount) = label
+        .strip_prefix("bet ")
+        .or_else(|| label.strip_prefix("raise to "))
+    else {
+        return false;
+    };
+    let chips = if scale.is_decimal() {
+        scale.parse_bb(amount).ok()
+    } else {
+        amount
+            .strip_suffix('c')
+            .and_then(|s| s.parse().ok())
+            .map(nlh::MwChips)
+    };
+    chips.is_some_and(|chips| scale.amount_text(chips) == amount)
 }
 
 fn words(bytes: &[u8]) -> impl Iterator<Item = u32> + '_ {
@@ -723,6 +778,11 @@ pub(crate) fn read_index(
             "index and metadata disagree on the node count",
         ));
     }
+    if node_count == 0 || node_count > u64::from(u32::MAX) {
+        return Err(SolError::Malformed(
+            "index node count exceeds the format limit",
+        ));
+    }
     let deal_count = read_u64(input)?;
     let deal_weight_bytes = deal_count
         .checked_mul(4)
@@ -730,6 +790,9 @@ pub(crate) fn read_index(
     let deal_map_bytes = deal_count
         .checked_mul(8)
         .ok_or(SolError::Malformed("index deal count is too large"))?;
+    if deal_count >= node_count {
+        return Err(SolError::Malformed("index has too many deals"));
+    }
     let mask_count = read_u32(input)?;
     let transition_count = read_u32(input)?;
     let label_count = read_u32(input)?;
@@ -740,9 +803,21 @@ pub(crate) fn read_index(
             "index root dimensions differ from the embedded config's ranges",
         ));
     }
+    if u64::from(label_count) >= node_count {
+        return Err(SolError::Malformed("index has too many labels"));
+    }
+    if u64::from(mask_count) > deal_count.saturating_mul(2)
+        || u64::from(transition_count) > deal_count.saturating_mul(2)
+    {
+        return Err(SolError::Malformed("index has too many reach maps"));
+    }
+    let max_hands = root_dims[Player::P0].max(root_dims[Player::P1]);
 
     let kinds = take(input, node_count)?;
-    let mut shape_nodes = Vec::with_capacity(kinds.len());
+    let mut shape_nodes = Vec::new();
+    shape_nodes
+        .try_reserve_exact(kinds.len())
+        .map_err(|_| SolError::Malformed("index tree cannot fit in memory"))?;
     let mut terminals = 0u64;
     for &kind in &kinds {
         let (kind, player) = match kind {
@@ -768,6 +843,7 @@ pub(crate) fn read_index(
     {
         node.num_children = u16::from_le_bytes(*counts.next().expect("sized above"));
     }
+    validate_shape_depth(&shape_nodes)?;
     let mut previous = 0u32;
     let terminal_ids = words(&take(input, terminals * 4)?)
         .map(|delta| {
@@ -796,6 +872,9 @@ pub(crate) fn read_index(
     let mut masks = Vec::new();
     for _ in 0..mask_count {
         let len = read_u32(input)?;
+        if len > max_hands {
+            return Err(SolError::Malformed("index mask exceeds the hand count"));
+        }
         masks.push(
             words(&take(input, u64::from(len) * 4)?)
                 .map(f32::from_bits)
@@ -812,6 +891,11 @@ pub(crate) fn read_index(
             ));
         }
         let len = read_u32(input)?;
+        if in_dim > max_hands || u64::from(len) > u64::from(max_hands) * 52 {
+            return Err(SolError::Malformed(
+                "index transition exceeds its size limit",
+            ));
+        }
         let bytes = take(input, u64::from(len) * 12)?;
         let entries = bytes
             .as_chunks::<12>()
@@ -831,8 +915,17 @@ pub(crate) fn read_index(
     let mut labels = Vec::new();
     for _ in 0..label_count {
         let len = read_u32(input)?;
+        // A label is a short prefix and a u64 chip amount or its exact BB spelling.
+        if len > 128 {
+            return Err(SolError::Malformed("index action label is too long"));
+        }
         let label = String::from_utf8(take(input, u64::from(len))?)
             .map_err(|_| SolError::Malformed("index label is not UTF-8"))?;
+        if !valid_label(&label, config.scale) {
+            return Err(SolError::Malformed(
+                "index contains an invalid action label",
+            ));
+        }
         labels.push(label);
     }
 
@@ -945,13 +1038,90 @@ memory = "1GiB"
 "#;
 
     #[test]
+    fn rejects_excessive_tree_depth() {
+        let p = crate::prepare::prepare(TURN, std::path::Path::new("test.toml")).unwrap();
+        let hands = PostflopHands::new(&p.config.board, &p.config.ranges);
+        let count = (MAX_TREE_DEPTH + 1) as u64;
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(&count.to_le_bytes());
+        bytes.extend_from_slice(&0u64.to_le_bytes());
+        for _ in 0..3 {
+            bytes.extend_from_slice(&0u32.to_le_bytes());
+        }
+        for player in Player::BOTH {
+            bytes.extend_from_slice(&(hands.len(player) as u32).to_le_bytes());
+        }
+        bytes.extend(vec![0; MAX_TREE_DEPTH]);
+        bytes.push(3);
+        for _ in 0..MAX_TREE_DEPTH {
+            bytes.extend_from_slice(&1u16.to_le_bytes());
+        }
+        assert!(matches!(
+            read_index(&mut bytes.as_slice(), &p.config, count),
+            Err(SolError::Malformed("index tree exceeds the depth limit"))
+        ));
+    }
+
+    #[test]
+    fn rejects_invalid_labels() {
+        let p = crate::prepare::prepare(TURN, std::path::Path::new("test.toml")).unwrap();
+        let hands = PostflopHands::new(&p.config.board, &p.config.ranges);
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(&2u64.to_le_bytes());
+        bytes.extend_from_slice(&0u64.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.extend_from_slice(&1u32.to_le_bytes());
+        for player in Player::BOTH {
+            bytes.extend_from_slice(&(hands.len(player) as u32).to_le_bytes());
+        }
+        bytes.extend_from_slice(&[0, 3]);
+        bytes.extend_from_slice(&1u16.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.extend_from_slice(&7u32.to_le_bytes());
+        bytes.extend_from_slice(b"bet abc");
+        assert!(matches!(
+            read_index(&mut bytes.as_slice(), &p.config, 2),
+            Err(SolError::Malformed(
+                "index contains an invalid action label"
+            ))
+        ));
+    }
+
+    #[test]
+    fn rejects_oversized_mask_before_reading_its_payload() {
+        let p = crate::prepare::prepare(TURN, std::path::Path::new("test.toml")).unwrap();
+        let hands = PostflopHands::new(&p.config.board, &p.config.ranges);
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(&2u64.to_le_bytes());
+        bytes.extend_from_slice(&1u64.to_le_bytes());
+        bytes.extend_from_slice(&1u32.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        for player in Player::BOTH {
+            bytes.extend_from_slice(&(hands.len(player) as u32).to_le_bytes());
+        }
+        bytes.extend_from_slice(&[2, 3]);
+        bytes.extend_from_slice(&1u16.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.extend_from_slice(&0u64.to_le_bytes());
+        bytes.push(0);
+        bytes.extend_from_slice(&u32::MAX.to_le_bytes());
+        assert!(matches!(
+            read_index(&mut bytes.as_slice(), &p.config, 2),
+            Err(SolError::Malformed("index mask exceeds the hand count"))
+        ));
+    }
+
+    #[test]
     fn rejects_overflowing_deal_count() {
         let prepared = crate::prepare::prepare(TURN, std::path::Path::new("test.toml")).unwrap();
         let mut bytes = Vec::new();
-        bytes.extend_from_slice(&0u64.to_le_bytes());
+        bytes.extend_from_slice(&1u64.to_le_bytes());
         bytes.extend_from_slice(&u64::MAX.to_le_bytes());
         assert!(matches!(
-            read_index(&mut bytes.as_slice(), &prepared.config, 0),
+            read_index(&mut bytes.as_slice(), &prepared.config, 1),
             Err(SolError::Malformed(_))
         ));
     }
@@ -985,20 +1155,24 @@ memory = "1GiB"
         let prepared = crate::prepare::prepare(TURN, std::path::Path::new("test.toml")).unwrap();
         let hands = PostflopHands::new(&prepared.config.board, &prepared.config.ranges);
         let mut bytes = Vec::new();
+        bytes.extend_from_slice(&2u64.to_le_bytes());
         bytes.extend_from_slice(&1u64.to_le_bytes());
-        bytes.extend_from_slice(&0u64.to_le_bytes());
         bytes.extend_from_slice(&0u32.to_le_bytes());
         bytes.extend_from_slice(&1u32.to_le_bytes());
         bytes.extend_from_slice(&0u32.to_le_bytes());
         for player in Player::BOTH {
             bytes.extend_from_slice(&(hands.len(player) as u32).to_le_bytes());
         }
-        bytes.push(3);
+        bytes.extend_from_slice(&[2, 3]);
+        bytes.extend_from_slice(&1u16.to_le_bytes());
         bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.extend_from_slice(&0u64.to_le_bytes());
+        bytes.push(0);
         bytes.extend_from_slice(&2u32.to_le_bytes());
         bytes.extend_from_slice(&1u32.to_le_bytes());
         assert!(matches!(
-            read_index(&mut bytes.as_slice(), &prepared.config, 1),
+            read_index(&mut bytes.as_slice(), &prepared.config, 2),
             Err(SolError::Malformed(
                 "index transition changes the hand dimension"
             ))
@@ -1165,7 +1339,11 @@ memory = "1GiB"
             assert_eq!(view.node_by_history_any(&history), Some(id), "{history}");
             if history.contains("r12cc") {
                 saw_chip_call = true;
-                assert!(internal_history(&history, p.config.scale).contains("r12c"));
+                assert!(
+                    internal_history(&history, p.config.scale)
+                        .unwrap()
+                        .contains("r12c")
+                );
             }
             match view.tree.node(id).kind {
                 // Profile selectors tokenize chip amounts the same way.
@@ -1276,7 +1454,10 @@ memory = "1GiB"
                     NodeKind::Action => {
                         let info = &built.node_info[a.tags[id as usize] as usize];
                         let history = view.history(id);
-                        assert_eq!(internal_history(&history, p.config.scale), info.history);
+                        assert_eq!(
+                            internal_history(&history, p.config.scale).unwrap(),
+                            info.history
+                        );
                         assert_eq!(view.node_by_history(&history), Some(id));
                         let labels: Vec<String> = info
                             .actions

@@ -19,6 +19,8 @@ payoffには実際の残stack、Preflopからの各席の拠出、foldした席�
 BBで指定した額とsize literalは`table.chip_rounding`で整数chipへ丸め、`Nc`は正確に扱う。丸めで変わった指定値と既定SBはvalidationで警告し、合法性は丸め後にも検査する（[共通Input第5節](nlh-input-v1.jp.md#chip単位)）。
 P1 lowerは開始pot＋2 × effective stackがu32の内部単位を超える場合を`NLH003`で拒否する。
 scriptによる最終空menuも`NLH003`である。
+OOP/IPの互換comboの重みが計算精度上0以下になる場合も木構築時に`NLH003`で拒否する。
+互換handが存在しても、他の重みに比べて極端に小さいとこのerrorになり得る。
 攻撃回数の構造上限は無く、capはscriptの最後の`flop, turn, river when aggressions >= 3 { remove raise }`などで書く。
 cap ruleが無ければraise chainはeffective stackとNLHの合法性だけで制限され、木が大きくなりうる。
 `turn, river { jam bet >= 85%stack jam raise >= 85%stack }`は、それまでのmenuの候補のうち
@@ -55,6 +57,7 @@ terminal payoffは次の順に作る。
 5. utility baselineを引き、solver payoffへ焼き込む。
 
 rakeは全matched potに率を掛け、指定の整数chip単位（既定1 chip）へ丸め、capを適用する。
+率は保持された値を往復できる最短の10進数として積と丸めを計算するため、例えば5500 chipに`0.07`を掛けた場合は`up`でも385 chipとなる。
 P1のhand factsは`flop_dealt = true`、`players_dealt = table.players`、`players_saw_flop = 2`である。
 `showdown`と`won_without_showdown`はterminalで決まる。
 単一potであるため`allocation`による結果差は無い。条件文法と丸めは共通Input第6節に従う。
@@ -91,9 +94,11 @@ ICM EVの和をBBのpotと比較しない。
 P0はOOP、P1はIPである。ハンド別EVも元のspot開始基準であり、後続nodeまでの追加wagerは費用に含む。
 到達nodeのpotや投入額を足し戻さない。exploitabilityはbaselineの定数移動で変わらない。
 
-`compare`はtree形状・保存node集合・node別block長の一致を常に要求する。
-通常はboard・pot・effective stack、seat別comboリスト、node別action label（size込み）も一致を要求する。
-rangeの重みだけの違いは許す。`--cross-game`では通常のidentity条件を外し、形状だけで対応付ける。
+`compare`は木の接続・手番・chance branch、保存node集合・seat別comboリスト・utility単位の一致を常に要求する。
+通常はboard・pot・effective stack、node別action label（size込み）も一致を要求する。
+rangeの重みだけの違いは許す。`--cross-game`は通常のidentity条件を外すが、木・combo・単位の一致は外せない。
+両側で自分と互換な相手の到達weightが正のhandだけを比較し、除外したhand-node数を`excluded_strategy_hands`と`excluded_ev_hands`に出す。比較可能なhandがないnodeは平均から外し、全nodeで無い指標はnullである。
+`export ev`と`decision`のEV行は、自分または互換な相手の到達weightがゼロのhandを省く。
 
 ## 4. 計算・停止・storage
 
@@ -149,6 +154,9 @@ entryの全対象nodeでhandが空なら入力エラーとする。
 必要な戦略が保存されていなければ拒否する。selectorによるsuit同型の制限で木が展開された場合は、
 基準解のchance代表へsuit置換で対応付け、各handの戦略をprofile側の順序に変換する。
 逆に基準解のgroupingがprofile側より細かく、対応する代表が一意に得られない場合は拒否する。
+また、戦略を対応付けるchance nodeで現在のsuit対称性が基準解の対称性に含まれない場合は、
+代表が同じでも戦略を誤って変換し得るため拒否する。基準profileのsuit制限を維持するか、
+両方の解でsuit mergingを無効にする。suitの統合がないboardではこの理由では拒否しない。
 実効configに記録したSHA-256と基準fileの内容が異なる場合も拒否するが、
 保存済み成果物の読み込み時には基準fileを再読込しない。
 `freeze_upstream`では、解決されたprofile対象nodeのうち他の対象nodeの子孫でない最大の対象nodeを根とする
@@ -250,6 +258,7 @@ HS-DCFRはplanned iteration予算を使う。パラメータの既定と受理�
 `i16-f32avg`は`update_regrets_i16_impl`と共通の`normalize_columns` / `normalize_columns_f32`を旧i16と共用し、平均戦略はf32の累積・正規化を使う。
 同じ木・schedule・反復数ではregret配列とregret scaleが旧i16とbit一致する。
 i16の量子化blockはnodeごとのactorの席別support次元であり、support外handの除去でblock scaleと反復結果が変わり得る。
+極小の正regret合計でf32逆数が無限大になる列はf64で正規化する。i16量子化では非零blockのscaleを最小正f32以上にし、旧checkpointのscale 0は従来どおり零に復号する。極小値を含むsolveの結果は旧版と変わり得る。
 新旧layoutのbit一致をi16に要求せず、同じconfig・反復予算で収束品質を照合する。
 `auto`は木とmemory上限が揃ったprepareで、`required_bytes(f32) <= limit`ならf32、そうでなく`required_bytes(i16-f32avg) <= limit`ならi16-f32avgを選ぶ。両方超過なら両必要bytesと上限・auto指定を示してexit 75。明示storageの動作は維持する。正規化はautoを維持するが、run.toml・checkpoint・`.sol`のconfigとmetadataには具体storageを保存し、再開・照会を現在のmachine memoryから独立させる。既存実効configの明示storageはそのまま維持する。
 
@@ -279,6 +288,7 @@ node履歴はspotのlineとは別の文法である。actor positionとstreet区
 
 例は`xr5c[Th]xx`である。出力する額は卓のchip尺度に従い、`bb_chips`の素因数が2と5だけなら最短のBB 10進数、それ以外なら整数chip数に`c`を付けた`Nc`を使う。例えばTurnで2 BBをbet・callした後のRiverで2 BBをbetすると、10進の卓では`r2c[Th]r2`、Riverのlabelは`bet 2`である。`bb_chips = 3`なら同じ額は6 chipsなので履歴は`r6cc[Th]r6c`、Riverのlabelは`bet 6c`である（最初の`c`はchip単位、次の`c`はcall）。
 history selectorとaction labelには表示表記のほか、接尾辞なしまたは`bb`付きのBBと正確な整数chipの`Nc`を使え、BB額を卓の方式で丸めた結果が同額なら同じnode・actionに一致する。例えば`bb_chips = 3`では`r2c[Th]r2`も`r6cc[Th]r6c`と同じnodeを指す。
+history selectorは4096 bytes以下、chip接尾辞とcallを区別できない`r...c`は16個以下とする。超過は`NLH003`の入力errorで拒否する。
 node selectorとaction labelによる指定はCLI referenceに従う。
 
 ## 6. run directoryと`run.json`
@@ -302,6 +312,8 @@ runningのpidが存在しないinterruptedは読み手が同一hostで導出す�
 Windowsはprocess creation timeがrun開始時刻より1秒超遅ければpid再利用としてinterruptedを導出する（access deniedはalive扱い）。
 eventsのcheckpointの`sweeps`はP1ではiteration数である。
 stop reasonは`max-iterations` / `target-reached` / `time-limit` / `cancelled`である。
+manifestの`completion`にも同じ停止理由を記録する。目標または反復上限に達した同じbatchでキャンセルが要求された場合は、到達した停止理由を優先する。
+eventの追記に失敗した場合は警告を一度表示し、その実行中は同じlogへの追記を停止する。
 JSONLの不完全な末尾（最後の改行以降）だけを読み飛ばし、そのbytesはstatus/watchの読取りoffsetに含めない。再開writerはそのsuffixだけをtruncateして完全な行の続きへ追記する。評価履歴も不完全な最終行だけを無視し、改行済みの不正JSONは従来どおり履歴無しへ戻る。
 solve/resumeは出力directoryの`run.lock`を排他取得する。使用中directoryへのin-place resumeはdirectoryとmanifest pidを示しexit 1で拒否してrunfileを変更しない。`--out`は実行中sourceからもforkでき、sourceを書き換えない。process終了・crashでOS lockは解放され、file残存は再開を妨げない。
 recording開始後の失敗は`run.json`の書込み失敗も含めmanifestをfailedにし、failureへ診断を保存する。
@@ -340,6 +352,7 @@ progressが無い・読めない場合は履歴無しとしてcheckpoint iterati
 `error`は絶対差、`lambda`は最終加点である。到達weightが0なら`achieved`と`error`はnull。
 
 checkpoint eventは実際にatomic置換したときだけ記録する。終了時に最後の保存と同じiterationなら再保存・eventを省く。
+checkpointの置換失敗は約10秒間backoffして再試行する。定期保存が失敗した場合は警告し、前のfileを保持して次の間隔で再試行する。最終保存が失敗した場合も`.sol`を出力するが、診断を表示してrunは失敗となる。checkpoint metadataは16 MiB以下でなければならず、実効configとfrequency stateを含むサイズを反復開始前に検査する。
 そのcheckpointのelapsed_secsは直前の保存境界の累積時間を保持し、run.jsonのwallSecsとの差には保存所要時間等が含まれる。
 停止summaryは最終評価境界のEV・Exploitabilityを再利用する。評価前に停止した場合はそのprofileを一度評価する。
 solve/resumeの区間終了時は、最後のcheckpointを新たに書き、`S + W + C + E + M`（第7節）がmemory上限以下ならregretを保持してcheckpointと`.sol`を並行生成する。その他は最後のcheckpoint（`final_checkpoint = true`の場合）→ regret配列とそのscale配列の解放（容量0）→ `.sol`生成の順で処理する。cancel・max_time・max_iterations・target到達の全停止理由に適用し、checkpointを省く直列経路でも解放する。反復途中のcheckpointでは解放しない。再開は保存済みcheckpointを新しいsolverへ復元する。engineの`release_regrets`後は平均戦略・評価・EV passを利用できるが、反復・current strategy・checkpoint書出し・state復元はpanicする。current strategyを提供するlive queryは解放しない。
@@ -351,9 +364,11 @@ checkpointのelapsed_secsはsolveの累積時間である。run.jsonの時刻値
 
 `[run] final_checkpoint`はP1のみのbool、既定true（PF9、2026-10-08）。falseでは停止理由によらず終了時のcheckpointとそのeventを省くが、定期checkpointと`.sol`は保存する。再開できるのは最後の定期checkpointの状態までで、途中の保存が無ければ再solveが必要。run directoryの`run.toml`を編集して切り替えられ、互換性hashには影響しない。keyの無い旧runはtrueになる。再開時のprogressはcrash再開と同じ追記方式で、checkpointより後の既存行も残す。
 
-最後のcheckpointを新たに書き、`S + W + C + E + M ≤ memory上限`なら、regretを保持したままcheckpointと`.sol`を並行保存する。checkpointはlevel 1・1 MiB window・run threadsのzstd、`.sol`はchunk単位のlevel 3 zstdで、`.sol`の書き手にC、checkpointのencoderにEを計上する。run用Rayon poolを共有し、両方の完了を待つ。どちらかが失敗すればrunはfailedとなり、checkpointのerrorを優先する。並行時はcheckpoint失敗でも`.sol`が残り得る。並行条件を満たさなければcheckpoint（指定時）→ regretとscaleの解放 → `.sol`の順を維持する。並行保存でもmemory見積り式と各artifactの形式は同じである。
+最後のcheckpointを新たに書き、`S + W + C + E + M ≤ memory上限`なら、regretを保持したままcheckpointと`.sol`を並行保存する。checkpointはlevel 1・1 MiB window・run threadsのzstd、`.sol`はchunk単位のlevel 3 zstdで、`.sol`の書き手にC、checkpointのencoderにEを計上する。run用Rayon poolを共有し、両方の完了を待つ。どちらかが失敗すればrunはfailedとなり、`.sol`のerrorを優先する。checkpoint失敗時も並行・直列とも`.sol`を書いてからerror終了する。並行条件を満たさなければcheckpoint（指定時）→ regretとscaleの解放 → `.sol`の順を維持する。並行保存でもmemory見積り式と各artifactの形式は同じである。
 
 `.sol`はprofile無しではversion 7、profile有りではversion 8、no-riversでRiverに制約がある場合はversion 9である。version 8と9のmetadata frameはversion 7のmetadataと第6節の`ProfileReport`のpostcard tupleである。version 7、8、9を読める。solveした木と閲覧用indexを保存し、読込みは木を再構築しない。多byte値はlittle endianで、次の順に並ぶ。全frameはzstd level 3である。
+
+木の入力と`.sol`読込みではrootを含む経路を512 nodeまでに制限する。v0.2.0でも極端に深い木は再帰処理のstack上限に達し得た。metadata・directory・chunkの展開長とindexの各列は形式・木の寸法に基づく上限があり、圧縮frameの宣言長とaction labelの正規表記を検証する。上限超過や不正なfileは読込みerrorとなる。
 
 | 部分 | 内容 |
 |---|---|
@@ -448,6 +463,7 @@ process領域・G/16・Xはflop・turn・riverの木で測ったRSSから較正�
 NoRiversもfull出力の保守的な見積りを使う。Mは測定から較正した見積りであり、RSSの上限保証ではない。
 
 P1のresume互換性hashは正規化configから`[run]`・`[meta]`・`solver.cfr_precision`を除いたTOMLのblake3である。
+hash計算時のprofileはv0.2.0と同じkey順に直列化する。実効configのprofile出力順が変わっても、v0.2.0のrunとcheckpointの互換性hashは変わらない。profileが無い場合のhash入力も変わらない。
 運用thread・memory・時間・checkpoint間隔と名前・説明は変えられるが、`solver.cfr_precision`以外のsolver/outputを変えるとhashは変わる。
 CFR精度はgame定義にもstate形式にも影響しないため互換性hashから除外し、keyの無い旧runは新既定f32で再開する。
 実効config全文のmanifest/solution hashとは別である。
@@ -506,12 +522,14 @@ support外のcombo照会は「rangeに無い」旨のerrorまたは空結果で�
 未保存Riverの再解決ではnode reachを新しいrangeとし、親子のsupportをglobal comboで対応付ける。
 再解決はRiver配牌直後のnodeから下の部分木を1つのsubgameとして解き、同じ読込みの照会では再利用する。
 部分木内の節点の到達weightはtrunkの保存戦略と再解決した戦略の積である。再解決のEVは同じpayoff基準（trunkの開始時点へのoffset込み）で、
-保存値と同じ元のspot開始基準の値となる。一方の席の到達が全handで0の線は再解決せずerrorとする。
+保存値と同じ元のspot開始基準の値となる。各席に到達weightが`1e-9`を厳密に超えるhandが少なくとも1つ必要であり、一方でも満たさない線は再解決せずerrorとする。また、両席の到達rangeに正の重みを持つ互換handの組がない場合もerrorとする。
+互換handの組があっても、数値精度上その合計重みを正と判定できなければ同様にerrorとする。
 
 reportの先頭7列は`board,iterations,wall_s,nash_conv,ev_oop,ev_ip,oop_equity`で固定である。
 続く`freq_*`列は入力board順で初めて現れたroot action labelの和集合である。
 そのboardにactionが無いセルは空文字であり、選択頻度0の`0`とは異なる。
 `oop_equity`はOOPのroot rangeで加重したshowdown equityである。0..1でありEVではない。
+表示用showdown equityは桁落ちが疑われる場合に互換handの組を直接加算する。
 reportはroot nodeだけを集計する。
 
 ## 9. 品質と制限

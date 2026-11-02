@@ -1,9 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { parse } from "smol-toml";
-import { actionProfileEntry, classesToRange, relockPayload, roundedStrategy, selectionStrategy } from "./profile";
+import { actionProfileEntry, classesToRange, relockPayload, roundedStrategy, selectionStrategy, validLockSum } from "./profile";
 import type { StrategyRow } from "../api/types";
 
 describe("relock", () => {
+  it("matches the solver's f32 lock sum boundaries", () => {
+    expect(validLockSum([0.5, 0.5000009], 1)).toBe(true);
+    expect(validLockSum([0.5, 0.500002], 1)).toBe(false);
+    expect(validLockSum([0.5, 0.499999], 1)).toBe(true);
+    expect(validLockSum([0.5, 0.499998], 1)).toBe(false);
+    expect(validLockSum([0.5, 0.499999], 0.5)).toBe(false);
+    expect(validLockSum([0.5, 0.4999992], 0.5)).toBe(true);
+  });
   it("writes queued locks as parseable profile fragments and payload flags", () => {
     const payload = relockPayload([
       { kind: "lock", value: { node: "root", hands: "AA,AKs", strategy: { check: 0.25, "bet 3.3": 0.75 }, confidence: 0.8 } },

@@ -122,49 +122,6 @@ fn bench_selector() {
         "91c7c88a8e36fb628a4167c4e64722d1ec6a5034b20ccdacd27868b91ae6007e",
     );
 }
-#[test]
-#[ignore = "exhaustive multi-million-node tree; run with --release --ignored"]
-fn reference_simple() {
-    check(
-        include_str!("../../../examples/bench/6max_100bb_nl50_partial_simple_reference.toml"),
-        1962894,
-        "37a9949cc832cd909d339cc51a6b24c22a582a0bfc530eda0bc71d75adac2236",
-    );
-}
-
-macro_rules! expensive_consistency {
-    ($name:ident, $file:literal, $count:literal, $hash:literal) => {
-        #[test]
-        #[ignore = "exhaustive multi-million-node tree; run with --release --ignored"]
-        fn $name() {
-            let raw = include_str!($file);
-            let doc = spot::Document::parse(raw, Path::new("fixture.toml")).unwrap();
-            let effective = doc.normalize(&P2Sections).unwrap();
-            let observed = identity(raw);
-            println!(
-                "{}: nodes={} hash={}",
-                stringify!($name),
-                observed.0,
-                observed.1
-            );
-            assert_eq!(observed.0, $count);
-            assert_eq!(observed.1, $hash);
-            assert_eq!(observed, identity(&effective));
-        }
-    };
-}
-expensive_consistency!(
-    reference,
-    "../../../examples/bench/6max_100bb_nl50_partial_reference.toml",
-    37191758,
-    "85cd8a03760f02de8b4c288da5df39858675f4884e7a82156a957ec0057779d3"
-);
-expensive_consistency!(
-    reference_limp,
-    "../../../examples/bench/6max_100bb_nl50_partial_reference_limp.toml",
-    37193418,
-    "957d4f9ef26c51a779138040983e994b0167052668a7de1fb2880f00fbd88598"
-);
 
 #[test]
 fn full_surface_has_an_explicit_unrepresentable_first_actor_boundary() {

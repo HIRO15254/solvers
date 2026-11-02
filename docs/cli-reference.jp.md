@@ -156,6 +156,7 @@ human表示は製品、開始状態、lineの行動、treeのparam・展開済�
 BB指定値が丸めで変わった場合は、key、lineのaction、script位置または既定SBの位置、指定BB値、結果のchip数と丸め方式を警告に表示する。
 実効configは全tableで額のkeyと`spot.line`の額を`Nc`文字列とし、既定値を明示する。stackが異なる場合は全positionを`[table.stacks]`に書く。tree script本文はそのまま保持する。
 `--show-effective`・`--write-effective`、`run.toml`、`--print-config`、solutionとcheckpointに埋め込むconfigはこの形式である。再正規化は同じbytesになり、keyとlineの額の丸め警告を繰り返さない（tree scriptは書いたまま残すため、丸めで変わるscriptのBB sizeは再読込でも警告する）。
+profileの出力順はlock、incentive、frequency、freeze_upstreamであり、旧版の順で保存されたrunとcheckpointの互換性hashは維持する。
 人が見る額（validate、node history、action label、tree、export、inspect、GUI）は、`bb_chips`の素因数が2と5だけなら最短の接尾辞なしBB10進数、それ以外なら`Nc`で表示する。P1のline表示の`*`は暗黙foldである。utilityはcashでBB、ICMで賞金単位である。
 P1のprofile指定時は実際の木へselectorを解決し、humanでは一致node・hand数と各selectorの内訳、
 JSONでは`profile`に`matched_nodes`・`matched_hands`・`iso_restricted`・`selectors`・`resolved_nodes`を返す。
@@ -218,8 +219,10 @@ solve/resumeはstderr、reportはboard集合に対して1回だけ表示する�
 `preflop when aggressions >= 1 { jam raise > 33.333%stack }`へ移行する。
 閾値の分母M（hand開始stack − ante）、整数chipへの丸め（`table.chip_rounding`）、ソース位置での適用は旧keyと異なる。
 卓の額面は`table.bb_chips`（既定1000）、BB額と計算sizeの丸めは`table.chip_rounding`で指定する。
+sizeの百分率は保持された比率へ戻る10進百分率を復元し、他のsize係数とrake率は保持された数値を往復できる最短の10進数として計算する。
 額は`stack = 100`、`sb = "1c"`のように単位を値に書く。数値・文字列`"N"`・`"Nbb"`はBB、`"Nc"`は整数chip。旧`stack_bb`・`stack_chips`などのkeyは`NLH002`で拒否する（[共通Input第5節](nlh-input-v1.jp.md#chip単位)）。
 tree scriptの接尾辞なし数値と`Nbb`はBB、`Nc`はchip、`N%`はpot比である。例えば旧pot 33%は`33%`と書き、`33`は33 BBとなる。`[tree.params]`の数値overrideも同様で、pot比は`"33%"`とする。`Nx`、`Ne`、`N%stack`、`N%effective`、`a`、`min`も使える。
+P1の木はrootを含む各経路が512 nodeを超えると入力errorとなる。保存済み`.sol`にも同じ上限を適用する。
 例えば`turn, river { jam bet >= 85%stack jam raise >= 85%stack }`は現在menuの大きい候補だけをall-inへ置き換える。
 `jam`は候補を追加しないのでsizeを足すruleの後へ置く。閾値はliteralの到達額変換だけで求め、
 最小raiseへの引上げやMでのcapはしない。`tree.rules`でも`turn { jam raise >= 85%stack }`のように表示する。
@@ -237,6 +240,7 @@ P2（`mw-preflop`）は`NLH005`（exit 2）で明示的に拒否する。戦略�
 `--node`の既定は`root`。履歴（`xr10c`、配牌を含む`xx[9d]`など）または
 slash区切りのaction label（`check/bet 10`）を指定でき、繰り返し時は指定順に行を返す。履歴のbet/raise額は各streetの到達額であり、前streetの投入額を含まない。
 selectorとaction labelの額は表示表記のほか、接尾辞なし・`bb`付きBBまたは`Nc`を受け付け、BBは卓の丸め方式でchipに変換して照合する。profileやrelockのselectorも同様である。
+履歴selectorは4096 bytes以下、曖昧な`r...c`は16個以下であり、超過は入力errorとなる。
 `all`は全action nodeを木順で返す。chance・terminalも明示selectorで選べる。
 未知nodeは入力error（exit 2）であり、無視したりrootへ戻したりしない。
 `--rest-of-street`は選択した各nodeの行の直後に、同じstreetでそのnodeより後のaction nodeの行を木の先行順で続ける。
@@ -328,6 +332,7 @@ P2は対象外。既定では上流も自由にして木全体を再solveする�
 通常は既存profileに追記する。重複は通常のprofile検証で拒否される。
 `--clear-profile`は最初に適用し、`--freeze-upstream`はSOURCEのsolutionを新たな基準として設定する。
 不正なSOURCE、P2、断片、strategy構文、profile selectorの解決errorはexit 2。
+lock確率の和は絶対許容誤差1e-6で検証する。f32演算を含む正確な境界は[共通Input規範](nlh-input-v1.jp.md)を参照。
 `export <sol> lock`で得た断片も`--add`に使える。
 
 ## `solvers resume`
@@ -342,6 +347,7 @@ solvers resume <RUN> [--out DIR] [--threads N] [--memory SIZE] [--max-time DUR]
 directoryでは製品のcheckpointを選び、埋込みconfigの互換性を検査する。互換性hashが一致するP1 runで精度keyが無い場合は新既定f32で再開する。旧checkpointは互換性hashが異なるため再開できず、現行configから再solveする。
 solveとresumeは出力directoryの`run.lock`をfile更新前に排他取得し、process終了まで保持する。元directoryが使用中のin-place resumeはdirectoryとmanifestのpidを示してexit 1で拒否し、config・manifest・eventを変更しない。`--out`は出力先だけをlockし、実行中sourceからもforkできる（sourceは書き換えない）。crash後のlock fileの残存自体は再開を妨げない。
 P1は保存済み`run.toml`の`[run] final_checkpoint`（既定true）を使う。falseでは全停止理由で最後のcheckpointを省き、定期checkpointと`.sol`は保存する。`[run]`は互換性hashの対象外なので、このkeyは再開前に編集できる。keyの無い旧runはtrueになる。CLI flagは無い。P2で指定すると`NLH002`。
+P1のcheckpoint置換失敗は約10秒間backoffして再試行する。定期保存が失敗すると警告し、次の間隔で再試行する。最終保存が失敗した場合は`.sol`出力後にエラー終了する。checkpoint metadataが16 MiBを超える場合は反復開始前に拒否する。
 最終checkpointを省いたrunの再開は最後の定期checkpointから続ける。progressの既存行はcrash再開と同じく残して追記するため、同じiterationの行が再度現れ得る。checkpointが無ければ再開できず、`run.toml`から再solveする。
 P1のautoはrun directoryの`progress.jsonl`からcheckpoint iteration以下の評価履歴を復元し、同じiterationの重複は最後の行を採用する。同じ方式で次の評価iterationを再計算する。progressが無い・読めない場合（裸のcheckpointを含む）は履歴無しでcheckpoint iteration＋25から評価し、max_iterationsで切る。この場合は一度に解いたrunとの評価iteration一致を保証しない。checkpoint形式は変えず、旧run.tomlの`check_every = 25`は固定25で再開できる。
 
@@ -378,6 +384,8 @@ statusはstate・進捗・completionと`eventsOffset`を返す。runningのpid�
 `interrupted`を導出し、JSONの`recordedState`へ記録状態を残す。`resumable`は停止状態とcheckpointの存在による表示である。
 Windowsではprocessの終了とcreation timeを確認する。run開始時刻より1秒超遅く作成された同じpidは別processとみなし、access deniedは保守的にaliveとする。
 watchは停止時までeventを追い、不完全な末尾（最後の改行以降）をoffsetに含めない。statusの`eventsOffset`も同じ完全record境界であり、progressも不完全な最終行を無視する。runs lsはROOT直下だけを列挙する。
+heads-up postflopの`completion`は`target-reached`、`max-iterations`、`time-limit`、`cancelled`のいずれかで、statusとruns lsに表示される。旧runの記録値は変更しない。
+event追記の失敗時は警告を一度出し、そのsolveまたはresumeの残りの実行中は以後のevent追記を停止する。これはPreflop solverにも適用される。
 これらはconfigをparseせず、旧run directoryも読める。JSONの`configSchema` / `gameKind`は記録値を保つ。
 旧runの`resumable`表示は現行CLIの再開互換性を保証しない。
 
@@ -422,6 +430,7 @@ P1のREPLは次を使う。
 | `help` / `quit` / `exit` | help / 終了 |
 
 iso併合dealは代表cardに`*`を付ける。member表示のremapは未対応である。
+複数のsuit同型cardを表し代表cardが記録されない`[dealN]`の先では`eq`を拒否する。親streetのnodeまたは具体的なcardを持つbranchでは使える。
 未保存Riverの戦略・値は再計算値であり、保存時の値ではない。`export --resolve-rivers`も同じ再解決を使う。
 
 ## `solvers report`
@@ -473,6 +482,7 @@ P2のactions CSVは額を`amount_chips`、1 BBあたりのchip数を`bb_chips`�
 P2のinspect JSONでは`bbChips`・`potChips`・`remainingStacksChips`を使う。
 
 P1のcombo照会・exportは開始rangeの正weight supportだけを対象とする。support外の照会は空結果またはrange外errorである。
+`ev`と`decision`のEV行は、自分または互換な相手の到達weightがゼロのhandを省く。
 P1の`tree`はaction・chance・terminalを履歴またはlabel pathで照会できる。chance labelはiso併合で代表cardに`*`が付き、実cardの無いrunoutでは`dealN`となる（履歴tokenは`[dealN]`）。
 `tree`の`children`（子履歴）・`child_kinds`（子kind）・`actions`は木の子順で対応し、子履歴を同じ`--node`へ渡して辿れる。
 `kind`は`action` / `chance` / `terminal`、`street`は行動street / 配牌するstreet / 終了streetである。
@@ -481,7 +491,8 @@ P1の`tree`はaction・chance・terminalを履歴またはlabel pathで照会で
 P1の未保存Riverの戦略・値は既定ではexportできず（exit 1、`--resolve-rivers`を案内する）、`tree`の照会はできる。P2ではnode selectorをinspectで指定する。
 `--resolve-rivers`は照会nodeを含むRiver部分木（River配牌直後のnodeから下）を、`inspect --sol`と同じ方法で1回の読込みにつき部分木ごとに1回だけ再解決する。
 行の列と単位は保存値と同じで、EVも保存値と同じsubgame開始基準だが再計算値である。保存済みnodeの行は変わらず、`--node all`は従来どおり保存済みnodeだけを選ぶ。
-一方の席の到達が全handで0の線は再解決できずexit 1となる。
+各席に到達weightが`1e-9`を厳密に超えるhandが少なくとも1つ必要であり、一方でも満たさない線、または正の重みを持つ互換handの組がない線は再解決できずexit 1となる。
+互換handの組があっても、数値精度上その合計重みを正と判定できなければ同様に失敗する。
 P1で解決できない`--node`、または`actions` / `strategy` / `ev` / `decision`へのchance・terminal指定は型付き入力error（exit 2）で拒否する。診断にはselectorの問題、またはaction nodeだけが戦略を持つ旨を示す。
 P1の`summary`は`.sol`のmetadataだけを読む。他のviewは保存済みの木とindexを1回展開し（木は再構築しない）、照会nodeを含むchunkだけを展開する。
 列・単位・未保存値は[P1第8節](hu-postflop.jp.md)・[P2第7節](mw-preflop.jp.md)を参照する。
@@ -493,12 +504,12 @@ solvers compare <LEFT> <RIGHT> [--cross-game]
 ```
 
 同じ製品のsolutionの平均profileを比較し、JSONを出す。
-P1はtree形状と保存node集合、通常はboard・pot・effective stack、seat別comboリスト、
-各nodeのaction label（sizeを含む）の一致も要求する。rangeの重みだけの違いは許す。
-`--cross-game`は形状・保存node集合以外の一致条件を外す。最初の不一致をerrorで示す。
-`mean_strategy_l1` / `max_strategy_l1`は戦略差、
-`mean_max_ev_delta` / `max_ev_delta`はhand別EV差、`ev_oop` / `ev_ip` / `nash_conv`は両runのroot値である。
-EV差はcashでBB、ICMで賞金単位である。
+P1は木の接続・手番・chance branch、保存node集合、seat別comboリスト、utility単位の一致を常に要求する。
+通常はboard・pot・effective stack、各nodeのaction label（sizeを含む）も一致させる。rangeの重みの違いは許す。
+`--cross-game`でも木・combo・単位の一致は外せない。最初の不一致をerrorで示す。
+両側で自分と互換な相手の到達weightが正のhandだけを比較する。除外したhand-node数は`excluded_strategy_hands`と`excluded_ev_hands`である。
+`mean_strategy_l1` / `max_strategy_l1`は戦略差、`mean_max_ev_delta` / `max_ev_delta`はhand別EV差である。比較可能handのないnodeは平均から外し、全nodeで比較不能なら指標はnullである。
+`ev_oop` / `ev_ip` / `nash_conv`は両runのroot値である。EV差はcashでBB、ICMで賞金単位である。
 P1では両解のどちらかにprofileがある場合、`profile_conditions`に左右の正規化profile TOML
 （無い側はnull）を表示し、異なる場合は`profile_changed: true`を付ける。
 P1は保存index checksumとconfigから復元したseat別comboリスト・root range・開始streetが全て一致する場合だけ木とindexを共有する。異なれば右indexも通常どおり読込・検証する。共有時も右indexのchecksumを検証し、config hashの一致だけでは共有しない。
@@ -578,6 +589,7 @@ resume・inspect（`--sol`を含む）・export・evaluate・compareの読込み
 | `130` | solve/resumeの協調停止 |
 
 型付き入力errorは診断に利用者由来の`resource limit`等を含んでもexit 2であり、資源上限はerror型でexit 75へ分類する。P2の資源診断は`NLH003`の表記を保つが入力errorとは区別する。
+P1のOOP/IP互換comboの重みが計算精度上0以下になる場合も木構築時の入力error（exit 2）である。
 profileのselector解決errorと`freeze_upstream`のSHA-256不一致は入力error（exit 2）である。
 基準solution自体が破損・非互換なら通常の成果物error（exit 3）である。
 P1 exportのnode selector入力errorは履歴・label pathを解決できない場合と、`actions` / `strategy` / `ev` / `decision`へ非action nodeを指定した場合を含む。selector文字列に資源・成果物errorの語があってもexit 2であり、I/O等のexport失敗（exit 1）や破損・非互換（exit 3）と区別する。
@@ -607,6 +619,9 @@ solversd [--runs DIR] [--bind ADDR] [--tls-cert PEM] [--tls-key PEM]
 
 `/v1`と`/v1/`配下はbearer tokenを要求する。`--ui`省略時の探索基準はcurrent working directoryではなく
 `solversd`自身のdirectoryである。隣に`ui/index.html`が無ければAPI専用となり、全requestにtokenを要求する。
+UI directoryは信頼できる配布物を使用し、信頼できない利用者に書き込みを許可しない。
+パスの包含検査とfile openは別操作である。JSON本文は最大64 MiBで超過時はHTTP 413
+`payload-too-large`、認証前を含む同時処理64件の上限時はHTTP 503 `server-busy`を返す。
 
 | method | path | 内容 |
 |---|---|---|
@@ -654,11 +669,10 @@ daemonは一時fileへ本文を書き、`solvers tree CONFIG --format json`へ�
 認証は他の`/v1`と同じbearer token、未認証は401、起動/I/O/JSON出力の失敗は`internal`である。
 外部sourceを使うconfigは、先に`validate --write-effective`でinline化してから送る。
 
-queue中のcancelは`canceled`をmanifestへ保存し、再起動後も再投入しない。未開始runにはcheckpointが無く
-`resumable: false`であり、再計算には新規runを投入する。実行中のcancelはCLIの1回目のCtrl-C / SIGINTと
-同じ境界停止であり、checkpointの存在により再開可能かが決まる。
+queue中のcancelは`canceled`をmanifestへ保存し、再起動後も再投入しない。新規runの開始前にはcheckpointが無いが、待機中resumeのcancelでは元のcheckpointが残る。実行中のcancelはCLIの1回目のCtrl-C / SIGINTと同じ境界停止であり、checkpointの存在により再開可能かが決まる。
 Windowsのdaemonは子を別process groupで起動し、そのgroupへCtrl-Breakを送る。consoleを持たないdaemonでは
 送信できないため、成功を装わず`internal`を返す。daemonのconsoleへのCtrl-Cは子のsolveへ届かない。
+daemonは要求がなくても待機jobを順番に開始し、待機中のsolveとresumeの順序を再起動後も復元する。以前のdaemonが起動して生存しているprocessも同時実行数に含み、cancelできる。起動前に失敗したrunはfailureを記録して`failed`になる。
 
 daemonは計算せず、CLIへ委譲する。入力は同じ`solvers.nlh/v1`である。
 外部tree sourceなどのfile参照は`ConfigNotSelfContained`で拒否するため、

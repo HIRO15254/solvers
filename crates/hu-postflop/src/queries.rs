@@ -183,21 +183,31 @@ pub fn range_grid(view: TreeView<'_>, player: Player) -> Grid {
 pub fn equity(
     view: TreeView<'_>,
     board: &[Card],
-    history: &str,
+    current: NodeId,
     reach: &PerPlayer<Vec<f32>>,
-) -> PerPlayer<Vec<f32>> {
-    let mut board = board.to_vec();
-    for token in history.split('[').skip(1) {
-        if let Some(card) = token.split(']').next().and_then(|s| s.parse::<Card>().ok()) {
-            board.push(card);
+) -> Result<PerPlayer<Vec<f32>>> {
+    let mut node = current;
+    while view.index.parents[node as usize] != NodeId::MAX {
+        let parent = view.index.parents[node as usize];
+        let p = view.tree.node(parent);
+        if p.kind == hu_engine::NodeKind::Chance
+            && view
+                .deal_card(parent, (node - p.first_child) as usize)
+                .is_none()
+        {
+            anyhow::bail!(
+                "equity is unavailable: this branch represents several suit-isomorphic cards and the solution does not record which one; use eq at the parent street node or on a branch with a concrete card"
+            );
         }
+        node = parent;
     }
+    let board = view.profile_board(current, board);
     let hands = view.hands();
     let global = PerPlayer::new(
         hands.expand(Player::P0, &reach[Player::P0]),
         hands.expand(Player::P1, &reach[Player::P1]),
     );
-    range_equity(&board, &global)
+    Ok(range_equity(&board, &global))
 }
 /// Class-averaged OOP equity percentages against the current IP reach.
 pub fn equity_grid(
@@ -335,6 +345,46 @@ pub(crate) fn history_token_matches(
 /// Parse ambiguous `rNc` as either a chip amount or a BB amount followed by
 /// a call, preferring the table's canonical spelling.
 pub(crate) fn selector_history_steps(selector: &str, scale: nlh::ChipScale) -> Vec<Vec<&str>> {
+    // Bound both the number of tokenizations and recursive parser depth.
+    // Sixteen ambiguous amounts permit 65,536 possible interpretations.
+    const MAX_AMBIGUOUS: usize = 16;
+    const MAX_SELECTOR_BYTES: usize = 4096;
+    if selector.len() > MAX_SELECTOR_BYTES {
+        return Vec::new();
+    }
+    let bytes = selector.as_bytes();
+    let mut ambiguous = 0;
+    let mut minimum_steps = 0;
+    let mut i = 0;
+    while i < bytes.len() {
+        minimum_steps += 1;
+        if minimum_steps >= hu_engine::MAX_TREE_DEPTH {
+            return Vec::new();
+        }
+        if bytes[i] == b'[' {
+            match bytes[i..].iter().position(|&b| b == b']') {
+                Some(end) => i += end + 1,
+                None => return Vec::new(),
+            }
+        } else if bytes[i] == b'r' {
+            i += 1;
+            while i < bytes.len() && (bytes[i].is_ascii_digit() || bytes[i] == b'.') {
+                i += 1;
+            }
+            if bytes.get(i..i + 2) == Some(b"bb") {
+                i += 2;
+            }
+            if bytes.get(i) == Some(&b'c') {
+                ambiguous += 1;
+                if ambiguous > MAX_AMBIGUOUS {
+                    return Vec::new();
+                }
+                i += 1;
+            }
+        } else {
+            i += 1;
+        }
+    }
     fn parse<'a>(
         rest: &'a str,
         chips_first: bool,

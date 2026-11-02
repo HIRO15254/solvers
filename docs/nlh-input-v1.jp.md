@@ -13,6 +13,7 @@
 - **額は単位付きの値で書く。** 1つの量に1つのkeyを使い、数値と接尾辞なしの額はBB、`Nbb`はBB、`Nc`は整数chipである。
   内部の整数1単位は1 chipで、`table.bb_chips`が1 BBあたりのchip数を定める。BBの額は`table.chip_rounding`で整数chipへ丸める（第5節）。
   tree scriptのsize literalも同じ規則で、pot比は`N%`と書く（第9節）。
+  P1の木はrootを含む各経路を最大512 nodeとする。超過する設定は入力errorとなる。
 - **strict。** 未知key、決定した製品に適用されないkey、旧形式のkeyはerrorとし、黙って無視・近似しない。
   丸めで額が変わった場合はwarningで示す。
 - **lineの行動とboardの表記は厳密**（第7節）。lineの額にはBBとchipのどちらも使え、
@@ -59,14 +60,17 @@ confidence = 1.0
   historyの`[?]`、label pathの`?`は全runoutに一致するwildcard。
   `action`は空にできず、`solvers tree`に表示されるlabelを使う。
   node・labelの額は表示表記（第5節）のほか、BBとchipのどちらでも書け、第5節の方式で丸めた額で照合する。
+  historyは4096 bytes以下、chip接尾辞とcallを区別できない`r...c`は16個以下とする。超過は`NLH003`。
 - `hands`は第8節のrange文字列で、明示weightはすべて1でなければならない。
   `category`は[hand category](hu-postflop.jp.md#hand-category)の式で、`hands`と排他。
   両方省略するとそのnodeのactorの全handが対象。
 - lockは`strategy`（actionから確率へのmap）または`combos`（2枚の異なるcardから
   action確率mapへのmap）のどちらかを必須とする。`combos`は`hands`・`category`と排他。
-  確率は有限の0..1、各戦略の和は1以下（許容誤差1e-9）。部分指定の残りは自由に最適化する。
-  `confidence`は既定1、範囲は(0,1]。1未満なら全actionを指定し和を1にする。
-  `confidence = 1`で全actionを固定する場合も和は1でなければならない。和が1未満なら未指定の自由actionが必要。
+  確率は有限の0..1。列挙した確率の和は1以下とし、絶対許容誤差は1e-6とする。
+  判定では各確率をf32に変換し、解決後のnodeのaction順にf32で加算する。和の上限はf32の`1.000001`。
+  `confidence`は既定1、範囲は(0,1]。1未満なら全actionを指定し、和と1のf32差の絶対値がf32の`1e-6`以下でなければならない。
+  `confidence = 1`で全actionを固定する場合、和はf32の`1 - 1e-6`以上でなければならない。
+  部分指定の残りは自由に最適化する。和がこの下限未満なら未指定の自由actionが必要。
 - incentiveは`action`と、pot比の`pot`またはBB単位の`bb`のどちらか一方を必須とする。
   額は有限で、負の加点も指定できる。frequencyは`action`と0..1の`target`が必須。
   frequencyの対象頻度はrunoutごとに数える。
@@ -185,6 +189,7 @@ BBの額は`bb_chips`を掛け、`chip_rounding`で整数chipへ丸める。
 正確に1 chipにしたい場合は`sb = "1c"`とする。`Nc`は正確に扱い、丸めない。
 正値・範囲やlineの合法性などは丸め後の額で検査する。
 size literalの計算額も同じ方式で丸め、最小full raiseへの引上げとstack capは丸めの後に適用する。
+sizeの百分率は保持された比率へ戻る10進百分率を復元し、他のsize係数とrake率は保持された値を往復できる最短の10進数として、整数演算で積と丸めを求める。例えば5250 chipのpotの`35%`は`nearest`で1838 chip、5500 chipのpotに率`0.07`を掛けたrakeは`up`でも385 chipである。
 
 実効configはkeyとlineの額をすべて`"Nc"`・`Nc`で書く（第13節）。そのため実効configの再読込でkeyとlineの丸めのwarningは出ない。
 tree scriptは書いたまま残すため、丸めで変わるscriptのBB sizeのwarningは再読込でも出る。
@@ -261,6 +266,7 @@ outside_field = [18, 26]     # 既定[]。この卓にいない残存playerのst
   16人以上はDE-ICM（[arXiv:2610.06028](https://arxiv.org/abs/2610.06028)）を固定outside field向けに適応した
   決定的な二重指数型求積であり、乱数を使わない。stackの総和で正規化した格子を1つ使い、
   1 chipのstackまでを窓に含める。exact ICMとの相対差は試験で1e-12以内である。
+  極めて大きな賞金は中間計算のoverflowを避けるため2の冪で縮小し、計算後に元の単位へ戻す。
   そのhandで0になった席は残存者より下位で、開始stackが大きい順に上位とする。同じ開始stackならその順位の賞金を等分する。
 - `payouts`の省略順位には0を補う。卓＋fieldの人数を超える項目は`NLH003`である。
   補完後の全順位が同額なら`NLH003`である。賞金のある順位だけが同額のチケット型サテライトは書ける。
@@ -363,6 +369,7 @@ BB = "random"
 - P2: 書かなかったpositionは`"random"`。
 - P1: 手に残る2人は必須。それ以外のpositionを書くと`NLH003`。boardと衝突するcomboは除き、
   両者に互いに重ならないcomboの組が無ければ`NLH003`。foldしたplayerのcard removalは扱わない。
+  木構築時に互換comboの重みが計算精度上0以下になる場合も`NLH003`となる。
 
 ## 9. `[tree]`
 
@@ -414,7 +421,7 @@ turn, river {
 - street listはカンマで並べる。同じlist内のstreet重複は`NLH003`である。別blockの同じstreetは許す。
   全streetや`postflop`を表す擬似streetは無い。
 - `<street list> when C { ... }`は`<street list> { when C { ... } }`と同じである。
-- `when C { ... }`は囲む条件とANDする。入れ子に文法上の深さ制限は無い。
+- `when C { ... }`は囲む条件とANDする。blockの入れ子の上限は下記の通りである。
 - `if A { ... } else if B { ... } else { ... }`の枝は、`A`、`!A && B`、`!A && !B`と
   排他になる。外側の条件もANDする。`else`は直前の`if`列にだけ付けられる。
 - blockの本文は空にできない。空scriptは許す。文は改行・空白で並べ、`;`は使わない。
@@ -483,10 +490,28 @@ P1はこの手番も1つの行動を持つdecision nodeとして保存する。
 
 `param NAME = VALUE`は単一tokenの置換である。条件・sizeで使える。
 `[tree.params]`の同名keyが上書きする。値はstring、integer、有限float、boolに限る。
-stringの中身も単一tokenでなければならない。未宣言keyや複数tokenは`NLH003`である。
+stringの中身も単一tokenでなければならず、構造を表す`{` / `}`は値に使えない。未宣言keyや不正な値は`NLH003`である。
 `define NAME = CONDITION`は条件だけの別名であり、括弧で囲んで展開する。paramsから上書きできない。
 宣言はトップレベルだけである。宣言同士の参照は先行宣言だけに限り、自己参照・前方参照・重複名はerrorである。
 street blockは宣言を解決した後に展開する。正規化はscript本文とparamsを残し、展開済みruleに置き換えない。
+
+`define`の条件は、対応しない開き`(`があるか、行末が二項演算子（`&&`、`||`、`in`、比較演算子）
+である間、次の行へ続く。コメントや空行は無視し、初めて条件が完結した行の末尾で宣言が終わる。
+未完結の条件の後で別のトップレベル宣言やstreet blockが始まる場合は`NLH003`である。
+完結した条件と同じ行に別のtokenを書くと`NLH003`である。例えば次の2つは有効である。
+
+```text
+define wet = (flush_possible ||
+              straight_possible)
+define shallow = spr <=
+                 2
+flop when wet { checkdown }
+```
+
+資源保護のため、street block自身を含むblockの入れ子は最大64、条件式の各経路の深さは括弧・`!`・
+`&&`・`||`を含め最大64、1つの`if`列の条件付き分岐は最初の`if`を含め最大64、
+宣言とblockの置換で生成するtokenの合計は最大1,000,000とする。
+上限超過は該当行の`NLH003`である。
 
 予約名は全条件変数、全street、`param`、`define`、`when`、`if`、`else`、`in`、
 `add`、`remove`、`replace`、`force`、`jam`、`merge`、`within`、`checkdown`、`fold`、`check`、`call`、`bet`、`raise`、
@@ -519,6 +544,8 @@ comparison = "<" | "<=" | "==" | "!=" | ">=" | ">"
 `1e999`・`inf`・`NaN`等の非有限値は、param/define・overrideを経由する場合もscriptの行を示す`NLH003`で拒否する。
 比較はIEEEの規則に従う。引用textにescape構文は無い。
 text literalは`"BTN"`などの引用形または裸tokenである。bool比較はtrue/falseを使う。
+右辺や`in`の要素に裸の条件変数名は使えず、文字列として比較する場合は引用する。
+`high_card` / `low_card`では裸の`2`〜`9`もrankのtext literalとして扱う（`in`内も同様）。
 数値変数は全比較と`in`、text変数は`==` / `!=` / `in`、bool変数は単独または`==` / `!=`だけである。
 `in`の要素は変数と同じ型に限る。boolの`in`は不可。未知識別子と型不一致は`NLH003`である。
 条件の`true` / `false`単独は定数predicateではない。無条件文は`when`を省く。

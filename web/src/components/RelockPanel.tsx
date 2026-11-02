@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api/client";
 import type { ProfileReport, StrategyRow, TreeRow } from "../api/types";
 import { Button, Card, CardContent, Checkbox, Input, Select } from "../cryst";
-import { actionProfileEntry, classesToRange, relockPayload, roundedStrategy, selectionStrategy, type PendingEntry, type PendingLock } from "../lib/profile";
+import { actionProfileEntry, classesToRange, relockPayload, roundedStrategy, selectionStrategy, validLockSum, type PendingEntry, type PendingLock } from "../lib/profile";
 import { ALL_CLASSES } from "../lib/range";
 import { navigate } from "../route";
 
@@ -73,7 +73,7 @@ function LockEditor({ node, actions, rows, onAdd }: { node: string; actions: str
     } else {
       const probs = values.map((v) => v.trim() === "" ? NaN : Number(v));
       const c = confidence.trim() === "" ? undefined : Number(confidence);
-      if (probs.length !== actions.length || probs.some((p) => !Number.isFinite(p) || p < 0 || p > 1) || Math.abs(probs.reduce((a, b) => a + b, 0) - 1) > 0.00001) return setError("Action probabilities must be between 0 and 1 and sum to 1.");
+      if (probs.length !== actions.length || probs.some((p) => !Number.isFinite(p) || p < 0 || p > 1) || !validLockSum(probs, c ?? 1)) return setError("Action probabilities must be between 0 and 1 and sum to 1 within 1e-6.");
       if (c !== undefined && (!Number.isFinite(c) || c < 0 || c > 1)) return setError("Confidence must be between 0 and 1.");
       const lock: PendingLock = { node, ...selector, strategy: Object.fromEntries(actions.map((action, i) => [action, probs[i]!])) };
       if (c !== undefined) lock.confidence = c;

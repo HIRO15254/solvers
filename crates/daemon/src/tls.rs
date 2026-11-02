@@ -38,11 +38,8 @@ impl Tls {
     }
 }
 
-/// Whether every address `bind` resolves to is loopback.
-///
-/// A hostname can resolve to several addresses, and reaching the daemon over
-/// any one of them is enough, so this is only true when they all are.
-pub fn is_loopback(bind: &str) -> Result<bool> {
+/// Resolve once and check every candidate before any of them is bound.
+pub fn checked_addresses(bind: &str, tls: bool) -> Result<Vec<SocketAddr>> {
     let addresses: Vec<SocketAddr> = bind
         .to_socket_addrs()
         .with_context(|| format!("resolving the bind address {bind}"))?
@@ -50,13 +47,8 @@ pub fn is_loopback(bind: &str) -> Result<bool> {
     if addresses.is_empty() {
         anyhow::bail!("the bind address {bind} resolved to nothing");
     }
-    Ok(addresses.iter().all(|address| address.ip().is_loopback()))
-}
-
-/// Refuses a configuration that would put the token on the wire in clear.
-pub fn check_exposure(bind: &str, tls: bool) -> Result<()> {
-    if tls || is_loopback(bind)? {
-        return Ok(());
+    if tls || addresses.iter().all(|address| address.ip().is_loopback()) {
+        return Ok(addresses);
     }
     anyhow::bail!(
         "refusing to bind {bind} without TLS: the bearer token would cross the network \
@@ -71,28 +63,32 @@ mod tests {
 
     #[test]
     fn loopback_addresses_are_recognized() {
-        assert!(is_loopback("127.0.0.1:38127").unwrap());
-        assert!(is_loopback("localhost:38127").unwrap());
-        assert!(is_loopback("[::1]:38127").unwrap());
-        assert!(!is_loopback("0.0.0.0:38127").unwrap());
+        for bind in ["127.0.0.1:38127", "localhost:38127", "[::1]:38127"] {
+            assert!(
+                checked_addresses(bind, false)
+                    .unwrap()
+                    .iter()
+                    .all(|address| address.ip().is_loopback())
+            );
+        }
+        assert!(checked_addresses("0.0.0.0:38127", false).is_err());
     }
 
-    /// The whole point: a token on a clear network connection is a token
-    /// anyone on the path can take and use.
     #[test]
     fn a_public_bind_without_tls_is_refused() {
-        let error = check_exposure("0.0.0.0:38127", false)
+        let error = checked_addresses("0.0.0.0:38127", false)
             .unwrap_err()
             .to_string();
         assert!(error.contains("without TLS"), "{error}");
         assert!(error.contains("--tls-cert"), "{error}");
 
-        check_exposure("0.0.0.0:38127", true).expect("TLS makes a public bind acceptable");
-        check_exposure("127.0.0.1:38127", false).expect("loopback needs no TLS");
+        checked_addresses("0.0.0.0:38127", true).expect("TLS makes a public bind acceptable");
+        checked_addresses("127.0.0.1:38127", false).expect("loopback needs no TLS");
     }
 
     #[test]
     fn an_unresolvable_bind_is_an_error() {
-        assert!(check_exposure("no-such-host.invalid:38127", false).is_err());
+        assert!(checked_addresses("no-such-host.invalid:38127", false).is_err());
+        assert!(checked_addresses("no-such-host.invalid:38127", true).is_err());
     }
 }

@@ -55,8 +55,60 @@ export const ALL_CLASSES: string[] = RANKS.split("").flatMap((_, i) => RANKS.spl
 const RANK = "[AKQJT2-9]";
 const COMBO = new RegExp(`^(${RANK})([shdc])(${RANK})([shdc])$`, "i");
 const SINGLE = new RegExp(`^(${RANK})(${RANK})([so]?)(\\+?)$`, "i");
-const SPAN = new RegExp(`^(${RANK})(${RANK})([so]?)\\s*-\\s*(${RANK})(${RANK})([so]?)$`, "i");
+const WHITE_SPACE = "[\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000]";
+const TRIM = new RegExp(`^${WHITE_SPACE}+|${WHITE_SPACE}+$`, "g");
+const SPAN = new RegExp(`^(${RANK})(${RANK})([so]?)${WHITE_SPACE}*-${WHITE_SPACE}*(${RANK})(${RANK})([so]?)$`, "i");
 const WEIGHT = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/;
+
+/** Rust's char::is_whitespace, rather than JavaScript's different whitespace set. */
+const rustTrim = (text: string) => text.replace(TRIM, "");
+
+/** Parse a decimal directly to f32, correcting the rare f64 midpoint double-round. */
+function weightF32(text: string): number {
+  const value = Number(text);
+  const rounded = Math.fround(value);
+  const magnitude = Math.abs(value);
+  if (!Number.isFinite(value) || magnitude === 0 || !Number.isFinite(rounded)) return rounded;
+
+  const bits = new DataView(new ArrayBuffer(4));
+  bits.setFloat32(0, Math.abs(rounded));
+  const nearest = bits.getUint32(0);
+  const lower = magnitude < Math.abs(rounded) ? nearest - 1 : nearest;
+  const upper = lower + 1;
+  bits.setUint32(0, lower);
+  const lo = bits.getFloat32(0);
+  bits.setUint32(0, upper);
+  const hi = bits.getFloat32(0);
+  if (magnitude !== (lo + hi) / 2) return rounded;
+
+  // An f32 is an integer multiple of 2^-149; its midpoint is a
+  // multiple of 2^-150. Convert that exact dyadic to decimal digits.
+  const units = (word: number): bigint => {
+    const exponent = (word >>> 23) & 0xff;
+    const fraction = word & 0x7fffff;
+    return exponent === 0 ? BigInt(fraction) : BigInt(fraction | 0x800000) << BigInt(exponent - 1);
+  };
+  const midpoint = ((units(lower) + units(upper)) * 5n ** 150n).toString();
+  const [mantissa = "", exponentText = "0"] = text.replace(/^[+-]/, "").split(/[eE]/);
+  const dot = mantissa.indexOf(".");
+  const digits = mantissa.replace(".", "").replace(/^0+/, "");
+  const decimalPower = Number(exponentText) - (dot < 0 ? 0 : mantissa.length - dot - 1);
+  const order = digits.length + decimalPower;
+  const midpointOrder = midpoint.length - 150;
+  let comparison = Math.sign(order - midpointOrder);
+  if (comparison === 0) {
+    for (let i = 0; i < Math.max(digits.length, midpoint.length); i++) {
+      const a = digits.charCodeAt(i) || 48;
+      const b = midpoint.charCodeAt(i) || 48;
+      if (a !== b) {
+        comparison = Math.sign(a - b);
+        break;
+      }
+    }
+  }
+  if (comparison === 0) return rounded;
+  return (value < 0 ? -1 : 1) * (comparison < 0 ? lo : hi);
+}
 
 /** One class described by rank indexes (`hi <= lo`) and suitedness (`""` = both). */
 interface ClassRef {
@@ -126,18 +178,18 @@ export function parseRange(text: string): ParsedRange {
     return { weights, errors };
   }
   for (const raw of text.split(",")) {
-    let entry = raw.trim();
+    let entry = rustTrim(raw);
     if (!entry) continue;
     let weight = 1;
     const colon = entry.indexOf(":");
     if (colon >= 0) {
-      const value = entry.slice(colon + 1).trim();
-      weight = Math.fround(Number(value));
-      if (!WEIGHT.test(value) || !Number.isFinite(weight) || weight < 0 || weight > 1) {
-        errors.push(`${raw.trim()}: weight must be a finite number in 0..1`);
+      const value = rustTrim(entry.slice(colon + 1));
+      weight = WEIGHT.test(value) ? weightF32(value) : NaN;
+      if (!Number.isFinite(weight) || weight < 0 || weight > 1) {
+        errors.push(`${rustTrim(raw)}: weight must be a finite number in 0..1`);
         continue;
       }
-      entry = entry.slice(0, colon).trim();
+      entry = rustTrim(entry.slice(0, colon));
     }
     const combo = COMBO.exec(entry);
     if (combo) {

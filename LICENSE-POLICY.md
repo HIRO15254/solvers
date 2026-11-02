@@ -7,6 +7,7 @@ This repository is licensed under **MIT OR Apache-2.0** (dual license, at your o
 | Source | License | Use |
 |---|---|---|
 | aya_poker (crates.io) | Zlib OR Apache-2.0 OR MIT | dependency |
+| tiny_http 0.12.0 (crates.io, vendored at `third_party/tiny_http`) | MIT OR Apache-2.0 | daemon HTTP server; local security patch documented in `third_party/tiny_http/PATCHES.md` |
 | rayon, serde, clap, etc. (crates.io) | MIT/Apache-2.0 | dependency |
 | Academic papers (CFR+, DCFR, MCCFR, ...) | n/a (ideas) | algorithms reimplemented independently, cited in docs |
 | Tabler Icons 3.34.1 (`web/vendor/cryst/fonts/tabler-icons.woff2`) | MIT (`LICENSE-TablerIcons.txt` beside font) | vendored GUI asset |

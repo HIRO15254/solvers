@@ -96,7 +96,8 @@ fn run<const PRUNE: bool>(
         root_dims: PerPlayer::new(own_dim, opp_dim),
         masks: vec![],
         transitions: vec![],
-    });
+    })
+    .unwrap();
     assert_eq!(
         own_dim != 0 && parallel_actions(&tree, 0),
         threads > 1 && own_dim != 0

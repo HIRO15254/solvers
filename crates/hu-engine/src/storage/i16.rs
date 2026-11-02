@@ -13,13 +13,13 @@ pub(super) fn quantize_block(vals: &[f32], max_abs: f32, out_q: &mut [i16]) -> f
         out_q.fill(0);
         return 1.0;
     }
-    let scale = max_abs / 32_000.0;
+    let scale = (max_abs / 32_000.0).max(f32::from_bits(1));
     // Use a double-precision reciprocal/product to avoid creating artificial
     // half-integer ties by rounding the product to f32 before rounding to i16.
     let inverse = f64::from(scale).recip();
     if !inverse.is_finite() || inverse > f64::from(f32::MAX) {
-        // Very small subnormal blocks can underflow the scale or overflow
-        // its reciprocal. Preserve saturating conversion in that rare case.
+        // Subnormal scales can yield a reciprocal too large for f32 and
+        // rounding the scale can exceed the unchecked conversion bound.
         for (o, &v) in out_q.iter_mut().zip(vals) {
             *o = (v / scale).round_ties_even() as i16;
         }

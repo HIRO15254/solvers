@@ -10,39 +10,6 @@
     "seed": 0,
     "turn_buckets": 2
   },
-  "6max_100bb_nl50_partial_reference.toml": {
-    "active_opponent_buckets": [],
-    "artifact_cache": null,
-    "flop_buckets": 256,
-    "kind": "ehs2-table",
-    "recall": "street",
-    "river_buckets": 256,
-    "rollout_samples": 512,
-    "seed": 0,
-    "turn_buckets": 256
-  },
-  "6max_100bb_nl50_partial_reference_limp.toml": {
-    "active_opponent_buckets": [],
-    "artifact_cache": null,
-    "flop_buckets": 256,
-    "kind": "ehs2-table",
-    "recall": "street",
-    "river_buckets": 256,
-    "rollout_samples": 512,
-    "seed": 0,
-    "turn_buckets": 256
-  },
-  "6max_100bb_nl50_partial_simple_reference.toml": {
-    "active_opponent_buckets": [],
-    "artifact_cache": null,
-    "flop_buckets": 32,
-    "kind": "ehs2-table",
-    "recall": "street",
-    "river_buckets": 32,
-    "rollout_samples": 512,
-    "seed": 0,
-    "turn_buckets": 32
-  },
   "6max_20bb_checkdown.toml": {
     "active_opponent_buckets": [],
     "artifact_cache": null,

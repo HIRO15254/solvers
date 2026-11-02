@@ -147,11 +147,13 @@ BB額と計算したsizeは`table.chip_rounding`（`down` / `nearest` / `up`、�
 例えば`bb_chips = 3`の既定SB 0.5 BBは`nearest`なら2 chipsになる。1 chipのSBが必要なら`sb = "1c"`と書く。
 丸めで変わったBB値はvalidateの警告に位置（key、line action、script位置または既定SB）、元のBB値、結果のchip数と丸め方式が表示される。構文と丸め後の合法性は引き続き検査する。
 rakeの丸めは`economics.rake.rounding_unit`（既定`"1c"`）と`economics.rake.rounding`で別に指定する。P1のrange指定やline文法は規範の例に従う。
+sizeの百分率は保持された比率へ戻る10進百分率を復元して計算する。例えば5250 chipのpotの`35%`は`nearest`で1838 chipとなる。
 P1ではPreflop ruleは効果を持たず、指定すると警告が出る。
 `checkdown`は一致した手番のmenuをcheck、賭けに直面していればfoldだけにする。後続ruleはこのmenuをさらに編集できる。
 外部`.tree`を使う場合はconfigからの相対pathと`tree.params`を記し、
 [river_script.toml](../examples/hu-postflop/river_script.toml)を参照する。
 tree scriptのsizeは接尾辞なし数値と`Nbb`がBB、`Nc`がchip、`N%`がpot比である。例えばpot 33%は`33%`で、`33`は33 BBである。`[tree.params]`の数値overrideもBBなので、pot比は`cb = "33%"`とする。`Nx`、`Ne`、`N%stack`、`N%effective`、`a`、`min`も使える。旧`50%pot`などは使えない。
+木はrootを含む各経路が512 nodeまでで、それを超える入力や保存済み`.sol`は拒否する。
 旧configの自動変換は無いため、現行例から書き直す。
 `tree.allin_threshold`・`[tree.max_aggressive_actions]`・`tree.preflop_reraise_jam_above_stack`は削除済みで、指定は未知keyの`NLH002`となる。
 これらを埋込みconfigに含むartifact・checkpointも読み込めない。
@@ -202,6 +204,8 @@ solvers validate spot.toml --resources
 
 製品・開始状態・暗黙fold・tree ruleを確認する。実効入力は既定値を展開し、外部scriptをinline化する。
 実効configは全tableで額のkeyと`spot.line`の額を`Nc`文字列にし、stackが異なる場合は全positionを`[table.stacks]`に書く。script本文はそのまま保持する。`--show-effective`・`--write-effective`、`run.toml`、relockの`--print-config`、solution・checkpointに埋め込まれるconfigはこの形式である。再正規化は同じbytesになり、keyとlineの額の丸め警告は繰り返さない。scriptは書いたまま残るため、丸めで変わるscriptのBB sizeは再読込でも警告する。
+実効configのprofileはlock、incentive、frequency、freeze_upstreamの順に出力する。旧版の並びで保存したrunやcheckpointも互換性hashを維持して再開できる。
+ただしv0.2.0のconfigでbet sizeまたはrakeが小数の丸め境界にあった場合、額が1 chip変わり、木の形状も変わるとcheckpointのresumeは`storage backend or lengths mismatch`で失敗するため、そのspotを再solveする。
 P1は木と3種類のstorage bytes（JSON: `f32Bytes`・`i16Bytes`・`i16F32avgBytes`）を見積もる。P2の通常validateは木を歩かず、ruleHitStatusは`not-checked`となる。
 P2の`--resources`はpublic treeのarena countとrule hit測定を行うため、大きい木では時間が掛かる。
 `complete`なら未一致ruleの警告を確認する。`incomplete`なら未使用ruleの判定は保留である。
@@ -236,6 +240,7 @@ solvers tree spot.toml --rest-of-street --format json
 
 既定はrootだけを返す。JSONの`children`にある履歴をそのまま`--node`へ渡して辿れる。
 `--node`やprofile・relockのselector、action labelは表示表記のほか、BB（接尾辞なしまたは`bb`付き）と`Nc`を受け付け、丸め後のchip額で照合する。
+履歴selectorは4096 bytes以下、曖昧な`r...c`は16個以下に制限される。
 行の意味は`export SOLUTION tree`と同じだが、まだ保存状態が無いので`stored`は含まない。
 solveやrun directoryの作成は行わず、P2 configと未知nodeは明示的に拒否する。
 
@@ -261,11 +266,14 @@ P1はNashConv / 2の目標、P2は測定deviationの目標を検査する。
 反復・sweep・時間の上限で終わったことは品質目標の達成を意味しない。
 保存物はrun.toml、manifest.json、events.jsonl、progress.jsonl、run.jsonと、
 P1のcheckpoint.ckpt / solution.solまたはP2のcheckpoint.mwckpt / solution.mwsolである。
+heads-up postflopの停止理由はmanifestの`completion`に記録され、statusやruns lsで確認できる。目標達成、反復上限、時間上限、キャンセルはそれぞれ`target-reached`、`max-iterations`、`time-limit`、`cancelled`である。目標または反復上限への到達とキャンセルが同時なら到達を優先する。
 `run.lock`は排他OS lock用の共通fileであり、artifactではない。process終了・crashでlockは自動解放され、fileが残っていても妨げにならない。
 P1の`[solver] cfr_precision`は`"f32"`（既定）または`"f64"`（旧版とbit一致）。CFR終端とcurrent strategyだけに作用し、評価・平均戦略・保存EVはf64を使う。
 
 P1の保存streetは`[output] solution_streets`で設定する。
 no-riversはRiverの戦略と値を省く。省いたRiverはviewer・`export --resolve-rivers`・Web GUIのResultsが開いた時にその場で再solveする。
+各席に到達weightが`1e-9`を厳密に超えるhandが少なくとも1つ必要で、一方でも満たさない場合や正の重みを持つ互換handの組がない場合は再solveできない。
+互換handの組があっても、数値精度上その合計重みを正と判定できなければ同様に失敗する。
 
 ### P1のnodelockと相手profile
 
@@ -282,6 +290,7 @@ comboごとの固定のほか、`combos`の代わりに`hands = "AA,KK"`また�
 `category = "toppair & !flushdraw"`と`strategy = { check = 0.5 }`を使える。
 部分lockでは残りの確率を未指定actionで最適化する。`confidence = 0.5`のsoft lockは
 固定戦略50%と自由戦略50%を混ぜるため、全actionの確率を指定し合計1にする。
+確率の和には絶対許容誤差1e-6を使い、f32の丸めを含む正確な判定は[共通Input規範](nlh-input-v1.jp.md)に従う。
 categoryの名称と式は[P1規範](hu-postflop.jp.md#hand-category)を参照する。
 
 相手の判断を偏らせるには別の`[[profile.incentive]]`で`node`、`action`、任意の
@@ -340,6 +349,7 @@ soft lockには`--confidence P`を指定する。既定では上流も自由に�
 ## 5. 監視・停止・再開する
 
 P1の`[run] final_checkpoint = false`は終了時の再開state保存を省く設定で、既定はtrue（PF9、2026-10-08）。目標到達・iteration上限・時間上限・cancelの全てに適用し、定期checkpointと`.sol`は従来どおり保存する。保存した`run.toml`を編集してresumeにも適用できる。P2では指定不可（`NLH002`）。省いたrunは最終状態から再開できず、最後の定期checkpointから続ける。定期checkpointも無ければ`run.toml`から再solveする。再開時のprogressはcrash再開と同じ追記方式で、checkpointより後の既存行も残るためiterationが重複し得る。
+checkpointの置換失敗は約10秒間再試行します。定期保存に失敗すると警告し、前のcheckpointを残して次の間隔で再試行します。最終保存に失敗すると`.sol`は保存しますがrunは失敗として終了します。実効configなどを含むcheckpoint metadataが16 MiBを超える場合は反復開始前に拒否します。lockを減らすなどしてconfigを小さくしてください。
 autoの評価は時間・thread数に依存せず、progressは評価ごとに追記するためtarget有りでは不等間隔になる。中断・max_time・定期checkpointの判定はautoで25 iteration以下のsub-batchごと、整数で指定間隔ごとに行う。
 autoの再開はprogress.jsonlのcheckpoint iteration以下の行を使い、同じiterationの重複は最後の行を採用して次の評価を再計算する。同じconfigで一度に解いたrunと評価iteration・停止iteration・stateが一致する。progressが無い・読めない場合は履歴無しとしてcheckpoint iteration＋25（max_iterationsで切る）から評価するため、評価iteration一致を保証しない。裸のcheckpointだけを移した場合も同様である。checkpoint形式は変わらず、旧run.tomlの`check_every = 25`は固定25で再開する。
 
@@ -399,6 +409,7 @@ solvers report examples/hu-postflop/river_small.toml --boards "2c7d9hJsQs,2c7d9h
 
 REPLのshowでactionを確認し、goで子へ進み、grid・combosで戦略、eqで到達rangeのequityを見る。
 up/rootで戻り、quitで終える。evはroot summaryで、hand別EVはexport evを使う。
+`eq`は代表cardが記録されない同型併合runoutの`[dealN]`以降では使えない。親streetまたは具体的なcardのbranchを使う。`export ev`は自分または互換な相手の到達weightがゼロのhandを省く。
 no-riversの未保存Riverをviewerで開くと再solveする。`export`も`--resolve-rivers`を付けると未保存Riverの`actions`・`strategy`・`ev`を同じ再solveで出す
 （反復予算は`--river-iterations`、既定500）。3つとも要るなら`export SOL decision --node NODE --resolve-rivers`の1回でJSONにまとめて受け取ると再solveも1回で済む。
 再計算値を保存時の値と同一視しない。
@@ -416,9 +427,9 @@ evaluateは保存averageを復元し、deviation gainとCI、coverageを再測�
 未訪問columnと量子化前の値は復元できない。小さいgainをexploitability上界やNash保証として読まない。
 coverageは訪問内訳であり、全branchの学習率ではない。
 compareは通常同一gameを要求する。`--cross-game`でもseat mappingとutility単位は一致が必要である。
-P1のsolution同士もcompareできるが、tree形状と保存node集合の一致が必要である。
-通常はboard・pot・effective stack、seat別comboリスト、各nodeのaction label（size込み）も一致させる。
-rangeの重みやalgorithmだけの違いは許す。意図的に異なるspotを形状だけで対応付ける場合は`--cross-game`を付ける。
+P1のsolution同士もcompareでき、木の接続・手番・chance branch、保存node集合、seat別comboリストとutility単位は`--cross-game`でも一致が必要である。
+通常はboard・pot・effective stackと各nodeのaction label（size込み）も一致させる。
+rangeの重みやalgorithmだけの違いは許す。両側で到達可能なhandだけを比較し、除外hand-node数を出す。比較可能なhandが全nodeにない指標はnullとなる。
 P2のPreflop-only出力は未達で、現行artifactにPostflop blockが含まれうる。
 
 ### P2からP1の入力を作る（derive）
@@ -467,6 +478,8 @@ solversd --runs runs --max-concurrent 1
 ```
 
 表示されたbearer tokenを全`/v1` API requestのAuthorizationへ付ける。
+JSON本文は最大64 MiBで、超過時はHTTP 413 `payload-too-large`となる。
+同時処理中のrequestが64件に達すると、認証前も含めHTTP 503 `server-busy`を返す。
 POST /v1/validateまたはPOST /v1/runsへJSONのconfigTomlを送る。
 上流固定には任意の`freezeBaseRunId`を同じJSONに指定できる。daemon管理下の停止済みP1 runの
 `solution.sol`をdaemonが選び、pathとSHA-256を実効configへ入れる。clientからpathは送れない。
@@ -476,6 +489,7 @@ P1のsolve前の木はPOST /v1/treeへconfigTomlと任意のnodes配列を送り
 nodes省略・空配列ならrootだけで、childrenの履歴を次のnodesへ渡せる。storedは含まない。restOfStreet: trueで各nodeのstreetの残りも返す。
 外部source参照は拒否されるため、先にvalidate --write-effectiveでinline化する。
 daemonは同じCLIを起動し、run directoryに状態を保存する。再起動後もrun rootから一覧を復元する。
+待機中のsolveとresumeはFIFO順で保存され、再起動後も復元される。空きslotができると操作を待たずに次を開始する。再起動前から生存するprocessも同時実行数に含まれ、cancelできる。起動前の失敗は`failed`とfailureに記録される。
 run一覧・詳細は`lastProgress`に最後のraw進捗行を含み、P1では`nash_conv / 2`を一覧のExploitabilityに使える。進捗行がまだ無ければこのfieldは省略される。
 停止済みP1 solutionからは`POST /v1/runs/{id}/relock`へ
 `{"profileToml":"...", "replace":true, "clearProfile":false, "freezeUpstream":false}`を送り、
@@ -492,9 +506,7 @@ P1の`resolve=rivers`はno-riversで未保存のRiver節点を`export --resolve-
 Riverのlock・incentive・固定祖先は再solveにも適用され、frequencyは元runの最終λを固定して使う。基準`.sol`は閲覧に不要で、再solveの値は元runの保存値ではない。
 同じnodeの`actions`・`strategy`・`ev`は`GET /v1/runs/{id}/solution/decision?node=...`の1 requestにまとめられる（P1のみ、JSONのみ）。
 `restOfStreet=true`を付けると各nodeの後にそのstreetの残りのaction nodeも返す。Riverの入口に付ければ1回の再solveでそのRiverの全action nodeが得られる。
-queue中のcancelは`canceled`として保存され、daemonを再起動しても実行されない。未開始runにはcheckpointが無く
-resumeできないため、再計算には新規runを投入する。実行中のcancelは1回目のCtrl-Cと同じく境界で止まり、
-checkpointがあればresumeできる。Windowsではdaemonをconsoleのある端末から起動する
+queue中のcancelは`canceled`として保存され、daemonを再起動しても実行されない。新規runの開始前にはcheckpointが無いが、待機中resumeをcancelしても元のcheckpointは残る。実行中のcancelは1回目のCtrl-Cと同じく境界で止まり、checkpointがあればresumeできる。Windowsではdaemonをconsoleのある端末から起動する
 （console無しでは実行中runのcancelが`internal` errorになる）。
 
 ### Web GUI
@@ -516,6 +528,8 @@ browserの起動に失敗してもdaemonは動き続け、stderrに警告を出�
 `--open`を省略した場合もそのURLを手動で開ける。tokenはそのoriginに保存され、
 無効なら入力欄が出る。静的assetは認証不要だが`/v1` APIは引き続きbearer tokenが必要である。
 `/`と拡張子なしの未存在pathは`index.html`へ、未存在のassetは404となる。
+UI directoryは信頼できるものを使い、信頼できない利用者がdirectoryや内容を変更できないようにする。
+静的fileのパス検査とopenは別操作である。
 明示`--ui DIR`は自動検出より優先する。`--ui`省略時は実行binaryの隣の`ui/index.html`を探し、
 無ければAPI専用となり全requestの認証が必要である（作業directoryの`ui/`は探さない）。
 UI無しで`--open`を指定すると起動errorになる。endpointとflagは[CLI reference](cli-reference.jp.md#solversd)を参照する。
@@ -564,6 +578,7 @@ GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付�
     手番が来る席のpositionだけを破線のbadgeで並べる（daemonのreplayで前の席がcheck、できなければfoldしたときに手番が回る席）。
     badgeを押すとpopoverにその席の行動（fold・check・call 額・bet / raise 最小–最大・all-in 額）が出て、選ぶとその前の席を
     check / foldで補ってlineへ足す。bet・raiseはそのstreetでの合計額を書いて足し、範囲外の額は足さずに理由を示す。
+    額の入力欄の最小・最大はBBで表示する。行動のbadgeにはchip単位で表示される場合もある。
     replayのbadgeを押すと、そのactionの前まで戻す。
     組み立て途中のlineはfoldを含む明示の手順でreplayし続け、lineを手で書き換えるかpresetを選ぶと書いたlineのreplayへ戻る。
     boardは文字で直すか「Choose」（flop・turn・riverの順に最大5枚）で選び、
@@ -609,6 +624,8 @@ GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付�
   13×13 gridは戦略・EV・Rangeをclassごとに到達weightで集計し、hand tabでcombo別の値を見る。戦略の色はセル幅いっぱいに
   actionの割合で区切り線なしに塗り分ける。actionの色はGTO Wizardの既定に揃え、foldは青、check・callは緑、bet・raiseは
   menuの小さい順に4段の赤（5つ以上は最も明るい赤から最も暗い赤までを等分）である。
+  Rangeで手番でない席を選ぶと、hand tabはその席の到達weightとEVを表示する（戦略は手番の席のみ）。
+  RunsのResults buttonはsolutionがある終了済みrunに表示し、再開後の待機中・実行中は表示しない。
   「Lock & re-solve」では現在の節点にlock・incentive・頻度目標を追加し、不要なentryを取り除いてから
   再solveできる。replaceと上流固定の選択はまとめて送るprofileに適用される。
   エクスポートは現在節点の`strategy` CSVを保存する。no-riversのrunで未保存のRiver節点を開くと、そのRiverの部分木を
@@ -625,6 +642,7 @@ GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付�
 | `NLH001` / 2 | schemaを`solvers.nlh/v1`にした現行例から入力を書き直す |
 | `NLH002` / 2 | 未知key・型・製品に適用されないkeyを確認 |
 | `NLH003` / 2 | 値、range、tree条件・size・最終menuを確認。script位置も読む |
+| 互換comboの重みが計算精度上0 | OOP/IPの重なりを確認し、極端に小さい互換handの重みを見直す |
 | `NLH004` / 2 | lineの綴り、action順、合法min-raise・callを確認 |
 | `NLH005` / 2 | 開始street・board・残player数が製品の対象か確認 |
 | `removed config family ...` / 3 | 現行configから再solve。旧solution/checkpoint/runは照会・再開できない |

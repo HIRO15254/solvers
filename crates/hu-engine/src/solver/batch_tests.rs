@@ -196,7 +196,8 @@ fn fixture(turn: bool) -> (PublicTree, Evaluator) {
         root_dims: dims,
         masks,
         transitions: vec![],
-    });
+    })
+    .unwrap();
     (
         tree,
         Evaluator {
@@ -577,7 +578,8 @@ fn storage_preorder_matches_recursive_bits_when_node_order_differs() {
         root_dims: e.hands.as_ref().map(|h| h.len() as u32),
         masks: vec![],
         transitions: vec![],
-    });
+    })
+    .unwrap();
     let id_order: Vec<_> = Subtree::new(&tree, 0)
         .walk()
         .filter(|&id| tree.node(id).kind == NodeKind::Action)

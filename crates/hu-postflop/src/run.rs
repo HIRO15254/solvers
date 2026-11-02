@@ -769,6 +769,15 @@ fn drive_ready<S: Storage>(
                 .map_or(String::new(), |reason| format!(" (fallback: {reason})"))
         )));
     }
+    crate::checkpoint::preflight_metadata(
+        solver.storage(),
+        &p.effective,
+        stop.max_iterations
+            .max(state.as_ref().map_or(solver.iteration(), |s| s.iteration)),
+        &controller.lambdas,
+        mode,
+    )
+    .context("checkpoint metadata preflight")?;
     if let Some(state) = state {
         if state.mode != mode {
             bail!(
@@ -861,7 +870,7 @@ fn drive_ready<S: Storage>(
         }
         let elapsed_secs = (elapsed_before + start.elapsed()).as_secs_f64();
         if last_checkpoint.elapsed() >= interval {
-            save(
+            match save(
                 &solver,
                 p,
                 checkpoint,
@@ -869,17 +878,31 @@ fn drive_ready<S: Storage>(
                 observer,
                 &controller.lambdas,
                 mode,
-            )?;
+            ) {
+                Ok(()) => saved_iteration = Some(solver.iteration()),
+                Err(error)
+                    if error
+                        .downcast_ref::<crate::checkpoint::CheckpointError>()
+                        .is_some() =>
+                {
+                    diagnostics(Diagnostic::Warning(format!(
+                        "checkpoint save failed; will retry at the next interval: {error:#}"
+                    )));
+                }
+                Err(error) => return Err(error),
+            }
             last_checkpoint = Instant::now();
-            saved_iteration = Some(solver.iteration());
+        }
+        if target_reached {
+            reason = "target-reached";
+            break;
+        }
+        if solver.iteration() >= stop.max_iterations {
+            break;
         }
         if cancel.load(std::sync::atomic::Ordering::SeqCst) {
             canceled = true;
             reason = "cancelled";
-            break;
-        }
-        if target_reached {
-            reason = "target-reached";
             break;
         }
         if matches!(stop.check_every, input::CheckEvery::Auto)
@@ -973,10 +996,10 @@ fn drive_ready<S: Storage>(
         );
         // join waits for both writers, even on error. A successful .sol may
         // remain on checkpoint failure; the caller records the run as failed.
-        checkpoint_result?;
         solution_result?;
+        checkpoint_result.context("final checkpoint save failed; solution was written")?;
     } else {
-        if final_checkpoint {
+        let checkpoint_result = if final_checkpoint {
             save(
                 &solver,
                 p,
@@ -985,8 +1008,10 @@ fn drive_ready<S: Storage>(
                 observer,
                 &controller.lambdas,
                 mode,
-            )?;
-        }
+            )
+        } else {
+            Ok(())
+        };
         solver.release_regrets();
         crate::artifact::export_sol(
             &spec,
@@ -997,6 +1022,7 @@ fn drive_ready<S: Storage>(
             &summary,
             &mut |d| diagnostics(Diagnostic::Artifact(d)),
         )?;
+        checkpoint_result.context("final checkpoint save failed; solution was written")?;
     }
     if let Some(errors) = &base_errors {
         check_base_error(errors)?;
@@ -1246,6 +1272,87 @@ node = "root"
 action = "check"
 target = 0.5
 "#;
+
+    #[test]
+    fn periodic_checkpoint_failure_does_not_prevent_solution() {
+        let dir = tempfile::tempdir().unwrap();
+        let input = RIVER_PROFILE
+            .replace("max_iterations = 4000", "max_iterations = 1")
+            .replace("check_every = 25", "check_every = 1")
+            .replace(
+                "threads = 1",
+                "threads = 1\ncheckpoint_interval = '0.000000001s'\nfinal_checkpoint = false",
+            );
+        let p = crate::prepare::prepare(&input, &dir.path().join("spot.toml")).unwrap();
+        let checkpoint = dir.path().join("missing").join("checkpoint.ckpt");
+        let solution = dir.path().join("solution.sol");
+        let mut warned = false;
+        run(
+            RunRequest {
+                prepared: &p,
+                checkpoint: &checkpoint,
+                solution: &solution,
+                state: None,
+                evaluation_history: Vec::new(),
+                elapsed_before: Duration::ZERO,
+                cancel: &AtomicBool::new(false),
+            },
+            &mut |_| Ok(()),
+            &mut |diagnostic| {
+                if let Diagnostic::Warning(message) = diagnostic {
+                    warned |= message.contains("checkpoint save failed");
+                }
+            },
+        )
+        .unwrap();
+        assert!(warned);
+        assert!(solution.is_file());
+    }
+
+    #[test]
+    fn reached_target_or_budget_beats_cancel_at_evaluation() {
+        use std::sync::atomic::Ordering;
+        for (target, expected) in [(true, "target-reached"), (false, "max-iterations")] {
+            let dir = tempfile::tempdir().unwrap();
+            let budget = if target {
+                "max_iterations = 2"
+            } else {
+                "max_iterations = 1"
+            };
+            let mut input = RIVER_PROFILE
+                .replace("max_iterations = 4000", budget)
+                .replace("check_every = 25", "check_every = 1");
+            if target {
+                input = input.replace("[solver.stop]", "[solver.stop]\ntarget = \"100bb\"");
+            }
+            let p = crate::prepare::prepare(&input, &dir.path().join("spot.toml")).unwrap();
+            let cancel = AtomicBool::new(false);
+            let mut reason = None;
+            let summary = run(
+                RunRequest {
+                    prepared: &p,
+                    checkpoint: &dir.path().join("checkpoint.ckpt"),
+                    solution: &dir.path().join("solution.sol"),
+                    state: None,
+                    evaluation_history: Vec::new(),
+                    elapsed_before: Duration::ZERO,
+                    cancel: &cancel,
+                },
+                &mut |event| {
+                    match event {
+                        Observation::Progress(_) => cancel.store(true, Ordering::SeqCst),
+                        Observation::Stop { reason: value } => reason = Some(value),
+                        _ => {}
+                    }
+                    Ok(())
+                },
+                &mut |_| {},
+            )
+            .unwrap();
+            assert!(!summary.canceled);
+            assert_eq!(reason, Some(expected));
+        }
+    }
 
     #[test]
     fn river_frequency_target_is_reported_and_persisted() {

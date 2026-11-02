@@ -94,7 +94,9 @@ def main() -> None:
     source = args.source.resolve()
     output = args.out.resolve()
     output.mkdir(parents=True, exist_ok=False)
-    fixture = source / "examples/bench_multiway/6max_100bb_nl50_partial_reference.toml"
+    fixture = source / "examples/bench/6max_100bb_nl50_partial_reference.toml"
+    if not fixture.is_file():
+        parser.error(f"missing local-only research fixture: {fixture}")
     base = fixture.read_text()
     if args.cloud_threads < 1:
         parser.error("--cloud-threads must be positive")

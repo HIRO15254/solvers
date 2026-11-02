@@ -26,9 +26,9 @@ exploitability、Nash収束、GTOWと同一のゲームを証明するもので�
 | [3max_2bb.toml](../../examples/bench_multiway/3max_2bb.toml) | 3人、2bb、random range。economics/rakeを明示しない | limpなし、全street aggression cap 1。実際はpreflop all-inでpostflop decisionなし | EHS2 K2/2/2、current-street | 小さい決定性・resume・solver variantのsanity。GTOW品質比較には使わない |
 | [6max_2bb.toml](../../examples/bench_multiway/6max_2bb.toml) | 6人、2bb、random range。economics/rakeを明示しない | 上と同じ。実測exportはdecision 62、すべてpreflop | EHS2 K2/2/2、current-street | 6席の小規模回帰。100bb、rake、postflopを含む品質の代理ではない |
 | [6max_20bb_checkdown.toml](../../examples/bench_multiway/6max_20bb_checkdown.toml) | 6人、20bb、standard blinds、ante 0、cash。rake指定なし | limpなし。open 2.5x/all-in、reraise 3x/all-in、preflop cap 3、postflop明示checkdown | EHS2 K32/32/32、current-street。ただしdecisionはpreflopのみ | 中規模のthroughput、writer、checkpoint、評価器用anchor。General 100bbとの一致度は測れない |
-| [6max_100bb_nl50_partial_reference.toml](../../examples/bench_multiway/6max_100bb_nl50_partial_reference.toml) | 6人、100bb、cash、rake 5%/4bb cap。適用時点・丸め・side potは作業規約 | limpあり。観測済みopen、no-caller 3bet、一部4bet/callを反映。pre/post cap 4/4/4/4、postflopは50% potと2.5x raiseの近似 | EHS2 K256/256/256、current-street | **General部分参照のbase**。未観測squeeze/limped/後続preflopとMulti Size postflopは近似 |
-| [6max_100bb_nl50_partial_reference_limp.toml](../../examples/bench_multiway/6max_100bb_nl50_partial_reference_limp.toml) | General baseと同じ | BBの3bb/5bb iso、SBの14bb/18bb応答を追加。固定100bbのSPR境界を使用 | EHS2 K256/256/256 | GeneralのSB limp menu感度。別treeなのでbaseとのcandidate gainを同一gameの収束順位にしない |
-| [6max_100bb_nl50_partial_simple_reference.toml](../../examples/bench_multiway/6max_100bb_nl50_partial_simple_reference.toml) | 6人、100bb、cash、rake 5%/4bb cap。同じ未検証の適用規約 | limpなし。観測した5 open、15 no-caller response、SB対BBの1個の4bet menuを反映。cap 4/1/1/1。後続は近似 | EHS2 K32/32/32、current-street | **Simple専用部分参照**。Generalの結果と統合しない |
+| General部分参照（local-only） | 6人、100bb、cash、rake 5%/4bb cap。適用時点・丸め・side potは作業規約 | 観測済みmenuを一部反映 | EHS2 K256/256/256、current-street | **General部分参照のbase**。未観測の枝は近似 |
+| General limp部分参照（local-only） | General baseと同じ | limp応答を追加 | EHS2 K256/256/256 | GeneralのSB limp menu感度。別treeなのでbaseとのcandidate gainを同一gameの収束順位にしない |
+| Simple部分参照（local-only） | 6人、100bb、cash、rake 5%/4bb cap。同じ未検証の適用規約 | 観測済みmenuを一部反映 | EHS2 K32/32/32、current-street | **Simple専用部分参照**。Generalの結果と統合しない |
 | [6max_position_selector.toml](../../examples/bench_multiway/6max_position_selector.toml) | 6人、20bb、random range。economics/rakeを明示しない | `last_preflop_aggressor_position` のpre/postflop ruleを含む小木、cap 2/1/1/1 | EHS2 K2/2/2 | parser/runtime selectorのsmoke。品質・収束benchmarkではない |
 
 canonical TOMLの値と、runnerが生成した実行configを区別する。例えばGeneral baseは
@@ -113,10 +113,7 @@ state4の主要数値とraw evidenceは
   2,171,445,586 bytesを扱った。実測は初期化144.681秒、復元156.953秒、solution構築
   74.117秒、write43.280秒、verify15.967秒である。writerだけを並列化しても全体の最大項は
   解消しない（[長時間方針](scaling-note.md)）。
-- [General部分menu test](../../crates/cli/tests/gtow_partial_reference.rs)、
-  [limp menu test](../../crates/cli/tests/gtow_limp_reference.rs)、
-  [Simple menu test](../../crates/cli/tests/gtow_simple_partial_reference.rs) は
-  fixtureをparse/lowerしたlegal-action契約を検証する。solver品質のtestではない。
+- General・limp・Simpleの参照menu testはlocal-onlyであり配布しない。fixtureをparse/lowerしたlegal-action契約を検証するもので、solver品質のtestではない。
 
 ## 比較の可否
 

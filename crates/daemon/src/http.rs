@@ -1,10 +1,12 @@
 //! HTTP routing and the bearer-token check.
 //!
-//! Deliberately small: one blocking server, one thread per request, no
-//! async runtime. The daemon's work is spawning processes and reading
-//! files, and the request rate is a person clicking things.
+//! Deliberately small: one blocking server, bounded request threads, no
+//! async runtime. The daemon's work is spawning processes and reading files.
 
+use std::io::Read;
+use std::net::{SocketAddr, TcpListener};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 use anyhow::{Context, Result};
 use protocol::{
@@ -18,6 +20,17 @@ use crate::api::{Api, SolutionQuery};
 use crate::static_ui::StaticUi;
 use crate::tls::Tls;
 
+const MAX_BODY_BYTES: usize = 64 * 1024 * 1024;
+const MAX_IN_FLIGHT: usize = 64;
+
+struct RequestSlot(Arc<AtomicUsize>);
+
+impl Drop for RequestSlot {
+    fn drop(&mut self) {
+        self.0.fetch_sub(1, Ordering::Relaxed);
+    }
+}
+
 pub struct Daemon {
     pub api: Api,
     pub token: String,
@@ -26,13 +39,12 @@ pub struct Daemon {
 
 impl Daemon {
     /// Serves until the process is stopped.
-    pub fn serve(self, address: &str, tls: Option<Tls>, open: bool) -> Result<()> {
+    pub fn serve(self, addresses: &[SocketAddr], tls: Option<Tls>, open: bool) -> Result<()> {
         let scheme = if tls.is_some() { "https" } else { "http" };
-        let server = match tls {
-            Some(tls) => Server::https(address, tls.into_config()),
-            None => Server::http(address),
-        }
-        .map_err(|error| anyhow::anyhow!("binding {address}: {error}"))?;
+        let listener = TcpListener::bind(addresses)
+            .with_context(|| format!("binding one of {addresses:?}"))?;
+        let server = Server::from_listener(listener, tls.map(Tls::into_config))
+            .map_err(|error| anyhow::anyhow!("starting HTTP server: {error}"))?;
         let port = server
             .server_addr()
             .to_ip()
@@ -41,7 +53,10 @@ impl Daemon {
         // The banner comes first, and always. Anything a client waits for
         // -- a port, a readiness signal -- must not be preceded by output
         // whose presence depends on what the runs root happened to hold.
-        println!("solversd listening on {scheme}://{address} (port {port})");
+        println!(
+            "solversd listening on {scheme}://{} (port {port})",
+            server.server_addr()
+        );
         println!("runs root: {}", self.api.runs.path().display());
         println!("token: {}", self.token);
         if self.ui.is_some() {
@@ -92,12 +107,34 @@ impl Daemon {
         }
 
         let shared = Arc::new(self);
+        let scheduler = Arc::downgrade(&shared);
+        std::thread::spawn(move || {
+            while let Some(daemon) = scheduler.upgrade() {
+                daemon.api.pump();
+                drop(daemon);
+                std::thread::sleep(std::time::Duration::from_millis(250));
+            }
+        });
+        let in_flight = Arc::new(AtomicUsize::new(0));
         for request in server.incoming_requests() {
+            if in_flight
+                .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |count| {
+                    (count < MAX_IN_FLIGHT).then_some(count + 1)
+                })
+                .is_err()
+            {
+                if let Err(error) = respond_error(
+                    request,
+                    ErrorResponse::new(ErrorCode::ServerBusy, "too many concurrent requests"),
+                ) {
+                    eprintln!("request failed: {error:#}");
+                }
+                continue;
+            }
+            let slot = RequestSlot(Arc::clone(&in_flight));
             let daemon = Arc::clone(&shared);
-            // A request that reads a large event page should not hold up a
-            // status poll, and a panic in one handler should not take the
-            // daemon down with it.
             std::thread::spawn(move || {
+                let _slot = slot;
                 if let Err(error) = daemon.dispatch(request) {
                     eprintln!("request failed: {error:#}");
                 }
@@ -368,10 +405,24 @@ pub(crate) fn decode_component(
 fn read_json<T: serde::de::DeserializeOwned>(
     request: &mut Request,
 ) -> std::result::Result<T, ErrorResponse> {
-    let mut body = String::new();
-    std::io::Read::read_to_string(request.as_reader(), &mut body)
+    let too_large =
+        || ErrorResponse::new(ErrorCode::PayloadTooLarge, "request body exceeds 64 MiB");
+    if request
+        .body_length()
+        .is_some_and(|length| length > MAX_BODY_BYTES)
+    {
+        return Err(too_large());
+    }
+    let mut body = Vec::new();
+    request
+        .as_reader()
+        .take((MAX_BODY_BYTES + 1) as u64)
+        .read_to_end(&mut body)
         .map_err(|error| ErrorResponse::new(ErrorCode::InvalidConfig, error.to_string()))?;
-    serde_json::from_str(&body).map_err(|error| {
+    if body.len() > MAX_BODY_BYTES {
+        return Err(too_large());
+    }
+    serde_json::from_slice(&body).map_err(|error| {
         ErrorResponse::new(
             ErrorCode::InvalidConfig,
             format!("request body is not the expected JSON: {error}"),

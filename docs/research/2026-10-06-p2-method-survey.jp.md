@@ -15,7 +15,7 @@
 ## 2. 木の規模
 
 Postflopをcheckdownにした場合のPreflop decision nodeと、Preflop終端で手に残る人数別のleaf数（showdown・all-inの終端）。
-GTO Wizard参照の木は`examples/bench/6max_100bb_nl50_partial_*reference.toml`のPostflopをcheckdownに置き換えて数えた。
+GTO Wizard参照の木はlocal-onlyの入力のPostflopをcheckdownに置き換えて数えた。入力は配布しない（`packaging/gtow-local-only.json`）。
 
 | 木 | decision node | 2人 | 3人 | 4人 | 5人以上 |
 |---|---|---|---|---|---|

@@ -60,8 +60,8 @@ impl ChipScale {
         chips.raw() as f64 / self.0 as f64
     }
 
-    /// Nearest whole chip to a computed big-blind amount. Exact decimal input
-    /// goes through [`Self::parse_bb`] or [`Self::from_decimal`] instead.
+    /// Nearest whole chip to the shortest round-trip decimal of a computed
+    /// big-blind amount. Exact input text can use [`Self::parse_bb`].
     pub fn from_bb(self, bb: f64) -> Result<MwChips, ChipAmountError> {
         if !bb.is_finite() {
             return Err(ChipAmountError::NotFinite);
@@ -69,11 +69,9 @@ impl ChipScale {
         if bb < 0.0 {
             return Err(ChipAmountError::Negative);
         }
-        let chips = (bb * self.0 as f64).round();
-        if chips > u64::MAX as f64 {
-            return Err(ChipAmountError::Overflow);
-        }
-        Ok(MwChips(chips as u64))
+        crate::decimal::rounded_product(self.0, bb, 1, crate::Rounding::Nearest)
+            .map(MwChips)
+            .ok_or(ChipAmountError::Overflow)
     }
 
     /// Exact chips of `mantissa × 10^exponent` BB; fails unless whole.
@@ -306,6 +304,18 @@ mod tests {
             Err(ChipAmountError::Overflow)
         );
         assert_eq!(scale(3).from_bb(1.0 / 3.0), Ok(MwChips(1)));
+    }
+
+    #[test]
+    fn computed_bb_conversion_rejects_u64_overflow() {
+        assert_eq!(
+            scale(1).from_bb(18_446_744_073_709_551_616.0),
+            Err(ChipAmountError::Overflow)
+        );
+        assert_eq!(
+            scale(1).from_bb(18_446_744_073_709_549_568.0),
+            Ok(MwChips(18_446_744_073_709_550_000))
+        );
     }
 
     #[test]

@@ -18,12 +18,6 @@ pub enum Rounding {
     Up,
 }
 
-/// Relative distance within which a computed amount counts as a whole chip.
-/// Percentages such as `0.29` are not exact in binary, so a size whose exact
-/// value is whole can land a few ulps on either side; `down` and `up` must not
-/// move such a value by a whole chip.
-const EXACT_TOLERANCE: f64 = 1e-9;
-
 impl Rounding {
     pub fn is_nearest(&self) -> bool {
         *self == Self::Nearest
@@ -32,15 +26,10 @@ impl Rounding {
     /// Snap a non-negative exact amount in chips to a whole chip, saturating
     /// at `u64::MAX`.
     pub fn snap(self, exact: f64) -> u64 {
-        let nearest = exact.round();
-        let whole = if (exact - nearest).abs() <= EXACT_TOLERANCE * nearest.abs().max(1.0) {
-            nearest
-        } else {
-            match self {
-                Self::Down => exact.floor(),
-                Self::Nearest => nearest,
-                Self::Up => exact.ceil(),
-            }
+        let whole = match self {
+            Self::Down => exact.floor(),
+            Self::Nearest => exact.round(),
+            Self::Up => exact.ceil(),
         };
         whole.max(0.0) as u64
     }
@@ -91,10 +80,8 @@ mod tests {
                 expected
             );
         }
-        // 29% of 100 is 29 exactly, though 100.0 * 0.29 is not.
-        for rounding in [Rounding::Down, Rounding::Nearest, Rounding::Up] {
-            assert_eq!(rounding.snap(100.0 * 0.29), 29);
-        }
+        assert_eq!(Rounding::Up.snap(1_000_000_000.4), 1_000_000_001);
+        assert_eq!(Rounding::Down.snap(1_000_000_000.6), 1_000_000_000);
         assert_eq!(Rounding::Nearest.snap(f64::INFINITY), u64::MAX);
     }
 

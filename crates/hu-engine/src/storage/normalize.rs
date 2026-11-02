@@ -112,6 +112,20 @@ pub(super) fn normalize_columns_f32<T: Positive>(data: &[T], r: StorageRef, out:
                 }
             }
         }
+        // An overflowing reciprocal would produce infinities and NaNs. Recompute
+        // only those rare columns in f64, leaving the ordinary hot path intact.
+        for (hand, &inverse) in totals[..len].iter().enumerate() {
+            if inverse.is_infinite() {
+                let hand = first + hand;
+                let total: f64 = (0..num_actions)
+                    .map(|a| data[a * num_hands + hand].positive_f64())
+                    .sum();
+                for a in 0..num_actions {
+                    let index = a * num_hands + hand;
+                    out[index] = (data[index].positive_f64() / total) as f32;
+                }
+            }
+        }
     }
 }
 
@@ -142,6 +156,11 @@ mod tests {
         let mut out = [0.0; 10];
         normalize_columns_f32(&data, r, &mut out);
         for hand in 0..5 {
+            if hand == 3 {
+                assert_eq!(out[hand], 1.0);
+                assert_eq!(out[5 + hand], 0.0);
+                continue;
+            }
             let total = 0.0 + data[hand].max(0.0) + data[5 + hand].max(0.0);
             let inverse = if total > 0.0 { total.recip() } else { 0.0 };
             for action in 0..2 {
@@ -158,5 +177,21 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn f32_subnormal_regrets_preserve_distribution() {
+        let r = StorageRef {
+            offset: 0,
+            num_actions: 3,
+            num_hands: 1,
+            index: 0,
+        };
+        let unit = f32::from_bits(1);
+        let mut out = [0.0; 3];
+        normalize_columns_f32(&[unit, 2.0 * unit, -unit], r, &mut out);
+        assert_eq!(out, [1.0 / 3.0, 2.0 / 3.0, 0.0]);
+        assert!(out.iter().all(|value| value.is_finite()));
+        assert_eq!(out.iter().sum::<f32>(), 1.0);
     }
 }

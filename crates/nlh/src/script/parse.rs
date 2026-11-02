@@ -34,6 +34,9 @@ use super::lower;
 use super::token::{self, Token, TokenKind, expect_punct, is_punct, is_word, line_at, tokenize};
 use crate::{SizeSpec, Street};
 
+const MAX_BLOCK_DEPTH: usize = 64;
+const MAX_EXPANDED_TOKENS: usize = 1_000_000;
+
 impl<V: Vars> Script<V> {
     /// Compiles a `.tree` script source against `dialect`, applying
     /// `overrides` to any `param` they name. Unknown override keys and
@@ -51,12 +54,24 @@ impl<V: Vars> Script<V> {
             .collect();
 
         let items = scan_top_level(&significant, dialect)?;
-        let (resolved, params) = resolve_declarations(&items, &line_info, overrides, dialect)?;
+        let mut expansion_budget = MAX_EXPANDED_TOKENS;
+        let (resolved, params) = resolve_declarations(
+            &items,
+            &line_info,
+            overrides,
+            dialect,
+            &mut expansion_budget,
+        )?;
 
         let mut blocks = Vec::with_capacity(items.len());
         for item in &items {
             if let TopLevel::Street(street_item) = item {
-                blocks.push(parse_street_block(street_item, &resolved, dialect)?);
+                blocks.push(parse_street_block(
+                    street_item,
+                    &resolved,
+                    dialect,
+                    &mut expansion_budget,
+                )?);
             }
         }
 
@@ -148,10 +163,15 @@ enum TopLevel {
 
 /// True when `token` can legally start a new top-level item, i.e. is a
 /// valid stopping point for a `param`'s single-token value.
-fn starts_top_level<V: Vars>(token: &Token, dialect: &Dialect<V>) -> bool {
-    match &token.kind {
-        TokenKind::Word(word) => {
-            word == "param" || word == "define" || dialect.streets.iter().any(|(n, _)| n == word)
+fn starts_top_level<V: Vars>(tokens: &[Token], pos: usize, dialect: &Dialect<V>) -> bool {
+    match tokens.get(pos).map(|token| &token.kind) {
+        Some(TokenKind::Word(word)) => {
+            word == "param"
+                || word == "define"
+                || dialect.streets.iter().any(|(n, _)| n == word)
+                || is_punct(tokens, pos + 1, "{")
+                || is_punct(tokens, pos + 1, ",")
+                || is_word(tokens, pos + 1, "when")
         }
         _ => false,
     }
@@ -175,13 +195,28 @@ fn scan_top_level<V: Vars>(
                 i += 1;
                 let (name, _) = expect_top_level_word(tokens, &mut i, "a param name")?;
                 expect_punct(tokens, &mut i, "=")?;
+                let equals_line = tokens[i - 1].line;
+                if tokens.get(i).is_some_and(|token| token.line > equals_line)
+                    && starts_top_level(tokens, i, dialect)
+                {
+                    return Err(ScriptError {
+                        line,
+                        message: format!("param {name:?} is missing a value"),
+                    });
+                }
                 let value_token = tokens.get(i).cloned().ok_or_else(|| ScriptError {
                     line,
                     message: format!("param {name:?} is missing a value"),
                 })?;
+                if matches!(&value_token.kind, TokenKind::Punct("{" | "}")) {
+                    return Err(ScriptError {
+                        line: value_token.line,
+                        message: format!("param {name:?} value cannot be a structural brace"),
+                    });
+                }
                 i += 1;
                 if let Some(next) = tokens.get(i)
-                    && !starts_top_level(next, dialect)
+                    && !starts_top_level(tokens, i, dialect)
                 {
                     return Err(ScriptError {
                         line: next.line,
@@ -203,10 +238,34 @@ fn scan_top_level<V: Vars>(
                 i += 1;
                 let (name, _) = expect_top_level_word(tokens, &mut i, "a define name")?;
                 expect_punct(tokens, &mut i, "=")?;
-                let mut condition_tokens = Vec::new();
+                let equals_line = tokens[i - 1].line;
+                let mut condition_tokens: Vec<Token> = Vec::new();
+                let mut parens = 0usize;
                 while let Some(token) = tokens.get(i) {
-                    if token.line != line {
+                    if token.line > equals_line && starts_top_level(tokens, i, dialect) {
+                        if parens > 0 {
+                            return Err(ScriptError {
+                                line,
+                                message: format!("define {name:?} has an unclosed '('"),
+                            });
+                        }
                         break;
+                    }
+                    if let Some(previous) = condition_tokens.last()
+                        && token.line > previous.line
+                        && parens == 0
+                        && !matches!(
+                            &previous.kind,
+                            TokenKind::Punct("&&" | "||" | "==" | "!=" | "<" | "<=" | ">" | ">=")
+                        )
+                        && !matches!(&previous.kind, TokenKind::Word(word) if word == "in")
+                    {
+                        break;
+                    }
+                    match &token.kind {
+                        TokenKind::Punct("(") => parens += 1,
+                        TokenKind::Punct(")") => parens = parens.saturating_sub(1),
+                        _ => {}
                     }
                     condition_tokens.push(token.clone());
                     i += 1;
@@ -257,7 +316,7 @@ fn scan_top_level<V: Vars>(
                     }
                 }
                 expect_punct(tokens, &mut i, "{")?;
-                let mut depth = 1i32;
+                let mut depth = 1usize;
                 let mut body_tokens = Vec::new();
                 loop {
                     let token = tokens.get(i).ok_or_else(|| ScriptError {
@@ -267,6 +326,12 @@ fn scan_top_level<V: Vars>(
                     match &token.kind {
                         TokenKind::Punct("{") => {
                             depth += 1;
+                            if depth > MAX_BLOCK_DEPTH {
+                                return Err(ScriptError {
+                                    line: token.line,
+                                    message: format!("block nesting exceeds {MAX_BLOCK_DEPTH}"),
+                                });
+                            }
                             body_tokens.push(token.clone());
                         }
                         TokenKind::Punct("}") => {
@@ -338,9 +403,27 @@ enum Resolution {
 /// `wet && c`. Each `Resolution::Define` already holds *fully* resolved
 /// tokens (its own references were substituted when it was declared), so
 /// this is a single non-recursive pass.
-fn substitute_tokens(tokens: &[Token], resolved: &HashMap<String, Resolution>) -> Vec<Token> {
-    let mut out = Vec::with_capacity(tokens.len());
+fn substitute_tokens(
+    tokens: &[Token],
+    resolved: &HashMap<String, Resolution>,
+    budget: &mut usize,
+) -> Result<Vec<Token>, ScriptError> {
+    let mut out = Vec::new();
     for token in tokens {
+        let count = match &token.kind {
+            TokenKind::Word(word) => match resolved.get(word) {
+                Some(Resolution::Define(expanded)) => expanded.len() + 2,
+                _ => 1,
+            },
+            _ => 1,
+        };
+        if count > *budget {
+            return Err(ScriptError {
+                line: token.line,
+                message: format!("expanded token count exceeds {MAX_EXPANDED_TOKENS}"),
+            });
+        }
+        *budget -= count;
         if let TokenKind::Word(word) = &token.kind
             && let Some(resolution) = resolved.get(word)
         {
@@ -365,7 +448,7 @@ fn substitute_tokens(tokens: &[Token], resolved: &HashMap<String, Resolution>) -
         }
         out.push(token.clone());
     }
-    out
+    Ok(out)
 }
 
 /// Errors if `tokens` (a `param`'s raw value or a `define`'s raw condition)
@@ -443,6 +526,7 @@ fn resolve_declarations<V: Vars>(
     line_info: &HashMap<usize, LineInfo>,
     overrides: &BTreeMap<String, String>,
     dialect: &Dialect<V>,
+    budget: &mut usize,
 ) -> Result<(HashMap<String, Resolution>, Vec<ParamSchema>), ScriptError> {
     let mut declared_names: HashSet<String> = HashSet::new();
     for item in items {
@@ -486,7 +570,7 @@ fn resolve_declarations<V: Vars>(
                 if let Some(override_value) = overrides.get(name) {
                     let declared = std::slice::from_ref(value_token);
                     check_self_and_forward_references(name, declared, &declared_names, &resolved)?;
-                    if substitute_tokens(declared, &resolved).len() != 1 {
+                    if substitute_tokens(declared, &resolved, budget)?.len() != 1 {
                         return Err(ScriptError {
                             line: *name_line,
                             message: format!(
@@ -512,11 +596,19 @@ fn resolve_declarations<V: Vars>(
                             message: format!("override for param {name:?} must be a single token"),
                         });
                     }
+                    if matches!(&override_tokens[0].kind, TokenKind::Punct("{" | "}")) {
+                        return Err(ScriptError {
+                            line: *name_line,
+                            message: format!(
+                                "override for param {name:?} cannot be a structural brace"
+                            ),
+                        });
+                    }
                     raw = override_tokens;
                     raw[0].line = *name_line;
                 }
                 check_self_and_forward_references(name, &raw, &declared_names, &resolved)?;
-                let expanded = substitute_tokens(&raw, &resolved);
+                let expanded = substitute_tokens(&raw, &resolved, budget)?;
                 if expanded.len() != 1 {
                     return Err(ScriptError {
                         line: *name_line,
@@ -540,7 +632,7 @@ fn resolve_declarations<V: Vars>(
             }
             TopLevel::Define { name, tokens, .. } => {
                 check_self_and_forward_references(name, tokens, &declared_names, &resolved)?;
-                let expanded = substitute_tokens(tokens, &resolved);
+                let expanded = substitute_tokens(tokens, &resolved, budget)?;
                 check_finite_numbers(&expanded)?;
                 let mut pos = 0;
                 cond::parse_condition(&expanded, &mut pos, dialect)?;
@@ -574,6 +666,7 @@ fn parse_street_block<V: Vars>(
     item: &StreetItem,
     resolved: &HashMap<String, Resolution>,
     dialect: &Dialect<V>,
+    budget: &mut usize,
 ) -> Result<StreetBlockAst<V>, ScriptError> {
     let mut seen = HashSet::new();
     let mut streets = Vec::with_capacity(item.streets.len());
@@ -599,7 +692,7 @@ fn parse_street_block<V: Vars>(
     let condition = if item.when_tokens.is_empty() {
         None
     } else {
-        let substituted = substitute_tokens(&item.when_tokens, resolved);
+        let substituted = substitute_tokens(&item.when_tokens, resolved, budget)?;
         let mut pos = 0;
         let condition = cond::parse_condition(&substituted, &mut pos, dialect)?;
         if pos != substituted.len() {
@@ -617,9 +710,9 @@ fn parse_street_block<V: Vars>(
             message: "block body must not be empty".to_string(),
         });
     }
-    let body_tokens = substitute_tokens(&item.body_tokens, resolved);
+    let body_tokens = substitute_tokens(&item.body_tokens, resolved, budget)?;
     let mut pos = 0;
-    let body = parse_body(&body_tokens, &mut pos, dialect)?;
+    let body = parse_body(&body_tokens, &mut pos, dialect, 1)?;
     if pos != body_tokens.len() {
         return Err(ScriptError {
             line: line_at(&body_tokens, pos),
@@ -638,10 +731,11 @@ fn parse_body<V: Vars>(
     tokens: &[Token],
     pos: &mut usize,
     dialect: &Dialect<V>,
+    depth: usize,
 ) -> Result<Vec<StmtAst<V>>, ScriptError> {
     let mut stmts = Vec::new();
     while *pos < tokens.len() && !is_punct(tokens, *pos, "}") {
-        stmts.push(parse_stmt(tokens, pos, dialect)?);
+        stmts.push(parse_stmt(tokens, pos, dialect, depth)?);
     }
     Ok(stmts)
 }
@@ -650,16 +744,23 @@ fn parse_braced_body<V: Vars>(
     tokens: &[Token],
     pos: &mut usize,
     dialect: &Dialect<V>,
+    depth: usize,
 ) -> Result<Vec<StmtAst<V>>, ScriptError> {
     let open_line = line_at(tokens, *pos);
     expect_punct(tokens, pos, "{")?;
+    if depth >= MAX_BLOCK_DEPTH {
+        return Err(ScriptError {
+            line: open_line,
+            message: format!("block nesting exceeds {MAX_BLOCK_DEPTH}"),
+        });
+    }
     if is_punct(tokens, *pos, "}") {
         return Err(ScriptError {
             line: open_line,
             message: "block body must not be empty".to_string(),
         });
     }
-    let body = parse_body(tokens, pos, dialect)?;
+    let body = parse_body(tokens, pos, dialect, depth + 1)?;
     expect_punct(tokens, pos, "}")?;
     Ok(body)
 }
@@ -683,17 +784,18 @@ fn parse_stmt<V: Vars>(
     tokens: &[Token],
     pos: &mut usize,
     dialect: &Dialect<V>,
+    depth: usize,
 ) -> Result<StmtAst<V>, ScriptError> {
     let line = line_at(tokens, *pos);
 
     if is_word(tokens, *pos, "when") {
         *pos += 1;
         let condition = cond::parse_condition(tokens, pos, dialect)?;
-        let body = parse_braced_body(tokens, pos, dialect)?;
+        let body = parse_braced_body(tokens, pos, dialect, depth)?;
         return Ok(StmtAst::When { condition, body });
     }
     if is_word(tokens, *pos, "if") {
-        return parse_if(tokens, pos, dialect);
+        return parse_if(tokens, pos, dialect, depth);
     }
     if is_word(tokens, *pos, "checkdown") {
         *pos += 1;
@@ -854,24 +956,31 @@ fn parse_if<V: Vars>(
     tokens: &[Token],
     pos: &mut usize,
     dialect: &Dialect<V>,
+    depth: usize,
 ) -> Result<StmtAst<V>, ScriptError> {
     *pos += 1; // consume 'if'
     let mut arms = Vec::new();
     let condition = cond::parse_condition(tokens, pos, dialect)?;
-    let body = parse_braced_body(tokens, pos, dialect)?;
+    let body = parse_braced_body(tokens, pos, dialect, depth)?;
     arms.push((condition, body));
 
     let mut else_body = None;
     while is_word(tokens, *pos, "else") {
         *pos += 1;
         if is_word(tokens, *pos, "if") {
+            if arms.len() >= MAX_BLOCK_DEPTH {
+                return Err(ScriptError {
+                    line: line_at(tokens, *pos),
+                    message: format!("if chain exceeds {MAX_BLOCK_DEPTH} conditional arms"),
+                });
+            }
             *pos += 1;
             let condition = cond::parse_condition(tokens, pos, dialect)?;
-            let body = parse_braced_body(tokens, pos, dialect)?;
+            let body = parse_braced_body(tokens, pos, dialect, depth)?;
             arms.push((condition, body));
             continue;
         }
-        let body = parse_braced_body(tokens, pos, dialect)?;
+        let body = parse_braced_body(tokens, pos, dialect, depth)?;
         else_body = Some(body);
         break;
     }
@@ -959,6 +1068,120 @@ mod tests {
         assert!(compile("define bad = unknown\nflop { checkdown }").is_err());
         assert!(compile("define bad = unopened unopened\nflop { checkdown }").is_err());
         assert!(compile("define good = unopened\nflop { checkdown }").is_ok());
+    }
+
+    #[test]
+    fn define_continues_only_while_incomplete() {
+        for source in [
+            "define wet = (unopened\n || cbet)\nflop when wet { checkdown }",
+            "define wet = unopened ||\n cbet\nflop when wet { checkdown }",
+            "define shallow = spr <=\n 2\nflop when shallow { checkdown }",
+        ] {
+            assert!(compile(source).is_ok(), "{source}");
+        }
+        let error = compile("define wet = unopened flop { checkdown }").unwrap_err();
+        assert_eq!(error.line, 1);
+        assert!(error.message.contains("unexpected token"));
+        assert!(compile("define wet = unopened\n|| cbet\nflop { checkdown }").is_err());
+        let error = compile("define x =\nflop { checkdown }").unwrap_err();
+        assert_eq!(error.line, 1);
+        assert!(error.message.contains("has no condition"));
+        let error = compile("define x = (unopened\nflop { checkdown }").unwrap_err();
+        assert_eq!(error.line, 1);
+        assert!(error.message.contains("unclosed"));
+    }
+
+    #[test]
+    fn param_boundary_reports_unknown_street_and_missing_value() {
+        for street in ["postflop", "Flop", "flp"] {
+            let error = compile(&format!("param cb = 33%\n{street} {{ checkdown }}")).unwrap_err();
+            assert_eq!(error.line, 2);
+            assert!(
+                error.message.contains("unknown street"),
+                "{}",
+                error.message
+            );
+        }
+        let error = compile("param cb =\nflop { checkdown }").unwrap_err();
+        assert_eq!(error.line, 1);
+        assert!(error.message.contains("missing a value"));
+        assert!(
+            compile("param cb = a || b\nflop { checkdown }")
+                .unwrap_err()
+                .message
+                .contains("single token")
+        );
+    }
+
+    #[test]
+    fn block_nesting_and_total_expansion_are_bounded() {
+        let source = format!(
+            "flop {{ {} checkdown {} }}",
+            "when unopened { ".repeat(MAX_BLOCK_DEPTH),
+            " }".repeat(MAX_BLOCK_DEPTH)
+        );
+        let error = compile(&source).unwrap_err();
+        assert!(error.message.contains("block nesting"));
+        assert_eq!(error.line, 1);
+
+        let mut source = String::from("define d0 = unopened\n");
+        for i in 1..25 {
+            source.push_str(&format!("define d{i} = d{} || d{}\n", i - 1, i - 1));
+        }
+        let error = compile(&source).unwrap_err();
+        assert!(
+            error.message.contains("expanded token count"),
+            "{}",
+            error.message
+        );
+        assert!(error.line > 1);
+    }
+
+    #[test]
+    fn braces_cannot_bypass_nesting_limit_through_params() {
+        for brace in ["{", "}"] {
+            let error = compile(&format!("param p = {brace}\nflop {{ checkdown }}")).unwrap_err();
+            assert!(error.message.contains("structural brace"));
+            let error =
+                compile_with("param p = 33%\nflop { checkdown }", &[("p", brace)]).unwrap_err();
+            assert!(error.message.contains("structural brace"));
+        }
+        let source = format!(
+            "param o = {{\nparam c = }}\nflop {{ {} checkdown {} }}",
+            "when unopened o ".repeat(MAX_BLOCK_DEPTH + 1),
+            "c ".repeat(MAX_BLOCK_DEPTH + 1)
+        );
+        assert!(
+            compile(&source)
+                .unwrap_err()
+                .message
+                .contains("structural brace")
+        );
+
+        let body = format!(
+            "{} checkdown {}",
+            "when unopened { ".repeat(MAX_BLOCK_DEPTH),
+            " }".repeat(MAX_BLOCK_DEPTH)
+        );
+        let tokens = tokenize(&body).unwrap();
+        let error = parse_body(&tokens, &mut 0, &TEST_DIALECT, 1).unwrap_err();
+        assert!(error.message.contains("block nesting"));
+    }
+
+    #[test]
+    fn conditional_arm_count_is_bounded() {
+        let source = format!(
+            "flop {{ if unopened {{ checkdown }}\n{} }}",
+            "else if unopened { checkdown }\n".repeat(MAX_BLOCK_DEPTH - 1)
+        );
+        assert!(compile(&source).is_ok());
+        let source = format!(
+            "flop {{ if unopened {{ checkdown }}\n{} }}",
+            "else if unopened { checkdown }\n".repeat(MAX_BLOCK_DEPTH)
+        );
+        let error = compile(&source).unwrap_err();
+        assert_eq!(error.line, MAX_BLOCK_DEPTH + 1);
+        assert!(error.message.contains("if chain exceeds"));
     }
 
     fn base_ctx() -> RuleContext {

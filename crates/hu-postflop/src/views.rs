@@ -717,13 +717,14 @@ fn value_rows(blocks: &mut Blocks<'_>, ids: &[NodeId]) -> Result<Vec<ValueRow>> 
         let values = blocks.values(id)?;
         let mut rows = Vec::new();
         for seat in Player::BOTH {
+            let facing = crate::artifact::compatible_reach(hands, seat, &reach[seat.opponent()]);
             let base = match seat {
                 Player::P0 => 0,
                 Player::P1 => hands.len(Player::P0),
             };
             for hand in 0..hands.len(seat) {
                 let weight = reach[seat][hand];
-                if weight <= 0.0 {
+                if weight <= 0.0 || facing[hand] <= 0.0 {
                     continue;
                 }
                 rows.push(ValueRow {
@@ -788,6 +789,66 @@ pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<
             right_ids.len(),
         );
     }
+    let left_cash = matches!(
+        left.nlh.0.economics.utility,
+        economics::UtilityConfig::ChipEv
+    );
+    let right_cash = matches!(
+        right.nlh.0.economics.utility,
+        economics::UtilityConfig::ChipEv
+    );
+    if left_cash != right_cash {
+        bail!("artifacts have different utility units (BB vs prize units)");
+    }
+    for seat in Player::BOTH {
+        if left.game.index.hands.combos(seat) != right.game.index.hands.combos(seat) {
+            bail!(
+                "artifacts have different {} hand lists; hand-by-hand comparison requires identical supports",
+                seat_name(seat)
+            );
+        }
+    }
+    for id in 0..left.game.tree.nodes.len() as NodeId {
+        let a = left.game.tree.node(id);
+        let b = right.game.tree.node(id);
+        if a.kind != b.kind
+            || a.num_children != b.num_children
+            || a.first_child != b.first_child
+            || (a.kind == NodeKind::Action && a.player != b.player)
+        {
+            bail!("artifacts have different topology at node {id}");
+        }
+        if a.kind == NodeKind::Chance {
+            for pos in 0..a.num_children as usize {
+                if left.view().deal_card(id, pos) != right.view().deal_card(id, pos) {
+                    bail!("artifacts have different chance branches at node {id}");
+                }
+                let a_deal = left.game.tree.deal(a, pos);
+                let b_deal = right.game.tree.deal(b, pos);
+                if a_deal.weight != b_deal.weight {
+                    bail!("artifacts have different chance branches at node {id}");
+                }
+                for seat in Player::BOTH {
+                    use hu_engine::ReachMap;
+                    let same = match (a_deal.maps[seat], b_deal.maps[seat]) {
+                        (ReachMap::Identity, ReachMap::Identity) => true,
+                        (ReachMap::Mask(x), ReachMap::Mask(y)) => {
+                            left.game.tree.masks[x as usize] == right.game.tree.masks[y as usize]
+                        }
+                        (ReachMap::Transition(x), ReachMap::Transition(y)) => {
+                            let x = &left.game.tree.transitions[x as usize];
+                            let y = &right.game.tree.transitions[y as usize];
+                            x.in_dim == y.in_dim && x.out_dim == y.out_dim && x.entries == y.entries
+                        }
+                        _ => false,
+                    };
+                    if !same {
+                        bail!("artifacts have different chance branches at node {id}");
+                    }
+                }
+            }
+        }
+    }
     if !cross_game {
         for (name, differs) in [
             ("board", left.config.board != right.config.board),
@@ -801,21 +862,7 @@ pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<
                 bail!("artifacts have different {name}; pass --cross-game to compare them anyway");
             }
         }
-        for seat in Player::BOTH {
-            let a = left.game.index.hands.combos(seat);
-            let b = right.game.index.hands.combos(seat);
-            if a != b {
-                let hand = a
-                    .iter()
-                    .zip(b)
-                    .position(|(a, b)| a != b)
-                    .unwrap_or(a.len().min(b.len()));
-                bail!(
-                    "artifacts have different {} hand lists at combo {hand}; pass --cross-game to compare them anyway",
-                    seat_name(seat)
-                );
-            }
-        }
+        // Hand supports and topology must match even for cross-game comparisons.
         for id in 0..left.game.tree.nodes.len() as NodeId {
             let a = left.game.tree.node(id).kind;
             let b = right.game.tree.node(id).kind;
@@ -833,15 +880,38 @@ pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<
             }
         }
     }
+    let reachable = |loaded: &LoadedSol, ids: &[NodeId]| -> Result<Vec<PerPlayer<Vec<bool>>>> {
+        let mut blocks = Blocks {
+            loaded,
+            resolver: None,
+        };
+        reached_rows(&mut blocks, ids, |_, _, reach| {
+            Ok(vec![PerPlayer::new(Player::P0, Player::P1).map(|seat| {
+                let facing = crate::artifact::compatible_reach(
+                    &loaded.game.index.hands,
+                    seat,
+                    &reach[seat.opponent()],
+                );
+                reach[seat]
+                    .iter()
+                    .zip(facing)
+                    .map(|(&own, opponent)| own > 0.0 && opponent > 0.0)
+                    .collect()
+            })])
+        })
+    };
+    let left_reach = reachable(&left, &left_ids)?;
+    let right_reach = reachable(&right, &right_ids)?;
 
     // Per-node deltas run in parallel; the fold below stays in node order so
     // sums and first-maximum ties match a serial walk.
     use rayon::prelude::*;
     let deltas: Vec<Result<_>> = left_ids
         .par_iter()
+        .enumerate()
         .map_init(
             || (Vec::new(), Vec::new(), Vec::new(), Vec::new()),
-            |(a_strategy, b_strategy, a_values, b_values), &id| {
+            |(a_strategy, b_strategy, a_values, b_values), (position, &id)| {
                 let a_node = left.game.tree.node(id);
                 let b_node = right.game.tree.node(id);
                 let a = left.game.tree.storage_ref(a_node);
@@ -879,19 +949,36 @@ pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<
                 // the usual "how differently does this node play" number, bounded
                 // by 2 and independent of how many actions the node offers.
                 let mut node_l1 = 0.0f64;
+                let mut strategy_hands = 0usize;
+                let mut excluded = 0usize;
+                let actor = a_node.player;
                 for hand in 0..a.num_hands as usize {
+                    if !left_reach[position][actor][hand] || !right_reach[position][actor][hand] {
+                        excluded += 1;
+                        continue;
+                    }
+                    strategy_hands += 1;
                     for action in 0..a.num_actions as usize {
                         let index = action * a.num_hands as usize + hand;
                         node_l1 += (a_strategy[index] - b_strategy[index]).abs() as f64;
                     }
                 }
-                let node_l1 = node_l1 / a.num_hands.max(1) as f64;
-                let node_ev = a_values
-                    .iter()
-                    .zip(b_values.iter())
-                    .map(|(x, y)| (x - y).abs() as f64)
-                    .fold(0.0, f64::max);
-                Ok((id, node_l1, node_ev))
+                let node_l1 = (strategy_hands > 0).then(|| node_l1 / strategy_hands as f64);
+                let mut node_ev: Option<f64> = None;
+                let mut ev_excluded = 0usize;
+                let mut base = 0;
+                for seat in Player::BOTH {
+                    for hand in 0..left.game.index.hands.len(seat) {
+                        if !left_reach[position][seat][hand] || !right_reach[position][seat][hand] {
+                            ev_excluded += 1;
+                            continue;
+                        }
+                        let delta = (a_values[base + hand] - b_values[base + hand]).abs() as f64;
+                        node_ev = Some(node_ev.map_or(delta, |old| old.max(delta)));
+                    }
+                    base += left.game.index.hands.len(seat);
+                }
+                Ok((id, node_l1, node_ev, excluded, ev_excluded))
             },
         )
         .collect();
@@ -899,33 +986,47 @@ pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<
     let view = left.view();
     let nodes = deltas.len();
     let mut strategy_total = 0.0f64;
-    let mut strategy_max = 0.0f64;
+    let mut strategy_max: Option<f64> = None;
+    let mut strategy_nodes = 0usize;
     let mut worst_strategy = None;
     let mut ev_total = 0.0f64;
-    let mut ev_max = 0.0f64;
+    let mut ev_max: Option<f64> = None;
+    let mut ev_nodes = 0usize;
     let mut worst_ev = None;
+    let mut excluded_strategy_hands = 0usize;
+    let mut excluded_ev_hands = 0usize;
     for delta in deltas {
-        let (id, node_l1, node_ev) = delta?;
-        strategy_total += node_l1;
-        if node_l1 > strategy_max {
-            strategy_max = node_l1;
-            worst_strategy = Some(id);
+        let (id, node_l1, node_ev, excluded, ev_excluded) = delta?;
+        excluded_strategy_hands += excluded;
+        excluded_ev_hands += ev_excluded;
+        if let Some(value) = node_l1 {
+            strategy_total += value;
+            strategy_nodes += 1;
+            if strategy_max.is_none_or(|old| value > old) {
+                strategy_max = Some(value);
+                worst_strategy = Some(id);
+            }
         }
-        ev_total += node_ev;
-        if node_ev > ev_max {
-            ev_max = node_ev;
-            worst_ev = Some(id);
+        if let Some(value) = node_ev {
+            ev_total += value;
+            ev_nodes += 1;
+            if ev_max.is_none_or(|old| value > old) {
+                ev_max = Some(value);
+                worst_ev = Some(id);
+            }
         }
     }
 
     let report = ComparisonReport {
         nodes,
-        mean_strategy_l1: strategy_total / nodes.max(1) as f64,
+        excluded_strategy_hands,
+        excluded_ev_hands,
+        mean_strategy_l1: (strategy_nodes > 0).then(|| strategy_total / strategy_nodes as f64),
         max_strategy_l1: strategy_max,
         max_strategy_node: worst_strategy
             .map(|id| view.history(id))
             .unwrap_or_default(),
-        mean_max_ev_delta: ev_total / nodes.max(1) as f64,
+        mean_max_ev_delta: (ev_nodes > 0).then(|| ev_total / ev_nodes as f64),
         max_ev_delta: ev_max,
         max_ev_node: worst_ev.map(|id| view.history(id)).unwrap_or_default(),
         ev_oop: [left.meta.ev[0], right.meta.ev[0]],
@@ -942,15 +1043,18 @@ pub fn compare(left_path: &Path, right_path: &Path, cross_game: bool) -> Result<
 /// Node-by-node strategy and utility differences between compatible artifacts.
 pub struct ComparisonReport {
     pub nodes: usize,
+    /// Hand-node observations excluded from strategy and EV comparisons.
+    pub excluded_strategy_hands: usize,
+    pub excluded_ev_hands: usize,
     /// Mean over nodes of the per-hand-averaged L1 distance between the two
     /// action distributions. `0` is identical play, `2` is disjoint.
-    pub mean_strategy_l1: f64,
-    pub max_strategy_l1: f64,
+    pub mean_strategy_l1: Option<f64>,
+    pub max_strategy_l1: Option<f64>,
     pub max_strategy_node: String,
     /// Mean over nodes of that node's largest per-hand EV difference, in
     /// utility units (BB for cash, prize units for ICM).
-    pub mean_max_ev_delta: f64,
-    pub max_ev_delta: f64,
+    pub mean_max_ev_delta: Option<f64>,
+    pub max_ev_delta: Option<f64>,
     pub max_ev_node: String,
     pub ev_oop: [f64; 2],
     pub ev_ip: [f64; 2],

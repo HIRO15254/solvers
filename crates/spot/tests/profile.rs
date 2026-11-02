@@ -23,6 +23,16 @@ fn full_profile_roundtrip() {
     );
     let first = Document::parse(&text, &path).unwrap();
     let normalized = first.normalize(&Hook).unwrap();
+    let lock = normalized.find("[[profile.lock]]").unwrap();
+    let incentive = normalized.find("[[profile.incentive]]").unwrap();
+    let frequency = normalized.find("[[profile.frequency]]").unwrap();
+    let freeze = normalized.find("[profile.freeze_upstream]").unwrap();
+    assert!(lock < incentive && incentive < frequency && frequency < freeze);
+    let first_lock =
+        &normalized[lock..normalized[lock + 1..].find("[[profile.lock]]").unwrap() + lock + 1];
+    assert!(first_lock.find("node =").unwrap() < first_lock.find("hands =").unwrap());
+    assert!(first_lock.find("hands =").unwrap() < first_lock.find("strategy =").unwrap());
+    assert!(first_lock.find("strategy =").unwrap() < first_lock.find("confidence =").unwrap());
     let second = Document::parse(&normalized, &path).unwrap();
     assert_eq!(first.spot.profile, second.spot.profile);
     assert_eq!(normalized, second.normalize(&Hook).unwrap());

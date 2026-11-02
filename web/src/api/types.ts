@@ -76,6 +76,8 @@ export type ErrorCode =
   | "invalid-request"
   | "conflict"
   | "unavailable"
+  | "payload-too-large"
+  | "server-busy"
   | "internal";
 
 // --- `solvers validate --format json` (docs/cli-reference.jp.md) ---------

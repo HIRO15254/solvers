@@ -14,6 +14,32 @@ fn combo(a: &str, b: &str) -> usize {
 }
 
 #[test]
+fn river_equity_preserves_tiny_compatible_weight() {
+    let board = parse_board("4c 5d 7h 9s Jc");
+    let mut oop = vec![0.0; NUM_COMBOS];
+    let mut ip = vec![0.0; NUM_COMBOS];
+    oop[combo("As", "Ah")] = 1.0;
+    ip[combo("As", "Ks")] = 1.0;
+    ip[combo("2c", "3d")] = 1e-20;
+    let equity = range_equity(&board, &PerPlayer::new(oop, ip));
+    assert_eq!(equity[Player::P0][combo("As", "Ah")], 1.0);
+}
+
+#[test]
+fn river_equity_preserves_tiny_winning_mass() {
+    let board = parse_board("4c 5d 7h 9s Jc");
+    let mut oop = vec![0.0; NUM_COMBOS];
+    let mut ip = vec![0.0; NUM_COMBOS];
+    oop[combo("As", "Ah")] = 1.0;
+    ip[combo("As", "Ks")] = 1.0;
+    ip[combo("9c", "9d")] = 1.0;
+    ip[combo("2c", "3d")] = 1e-20;
+    let equity = range_equity(&board, &PerPlayer::new(oop, ip));
+    let actual = equity[Player::P0][combo("As", "Ah")];
+    assert!((actual / 1e-20 - 1.0).abs() < 1e-5, "{actual}");
+}
+
+#[test]
 fn class_mapping_goldens() {
     // Cell indices anchored by `nlh::range`'s own `class_index_layout`
     // golden test: AA is the top-left diagonal cell (0), AKs the cell just

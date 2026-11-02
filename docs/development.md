@@ -78,8 +78,12 @@ Linearへ接続できない場合は[状態管理手順](status.jp.md)に従う�
 
 通常のコード変更では、最低限次を通す。
 
+daemonのHTTP統合試験は実際の`solvers`も起動するため、同じprofileで先にCLIをbuildする。
+`cargo test -p daemon --test http_api`を単独で実行する場合も同様である。
+
 ```text
 cargo fmt --all --check
+cargo build -p cli
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 ```
@@ -133,9 +137,13 @@ daemonは隣の`solvers`を子processとして使う。build済みのUIをdaemon
 
 | 種類 | 例 | 扱い |
 |---|---|---|
-| release受入 | 大規模solve、EHS² table build、全board列挙、P2 tree identityの大規模例、trunkのT2・T3 | 対応領域の受入前とrelease前に担当者が対象sourceで実行し、結果を保存する |
+| release受入 | 大規模solve、EHS² table build、全board列挙、heads-up postflopとP2のtree identity大規模例、trunkのT2・T3 | 対応領域の受入前とrelease前に担当者が対象sourceで実行し、結果を保存する |
 | 計測・報告 | `mw-preflop`の`sampler_throughput_benchmark`、`three_way_correction_statistics_b3_b4` | 値を出力するだけで合否を判定しない。出力を受入の証拠にしない |
 | 補助 | `daemon`の`child_process_helper` | queue試験が子processとして起動する。単独では何もしない |
+
+releaseの全試験を実行する前には`cargo build --release -p cli`を実行する。
+試験は既定でdaemon実行ファイルの隣の`solvers`（Windowsは`solvers.exe`）を使う。
+別の実行ファイルを使う場合は、そのpathを環境変数`SOLVERS_TEST_SOLVER`に指定する。
 
 すべてを毎PRで実行する必要はない。全体のrelease受入は次で実行する。計測・報告と補助も含まれる。
 

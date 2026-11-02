@@ -225,6 +225,7 @@ fn mask_tree() -> PublicTree {
         transitions: Vec::new(),
         root_dims: PerPlayer::new(NUM_HANDS as u32, NUM_HANDS as u32),
     })
+    .unwrap()
 }
 
 /// A quotient transition matching `hu_postflop::postflop`'s

@@ -13,9 +13,10 @@ members = [
     "crates/daemon",
     "crates/cli",
 ]
+exclude = ["third_party/tiny_http"]
 
 [workspace.package]
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/hiro15254/solvers"
@@ -56,6 +57,10 @@ rustc-hash = "2"
 parking_lot = "0.12"
 libc = "0.2"
 windows-sys = { version = "0.61", features = ["Win32_System_Console"] }
+
+# Vendored with a local security patch; see third_party/tiny_http/PATCHES.md.
+[patch.crates-io]
+tiny_http = { path = "third_party/tiny_http" }
 
 [profile.release]
 lto = "thin"

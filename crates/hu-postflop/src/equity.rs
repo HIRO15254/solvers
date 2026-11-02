@@ -1,6 +1,5 @@
-//! Range-vs-range showdown equity, averaged over remaining runouts. Cold
-//! path (display/reporting): built for correctness and reuse of the terminal
-//! kernels in [`crate::kernel`], not for the solve loop.
+//! Range-vs-range showdown equity, averaged over remaining runouts.
+//! The reporting path falls back to compatible-pair sums near cancellation.
 
 use nlh::{Card, CardSet, HandRank, NUM_COMBOS, PerPlayer, Player, combo_cards, rank_of};
 
@@ -83,8 +82,9 @@ pub fn range_equity(board: &[Card], ranges: &PerPlayer<Vec<f32>>) -> PerPlayer<V
     let mut denominator = PerPlayer::new(vec![0.0f64; NUM_COMBOS], vec![0.0f64; NUM_COMBOS]);
     let mut num_out = vec![0.0f32; NUM_COMBOS];
     let mut denom_out = vec![0.0f32; NUM_COMBOS];
-
     let same: Vec<u16> = (0..NUM_COMBOS as u16).collect();
+    let mut opponents = Vec::new();
+
     for missing in runouts(board) {
         let mut board5 = [board[0]; 5];
         board5[..board.len()].copy_from_slice(board);
@@ -94,6 +94,7 @@ pub fn range_equity(board: &[Card], ranges: &PerPlayer<Vec<f32>>) -> PerPlayer<V
         for p in Player::BOTH {
             let opp = p.opponent();
             num_out.fill(0.0);
+            denom_out.fill(0.0);
             kernel::showdown_kernel(
                 &sorted,
                 &sorted,
@@ -102,7 +103,6 @@ pub fn range_equity(board: &[Card], ranges: &PerPlayer<Vec<f32>>) -> PerPlayer<V
                 &ranges[opp],
                 &mut num_out,
             );
-            denom_out.fill(0.0);
             kernel::fold_kernel(
                 &sorted.hands,
                 &sorted.hands,
@@ -112,9 +112,66 @@ pub fn range_equity(board: &[Card], ranges: &PerPlayer<Vec<f32>>) -> PerPlayer<V
                 &ranges[opp],
                 &mut denom_out,
             );
-            for combo in 0..NUM_COMBOS {
-                numerator[p][combo] += num_out[combo] as f64;
-                denominator[p][combo] += denom_out[combo] as f64;
+            let total: f64 = sorted
+                .hands
+                .iter()
+                .map(|h| ranges[opp][h.local as usize] as f64)
+                .sum();
+            if total == 0.0 {
+                continue;
+            }
+            // The kernels sum at most NUM_COMBOS terms and subtract card
+            // totals. Recompute values near their accumulated rounding error.
+            let error_factor = f64::EPSILON * (NUM_COMBOS as f64) * 8.0;
+            let threshold = total * error_factor;
+            opponents.clear();
+            let mut opp_start = 0;
+            for &(rank, end) in &sorted.groups {
+                for hand in &sorted.hands[opp_start..end] {
+                    let weight = ranges[opp][hand.local as usize] as f64;
+                    if weight != 0.0 {
+                        opponents.push((rank, *hand, weight));
+                    }
+                }
+                opp_start = end;
+            }
+            let mut start = 0;
+            let mut le_mass = 0.0;
+            for &(rank, end) in &sorted.groups {
+                le_mass += sorted.hands[start..end]
+                    .iter()
+                    .map(|hand| ranges[opp][hand.local as usize] as f64)
+                    .sum::<f64>();
+                for hero in &sorted.hands[start..end] {
+                    let combo = hero.local as usize;
+                    let mut n = num_out[combo] as f64;
+                    let mut d = denom_out[combo] as f64;
+                    if n.abs() < le_mass * error_factor || d.abs() < threshold {
+                        n = 0.0;
+                        d = 0.0;
+                        for &(opp_rank, hand, weight) in &opponents {
+                            if hero.cards[0] == hand.cards[0]
+                                || hero.cards[0] == hand.cards[1]
+                                || hero.cards[1] == hand.cards[0]
+                                || hero.cards[1] == hand.cards[1]
+                            {
+                                continue;
+                            }
+                            let score = if rank > opp_rank {
+                                1.0
+                            } else if rank == opp_rank {
+                                0.5
+                            } else {
+                                0.0
+                            };
+                            n += score * weight;
+                            d += weight;
+                        }
+                    }
+                    numerator[p][combo] += n;
+                    denominator[p][combo] += d;
+                }
+                start = end;
             }
         }
     }

@@ -43,7 +43,8 @@ fn solver_with_support(modified: bool, supported: bool) -> Solver<Evaluator, F32
         masks: vec![],
         transitions: vec![],
         root_dims: PerPlayer::new(1, 1),
-    });
+    })
+    .unwrap();
     Solver::new(
         CompiledGame {
             tree,
@@ -193,7 +194,8 @@ fn incentive_propagates_to_upstream_choices() {
             masks: vec![],
             transitions: vec![],
             root_dims: PerPlayer::new(1, 1),
-        });
+        })
+        .unwrap();
         Solver::new(
             CompiledGame {
                 tree,

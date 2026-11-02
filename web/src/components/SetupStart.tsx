@@ -4,7 +4,7 @@ import type { LineCursor, LineOption, LineStep } from "../api/types";
 import { Button, Card, Input, Popover, PopoverContent, PopoverTrigger } from "../cryst";
 import { STREET_LABEL } from "../lib/cards";
 import { fieldText, getAt } from "../lib/config";
-import { displayAmount, lineToken, normalizedWager, writtenLine } from "../lib/format";
+import { bb, displayAmount, lineToken, normalizedWager, writtenLine } from "../lib/format";
 import { Board } from "./common";
 import { DocText, useDoc } from "./DocFields";
 import { LinePresets } from "./LinePresets";
@@ -64,7 +64,7 @@ async function streetTurns(toml: string, cursor: LineCursor): Promise<Turn[]> {
 }
 
 /** A player's badge on the street row; it opens their actions in a Popover. */
-function TurnPicker({
+export function TurnPicker({
   turn,
   open,
   busy,
@@ -86,7 +86,7 @@ function TurnPicker({
     const value = Number(amount);
     if (!sizing) return;
     if (!amount.trim() || !Number.isFinite(value)) {
-      setError(`Write the street total in BB (${displayAmount(sizing.min, turn.cursor.bbChips)} to ${displayAmount(sizing.max, turn.cursor.bbChips)})`);
+      setError(`Write the street total in BB (${bb(sizing.min)} to ${bb(sizing.max)})`);
       return;
     }
     onPick([...moves, `${sizing.token}${normalizedWager(amount)}`]);
@@ -151,7 +151,7 @@ function TurnPicker({
               className="mono"
               autoFocus
               aria-label={`${OPTION_LABEL[sizing.kind]} amount (BB, street total)`}
-              placeholder={`${displayAmount(sizing.min, turn.cursor.bbChips)}–${displayAmount(sizing.max, turn.cursor.bbChips)}`}
+              placeholder={`${bb(sizing.min)}–${bb(sizing.max)}`}
               type="number"
               step="any"
               inputMode="decimal"

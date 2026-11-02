@@ -222,9 +222,9 @@ def main() -> int:
     if output.exists() and any(output.iterdir()) and not args.resume:
         parser.error(f"output directory must be new or empty: {output}")
     output.mkdir(parents=True, exist_ok=True)
-    fixture = source / "examples/bench_multiway/6max_100bb_nl50_partial_reference.toml"
+    fixture = source / "examples/bench/6max_100bb_nl50_partial_reference.toml"
     if not fixture.is_file():
-        parser.error(f"missing research fixture: {fixture}")
+        parser.error(f"missing local-only research fixture: {fixture}")
     cache = (args.cache_dir.resolve() if args.cache_dir else baseline / ".cache/gcp-reference-ehs2")
     if not args.render_only and not cache.is_dir():
         parser.error(f"shared baseline EHS cache is missing: {cache}")

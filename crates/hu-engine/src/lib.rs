@@ -32,8 +32,8 @@ pub use storage::{
     StorageOps, StorageRef, StorageSpan, StorageState, StorageView,
 };
 pub use tree::{
-    Deal, Node, NodeId, NodeKind, PublicTree, ReachMap, ShapeError, ShapeNode, SparseTransition,
-    TempNode, TreeShape, TreeSpec,
+    Deal, MAX_TREE_DEPTH, Node, NodeId, NodeKind, PublicTree, ReachMap, ShapeError, ShapeNode,
+    SparseTransition, TempNode, TreeShape, TreeSpec,
 };
 
 /// Arithmetic precision of CFR terminals and current-strategy regret matching.

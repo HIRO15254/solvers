@@ -31,7 +31,10 @@ pub enum JobCommand {
 
 struct Running {
     run_id: String,
-    child: Child,
+    child: Option<Child>,
+    directory: PathBuf,
+    pid: u32,
+    started: u64,
     signalled: bool,
 }
 
@@ -52,6 +55,7 @@ pub struct JobRunner {
 struct RunnerState {
     queue: VecDeque<Queued>,
     running: Vec<Running>,
+    next_sequence: u64,
 }
 
 impl JobRunner {
@@ -74,31 +78,114 @@ impl JobRunner {
     /// manifest still says `queued` until one is spawned.
     pub fn submit(&self, run_id: &str, directory: &Path, command: JobCommand) -> Result<bool> {
         let mut state = self.state.lock().expect("job state");
+        if state.queue.iter().any(|job| job.run_id == run_id)
+            || state.running.iter().any(|job| job.run_id == run_id)
+        {
+            anyhow::bail!("run {run_id:?} is already active");
+        }
+        match std::fs::remove_file(running_marker(directory)) {
+            Ok(()) => {}
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(error) => return Err(error.into()),
+        }
+        state.next_sequence = state
+            .next_sequence
+            .max(runfiles::unix_millis())
+            .saturating_add(1);
+        let mut manifest = runfiles::RunManifest::read(directory)?;
+        manifest.state = runfiles::RunState::Queued;
+        manifest.queue_sequence = Some(state.next_sequence);
+        manifest.queued_command = Some(
+            match command {
+                JobCommand::Solve => "solve",
+                JobCommand::Resume => "resume",
+            }
+            .to_string(),
+        );
+        manifest.started_unix_ms = None;
+        manifest.finished_unix_ms = None;
+        manifest.failure = None;
+        manifest.write_atomic(directory)?;
         state.queue.push_back(Queued {
             run_id: run_id.to_string(),
             directory: directory.to_path_buf(),
             command,
         });
-        self.drain(&mut state)?;
+        self.drain(&mut state);
         Ok(state.running.iter().any(|running| running.run_id == run_id))
     }
 
-    /// Starts anything the freed slots can take. Called after reaping.
-    pub fn pump(&self) -> Result<()> {
+    pub fn restore(&self, run_id: &str, directory: &Path, manifest: &runfiles::RunManifest) {
         let mut state = self.state.lock().expect("job state");
-        self.drain(&mut state)
+        state.next_sequence = state
+            .next_sequence
+            .max(manifest.queue_sequence.unwrap_or(0));
+        let recorded = std::fs::read_to_string(running_marker(directory))
+            .ok()
+            .and_then(|text| {
+                let (pid, started) = text.split_once(' ')?;
+                Some((pid.parse::<u32>().ok()?, started.parse::<u64>().ok()?))
+            });
+        let mut probe = manifest.clone();
+        probe.state = runfiles::RunState::Running;
+        if let Some((pid, started)) = recorded {
+            probe.pid = pid;
+            probe.started_unix_ms = Some(started);
+        }
+        if (manifest.state == runfiles::RunState::Running && !manifest.is_stale())
+            || (manifest.state == runfiles::RunState::Queued && recorded.is_some())
+        {
+            state.running.push(Running {
+                run_id: run_id.to_string(),
+                directory: directory.to_path_buf(),
+                child: None,
+                pid: probe.pid,
+                started: probe.started_unix_ms.unwrap_or(probe.created_unix_ms),
+                signalled: false,
+            });
+        } else if manifest.state == runfiles::RunState::Queued {
+            state.queue.push_back(Queued {
+                run_id: run_id.to_string(),
+                directory: directory.to_path_buf(),
+                command: if manifest.queued_command.as_deref() == Some("resume") {
+                    JobCommand::Resume
+                } else {
+                    JobCommand::Solve
+                },
+            });
+        }
     }
 
-    fn drain(&self, state: &mut RunnerState) -> Result<()> {
+    /// Starts anything the freed slots can take. Called after reaping.
+    pub fn pump(&self) {
+        let mut state = self.state.lock().expect("job state");
+        self.drain(&mut state);
+    }
+
+    fn drain(&self, state: &mut RunnerState) {
         self.reap(state);
         loop {
             if state.running.len() >= self.max_concurrent {
-                return Ok(());
+                return;
             }
             let Some(job) = state.queue.pop_front() else {
-                return Ok(());
+                return;
             };
-            self.spawn(state, &job.run_id, &job.directory, job.command)?;
+            if let Err(error) = self.spawn(state, &job.run_id, &job.directory, job.command) {
+                match record_failure_if_unowned(&job.directory, &format!("{error:#}")) {
+                    Ok(true) => {}
+                    Ok(false) => {
+                        state.queue.push_front(job);
+                        return;
+                    }
+                    Err(record_error) => {
+                        eprintln!(
+                            "failed to record startup failure for run {:?}: {record_error:#}",
+                            job.run_id
+                        );
+                    }
+                }
+            }
         }
     }
 
@@ -123,6 +210,8 @@ impl JobRunner {
                 .with_context(|| format!("reading manifest for queued run {run_id:?}"))?;
             manifest.state = runfiles::RunState::Canceled;
             manifest.finished_unix_ms = Some(runfiles::unix_millis());
+            manifest.queue_sequence = None;
+            manifest.queued_command = None;
             manifest
                 .write_atomic(directory)
                 .with_context(|| format!("canceling queued run {run_id:?}"))?;
@@ -137,7 +226,7 @@ impl JobRunner {
             return Ok(CancelOutcome::NotRunning);
         };
         if !running.signalled {
-            signal_interrupt(running.child.id())
+            signal_interrupt(running.pid)
                 .with_context(|| format!("interrupting the solver of run {run_id:?}"))?;
             running.signalled = true;
         }
@@ -187,8 +276,11 @@ impl JobRunner {
         // The child's own output is a debugging aid, not the run's record --
         // that is `events.jsonl`. Keeping it beside the run means a failure
         // the manifest summarizes can still be read in full.
-        let log = std::fs::File::create(directory.join("stdout.log"))
-            .with_context(|| format!("creating stdout.log in {}", directory.display()))?;
+        let log = std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(directory.join("stdout.log"))
+            .with_context(|| format!("opening stdout.log in {}", directory.display()))?;
         let errors = log
             .try_clone()
             .context("duplicating the run log handle for stderr")?;
@@ -199,24 +291,110 @@ impl JobRunner {
             .spawn()
             .with_context(|| format!("spawning {}", self.solver.display()))?;
 
+        let pid = child.id();
+        let started = runfiles::unix_millis();
+        if let Err(error) = std::fs::write(running_marker(directory), format!("{pid} {started}")) {
+            let mut child = child;
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err(error.into());
+        }
         state.running.push(Running {
             run_id: run_id.to_string(),
-            child,
+            directory: directory.to_path_buf(),
+            child: Some(child),
+            pid,
+            started,
             signalled: false,
         });
         Ok(())
     }
 
-    /// Drops finished children.
-    ///
-    /// The run's outcome is not read from the exit status: the child records
-    /// it in the manifest before exiting, and that is what every reader
-    /// uses. This only frees the slot.
     fn reap(&self, state: &mut RunnerState) {
-        state
-            .running
-            .retain_mut(|running| !matches!(running.child.try_wait(), Ok(Some(_)) | Err(_)));
+        let mut index = 0;
+        while index < state.running.len() {
+            let running = &mut state.running[index];
+            let result = (|| -> Result<bool> {
+                let status = if let Some(child) = &mut running.child {
+                    child.try_wait()?.map(|status| status.to_string())
+                } else {
+                    let manifest = runfiles::RunManifest::read(&running.directory)?;
+                    let mut probe = manifest.clone();
+                    probe.state = runfiles::RunState::Running;
+                    probe.pid = running.pid;
+                    probe.started_unix_ms = Some(running.started);
+                    if probe.is_stale() {
+                        Some("unknown status".to_string())
+                    } else {
+                        None
+                    }
+                };
+                let Some(status) = status else {
+                    return Ok(false);
+                };
+                if !record_failure_if_unowned(
+                    &running.directory,
+                    &format!("solver exited with {status} before starting; see stdout.log"),
+                )? {
+                    let manifest = runfiles::RunManifest::read(&running.directory)?;
+                    if manifest.state == runfiles::RunState::Running && !manifest.is_stale() {
+                        running.pid = manifest.pid;
+                        running.started =
+                            manifest.started_unix_ms.unwrap_or(manifest.created_unix_ms);
+                        running.child = None;
+                    }
+                    return Ok(false);
+                }
+                Ok(true)
+            })();
+            match result {
+                Ok(false) => index += 1,
+                result => {
+                    if let Err(error) = result {
+                        eprintln!("failed to reap run {:?}: {error:#}", running.run_id);
+                    }
+                    let _ = std::fs::remove_file(running_marker(&running.directory));
+                    state.running.remove(index);
+                }
+            }
+        }
     }
+}
+
+fn running_marker(directory: &Path) -> PathBuf {
+    let name = directory.file_name().unwrap_or_default().to_string_lossy();
+    directory.with_file_name(format!(".{name}.daemon-running"))
+}
+
+// The CLI holds this lock from adoption through terminal manifest publication.
+// Holding it across the read and write prevents a losing duplicate from
+// replacing a live adopter's manifest.
+fn record_failure_if_unowned(directory: &Path, message: &str) -> Result<bool> {
+    let _lock = match runfiles::RunLock::acquire(directory) {
+        Ok(lock) => lock,
+        Err(runfiles::RunLockError::Busy { .. }) => return Ok(false),
+        Err(error) => return Err(error.into()),
+    };
+    let mut manifest = runfiles::RunManifest::read(directory)?;
+    if manifest.state == runfiles::RunState::Queued {
+        if let Ok(marker) = std::fs::read_to_string(running_marker(directory))
+            && let Some((pid, started)) = marker.split_once(' ')
+            && let (Ok(pid), Ok(started)) = (pid.parse::<u32>(), started.parse::<u64>())
+        {
+            let mut probe = manifest.clone();
+            probe.state = runfiles::RunState::Running;
+            probe.pid = pid;
+            probe.started_unix_ms = Some(started);
+            if !probe.is_stale() {
+                return Ok(false);
+            }
+        }
+        manifest.fail(message);
+        manifest.queue_sequence = None;
+        manifest.queued_command = None;
+        manifest.write_atomic(directory)?;
+    }
+    Ok(true)
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -301,6 +479,9 @@ mod tests {
             "schema = \"x\"\n",
         )
         .unwrap();
+        let mut manifest = runfiles::RunManifest::new(name, "test", None, "", vec![]);
+        manifest.state = runfiles::RunState::Queued;
+        manifest.write_atomic(&directory).unwrap();
         directory
     }
 
@@ -316,9 +497,13 @@ mod tests {
         // checking before any reap can free the slot.
         let queued = {
             let mut state = runner.state.lock().unwrap();
+            let child = sleeping_child();
             state.running.push(Running {
                 run_id: "hold".into(),
-                child: sleeping_child(),
+                pid: child.id(),
+                started: runfiles::unix_millis(),
+                directory: first.clone(),
+                child: Some(child),
                 signalled: false,
             });
             drop(state);
@@ -331,11 +516,13 @@ mod tests {
         runner.cancel("hold").unwrap();
         let mut state = runner.state.lock().unwrap();
         for running in &mut state.running {
-            let _ = running.child.kill();
-            let _ = running.child.wait();
+            if let Some(child) = &mut running.child {
+                let _ = child.kill();
+                let _ = child.wait();
+            }
         }
         drop(state);
-        runner.pump().unwrap();
+        runner.pump();
     }
 
     #[test]
@@ -357,18 +544,22 @@ mod tests {
 
     #[test]
     fn repeated_cancel_does_not_signal_again() {
-        let (_base, runner) = runner(1);
+        let (base, runner) = runner(1);
         {
             let mut state = runner.state.lock().unwrap();
+            let child = sleeping_child();
             state.running.push(Running {
                 run_id: "hold".into(),
-                child: sleeping_child(),
+                pid: child.id(),
+                started: runfiles::unix_millis(),
+                directory: base.path().to_path_buf(),
+                child: Some(child),
                 signalled: true,
             });
         }
         assert_eq!(runner.cancel("hold").unwrap(), CancelOutcome::Signalled);
         let mut state = runner.state.lock().unwrap();
-        let child = &mut state.running[0].child;
+        let child = state.running[0].child.as_mut().unwrap();
         assert!(child.try_wait().unwrap().is_none());
         child.kill().unwrap();
         child.wait().unwrap();
@@ -377,19 +568,99 @@ mod tests {
     #[test]
     fn failed_queued_spawn_does_not_block_later_jobs() {
         let (base, runner) = runner(1);
+        let first = run_dir(base.path(), "first");
+        std::fs::create_dir(first.join("stdout.log")).unwrap();
         let later = run_dir(base.path(), "later");
         {
             let mut state = runner.state.lock().unwrap();
             state.queue.push_back(Queued {
                 run_id: "first".into(),
+                directory: first.clone(),
+                command: JobCommand::Solve,
+            });
+        }
+        runner.submit("later", &later, JobCommand::Solve).unwrap();
+        let failed = runfiles::RunManifest::read(&first).unwrap();
+        assert_eq!(failed.state, runfiles::RunState::Failed);
+        assert!(failed.failure.unwrap().contains("stdout.log"));
+        assert!(failed.finished_unix_ms.is_some());
+        assert!(later.join("stdout.log").is_file());
+    }
+
+    #[test]
+    fn missing_queued_directory_does_not_block_later_jobs() {
+        let (base, runner) = runner(1);
+        let later = run_dir(base.path(), "later");
+        {
+            let mut state = runner.state.lock().unwrap();
+            state.queue.push_back(Queued {
+                run_id: "missing".into(),
                 directory: base.path().join("missing"),
                 command: JobCommand::Solve,
             });
         }
-        assert!(runner.submit("later", &later, JobCommand::Solve).is_err());
-        let state = runner.state.lock().unwrap();
-        assert_eq!(state.queue.len(), 1);
-        assert_eq!(state.queue[0].run_id, "later");
+        runner.submit("later", &later, JobCommand::Solve).unwrap();
+        assert!(later.join("stdout.log").is_file());
+    }
+
+    #[test]
+    fn missing_running_directory_releases_slot() {
+        let (base, runner) = runner(1);
+        let missing = run_dir(base.path(), "missing");
+        std::fs::remove_dir_all(&missing).unwrap();
+        let later = run_dir(base.path(), "later");
+        {
+            let mut state = runner.state.lock().unwrap();
+            state.running.push(Running {
+                run_id: "missing".into(),
+                directory: missing,
+                child: None,
+                pid: std::process::id(),
+                started: runfiles::unix_millis(),
+                signalled: false,
+            });
+        }
+        runner.submit("later", &later, JobCommand::Solve).unwrap();
+        assert!(later.join("stdout.log").is_file());
+    }
+
+    #[test]
+    fn child_exit_before_adoption_records_failure() {
+        let (base, runner) = runner(1);
+        let directory = run_dir(base.path(), "early");
+        runner
+            .submit("early", &directory, JobCommand::Solve)
+            .unwrap();
+        {
+            let mut state = runner.state.lock().unwrap();
+            state.running[0].child.as_mut().unwrap().wait().unwrap();
+        }
+        runner.pump();
+        let manifest = runfiles::RunManifest::read(&directory).unwrap();
+        assert_eq!(manifest.state, runfiles::RunState::Failed);
+        assert!(manifest.failure.unwrap().contains("before starting"));
+        assert!(manifest.finished_unix_ms.is_some());
+    }
+
+    #[test]
+    fn failed_duplicate_does_not_replace_live_or_terminal_manifest() {
+        let (base, _) = runner(1);
+        let directory = run_dir(base.path(), "winner");
+        let lock = runfiles::RunLock::acquire(&directory).unwrap();
+        assert!(!record_failure_if_unowned(&directory, "duplicate failed").unwrap());
+        assert_eq!(
+            runfiles::RunManifest::read(&directory).unwrap().state,
+            runfiles::RunState::Queued
+        );
+        drop(lock);
+        let mut manifest = runfiles::RunManifest::read(&directory).unwrap();
+        manifest.state = runfiles::RunState::Completed;
+        manifest.write_atomic(&directory).unwrap();
+        assert!(record_failure_if_unowned(&directory, "duplicate failed").unwrap());
+        assert_eq!(
+            runfiles::RunManifest::read(&directory).unwrap().state,
+            runfiles::RunState::Completed
+        );
     }
 
     #[test]

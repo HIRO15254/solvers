@@ -1106,3 +1106,78 @@ fn historical_explicit_storage_normalization_and_compatibility_are_preserved() {
     let restored = prepare::restore(&historical, &path).unwrap();
     assert_eq!(restored.state.config_hash, hash);
 }
+
+#[test]
+fn legacy_profile_order_keeps_checkpoint_identity_and_restores() {
+    use hu_postflop::{checkpoint, prepare};
+    let raw = format!(
+        "{}\n[[profile.lock]]\nnode = ''\nstrategy = {{ check = 1.0 }}\n",
+        text(
+            "",
+            "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
+            "Ks 7h 2d 3c 9s",
+            ""
+        )
+    );
+    let prepared = prepare::prepare(&raw, Path::new("run.toml")).unwrap();
+    let mut document: toml_edit::DocumentMut = prepared.effective.parse().unwrap();
+    let value: toml::Value = toml::from_str(&prepared.effective).unwrap();
+    let mut wrapper = toml::Table::new();
+    wrapper.insert("profile".into(), value["profile"].clone());
+    document.remove("profile");
+    let legacy = format!("{}\n{}", document, toml::to_string(&wrapper).unwrap());
+    assert_ne!(legacy, prepared.effective);
+
+    let mut legacy_hash_document: toml_edit::DocumentMut = legacy.parse().unwrap();
+    legacy_hash_document.remove("run");
+    legacy_hash_document.remove("meta");
+    if let Some(solver) = legacy_hash_document
+        .get_mut("solver")
+        .and_then(toml_edit::Item::as_table_mut)
+    {
+        solver.remove("cfr_precision");
+    }
+    let old_hash = runfiles::config_hash(legacy_hash_document.to_string().as_bytes());
+    assert_eq!(prepare::compatibility_hash(&legacy).unwrap(), old_hash);
+    assert_eq!(
+        prepare::compatibility_hash(&prepared.effective).unwrap(),
+        old_hash
+    );
+
+    let built = game(&prepared.config);
+    let solver = hu_engine::Solver::<_, hu_engine::F32Storage>::new(
+        built.game,
+        Box::<hu_engine::Dcfr>::default(),
+        Some(4),
+    );
+    let temp = tempfile::tempdir().unwrap();
+    let path = temp.path().join("checkpoint.ckpt");
+    checkpoint::write_storage_with_config(&path, old_hash, 0, solver.storage(), &legacy, 0.0, 1)
+        .unwrap();
+    let restored = prepare::restore(&legacy, &path).unwrap();
+    assert_eq!(restored.state.config_hash, old_hash);
+}
+
+#[test]
+fn unprofiled_compatibility_hash_preserves_original_bytes() {
+    let raw = text(
+        "",
+        "BTN r2.5, BB c / BB x, BTN x / BB x, BTN x",
+        "Ks 7h 2d 3c 9s",
+        "",
+    );
+    let prepared = hu_postflop::prepare::prepare(&raw, Path::new("run.toml")).unwrap();
+    let mut document: toml_edit::DocumentMut = prepared.effective.parse().unwrap();
+    document.remove("run");
+    document.remove("meta");
+    if let Some(solver) = document
+        .get_mut("solver")
+        .and_then(toml_edit::Item::as_table_mut)
+    {
+        solver.remove("cfr_precision");
+    }
+    assert_eq!(
+        hu_postflop::prepare::compatibility_hash(&prepared.effective).unwrap(),
+        runfiles::config_hash(document.to_string().as_bytes())
+    );
+}

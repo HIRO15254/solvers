@@ -32,9 +32,32 @@ impl BaseMap {
         {
             bail!("NLH003: freeze_upstream solution does not match tree or hand support");
         }
+        let perms = all_suit_perms();
+        let symmetry = |config: &PostflopConfig| -> Vec<SuitPerm> {
+            perms
+                .iter()
+                .copied()
+                .filter(|perm| {
+                    (config.iso_merging || *perm == [0, 1, 2, 3])
+                        && config
+                            .profile_suit_perms
+                            .as_ref()
+                            .is_none_or(|p| p.contains(perm))
+                        && (0..nlh::NUM_COMBOS).all(|combo| {
+                            Player::BOTH.into_iter().all(|seat| {
+                                config.ranges[seat].weight(combo)
+                                    == config.ranges[seat].weight(permute_combo(perm, combo))
+                            })
+                        })
+                })
+                .collect()
+        };
+        let allowed = symmetry(&base.config);
+        let current = symmetry(config);
         let view = crate::index::TreeView { tree, index };
         let old = base.view();
-        if base.game.tree.nodes.len() == tree.nodes.len()
+        if current.iter().all(|p| allowed.contains(p))
+            && base.game.tree.nodes.len() == tree.nodes.len()
             && tree.nodes.iter().enumerate().all(|(id, node)| {
                 let other = base.game.tree.node(id as u32);
                 node.kind == other.kind
@@ -56,25 +79,6 @@ impl BaseMap {
                 entries: Vec::new(),
             });
         }
-        let perms = all_suit_perms();
-        let allowed: Vec<_> = perms
-            .iter()
-            .copied()
-            .filter(|perm| {
-                (base.config.iso_merging || *perm == [0, 1, 2, 3])
-                    && base
-                        .config
-                        .profile_suit_perms
-                        .as_ref()
-                        .is_none_or(|p| p.contains(perm))
-                    && (0..nlh::NUM_COMBOS).all(|combo| {
-                        Player::BOTH.into_iter().all(|seat| {
-                            base.config.ranges[seat].weight(combo)
-                                == base.config.ranges[seat].weight(permute_combo(perm, combo))
-                        })
-                    })
-            })
-            .collect();
         let mut entries = vec![Entry::default(); tree.nodes.len()];
         let mut board = config.board.clone();
         let mut walker = Walker {
@@ -82,6 +86,7 @@ impl BaseMap {
             tree,
             view,
             allowed: &allowed,
+            current: &current,
             perms: &perms,
             entries: &mut entries,
         };
@@ -177,6 +182,7 @@ struct Walker<'a> {
     tree: &'a PublicTree,
     view: crate::index::TreeView<'a>,
     allowed: &'a [SuitPerm],
+    current: &'a [SuitPerm],
     perms: &'a [SuitPerm; 24],
     entries: &'a mut [Entry],
 }
@@ -230,6 +236,26 @@ impl Walker<'_> {
                     .into_iter()
                     .filter(|p| self.allowed.contains(p))
                     .collect();
+                // Only symmetries that stabilize this board can merge its
+                // next cards. Compare them in the base board's coordinates.
+                let current_stab = stabilizer(&Board::new(&board[..3], &board[3..]));
+                let mut inverse = [0; 4];
+                for (suit, &mapped) in perm.iter().enumerate() {
+                    inverse[mapped as usize] = suit as u8;
+                }
+                for p in current_stab.iter().filter(|p| self.current.contains(p)) {
+                    let conjugate = [
+                        perm[p[inverse[0] as usize] as usize],
+                        perm[p[inverse[1] as usize] as usize],
+                        perm[p[inverse[2] as usize] as usize],
+                        perm[p[inverse[3] as usize] as usize],
+                    ];
+                    if !stab.contains(&conjugate) {
+                        bail!(
+                            "NLH003: freeze_upstream base and current suit symmetry differ at a merged runout; retain the base profile's suit restrictions or disable suit merging in both solutions"
+                        );
+                    }
+                }
                 let old_view = self.base.view();
                 let mut weights = vec![0.0f32; b.num_children as usize];
                 let mut skipped_weight = 0.0f32;
@@ -288,6 +314,51 @@ mod tests {
     use super::*;
     use std::sync::atomic::AtomicBool;
     use std::time::Duration;
+
+    fn relock_cyclic_base(board: &str) -> Result<()> {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spot.toml");
+        let sol = dir.path().join("base.sol");
+        let input = TURN
+            .replace("2s 7s Ks 4s", board)
+            .replace("max_iterations = 20", "max_iterations = 1")
+            .replace("check_every = 20", "check_every = 1");
+        let base_input = format!(
+            "{input}\n[[profile.lock]]\nnode = 'root'\nhands = 'AcKd,AdKh,AhKc'\nstrategy = {{ check = 1.0 }}\n"
+        );
+        let p = crate::prepare::prepare(&base_input, &path)?;
+        crate::run::run(
+            crate::run::RunRequest {
+                prepared: &p,
+                checkpoint: &dir.path().join("base.ckpt"),
+                solution: &sol,
+                state: None,
+                evaluation_history: vec![],
+                elapsed_before: Duration::ZERO,
+                cancel: &AtomicBool::new(false),
+            },
+            &mut |_| Ok(()),
+            &mut |_| {},
+        )?;
+        let relock = format!(
+            "{input}\n[profile]\nfreeze_upstream = {{ solution = '{}' }}\n[[profile.lock]]\nnode = 'xx[?]x'\nstrategy = {{ check = 1.0 }}\n",
+            sol.display()
+        );
+        let p = crate::prepare::prepare(&relock, &path)?;
+        crate::run::build_profiled(&p)?;
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_cyclic_base_symmetry_at_merged_runout() {
+        let error = relock_cyclic_base("2s 7s Ks 4s").unwrap_err();
+        assert!(format!("{error:#}").contains("base and current suit symmetry differ"));
+    }
+
+    #[test]
+    fn maps_cyclic_base_when_board_has_no_suit_merging() {
+        relock_cyclic_base("2s 7h Ks 4d").unwrap();
+    }
 
     const TURN: &str = r#"
 schema = "solvers.nlh/v1"

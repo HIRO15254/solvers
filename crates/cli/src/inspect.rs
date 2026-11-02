@@ -388,10 +388,13 @@ impl<'a> Repl<'a> {
             .as_ref()
             .is_some_and(|(id, _)| *id == self.current)
         {
-            self.equity_cache = Some((
-                self.current,
-                queries::equity(self.view, &self.board, &self.history, &reach),
-            ));
+            match queries::equity(self.view, &self.board, self.current, &reach) {
+                Ok(equity) => self.equity_cache = Some((self.current, equity)),
+                Err(error) => {
+                    println!("error: {error}");
+                    return;
+                }
+            }
         }
         let grid = queries::equity_grid(self.view, &reach, &self.equity_cache.as_ref().unwrap().1);
         println!("oop equity vs ip at current node (class-averaged, %)");

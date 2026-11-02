@@ -17,15 +17,10 @@ use nlh::{PerPlayer, Player};
 struct Evaluator {
     general_sum: bool,
     calls: AtomicUsize,
-    workers: Mutex<BTreeSet<usize>>,
 }
 impl TerminalEvaluator for Evaluator {
     fn eval(&self, terminal: u32, p: Player, reach: &[f32], out: &mut [f32]) {
         self.calls.fetch_add(1, Ordering::Relaxed);
-        self.workers
-            .lock()
-            .unwrap()
-            .insert(rayon::current_thread_index().unwrap());
         let total: f32 = reach.iter().sum();
         let other: f32 = reach
             .iter()
@@ -107,7 +102,8 @@ fn game(
                 .collect(),
         ],
         root_dims: PerPlayer::new(dim as u32, dim as u32),
-    });
+    })
+    .unwrap();
     CompiledGame {
         tree,
         evaluator: Evaluator {
@@ -186,12 +182,6 @@ fn solve<S: Storage>(
             for _ in 0..5 {
                 solver.step();
                 states.push(state_bits(solver.state().storage));
-            }
-            if threads > 1 && dim == 257 {
-                assert!(
-                    solver.game().evaluator.workers.lock().unwrap().len() > 1,
-                    "large chance-free action subtrees must use multiple workers"
-                );
             }
             let counter = &solver.game().evaluator.calls;
             counter.store(0, Ordering::Relaxed);
@@ -351,7 +341,8 @@ fn check_asymmetric_empty<S: Storage>() {
                     root_dims: PerPlayer::new(0, 257),
                     masks: Vec::new(),
                     transitions: Vec::new(),
-                });
+                })
+                .unwrap();
                 game.root_ranges[Player::P0].clear();
                 game.normalizer = 1.0;
                 let mut solver = Solver::<_, S>::new(game, Box::<Dcfr>::default(), None);

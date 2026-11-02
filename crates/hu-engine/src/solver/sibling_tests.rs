@@ -73,7 +73,8 @@ fn sibling_rows_default_pruning_empty_dimensions_and_parallel_actions() {
                         root_dims: PerPlayer::new(dim, dim),
                         masks: vec![],
                         transitions: vec![],
-                    });
+                    })
+                    .unwrap();
                     for precision in [CfrPrecision::F32, CfrPrecision::F64] {
                         for zero in [false, true] {
                             let evaluator = Evaluator::default();

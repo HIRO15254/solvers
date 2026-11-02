@@ -16,6 +16,7 @@ mod sizing;
 mod types;
 
 pub mod category;
+pub mod decimal;
 pub mod iso;
 
 /// Tree-script front end: `.tree` source in, compiled rules out. Kept a

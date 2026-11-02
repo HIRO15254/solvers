@@ -16,6 +16,11 @@ __pycache__/
 /tmp*/
 
 # GTO Wizard copied/derived values: local research only, never distributed.
+/examples/bench/6max_100bb_nl50_partial_*reference*.toml
+/crates/cli/tests/gtow_limp_reference.rs
+/crates/cli/tests/gtow_partial_reference.rs
+/crates/cli/tests/gtow_simple_partial_reference.rs
+/experiments/p1-efficiency-2026-10/templates-20261009/gtow-trees.en.md
 /experiments/hu-postflop-reference/cases/ks7h2d-flop/README.md
 /experiments/hu-postflop-reference/cases/ks7h2d-flop/gw-check-*.toml
 /experiments/hu-postflop-reference/cases/ks7h2d3c8d-river/README.md

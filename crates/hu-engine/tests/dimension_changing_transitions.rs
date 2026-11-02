@@ -155,7 +155,8 @@ fn build_game(
         masks: Vec::new(),
         transitions,
         root_dims: PerPlayer::new(4, 4),
-    });
+    })
+    .unwrap();
 
     let normalizer = p0_range.iter().sum::<f32>() as f64 * p1_range.iter().sum::<f32>() as f64;
     CompiledGame {
@@ -327,7 +328,8 @@ fn build_asymmetric_game() -> CompiledGame<AsymEvaluator> {
         masks: Vec::new(),
         transitions: vec![merge_transition()],
         root_dims: PerPlayer::new(4, 3),
-    });
+    })
+    .unwrap();
 
     let p0_range = vec![1.0f32; 4];
     let p1_range = vec![1.0f32; 3];

@@ -207,9 +207,22 @@ def rust_notices(root: Path, policy: dict, offline: bool) -> list[dict]:
             raise NoticeError(f"empty Cargo release graph for {target}")
     result = []
     for package in selected.values():
+        name, version, source = package["name"], package["version"], package["source"]
+        directory = Path(package["manifest_path"]).parent
+        # The locally patched, reviewed crate has no registry source in metadata.
+        if (name, version, source, directory.resolve()) == (
+            "tiny_http", "0.12.0", None, (root / "third_party/tiny_http").resolve()
+        ):
+            result.append({
+                "ecosystem": "Rust", "name": name, "version": version,
+                "license": checked_expression(package.get("license"), policy),
+                "source": "third_party/tiny_http (patched crates.io source)",
+                "checksum": "389915df6413a2e74fb181895f933386023c71110878cd0825588928e64cdc82",
+                "texts": texts(directory, declared=package.get("license_file")),
+            })
+            continue
         if package["id"] in members:
             continue  # First-party code ships under LICENSE-MIT / LICENSE-APACHE.
-        name, version, source = package["name"], package["version"], package["source"]
         if source != "registry+https://github.com/rust-lang/crates.io-index":
             raise NoticeError(f"unreviewed non-crates.io dependency: {name} {version}: {source}")
         entry = locked.get((name, version, source))

@@ -367,6 +367,7 @@ fn execute(
         )?
     };
     let mut metrics = None;
+    let mut stop_reason = None;
     let outcome = run::run(
         run::RunRequest {
             prepared: &p,
@@ -406,6 +407,7 @@ fn execute(
                         .info(runfiles::RunEventPayload::Checkpoint { sweeps: iterations });
                 }
                 run::Observation::Stop { reason } => {
+                    stop_reason = Some(reason.to_owned());
                     let _ = recorder.events_mut().info(runfiles::RunEventPayload::Stop {
                         reason: reason.into(),
                     });
@@ -423,7 +425,7 @@ fn execute(
             run::Diagnostic::Artifact(diagnostic) => print_artifact(diagnostic),
         },
     );
-    let outcome = outcome.and_then(|summary| -> Result<String> {
+    let outcome = outcome.and_then(|summary| -> Result<Option<String>> {
         let mut result = json!({
             "kind": "hu-postflop", "gameKind": "hu-postflop", "configSchema": SCHEMA,
             "configHash": runfiles::config_hash_hex(&hash), "utilityUnit": utility_unit(&p),
@@ -446,14 +448,9 @@ fn execute(
         if summary.canceled {
             crate::CLI_EXIT_CODE.store(130, std::sync::atomic::Ordering::SeqCst);
         }
-        Ok(if summary.canceled {
-            "cancelled"
-        } else {
-            "completed"
-        }
-        .into())
+        Ok(stop_reason)
     });
-    let completion = outcome.as_ref().ok().cloned();
+    let completion = outcome.as_ref().ok().cloned().flatten();
     recorder.finish(outcome.map(|_| ()), completion)
 }
 

@@ -12,9 +12,7 @@ use crate::sol::{
     SolFileWriter, SolMeta, SolMetadata, SolReader, SolStore, StreetsStored, quantize_probs,
     quantize_values,
 };
-use crate::{
-    PostflopConfig, PostflopEvaluator, build_postflop_game, river_entry_state, river_resolve_config,
-};
+use crate::{PostflopConfig, PostflopEvaluator, river_entry_state, river_resolve_config};
 use anyhow::{Context, Result, anyhow, bail};
 use hu_engine::{
     F32Storage, I16Storage, MixedStorage, NodeId, NodeKind, Solver, Storage, pair_subtrees,
@@ -78,7 +76,11 @@ pub(crate) struct SolExportSpec {
 /// sharing a card with `h` cannot, which is the usual inclusion-exclusion:
 /// total, minus the reach through each of `h`'s two cards, plus the one
 /// combo that is both of them and was therefore subtracted twice.
-fn compatible_reach(hands: &crate::PostflopHands, p: Player, opp_reach: &[f32]) -> Vec<f32> {
+pub(crate) fn compatible_reach(
+    hands: &crate::PostflopHands,
+    p: Player,
+    opp_reach: &[f32],
+) -> Vec<f32> {
     let total: f64 = opp_reach.iter().map(|&r| r as f64).sum();
     let mut per_card = [0.0f64; 52];
     for (&combo, &reach) in hands.combos(p.opponent()).iter().zip(opp_reach) {
@@ -767,26 +769,19 @@ impl<'a> SolProvider<'a> {
             return Err(error);
         }
 
-        // A line the solved trunk (essentially) never takes gives one player
-        // an all-zero reach vector; the fresh subgame builder would then
-        // panic on "ranges share no compatible combos". Refuse up front with
-        // an explanation instead — the REPL surfaces provider errors as a
-        // plain "error: ..." line, so navigation itself survives. (A reach
-        // that is positive only on board-conflicting combos can still slip
-        // past this check into the builder assert; that requires a corrupt
-        // artifact rather than a merely-unreached line, so the loud panic is
-        // the right response there.)
+        // Reject lines whose reach is too small to build a stable subgame.
         for p in Player::BOTH {
             if !reach[p].iter().any(|&r| r > 1e-9) {
                 bail!(
-                    "cannot re-solve river at {history:?}: the solved strategy never \
-                     reaches this line for {} (reach is zero for every hand)",
+                    "cannot re-solve river at {history:?}: no hand for {} has \
+                     reach greater than 1e-9",
                     if p == Player::P0 { "oop" } else { "ip" },
                 );
             }
         }
 
-        let internal_history = crate::prepare::internal_history(&history, loaded.config.scale);
+        let internal_history = crate::prepare::internal_history(&history, loaded.config.scale)
+            .with_context(|| format!("invalid action label in river history {history:?}"))?;
         let state = river_entry_state(&loaded.config, &internal_history)
             .with_context(|| format!("replaying history {history:?} for river entry {entry}"))?;
         let sub_cfg = river_resolve_config(&loaded.config, &state, &reach);
@@ -809,7 +804,7 @@ impl<'a> SolProvider<'a> {
         spot.context.pot.0 = state.pot.0 as u64;
         spot.context.effective_stack = Some(nlh::MwChips(state.effective_stack.0 as u64));
         let payoff = crate::input::NlhPayoff::new(&spot)?;
-        let sub_game = build_postflop_game(&sub_cfg, payoff.pipeline());
+        let sub_game = build_river_game(&sub_cfg, payoff.pipeline(), &history)?;
         let rs = match loaded.nlh.1.solver.storage {
             crate::input::Storage::F32 => resolve_river::<F32Storage>(
                 loaded,
@@ -921,6 +916,19 @@ impl<'a> SolProvider<'a> {
         }
         Ok(values)
     }
+}
+
+fn build_river_game(
+    config: &PostflopConfig,
+    pipeline: crate::game::PayoffPipeline<'_>,
+    history: &str,
+) -> Result<crate::PostflopGame> {
+    crate::try_build_postflop_game(config, pipeline).map_err(|error| match error {
+        crate::TreeBuildError::NoCompatibleMass => anyhow!(
+            "cannot re-solve river at {history:?}: reaching ranges have no compatible hand-pair mass at numeric precision"
+        ),
+        error => anyhow!(error).context(format!("building river re-solve at {history:?}")),
+    })
 }
 
 fn resolve_river<S: Storage>(
@@ -1114,6 +1122,7 @@ impl StrategyProvider for SolProvider<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::build_postflop_game;
     use crate::game::{PayoffPipeline, UtilityModel};
     use crate::node_streets;
     use crate::sol::{dequantize_values, read_sol};
@@ -1340,6 +1349,24 @@ target = 1.0
         assert!(checked_soft > 0);
         assert!(frequency_count > 0);
         assert!((frequency_sum / frequency_count as f32 - 1.0).abs() < 0.02);
+    }
+
+    #[test]
+    fn river_rejects_mutually_incompatible_reaching_ranges() {
+        let p = crate::prepare::prepare(TINY_RIVER_TOML, Path::new("test.toml")).unwrap();
+        let hands = crate::PostflopHands::new(&p.config.board, &p.config.ranges);
+        let combo = hands.combos(Player::P0)[0] as usize;
+        let mut config = p.config.clone();
+        for player in Player::BOTH {
+            config.ranges[player] = nlh::Range::default();
+            config.ranges[player].set_weight(combo, 1.0);
+        }
+        let error = match build_river_game(&config, p.payoff.pipeline(), "xx[9d]") {
+            Ok(_) => panic!("overlapping ranges must not produce a river game"),
+            Err(error) => error,
+        };
+        assert!(error.to_string().contains("cannot re-solve river"));
+        assert!(error.to_string().contains("no compatible hand-pair mass"));
     }
 
     #[test]

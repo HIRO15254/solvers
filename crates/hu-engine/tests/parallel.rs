@@ -111,7 +111,8 @@ fn build_game() -> CompiledGame<FixedEvaluator> {
         masks,
         transitions: Vec::new(),
         root_dims: PerPlayer::new(DIM as u32, DIM as u32),
-    });
+    })
+    .unwrap();
     CompiledGame {
         tree,
         evaluator: FixedEvaluator { terminals },

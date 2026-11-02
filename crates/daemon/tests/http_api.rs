@@ -48,8 +48,8 @@ fn stub_solver() -> &'static Path {
         .executable
 }
 
-/// The real CLI is built by the workspace verification before these tests.
-/// An explicit override also supports testing an installed CLI.
+/// The real CLI must be built in the same profile before these tests, or
+/// supplied explicitly through `SOLVERS_TEST_SOLVER`.
 fn real_solver() -> PathBuf {
     let executable = std::env::var_os("SOLVERS_TEST_SOLVER")
         .map(PathBuf::from)
@@ -59,10 +59,24 @@ fn real_solver() -> PathBuf {
         });
     assert!(
         executable.is_file(),
-        "real CLI missing at {}; run cargo build -p cli first or set SOLVERS_TEST_SOLVER",
+        "real CLI missing at {}; build it with `cargo build -p cli` (add `--release` for release tests), or set SOLVERS_TEST_SOLVER to its path",
         executable.display()
     );
     executable
+}
+
+fn poll_until<T>(description: &str, mut poll: impl FnMut() -> Option<T>) -> T {
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(60);
+    loop {
+        if let Some(value) = poll() {
+            return value;
+        }
+        assert!(
+            std::time::Instant::now() < deadline,
+            "timed out after 60 seconds waiting for {description}"
+        );
+        std::thread::sleep(std::time::Duration::from_millis(25));
+    }
 }
 
 struct Daemon {
@@ -171,15 +185,15 @@ impl Daemon {
 
     /// Polls until a run reaches a terminal state.
     fn await_terminal(&self, run_id: &str) -> serde_json::Value {
-        for _ in 0..200 {
+        poll_until(&format!("run {run_id} to finish"), || {
             let (_, run) = self.get(&format!("/v1/runs/{run_id}"));
             if run["state"] == "completed" || run["state"] == "failed" || run["state"] == "canceled"
             {
-                return run;
+                Some(run)
+            } else {
+                None
             }
-            std::thread::sleep(std::time::Duration::from_millis(25));
-        }
-        panic!("run {run_id} never finished");
+        })
     }
 }
 
@@ -210,6 +224,108 @@ fn read_port(child: &mut Child) -> u16 {
 
 fn parse(body: &str) -> serde_json::Value {
     serde_json::from_str(body).unwrap_or_else(|error| panic!("not JSON: {body:?} ({error})"))
+}
+
+#[test]
+fn oversized_json_body_is_rejected_before_upload() {
+    let daemon = Daemon::start(1);
+    let mut stream = TcpStream::connect(("127.0.0.1", daemon.port)).unwrap();
+    stream
+        .set_read_timeout(Some(std::time::Duration::from_secs(10)))
+        .unwrap();
+    write!(
+        stream,
+        "POST /v1/validate HTTP/1.1\r\nHost: localhost\r\nAuthorization: Bearer test-token\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
+        64 * 1024 * 1024 + 1
+    )
+    .unwrap();
+    let mut reader = std::io::BufReader::new(stream);
+    let mut status = String::new();
+    std::io::BufRead::read_line(&mut reader, &mut status).unwrap();
+    assert!(status.starts_with("HTTP/1.1 413"), "{status}");
+    let mut length = None;
+    loop {
+        let mut line = String::new();
+        std::io::BufRead::read_line(&mut reader, &mut line).unwrap();
+        assert!(!line.is_empty(), "response ended before its headers");
+        if line == "\r\n" {
+            break;
+        }
+        if let Some((name, value)) = line.split_once(':')
+            && name.eq_ignore_ascii_case("content-length")
+        {
+            length = Some(value.trim().parse::<usize>().unwrap());
+        }
+    }
+    let mut body = vec![0; length.expect("response content-length")];
+    reader.read_exact(&mut body).unwrap();
+    assert_eq!(
+        parse(std::str::from_utf8(&body).unwrap())["code"],
+        "payload-too-large"
+    );
+}
+
+#[test]
+fn huge_declared_body_disconnect_does_not_stop_the_daemon() {
+    let daemon = Daemon::start(1);
+    let mut stream = TcpStream::connect(("127.0.0.1", daemon.port)).unwrap();
+    stream
+        .set_read_timeout(Some(std::time::Duration::from_secs(10)))
+        .unwrap();
+    stream
+        .write_all(b"POST /v1/validate HTTP/1.1\r\nHost: localhost\r\nAuthorization: Bearer test-token\r\nContent-Length: 1099511627776\r\nConnection: close\r\n\r\n")
+        .unwrap();
+    let mut reader = std::io::BufReader::new(stream);
+    let mut status = String::new();
+    std::io::BufRead::read_line(&mut reader, &mut status).unwrap();
+    assert!(status.starts_with("HTTP/1.1 413"), "{status}");
+    drop(reader);
+
+    let response = poll_until(
+        "the daemon to respond after the oversized disconnect",
+        || {
+            let mut stream = TcpStream::connect(("127.0.0.1", daemon.port)).ok()?;
+            stream
+                .set_read_timeout(Some(std::time::Duration::from_secs(2)))
+                .ok()?;
+            stream
+            .write_all(b"GET /v1 HTTP/1.1\r\nHost: localhost\r\nAuthorization: Bearer test-token\r\nConnection: close\r\n\r\n")
+            .ok()?;
+            let mut response = String::new();
+            stream.read_to_string(&mut response).ok()?;
+            response.starts_with("HTTP/1.1 200").then_some(response)
+        },
+    );
+    let (_, body) = response.split_once("\r\n\r\n").unwrap();
+    assert_eq!(parse(body)["protocolVersion"], 1);
+}
+
+#[test]
+fn saturated_slow_requests_receive_server_busy() {
+    let daemon = Daemon::start(1);
+    let mut slow = Vec::new();
+    for _ in 0..64 {
+        let mut stream = TcpStream::connect(("127.0.0.1", daemon.port)).unwrap();
+        stream
+            .write_all(b"POST /v1/validate HTTP/1.1\r\nHost: localhost\r\nAuthorization: Bearer test-token\r\nContent-Length: 100\r\nConnection: close\r\n\r\n{")
+            .unwrap();
+        slow.push(stream);
+    }
+    let response = poll_until("the daemon to reject a request while saturated", || {
+        let mut stream = TcpStream::connect(("127.0.0.1", daemon.port)).unwrap();
+        stream
+            .set_read_timeout(Some(std::time::Duration::from_secs(2)))
+            .unwrap();
+        stream
+            .write_all(b"GET /v1 HTTP/1.1\r\nHost: localhost\r\nAuthorization: Bearer test-token\r\nConnection: close\r\n\r\n")
+            .unwrap();
+        let mut response = String::new();
+        stream.read_to_string(&mut response).ok()?;
+        response.starts_with("HTTP/1.1 503").then_some(response)
+    });
+    let (_, body) = response.split_once("\r\n\r\n").unwrap();
+    assert_eq!(parse(body)["code"], "server-busy");
+    drop(slow);
 }
 
 #[test]
@@ -797,6 +913,7 @@ threads = 1
 [[profile.lock]]
 node = "root"
 strategy = { "bet 10" = 1.0 }
+confidence = 1.0
 "#;
     let body = serde_json::json!({ "configToml": config }).to_string();
     let (status, created) = daemon.post("/v1/runs", &body);
@@ -852,6 +969,23 @@ strategy = { "bet 10" = 1.0 }
     assert_eq!(status, 200, "{validated}");
     let effective = validated["effectiveConfigToml"].as_str().unwrap();
     assert!(!effective.contains("freeze_upstream"), "{effective}");
+    let positions: Vec<_> = ["[table]", "[spot]", "[ranges]", "[tree]"]
+        .iter()
+        .map(|section| effective.find(section).unwrap())
+        .collect();
+    assert!(
+        positions.windows(2).all(|pair| pair[0] < pair[1]),
+        "{effective}"
+    );
+    let lock = effective.split("[[profile.lock]]").nth(1).unwrap();
+    let positions: Vec<_> = ["node =", "strategy =", "confidence ="]
+        .iter()
+        .map(|field| lock.find(field).unwrap())
+        .collect();
+    assert!(
+        positions.windows(2).all(|pair| pair[0] < pair[1]),
+        "{effective}"
+    );
     let submit = serde_json::json!({
         "configToml": effective,
         "freezeBaseRunId": run_id
@@ -958,20 +1092,14 @@ threads = 1
 
     // A first progress row means the solver is past start-up and its
     // interrupt handler is installed.
-    let mut started = false;
-    for _ in 0..400 {
+    poll_until("the solve to report progress", || {
         let (_, run) = daemon.get(&format!("/v1/runs/{run_id}"));
         assert!(
             run["state"] == "queued" || run["state"] == "running",
             "{run}"
         );
-        if run["lastProgress"].is_object() {
-            started = true;
-            break;
-        }
-        std::thread::sleep(std::time::Duration::from_millis(25));
-    }
-    assert!(started, "the solve never reported progress");
+        run["lastProgress"].is_object().then_some(())
+    });
 
     let (status, cancelled) = daemon.post(&format!("/v1/runs/{run_id}/cancel"), "");
     assert_eq!(status, 200, "{cancelled}");
@@ -1113,6 +1241,59 @@ solution_streets = "no-rivers"
     }
 }
 
+#[test]
+fn solver_exit_before_manifest_is_reported_as_failed() {
+    let daemon = Daemon::start(1);
+    let (status, created) = daemon.post("/v1/runs", &config("EARLY_EXIT"));
+    assert_eq!(status, 200, "{created}");
+    let id = created["runId"].as_str().unwrap();
+    let finished = daemon.await_terminal(id);
+    assert_eq!(finished["state"], "failed", "{finished}");
+}
+
+#[test]
+fn queued_resume_is_visible_cancellable_and_survives_restart() {
+    let home = tempfile::tempdir().expect("temp home");
+    let daemon = Daemon::start_in(home.path(), 1);
+    let mut ids = Vec::new();
+    for marker in ["resume-first", "resume-cancel"] {
+        let (_, created) = daemon.post("/v1/runs", &config(marker));
+        let id = created["runId"].as_str().unwrap().to_owned();
+        assert_eq!(daemon.await_terminal(&id)["state"], "completed");
+        let directory = daemon.runs.join(&id);
+        let manifest_path = directory.join("manifest.json");
+        let mut manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(&manifest_path).unwrap()).unwrap();
+        manifest["state"] = serde_json::json!("failed");
+        std::fs::write(&manifest_path, serde_json::to_vec(&manifest).unwrap()).unwrap();
+        std::fs::write(directory.join("checkpoint.ckpt"), b"stub checkpoint").unwrap();
+        ids.push(id);
+    }
+    let (_, blocking) = daemon.post("/v1/runs", &config("WAIT_RELEASE"));
+    assert_eq!(blocking["state"], "running");
+    let blocking_dir = daemon.runs.join(blocking["runId"].as_str().unwrap());
+    for id in &ids {
+        let (status, queued) = daemon.post(&format!("/v1/runs/{id}/resume"), "");
+        assert_eq!(status, 200, "{queued}");
+        assert_eq!(queued["state"], "queued", "{queued}");
+        let (_, visible) = daemon.get(&format!("/v1/runs/{id}"));
+        assert_eq!(visible["state"], "queued", "{visible}");
+    }
+    let (status, canceled) = daemon.post(&format!("/v1/runs/{}/cancel", ids[1]), "");
+    assert_eq!(status, 200, "{canceled}");
+    assert_eq!(canceled["state"], "canceled", "{canceled}");
+    let resumed = daemon.runs.join(&ids[0]);
+    let canceled_dir = daemon.runs.join(&ids[1]);
+    drop(daemon);
+    let restarted = Daemon::start_in(home.path(), 1);
+    std::fs::write(blocking_dir.join("release"), b"").unwrap();
+    assert_eq!(restarted.await_terminal(&ids[0])["state"], "completed");
+    assert!(resumed.join("resumed").is_file());
+    let (_, canceled) = restarted.get(&format!("/v1/runs/{}", ids[1]));
+    assert_eq!(canceled["state"], "canceled", "{canceled}");
+    assert!(!canceled_dir.join("resumed").exists());
+}
+
 /// A queued run outlives the daemon that accepted it.
 ///
 /// Its directory is the only record that it was accepted, so a restart has
@@ -1122,18 +1303,56 @@ solution_streets = "no-rivers"
 fn a_restart_picks_up_a_run_that_was_still_queued() {
     let home = tempfile::tempdir().expect("temp home");
     let daemon = Daemon::start_in(home.path(), 1);
-    let (_, blocking) = daemon.post("/v1/runs", &config("BLOCK"));
+    let (_, blocking) = daemon.post("/v1/runs", &config("WAIT_RELEASE"));
     assert_eq!(blocking["state"], "running");
+    let blocking_dir = daemon.runs.join(blocking["runId"].as_str().unwrap());
     let (_, waiting) = daemon.post("/v1/runs", &config("waits-for-a-restart"));
     assert_eq!(waiting["state"], "queued");
     let waiting_id = waiting["runId"].as_str().unwrap().to_string();
 
-    // Restart over the same directory, with nothing holding a slot.
+    // Restart over the same directory, then release any surviving child.
     drop(daemon);
     let restarted = Daemon::start_in(home.path(), 1);
+    std::fs::write(blocking_dir.join("release"), b"").unwrap();
 
     let recovered = restarted.await_terminal(&waiting_id);
     assert_eq!(recovered["state"], "completed");
+}
+
+#[test]
+fn recovered_queue_advances_in_fifo_order_without_requests() {
+    let home = tempfile::tempdir().expect("temp home");
+    let daemon = Daemon::start_in(home.path(), 1);
+    let (_, blocking) = daemon.post("/v1/runs", &config("WAIT_RELEASE"));
+    assert_eq!(blocking["state"], "running");
+    let blocking_dir = daemon.runs.join(blocking["runId"].as_str().unwrap());
+    let (_, first) = daemon.post("/v1/runs", &config("WAIT_RELEASE"));
+    let (_, second) = daemon.post("/v1/runs", &config("after-release"));
+    assert_eq!(first["state"], "queued");
+    assert_eq!(second["state"], "queued");
+    let first_id = first["runId"].as_str().unwrap().to_owned();
+    let second_id = second["runId"].as_str().unwrap().to_owned();
+    let first_dir = daemon.runs.join(&first_id);
+    let second_dir = daemon.runs.join(&second_id);
+    drop(daemon);
+    let _restarted = Daemon::start_in(home.path(), 1);
+    std::fs::write(blocking_dir.join("release"), b"").unwrap();
+
+    let read_state = |directory: &Path| {
+        let bytes = std::fs::read(directory.join("manifest.json")).ok()?;
+        let manifest: serde_json::Value = serde_json::from_slice(&bytes).ok()?;
+        Some(manifest["state"].as_str()?.to_owned())
+    };
+    poll_until("the first recovered run to start", || {
+        (read_state(&first_dir).as_deref() == Some("running")).then_some(())
+    });
+    assert_eq!(read_state(&second_dir).as_deref(), Some("queued"));
+    std::fs::write(first_dir.join("release"), b"").unwrap();
+    poll_until(
+        "the second recovered run to finish without requests",
+        || (read_state(&second_dir).as_deref() == Some("completed")).then_some(()),
+    );
+    assert_eq!(read_state(&first_dir).as_deref(), Some("completed"));
 }
 
 #[test]

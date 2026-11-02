@@ -479,18 +479,14 @@ impl Chunk {
 }
 
 fn decompress(compressed: &[u8], limit: usize, what: &'static str) -> Result<Vec<u8>, SolError> {
-    zstd::zstd_safe::get_frame_content_size(compressed).map_err(|_| SolError::Malformed(what))?;
-    let decoder =
-        zstd::stream::read::Decoder::new(compressed).map_err(|_| SolError::Malformed(what))?;
-    let mut out = Vec::new();
-    decoder
-        .take(limit as u64 + 1)
-        .read_to_end(&mut out)
-        .map_err(|_| SolError::Malformed(what))?;
-    if out.len() > limit {
-        return Err(SolError::Malformed(what));
-    }
-    Ok(out)
+    let size = zstd::zstd_safe::get_frame_content_size(compressed)
+        .map_err(|_| SolError::Malformed(what))?
+        .ok_or(SolError::Malformed(what))?;
+    let size = usize::try_from(size)
+        .ok()
+        .filter(|&size| size <= limit)
+        .ok_or(SolError::Malformed(what))?;
+    zstd::bulk::decompress(compressed, size).map_err(|_| SolError::Malformed(what))
 }
 
 /// Random access to a `.sol` file: header, metadata and directory are read
@@ -539,6 +535,13 @@ impl SolReader {
         if header.directory_offset.checked_add(header.directory_len) != Some(file_len) {
             return Err(SolError::Malformed(
                 "directory frame does not end the file (truncated or extended)",
+            ));
+        }
+        if header.metadata_len > zstd::zstd_safe::compress_bound(MAX_METADATA_BYTES) as u64
+            || header.directory_len > zstd::zstd_safe::compress_bound(MAX_DIRECTORY_BYTES) as u64
+        {
+            return Err(SolError::Malformed(
+                "compressed frame exceeds its size limit",
             ));
         }
         let metadata_frame = read_exact_at(&mut file, HEADER_LEN as u64, header.metadata_len)?;
@@ -602,6 +605,8 @@ impl SolReader {
                     || entry.first_sref > entry.last_sref
                     || u64::from(entry.last_sref - entry.first_sref) < u64::from(entry.nodes) - 1
                     || previous.is_some_and(|last| entry.first_sref <= last)
+                    || entry.compressed_len
+                        > zstd::zstd_safe::compress_bound(MAX_CHUNK_BYTES) as u64
                     || entry.decoded_len > MAX_CHUNK_BYTES as u64
                 {
                     return Err(SolError::Malformed("inconsistent chunk directory"));
@@ -648,15 +653,20 @@ impl SolReader {
     }
 
     pub(crate) fn verify_index(&mut self) -> Result<(), SolError> {
-        self.index_frame().map(|_| ())
-    }
-
-    fn index_frame(&mut self) -> Result<Vec<u8>, SolError> {
-        let frame = read_exact_at(&mut self.file, self.index_offset, self.index_len)?;
-        if *blake3::hash(&frame).as_bytes() != self.index_checksum {
+        self.file.seek(SeekFrom::Start(self.index_offset))?;
+        let mut remaining = self.index_len;
+        let mut hasher = blake3::Hasher::new();
+        let mut buffer = [0u8; 64 * 1024];
+        while remaining != 0 {
+            let len = remaining.min(buffer.len() as u64) as usize;
+            self.file.read_exact(&mut buffer[..len])?;
+            hasher.update(&buffer[..len]);
+            remaining -= len as u64;
+        }
+        if *hasher.finalize().as_bytes() != self.index_checksum {
             return Err(SolError::Checksum("index"));
         }
-        Ok(frame)
+        Ok(())
     }
 
     pub fn into_metadata(self) -> SolMetadata {
@@ -669,8 +679,10 @@ impl SolReader {
         &mut self,
         decode: impl FnOnce(&mut dyn Read) -> Result<T, SolError>,
     ) -> Result<T, SolError> {
-        let frame = self.index_frame()?;
-        let mut decoder = zstd::stream::read::Decoder::with_buffer(frame.as_slice())
+        self.verify_index()?;
+        self.file.seek(SeekFrom::Start(self.index_offset))?;
+        let frame = (&mut self.file).take(self.index_len);
+        let mut decoder = zstd::stream::read::Decoder::new(frame)
             .map_err(|_| SolError::Malformed("index frame does not decompress"))?
             .single_frame();
         decode(&mut decoder)
@@ -2009,6 +2021,13 @@ mod tests {
         ));
         assert!(matches!(
             decompress(&[1, 2, 3], 32, "frame"),
+            Err(SolError::Malformed("frame"))
+        ));
+        let mut encoder = zstd::stream::write::Encoder::new(Vec::new(), 1).unwrap();
+        encoder.write_all(&[42; 32]).unwrap();
+        let unknown_size = encoder.finish().unwrap();
+        assert!(matches!(
+            decompress(&unknown_size, 32, "frame"),
             Err(SolError::Malformed("frame"))
         ));
     }

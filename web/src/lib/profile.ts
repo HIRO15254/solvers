@@ -34,6 +34,14 @@ export type PendingEntry =
   | { kind: "incentive"; value: PendingIncentive }
   | { kind: "frequency"; value: PendingFrequency };
 
+/** Match the solver's f32 accumulation and full-lock bounds in action order. */
+export function validLockSum(probabilities: number[], confidence: number): boolean {
+  const sum = probabilities.reduce((total, p) => Math.fround(total + Math.fround(p)), 0);
+  return sum <= Math.fround(1.000001) && (confidence < 1
+    ? Math.abs(Math.fround(sum - 1)) <= Math.fround(1e-6)
+    : sum >= Math.fround(1 - Math.fround(1e-6)));
+}
+
 export function queuedProfile(entries: PendingEntry[]): { lock?: PendingLock[]; incentive?: PendingIncentive[]; frequency?: PendingFrequency[] } {
   const profile: { lock?: PendingLock[]; incentive?: PendingIncentive[]; frequency?: PendingFrequency[] } = {};
   for (const entry of entries) {

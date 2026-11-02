@@ -194,7 +194,7 @@ checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
 
 [[package]]
 name = "cfr-ref"
-version = "0.2.0"
+version = "0.2.1"
 
 [[package]]
 name = "chunked_transfer"
@@ -271,7 +271,7 @@ checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
 
 [[package]]
 name = "cli"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "anyhow",
  "blake3",
@@ -411,7 +411,7 @@ dependencies = [
 
 [[package]]
 name = "daemon"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -424,6 +424,7 @@ dependencies = [
  "tempfile",
  "tiny_http",
  "toml",
+ "toml_edit",
  "windows-sys 0.61.2",
 ]
 
@@ -439,7 +440,7 @@ dependencies = [
 
 [[package]]
 name = "economics"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "nlh",
  "serde",
@@ -598,7 +599,7 @@ checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
 name = "hu-engine"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "criterion",
  "hu-engine",
@@ -610,7 +611,7 @@ dependencies = [
 
 [[package]]
 name = "hu-postflop"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "anyhow",
  "blake3",
@@ -744,7 +745,7 @@ dependencies = [
 
 [[package]]
 name = "mw-preflop"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "anyhow",
  "blake3",
@@ -769,7 +770,7 @@ dependencies = [
 
 [[package]]
 name = "nlh"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "aya_poker",
  "serde",
@@ -899,7 +900,7 @@ dependencies = [
 
 [[package]]
 name = "protocol"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "runfiles",
  "serde",
@@ -1052,7 +1053,7 @@ dependencies = [
 
 [[package]]
 name = "runfiles"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "blake3",
  "libc",
@@ -1222,7 +1223,7 @@ checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 
 [[package]]
 name = "spot"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "economics",
  "nlh",
@@ -1288,8 +1289,6 @@ dependencies = [
 [[package]]
 name = "tiny_http"
 version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "389915df6413a2e74fb181895f933386023c71110878cd0825588928e64cdc82"
 dependencies = [
  "ascii",
  "chunked_transfer",

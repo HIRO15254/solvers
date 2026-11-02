@@ -106,7 +106,9 @@ impl PotRake for CompiledRake {
 }
 
 fn percentage(amount: MwChips, rate: f64) -> MwChips {
-    MwChips((amount.raw() as f64 * rate).floor() as u64)
+    MwChips(
+        nlh::decimal::rounded_product(amount.raw(), rate, 1, Rounding::Down).unwrap_or(u64::MAX),
+    )
 }
 
 fn percentage_with_rounding(
@@ -115,13 +117,9 @@ fn percentage_with_rounding(
     rounding: Rounding,
     unit: MwChips,
 ) -> MwChips {
-    let exact = amount.raw() as f64 * rate / unit.raw() as f64;
-    let rounded = match rounding {
-        Rounding::Down => exact.floor(),
-        Rounding::Nearest => exact.round(),
-        Rounding::Up => exact.ceil(),
-    };
-    MwChips((rounded as u64).saturating_mul(unit.raw()))
+    let rounded =
+        nlh::decimal::rounded_product(amount.raw(), rate, unit.raw(), rounding).unwrap_or(u64::MAX);
+    MwChips(rounded.saturating_mul(unit.raw()))
 }
 
 #[cfg(test)]
@@ -130,6 +128,26 @@ mod tests {
     use nlh::betting::{BettingState, HandPhase, SeatState, SeatStatus};
     use nlh::settlement::{build_rated_pots, settle_ranked};
     use nlh::{SeatId, SeatMask, SeatVec, Street};
+
+    #[test]
+    fn decimal_rake_rounds_in_exact_units() {
+        assert_eq!(
+            percentage_with_rounding(MwChips(5500), 0.07, Rounding::Up, MwChips(1)),
+            MwChips(385)
+        );
+        assert_eq!(
+            percentage_with_rounding(MwChips(100_000), 0.07, Rounding::Up, MwChips(1000)),
+            MwChips(7000)
+        );
+        assert_eq!(
+            percentage_with_rounding(MwChips(200), 0.145, Rounding::Down, MwChips(1)),
+            MwChips(29)
+        );
+        assert_eq!(
+            percentage(MwChips(9_007_199_254_740_993), 1.0),
+            MwChips(9_007_199_254_740_993)
+        );
+    }
     fn manual(individual: &[u64], common: &[u64], statuses: &[SeatStatus]) -> BettingState {
         let seats = individual
             .iter()

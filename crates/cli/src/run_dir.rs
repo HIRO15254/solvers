@@ -134,17 +134,7 @@ impl RunRecorder {
             manifest.created_unix_ms = queued.created_unix_ms;
             manifest.relocked_from = queued.relocked_from;
         }
-        manifest
-            .write_atomic(directory)
-            .with_context(|| format!("writing the run manifest in {}", directory.display()))?;
-        let mut events = RunEventLog::create_or_append(directory)
-            .with_context(|| format!("opening the run event log in {}", directory.display()))?;
-        events.state(RunState::Running)?;
-        Ok(Self {
-            directory: directory.to_path_buf(),
-            manifest,
-            events,
-        })
+        Self::open_events(directory, manifest)
     }
 
     /// Reopens an existing run directory for another segment.
@@ -190,17 +180,35 @@ impl RunRecorder {
         );
         manifest.created_unix_ms = previous.created_unix_ms;
         manifest.relocked_from = previous.relocked_from;
+        Self::open_events(directory, manifest)
+    }
+
+    fn open_events(directory: &Path, mut manifest: RunManifest) -> Result<Self> {
         manifest
             .write_atomic(directory)
             .with_context(|| format!("writing the run manifest in {}", directory.display()))?;
-        let mut events = RunEventLog::create_or_append(directory)
-            .with_context(|| format!("opening the run event log in {}", directory.display()))?;
-        events.state(RunState::Running)?;
-        Ok(Self {
-            directory: directory.to_path_buf(),
-            manifest,
-            events,
-        })
+        let opened = (|| -> Result<RunEventLog> {
+            let mut events = RunEventLog::create_or_append(directory)
+                .with_context(|| format!("opening the run event log in {}", directory.display()))?;
+            events
+                .state(RunState::Running)
+                .context("writing the opening run event")?;
+            Ok(events)
+        })();
+        match opened {
+            Ok(events) => Ok(Self {
+                directory: directory.to_path_buf(),
+                manifest,
+                events,
+            }),
+            Err(error) => {
+                manifest.fail(format!("{error:#}"));
+                manifest.write_atomic(directory).with_context(|| {
+                    format!("closing the failed run manifest in {}", directory.display())
+                })?;
+                Err(error)
+            }
+        }
     }
 
     /// The run's single event writer.
@@ -335,6 +343,28 @@ mod tests {
         );
         assert_eq!(std::fs::read(manifest).unwrap(), b"invalid json");
         assert_eq!(std::fs::read(config).unwrap(), b"original config");
+    }
+
+    #[test]
+    fn event_open_failure_marks_started_and_resumed_runs_failed() {
+        for resumed in [false, true] {
+            let directory = tempfile::tempdir().unwrap();
+            if resumed {
+                let mut previous = RunManifest::new("run", "hu-postflop", None, "aa", vec![]);
+                previous.finish(RunState::Completed, Some("max-iterations".into()));
+                previous.write_atomic(directory.path()).unwrap();
+            }
+            std::fs::write(RunEventLog::path_in(directory.path()), b"invalid json\n").unwrap();
+            let result = if resumed {
+                RunRecorder::reopen(directory.path(), "hu-postflop", None, [0; 32], "", vec![])
+            } else {
+                RunRecorder::start(directory.path(), "hu-postflop", None, [0; 32], "", vec![])
+            };
+            assert!(result.is_err());
+            let manifest = RunManifest::read(directory.path()).unwrap();
+            assert_eq!(manifest.state, RunState::Failed);
+            assert!(manifest.failure.unwrap().contains("event log"));
+        }
     }
 
     #[test]

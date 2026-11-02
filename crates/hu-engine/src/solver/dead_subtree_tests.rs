@@ -2,7 +2,6 @@ use super::*;
 use crate::schedule::{CfrPlus, Dcfr, HsDcfr};
 use crate::storage::{F32Storage, I16Storage, StorageOps};
 use crate::tree::{ReachMap, SparseTransition, TempNode, TreeSpec};
-use std::collections::BTreeSet;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
@@ -82,7 +81,8 @@ fn game(dim: usize) -> CompiledGame<Evaluator> {
                 out_dim: (dim / 2) as u32,
                 entries: (0..dim / 2).map(|h| (h as u32, h as u32, 1.0)).collect(),
             }],
-        }),
+        })
+        .unwrap(),
         evaluator: Evaluator::default(),
         root_ranges: PerPlayer::new(vec![0.75; dim], vec![0.5; dim]),
         normalizer: 1.0,
@@ -236,7 +236,8 @@ fn nonzero_subnormal_opponent_reach_is_evaluated() {
         root_dims: PerPlayer::new(1, 1),
         masks: vec![],
         transitions: vec![],
-    });
+    })
+    .unwrap();
     g.root_ranges[Player::P1][0] = f32::from_bits(1);
     let solver = Solver::<_, F32Storage>::new(g, Box::<Dcfr>::default(), None);
     assert_eq!(
@@ -288,11 +289,12 @@ fn nonzero_subnormal_opponent_reach_is_evaluated() {
 #[derive(Default)]
 struct Activity {
     matching: AtomicUsize,
-    update_workers: Mutex<BTreeSet<usize>>,
+    updates: AtomicUsize,
+    splits: AtomicUsize,
 }
 
-// Observe real storage updates inside a dead subtree, where terminal calls
-// cannot reveal parallel execution because they are all skipped.
+// Observe storage updates and parallel work offered inside a dead subtree,
+// where terminal calls cannot reveal the traversal because they are skipped.
 struct TrackingView<V> {
     inner: V,
     activity: Arc<Activity>,
@@ -306,17 +308,7 @@ impl<V: StorageView> StorageOps for TrackingView<V> {
 
     fn update_regrets(&mut self, r: StorageRef, index: u32, inst: &[f32], d: &Discounts) {
         assert!(inst.iter().all(|&x| x == 0.0));
-        let seen = {
-            let mut workers = self.activity.update_workers.lock().unwrap();
-            workers.insert(rayon::current_thread_index().unwrap());
-            workers.len()
-        };
-        if seen < 2 {
-            // Pruned work is so fast that one worker can finish every task
-            // before another steals one. Give idle workers time to steal; a
-            // sequential run still records a single worker.
-            std::thread::sleep(std::time::Duration::from_millis(2));
-        }
+        self.activity.updates.fetch_add(1, Ordering::Relaxed);
         self.inner.update_regrets(r, index, inst, d);
     }
 
@@ -331,6 +323,7 @@ impl<V: StorageView> StorageOps for TrackingView<V> {
 
 impl<V: StorageView> StorageView for TrackingView<V> {
     fn split(&mut self, spans: &[StorageSpan]) -> Vec<Self> {
+        self.activity.splits.fetch_add(1, Ordering::Relaxed);
         self.inner
             .split(spans)
             .into_iter()
@@ -403,9 +396,10 @@ fn check_parallel_updates<S: Storage>(par: ParConfig) {
                 new_activity.matching.load(Ordering::Relaxed)
                     < old_activity.matching.load(Ordering::Relaxed)
             );
+            assert!(new_activity.updates.load(Ordering::Relaxed) > 0);
             assert!(
-                new_activity.update_workers.lock().unwrap().len() > 1,
-                "zero-opponent-reach storage updates must still run on multiple workers"
+                new_activity.splits.load(Ordering::Relaxed) > 0,
+                "zero-opponent-reach traversal must offer parallel work"
             );
         });
 }

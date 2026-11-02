@@ -10,8 +10,8 @@ First-party code is covered by the root licenses.
 Rust target union: aarch64-apple-darwin, x86_64-apple-darwin, x86_64-pc-windows-msvc, x86_64-unknown-linux-gnu
 No build timestamp or machine-local paths are included.
 
-SHA-256 Cargo.lock: 1e8a5783d65da43ecf3854629b304645bb72795840afd67af527b73b52d0a38c
-SHA-256 web/package-lock.json: 81377acf3c9690c9aa603dbd2a16efffb61ae8193fc472b89c2af6cbf5bc5781
+SHA-256 Cargo.lock: 50b4e4772c661d631e0cfd2e1f9901a33c2d420903c66e89d29a7181250b9683
+SHA-256 web/package-lock.json: ec720968e130c766542c9bec2fc65c9b11f131e86b3846f11190b45f7b479eb0
 SHA-256 packaging/third-party.json: 590c3717bd1e57a49234e4a6c64846fe7854986f8064855bbfc2c0f9c958b85e
 
 ==============================================================================
@@ -21655,7 +21655,7 @@ DEALINGS IN THE SOFTWARE.
 ==============================================================================
 Rust: tiny_http 0.12.0
 License: MIT OR Apache-2.0
-Source: registry+https://github.com/rust-lang/crates.io-index
+Source: third_party/tiny_http (patched crates.io source)
 Locked source checksum/integrity: 389915df6413a2e74fb181895f933386023c71110878cd0825588928e64cdc82
 
 --- LICENSE-APACHE ---

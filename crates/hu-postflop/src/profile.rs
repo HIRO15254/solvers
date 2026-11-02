@@ -230,10 +230,10 @@ pub fn resolve_profile(
             let s = node.aux as usize;
             let actions = node.num_children as usize;
             let hands = tree.storage_ref(node).num_hands as usize;
-            type Selection<'a> = (Vec<bool>, &'a Vec<(String, f64)>);
+            type Selection<'a> = (Vec<bool>, &'a Vec<(String, f64)>, Option<&'a str>);
             let selections: Vec<Selection<'_>> = match &lock.strategy {
                 LockStrategy::Uniform(strategy) => {
-                    vec![(mask(view, id, &config.board, &lock.hands)?, strategy)]
+                    vec![(mask(view, id, &config.board, &lock.hands)?, strategy, None)]
                 }
                 LockStrategy::PerCombo(entries) => {
                     let mut result = Vec::new();
@@ -252,14 +252,14 @@ pub fn resolve_profile(
                         }
                         let mut selected = vec![false; hands];
                         selected[local] = true;
-                        result.push((selected, strategy));
+                        result.push((selected, strategy, Some(text.as_str())));
                     }
                     result
                 }
             };
             if selections
                 .iter()
-                .all(|(selected, _)| !selected.iter().any(|&v| v))
+                .all(|(selected, _, _)| !selected.iter().any(|&v| v))
             {
                 continue;
             }
@@ -268,7 +268,7 @@ pub fn resolve_profile(
                 fixed: vec![f32::NAN; actions * hands],
                 confidence: vec![0.0; hands],
             });
-            for (selected, strategy) in selections {
+            for (selected, strategy, combo) in selections {
                 let mut fixed = vec![f32::NAN; actions];
                 for (label, probability) in strategy {
                     let a = action(view, id, label)?;
@@ -292,8 +292,10 @@ pub fn resolve_profile(
                         && fixed.iter().all(|x| !x.is_nan()))
                 {
                     return Err(error(format!(
-                        "invalid lock probabilities or confidence at {:?}, actions {:?}",
+                        "invalid lock probabilities or confidence at {:?}, hands {:?}, combo {:?}, actions {:?}",
                         view.history(id),
+                        lock.hands,
+                        combo,
                         view.actions(id)
                     )));
                 }

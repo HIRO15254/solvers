@@ -499,6 +499,46 @@ pub(crate) fn encoder_workspace(threads: u64) -> u64 {
         .saturating_mul(JOB)
         .saturating_add(threads.saturating_mul(CONTEXT))
 }
+fn encode_metadata(
+    metadata: Metadata,
+    lambdas: Option<&[f64]>,
+    mode: CheckpointMode,
+) -> Result<Vec<u8>, CheckpointError> {
+    let bytes = match (mode, lambdas) {
+        (CheckpointMode::Subtree, values) => {
+            postcard::to_allocvec(&(metadata, values.unwrap_or(&[]), mode))?
+        }
+        (CheckpointMode::WholeTree, Some(values)) => postcard::to_allocvec(&(metadata, values))?,
+        (CheckpointMode::WholeTree, None) => postcard::to_allocvec(&metadata)?,
+    };
+    if bytes.len() > MAX_METADATA {
+        return Err(CheckpointError::Invalid("metadata too large"));
+    }
+    Ok(bytes)
+}
+
+pub(crate) fn preflight_metadata(
+    storage: &impl Storage,
+    config: &str,
+    max_iteration: u64,
+    lambdas: &[f64],
+    mode: CheckpointMode,
+) -> Result<(), CheckpointError> {
+    let (backend, lengths) = shape(&storage.arrays());
+    encode_metadata(
+        Metadata {
+            config_toml: Some(config.to_owned()),
+            elapsed_secs: Some(0.0),
+            iteration: max_iteration,
+            backend,
+            lengths,
+        },
+        (!lambdas.is_empty()).then_some(lambdas),
+        mode,
+    )?;
+    Ok(())
+}
+
 #[allow(clippy::too_many_arguments)]
 fn write_arrays(
     path: &Path,
@@ -520,16 +560,7 @@ fn write_arrays(
         backend,
         lengths,
     };
-    let metadata = match (mode, lambdas) {
-        (CheckpointMode::Subtree, values) => {
-            postcard::to_allocvec(&(metadata, values.unwrap_or(&[]), mode))?
-        }
-        (CheckpointMode::WholeTree, Some(values)) => postcard::to_allocvec(&(metadata, values))?,
-        (CheckpointMode::WholeTree, None) => postcard::to_allocvec(&metadata)?,
-    };
-    if metadata.len() > MAX_METADATA {
-        return Err(CheckpointError::Invalid("metadata too large"));
-    }
+    let metadata = encode_metadata(metadata, lambdas, mode)?;
     let header = build_header(
         hash,
         iteration,
@@ -597,12 +628,33 @@ fn write_arrays(
         encoder.finish()?;
     }
     tmp.as_file().sync_all()?;
-    tmp.persist(path)
-        .map_err(|e| CheckpointError::Io(e.error))?;
+    persist_with_retry(tmp, path)?;
     #[cfg(unix)]
     File::open(dir)?.sync_all()?;
     Ok(())
 }
+fn persist_with_retry(
+    mut file: tempfile::NamedTempFile,
+    path: &Path,
+) -> Result<(), CheckpointError> {
+    let start = std::time::Instant::now();
+    let deadline = std::time::Duration::from_secs(10);
+    let mut delay = std::time::Duration::from_millis(50);
+    loop {
+        match file.persist(path) {
+            Ok(_) => return Ok(()),
+            Err(error) => {
+                if start.elapsed() >= deadline {
+                    return Err(CheckpointError::Io(error.error));
+                }
+                file = error.file;
+                std::thread::sleep(delay.min(deadline.saturating_sub(start.elapsed())));
+                delay = (delay * 2).min(std::time::Duration::from_secs(1));
+            }
+        }
+    }
+}
+
 fn write_array<T: Element>(
     writer: &mut impl Write,
     hasher: &mut blake3::Hasher,
@@ -646,6 +698,26 @@ mod tests {
                 strategy_sum: vec![0.1, 0.2, 0.3],
             },
         }
+    }
+
+    #[test]
+    fn metadata_preflight_matches_writer_limit() {
+        let storage = hu_engine::F32Storage::new(3, 2);
+        let config = "x".repeat(MAX_METADATA);
+        assert!(matches!(
+            preflight_metadata(&storage, &config, 42, &[], CheckpointMode::WholeTree),
+            Err(CheckpointError::Invalid("metadata too large"))
+        ));
+        assert!(
+            preflight_metadata(
+                &storage,
+                "small config",
+                42,
+                &[0.5],
+                CheckpointMode::Subtree
+            )
+            .is_ok()
+        );
     }
 
     #[test]

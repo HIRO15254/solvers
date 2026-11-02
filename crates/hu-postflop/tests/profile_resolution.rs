@@ -50,6 +50,26 @@ fn ir(hands: HandSelector) -> ProfileIr {
 }
 
 #[test]
+fn validate_profile_uses_solver_lock_sum_and_reports_hands() {
+    let path = std::path::Path::new("test.toml");
+    let accepted = format!(
+        "{RIVER}\n[[profile.lock]]\nnode = 'root'\nhands = 'AA'\nstrategy = {{ check = 0.9999995 }}\n"
+    );
+    let prepared = hu_postflop::prepare::prepare(&accepted, path).unwrap();
+    hu_postflop::run::validate_profile(&prepared).unwrap();
+
+    let rejected = format!(
+        "{RIVER}\n[[profile.lock]]\nnode = 'root'\nhands = 'AA'\nconfidence = 0.5\nstrategy = {{ check = 0.5 }}\n"
+    );
+    let prepared = hu_postflop::prepare::prepare(&rejected, path).unwrap();
+    let message = hu_postflop::run::validate_profile(&prepared)
+        .unwrap_err()
+        .to_string();
+    assert!(message.contains("NLH003"), "{message}");
+    assert!(message.contains("AA"), "{message}");
+}
+
+#[test]
 fn category_locks_only_board_live_matching_hands() {
     let p = hu_postflop::prepare::prepare(RIVER, std::path::Path::new("test.toml")).unwrap();
     let mut game = hu_postflop::build_postflop_game(&p.config, p.payoff.pipeline());
@@ -289,6 +309,23 @@ fn unmatched_profile_node_selector_is_an_error() {
         "{error}"
     );
     assert!(error.contains("not-a-node"), "{error}");
+}
+
+#[test]
+fn ambiguous_history_with_thirty_raises_is_rejected() {
+    let p = hu_postflop::prepare::prepare(RIVER, std::path::Path::new("test.toml")).unwrap();
+    let mut game = hu_postflop::build_postflop_game(&p.config, p.payoff.pipeline());
+    let mut profile = ir(HandSelector::All);
+    profile.locks[0].node = "r1c".repeat(30);
+    let error = resolve_profile(&mut game, &p.config, &profile, None)
+        .err()
+        .unwrap()
+        .to_string();
+    assert!(error.contains("NLH003"), "{error}");
+    assert!(
+        error.contains("unknown or non-action node selector"),
+        "{error}"
+    );
 }
 
 #[test]

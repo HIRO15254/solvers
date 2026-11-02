@@ -68,6 +68,9 @@ pub struct PreparedIcm {
     starting_table: SeatVec<MwChips>,
     outside_field: Vec<MwChips>,
     payouts: Vec<f64>,
+    payout_scale: f64,
+    payout_scale_extra: f64,
+    original_payouts: Vec<f64>,
     quadrature: Option<Quadrature>,
     baseline: SeatVec<f64>,
 }
@@ -89,6 +92,21 @@ impl PreparedIcm {
         {
             return Err(IcmError::ZeroStack);
         }
+        // Leave ordinary and tiny payouts untouched, avoiding underflow of
+        // subnormal prizes and preserving their existing rounding behavior.
+        // Very large payouts need headroom for quadrature's time integral.
+        let exponent = ((payouts[0].to_bits() >> 52) & 0x7ff) as i32 - 1023;
+        let (payout_scale, payout_scale_extra) = if exponent > 512 {
+            let k = exponent + 1;
+            (2.0_f64.powi(k.min(1023)), if k == 1024 { 2.0 } else { 1.0 })
+        } else {
+            (1.0, 1.0)
+        };
+        let original_payouts = payouts;
+        let payouts: Vec<f64> = original_payouts
+            .iter()
+            .map(|payout| (payout / payout_scale) / payout_scale_extra)
+            .collect();
         let quadrature = (field > EXACT_ICM_MAX_PLAYERS).then(|| {
             Quadrature::new(
                 starting_table.len(),
@@ -102,6 +120,9 @@ impl PreparedIcm {
             starting_table,
             outside_field,
             payouts,
+            payout_scale,
+            payout_scale_extra,
+            original_payouts,
             quadrature,
         };
         prepared.baseline = prepared.terminal_values(&prepared.starting_table)?;
@@ -148,6 +169,25 @@ impl PreparedIcm {
                 }
             }
             Some(quadrature) => quadrature.table_values(final_table, &survivors, &mut values),
+        }
+        // Preserve tiny busted prizes that cannot survive normalization.
+        let busted_values = if self.payout_scale != 1.0 {
+            Some(busted_prizes(&self.starting_table, final_table, &self.original_payouts).0)
+        } else {
+            None
+        };
+        for seat in final_table.seats() {
+            let value = &mut values[seat.index()];
+            if let Some(busted) = &busted_values
+                && final_table[seat] == MwChips::ZERO
+            {
+                *value = busted[seat.index()];
+                continue;
+            }
+            *value = (*value * self.payout_scale) * self.payout_scale_extra;
+            if !value.is_finite() {
+                return Err(IcmError::NonFiniteResult);
+            }
         }
         Ok(SeatVec::new_unchecked(values))
     }
@@ -402,7 +442,13 @@ fn busted_prizes(
         }
         let group = end - index;
         let first_prize = bottom - group;
-        let split = payouts[first_prize..bottom].iter().sum::<f64>() / group as f64;
+        let prizes = &payouts[first_prize..bottom];
+        let sum: f64 = prizes.iter().sum();
+        let split = if sum.is_finite() {
+            sum / group as f64
+        } else {
+            prizes.iter().map(|prize| prize / group as f64).sum()
+        };
         for &seat in &busted[index..end] {
             values[seat.index()] = split;
         }
@@ -447,6 +493,8 @@ pub enum IcmError {
     ZeroStack,
     #[error("table stack vectors have different seat counts")]
     SeatCount,
+    #[error("ICM result is not finite")]
+    NonFiniteResult,
 }
 
 #[cfg(test)]
@@ -469,6 +517,64 @@ mod tests {
             icm.terminal_values(&seats(&[0, 200])).unwrap().as_slice(),
             &[0.0, 0.0]
         );
+    }
+
+    #[test]
+    fn large_prizes_match_power_of_two_scaled_results() {
+        let scale = 2.0_f64.powi(996);
+        for outside_count in [0, 14] {
+            let mut payouts = vec![0.0; outside_count + 2];
+            payouts[0] = 16.0;
+            payouts[1] = 8.0;
+            let large: Vec<_> = payouts.iter().map(|p| p * scale).collect();
+            let small =
+                PreparedIcm::new(seats(&[1, 100]), vec![MwChips(100); outside_count], payouts)
+                    .unwrap();
+            let large =
+                PreparedIcm::new(seats(&[1, 100]), vec![MwChips(100); outside_count], large)
+                    .unwrap();
+            for final_stacks in [seats(&[1, 100]), seats(&[0, 101])] {
+                let expected = small.terminal_values(&final_stacks).unwrap();
+                let actual = large.terminal_values(&final_stacks).unwrap();
+                for (&a, &b) in actual.iter().zip(expected.iter()) {
+                    assert!(a.is_finite());
+                    assert_eq!(a, b * scale);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn quadrature_large_prizes_with_extreme_stack_ratio_are_finite() {
+        let mut payouts = vec![1e300; 16];
+        payouts[0] = 2e300;
+        let prepared =
+            PreparedIcm::new(seats(&[1, u64::MAX]), vec![MwChips(u64::MAX); 14], payouts).unwrap();
+        assert!(prepared.baseline().iter().all(|value| value.is_finite()));
+        assert!(
+            prepared
+                .terminal_values(&seats(&[1, u64::MAX]))
+                .unwrap()
+                .iter()
+                .all(|value| value.is_finite())
+        );
+    }
+
+    #[test]
+    fn large_prizes_preserve_subnormal_busted_prizes() {
+        let tiny = f64::from_bits(1);
+        let prepared =
+            PreparedIcm::new(seats(&[1, 2]), chips(&[3]), vec![1e300, tiny, tiny]).unwrap();
+        let terminal = prepared.terminal_values(&seats(&[0, 3])).unwrap();
+        assert_eq!(terminal[SeatId(0)], tiny);
+    }
+
+    #[test]
+    fn large_equal_busted_prizes_do_not_overflow() {
+        let prepared = PreparedIcm::new(seats(&[1, 1, 2]), Vec::new(), vec![1e308; 3]).unwrap();
+        let terminal = prepared.terminal_values(&seats(&[0, 0, 4])).unwrap();
+        assert_eq!(terminal[SeatId(0)], 1e308);
+        assert_eq!(terminal[SeatId(1)], 1e308);
     }
 
     fn assert_relative(actual: &[f64], expected: &[f64], tolerance: f64) {

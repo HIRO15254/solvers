@@ -17,11 +17,116 @@ Version 0.1.0 accepts only P1 `.sol` format 4 and checkpoint format 5.
 Version 0.2.0 reads P1 `.sol` formats 7–9 and resumes checkpoint formats 5, 6
 and 8 written by 0.2.0. It rejects every `.sol` written by 0.1.0 and cannot
 resume checkpoints written by 0.1.0, whose compatibility hash differs; re-solve
-those runs from a current config.
+those runs from a current config. Version 0.2.1 reads and resumes the same
+formats as 0.2.0.
 The human-readable `--version` includes a Git revision (`unknown` when unavailable);
 run manifests keep `cliVersion` as the plain workspace semantic version.
 
 ## [Unreleased]
+
+## [0.2.1] - 2026-11-03
+
+This patch release reads `.sol` files and resumes checkpoints and run
+directories written by 0.2.0; compatibility hashes are unchanged, including
+for configs with `[profile]`. A config whose bet size or rake fell exactly on a
+decimal rounding boundary now gets the exactly rounded chip amount (see
+Changed). If that changes the tree's shape, resuming its 0.2.0 checkpoint fails
+with a storage mismatch; re-solve that spot. Configs, scripts, selectors and
+`.sol` files beyond the new input limits (see Changed), such as a betting line
+longer than 511 decisions, are rejected.
+
+### Security
+
+- The daemon caps JSON request bodies at 64 MiB (HTTP 413) and concurrent
+  request handlers at 64 (HTTP 503), and applies its TLS exposure check to the
+  addresses it actually binds.
+- A request declaring a huge body could abort the daemon: its HTTP server,
+  tiny_http 0.12.0, allocated the whole declared `Content-Length` when
+  discarding an unread body. The daemon now builds a vendored, patched
+  tiny_http (`third_party/tiny_http`) that never drains an abandoned body,
+  closes a connection after any request that carried a body, and times out a
+  connection after 60 seconds without data.
+
+### Changed
+
+- Size coefficients and rake rates are read as the shortest decimal that
+  round-trips the written number and multiplied and rounded in integer
+  arithmetic. Results differ from 0.2.0 only where its binary floating-point
+  product fell on the wrong side of a rounding boundary: for example, `35%` of
+  a 5,250-chip pot is now 1,838 chips under `nearest`, and a `0.07` rake on a
+  5,500-chip pot is 385 chips under `up`. A BB amount whose chip conversion
+  overflows is an input error.
+- Tree-script conditions reject a bare condition-variable name on the
+  right-hand side of a comparison or inside an `in` list with `NLH003`; quote
+  it to compare text. `high_card` and `low_card` accept bare `2`–`9` as rank
+  text.
+- New input limits, each reported as an input error (`NLH003`) instead of
+  exhausting the stack or memory: a heads-up postflop tree path has at most 512
+  nodes; tree-script blocks nest at most 64 deep (also after `param`
+  substitution, and a `param` value may not be `{` or `}`), an `if` chain has
+  at most 64 conditional arms, a condition expression is at most 64 deep, and
+  declaration and block expansion produce at most 1,000,000 tokens; a
+  node-selector history has at most 4,096 bytes and 16 ambiguous `r...c`
+  raises.
+- Lock probability sums are checked once, with the solver's f32 arithmetic
+  and its 1e-6 tolerance, by `validate`, the daemon's validation and `relock`;
+  the GUI applies the same bounds. Sums within those bounds that the 0.2.0
+  parser rejected are accepted.
+- Effective configs write `[profile]` settings in the documented order, and
+  the daemon's validation response for a run frozen to a base keeps the
+  effective config's order.
+- `compare` refuses solutions with different utility units, per-seat hand
+  lists, trees or chance branches even with `--cross-game`, which now relaxes
+  only the board, pot, effective stack and action labels and sizes. Comparison
+  JSON reports how many unreachable hands it excluded, and a delta that is
+  undefined for every hand is `null`.
+- GTO Wizard-derived reference workloads and notes are no longer distributed
+  with the source.
+
+### Fixed
+
+- `freeze_upstream` rejects a base whose suit-symmetry mapping is
+  incompatible with the profiled tree instead of silently copying wrong
+  strategies.
+- A range whose compatible mass falls below numeric precision is an input
+  error instead of a panic, and reported showdown equity keeps tiny compatible
+  weights.
+- Regret matching no longer produces non-finite strategies, and i16 storage no
+  longer writes a zero quantization scale, for extremely small nonzero values.
+- Tournament ICM no longer overflows with very large prizes; ordinary prize
+  structures give bit-identical results.
+- Tree-script diagnostics after `param` declarations name the right line and
+  problem, and `define` conditions may continue over several lines while
+  incomplete.
+- Heads-up postflop runs record the actual completion reason, and a reached
+  target or iteration limit wins over a simultaneous cancellation. A run whose
+  event log cannot be opened is marked failed rather than left running, and
+  appends stop after the first failed write.
+- A failed periodic checkpoint save no longer stops the solve; if the final
+  checkpoint cannot be saved, the `.sol` is still written before the error is
+  reported. Checkpoint replacement retries for about 10 seconds (for example
+  while Windows holds the file open), and oversized checkpoint metadata is
+  rejected before the first iteration.
+- River re-solves report incompatible reaching ranges and malformed action
+  amounts as errors instead of panicking.
+- `compare` and EV export omit hands that cannot reach the node, and the
+  `inspect` REPL's `eq` refuses merged `[dealN]` branches that recorded no
+  card, with guidance, instead of computing equity for the wrong board.
+- Loading a malformed `.sol` fails cleanly on excessive tree depth, invalid
+  action labels or oversized compressed data, and reading an index needs less
+  memory.
+- The daemon advances queued jobs without client requests, keeps queued
+  solves and resumes across restarts, counts solver processes that survived a
+  restart against the concurrency limit, records solver start failures as
+  `failed`, and removes a run directory it reserved when writing its config or
+  manifest fails.
+- GUI Results shows the selected seat's range and EV for the seat not acting
+  at the node, and the Runs page offers Results only for finished runs with a
+  solution.
+- GUI Setup shows wager bounds in BB inputs correctly, and range parsing
+  rounds weights and treats whitespace as the solver does.
+- GUI Tree preview ignores stale card deals, shows a deal error beside its
+  branch, and resets walked streets when the document or chip scale changes.
 
 ## [0.2.0] - 2026-10-30
 

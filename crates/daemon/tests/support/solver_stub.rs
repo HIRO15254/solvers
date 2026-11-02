@@ -70,6 +70,13 @@ fn solve_or_resume(command: &str, args: &[std::ffi::OsString]) {
             .map(|pair| PathBuf::from(&pair[1]))
             .expect("--out directory")
     };
+    let config = std::fs::read_to_string(directory.join("run.toml")).unwrap_or_default();
+    if config.contains("EARLY_EXIT") {
+        std::process::exit(1);
+    }
+    if command == "resume" {
+        std::fs::write(directory.join("resumed"), b"").expect("write resume marker");
+    }
     let run_id = directory
         .file_name()
         .expect("run directory name")
@@ -95,9 +102,13 @@ fn solve_or_resume(command: &str, args: &[std::ffi::OsString]) {
     )
     .expect("write running event");
 
-    let config = std::fs::read_to_string(directory.join("run.toml")).unwrap_or_default();
     if config.contains("BLOCK") {
         std::thread::sleep(Duration::from_secs(30));
+    }
+    if config.contains("WAIT_RELEASE") {
+        while !directory.join("release").exists() {
+            std::thread::sleep(Duration::from_millis(25));
+        }
     }
 
     // Like the real CLI (`RunDir::finish`), progress and the terminal event
@@ -124,7 +135,7 @@ fn solve_or_resume(command: &str, args: &[std::ffi::OsString]) {
             r#"{{"schemaVersion":1,"runId":"{}","state":"completed","gameKind":"hu-postflop","#,
             r#""configSchema":"solvers.nlh/v1","configHash":"aa","cliVersion":"stub","#,
             r#""command":["solve"],"pid":1,"createdUnixMs":{},"startedUnixMs":{},"#,
-            r#""finishedUnixMs":{},"failure":null,"completion":"completed"}}"#,
+            r#""finishedUnixMs":{},"failure":null,"completion":"max-iterations"}}"#,
         ),
         run_id, NOW, NOW, NOW,
     );
