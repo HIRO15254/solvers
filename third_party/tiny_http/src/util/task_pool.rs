@@ -69,7 +69,11 @@ impl TaskPool {
     pub fn spawn(&self, code: Box<dyn FnMut() + Send>) {
         let mut queue = self.sharing.todo.lock().unwrap();
 
-        if self.sharing.waiting_tasks.load(Ordering::Acquire) == 0 {
+        // solvers patch: a notified worker stays counted as waiting until it
+        // reacquires the lock. Queue a task only while a worker remains that
+        // no queued task has claimed; otherwise a burst of connections could
+        // strand tasks behind long-running connections.
+        if self.sharing.waiting_tasks.load(Ordering::Acquire) <= queue.len() {
             self.add_thread(Some(code));
         } else {
             queue.push_back(code);

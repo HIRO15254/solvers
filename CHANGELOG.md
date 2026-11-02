@@ -120,6 +120,11 @@ longer than 511 decisions, are rejected.
   restart against the concurrency limit, records solver start failures as
   `failed`, and removes a run directory it reserved when writing its config or
   manifest fails.
+- The daemon no longer leaves a connection unanswered when several arrive at
+  once. Its HTTP server could queue a new connection for a worker thread that
+  an earlier queued connection had already claimed, so the request waited
+  until a busy connection finished; the vendored tiny_http now starts a thread
+  instead.
 - GUI Results shows the selected seat's range and EV for the seat not acting
   at the node, and the Runs page offers Results only for finished runs with a
   solution.

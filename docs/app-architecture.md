@@ -287,7 +287,7 @@ clientは`nash_conv / 2`でExploitabilityを表示できる。
 JSON本文の上限は64 MiBで、超過時はHTTP 413 `payload-too-large`を返す。
 同時処理は認証前も含め64 requestまでで、満杯時はHTTP 503 `server-busy`を返す。
 bind先は一度だけ名前解決し、全候補の公開条件を確認してからその候補のいずれかにbindする。
-同梱のtiny_http patchは未読本文をdrainせず本文付き接続を閉じ、socket読取の無通信timeoutを60秒にする（`third_party/tiny_http/PATCHES.md`）。接続数自体には上限がない。
+同梱のtiny_http patchは未読本文をdrainせず本文付き接続を閉じ、socket読取の無通信timeoutを60秒にし、未割当の待機workerがなければ接続threadを追加して新しい接続を待たせない（`third_party/tiny_http/PATCHES.md`）。接続数自体には上限がない。
 
 
 `solversd --ui DIR`はbuild済みSPAを静的配信する。`--ui`省略時は`current_exe`の隣の
