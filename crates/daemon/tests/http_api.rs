@@ -313,7 +313,9 @@ fn saturated_slow_requests_receive_server_busy() {
             .unwrap();
         slow.push(stream);
     }
-    let response = poll_until("the daemon to reject a request while saturated", || {
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(60);
+    let mut last = String::from("no poll");
+    let response = loop {
         let mut stream = TcpStream::connect(("127.0.0.1", daemon.port)).unwrap();
         stream
             .set_read_timeout(Some(std::time::Duration::from_secs(2)))
@@ -322,12 +324,53 @@ fn saturated_slow_requests_receive_server_busy() {
             .write_all(b"GET /v1 HTTP/1.1\r\nHost: localhost\r\nAuthorization: Bearer test-token\r\nConnection: close\r\n\r\n")
             .unwrap();
         let mut response = String::new();
-        stream.read_to_string(&mut response).ok()?;
-        response.starts_with("HTTP/1.1 503").then_some(response)
-    });
+        match stream.read_to_string(&mut response) {
+            Ok(_) if response.starts_with("HTTP/1.1 503") => break response,
+            Ok(_) => last = response.lines().next().unwrap_or("empty").to_string(),
+            Err(error) => last = format!("{error} after {} bytes", response.len()),
+        }
+        assert!(
+            std::time::Instant::now() < deadline,
+            "no 503 within 60 seconds; last poll: {last}; {}",
+            slow_request_states(&mut slow)
+        );
+        std::thread::sleep(std::time::Duration::from_millis(25));
+    };
     let (_, body) = response.split_once("\r\n\r\n").unwrap();
     assert_eq!(parse(body)["code"], "server-busy");
     drop(slow);
+}
+
+/// Says which slow requests the daemon already answered or closed, so a
+/// saturation timeout shows whether their handlers ever held a slot.
+fn slow_request_states(slow: &mut [TcpStream]) -> String {
+    let mut pending = 0;
+    let mut answers = Vec::new();
+    for stream in slow.iter_mut() {
+        stream
+            .set_read_timeout(Some(std::time::Duration::from_millis(50)))
+            .unwrap();
+        let mut buffer = [0; 512];
+        match stream.read(&mut buffer) {
+            Ok(0) => answers.push("closed".to_string()),
+            Ok(read) => answers.push(String::from_utf8_lossy(&buffer[..read]).into_owned()),
+            Err(error)
+                if matches!(
+                    error.kind(),
+                    std::io::ErrorKind::WouldBlock | std::io::ErrorKind::TimedOut
+                ) =>
+            {
+                pending += 1;
+            }
+            Err(error) => answers.push(error.to_string()),
+        }
+    }
+    format!(
+        "{pending} of {} slow requests pending; {} answered, first: {:?}",
+        slow.len(),
+        answers.len(),
+        answers.first()
+    )
 }
 
 #[test]
