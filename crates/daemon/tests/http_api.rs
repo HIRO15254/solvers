@@ -314,7 +314,6 @@ fn saturated_slow_requests_receive_server_busy() {
         slow.push(stream);
     }
     let deadline = std::time::Instant::now() + std::time::Duration::from_secs(60);
-    let mut last = String::from("no poll");
     let response = loop {
         let mut stream = TcpStream::connect(("127.0.0.1", daemon.port)).unwrap();
         stream
@@ -324,11 +323,11 @@ fn saturated_slow_requests_receive_server_busy() {
             .write_all(b"GET /v1 HTTP/1.1\r\nHost: localhost\r\nAuthorization: Bearer test-token\r\nConnection: close\r\n\r\n")
             .unwrap();
         let mut response = String::new();
-        match stream.read_to_string(&mut response) {
+        let last = match stream.read_to_string(&mut response) {
             Ok(_) if response.starts_with("HTTP/1.1 503") => break response,
-            Ok(_) => last = response.lines().next().unwrap_or("empty").to_string(),
-            Err(error) => last = format!("{error} after {} bytes", response.len()),
-        }
+            Ok(_) => response.lines().next().unwrap_or("empty").to_string(),
+            Err(error) => format!("{error} after {} bytes", response.len()),
+        };
         assert!(
             std::time::Instant::now() < deadline,
             "no 503 within 60 seconds; last poll: {last}; {}",
