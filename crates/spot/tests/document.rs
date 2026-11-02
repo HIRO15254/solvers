@@ -711,7 +711,7 @@ invalid!(spot_type, "[spot]\nline = 1", NLH002, "spot.line");
 invalid!(
     tree_script_source_exclusive,
     "[tree]\nscript = \"\"\nsource = \"none\"",
-    NLH003,
+    NLH002,
     "tree.source"
 );
 invalid!(
