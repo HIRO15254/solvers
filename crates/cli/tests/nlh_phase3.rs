@@ -650,7 +650,7 @@ fn false_without_periodic_checkpoint_still_exports_but_cannot_resume() {
 }
 
 #[test]
-fn finalization_paths_keep_run_pool_and_prioritize_checkpoint_errors() {
+fn finalization_paths_keep_run_pool_and_write_the_solution_before_checkpoint_errors() {
     use hu_postflop::{prepare, run};
     use std::sync::atomic::{AtomicBool, Ordering};
     use std::time::Duration;
@@ -703,7 +703,10 @@ fn finalization_paths_keep_run_pool_and_prioritize_checkpoint_errors() {
                 &mut |_| assert_eq!(rayon::current_num_threads(), 3),
             );
             assert_eq!(checkpoints, usize::from(!checkpoint_error));
-            if checkpoint_error {
+            if solution_error {
+                assert!(result.is_err());
+                assert!(!solution.is_file());
+            } else if checkpoint_error {
                 assert!(
                     result
                         .err()
@@ -711,9 +714,9 @@ fn finalization_paths_keep_run_pool_and_prioritize_checkpoint_errors() {
                         .downcast_ref::<hu_postflop::checkpoint::CheckpointError>()
                         .is_some()
                 );
-                assert_eq!(solution.is_file(), parallel && !solution_error);
-            } else if solution_error {
-                assert!(result.is_err());
+                // Both finalization paths write the solution before reporting
+                // the checkpoint failure.
+                assert!(solution.is_file());
             } else {
                 assert!(result.is_ok());
             }

@@ -304,10 +304,12 @@ fn huge_declared_body_disconnect_does_not_stop_the_daemon() {
 fn saturated_slow_requests_receive_server_busy() {
     let daemon = Daemon::start(1);
     let mut slow = Vec::new();
+    // tiny_http buffers bodies up to 1 KiB before yielding the request, so a
+    // larger declared body is needed for each handler to block reading it.
     for _ in 0..64 {
         let mut stream = TcpStream::connect(("127.0.0.1", daemon.port)).unwrap();
         stream
-            .write_all(b"POST /v1/validate HTTP/1.1\r\nHost: localhost\r\nAuthorization: Bearer test-token\r\nContent-Length: 100\r\nConnection: close\r\n\r\n{")
+            .write_all(b"POST /v1/validate HTTP/1.1\r\nHost: localhost\r\nAuthorization: Bearer test-token\r\nContent-Length: 4096\r\nConnection: close\r\n\r\n{")
             .unwrap();
         slow.push(stream);
     }
