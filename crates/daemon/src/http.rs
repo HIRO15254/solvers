@@ -117,12 +117,10 @@ impl Daemon {
         });
         let in_flight = Arc::new(AtomicUsize::new(0));
         for request in server.incoming_requests() {
-            if in_flight
-                .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |count| {
-                    (count < MAX_IN_FLIGHT).then_some(count + 1)
-                })
-                .is_err()
-            {
+            // Only this loop increments the count, so undoing a rejected
+            // increment here cannot admit a request over the limit.
+            if in_flight.fetch_add(1, Ordering::Relaxed) >= MAX_IN_FLIGHT {
+                in_flight.fetch_sub(1, Ordering::Relaxed);
                 if let Err(error) = respond_error(
                     request,
                     ErrorResponse::new(ErrorCode::ServerBusy, "too many concurrent requests"),

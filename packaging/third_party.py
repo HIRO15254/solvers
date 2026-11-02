@@ -208,11 +208,11 @@ def rust_notices(root: Path, policy: dict, offline: bool) -> list[dict]:
     result = []
     for package in selected.values():
         name, version, source = package["name"], package["version"], package["source"]
-        directory = Path(package["manifest_path"]).parent
         # The locally patched, reviewed crate has no registry source in metadata.
-        if (name, version, source, directory.resolve()) == (
-            "tiny_http", "0.12.0", None, (root / "third_party/tiny_http").resolve()
-        ):
+        if (source is None and (name, version) == ("tiny_http", "0.12.0")
+                and Path(package["manifest_path"]).parent.resolve()
+                == (root / "third_party/tiny_http").resolve()):
+            directory = Path(package["manifest_path"]).parent
             result.append({
                 "ecosystem": "Rust", "name": name, "version": version,
                 "license": checked_expression(package.get("license"), policy),
