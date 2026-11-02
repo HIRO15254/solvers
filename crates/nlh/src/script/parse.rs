@@ -1072,8 +1072,8 @@ turn, river when monotone {
         for (source, name, expected) in [
             ("param cb = cb\nflop { checkdown }", "cb", "itself"),
             (
-                "param a = b\nparam b = 33%\nflop { checkdown }",
-                "a",
+                "param early = late\nparam late = 33%\nflop { checkdown }",
+                "early",
                 "declared later",
             ),
             (

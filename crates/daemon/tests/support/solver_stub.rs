@@ -27,10 +27,6 @@ fn validate(args: &[std::ffi::OsString]) {
         eprintln!("MWP999: the stub was asked to reject this config");
         std::process::exit(1);
     }
-    if contents.contains("NEEDS_FILE") {
-        eprintln!("reading mwtree source /nowhere/tree.mwtree");
-        std::process::exit(1);
-    }
     let effective = args
         .windows(2)
         .find(|pair| pair[0] == "--write-effective")

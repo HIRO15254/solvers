@@ -368,19 +368,24 @@ fn events_resume_from_the_offset_the_previous_page_reported() {
     assert_eq!(empty["nextOffset"], offset);
 }
 
-/// A config the daemon cannot resolve on its own filesystem is refused with
-/// a code that says why, rather than being resolved against whatever the
-/// daemon happens to have there (R10).
 #[test]
-fn a_config_that_names_a_file_is_refused_as_not_self_contained() {
+fn tree_source_is_rejected_before_any_config_endpoint_invokes_cli() {
     let daemon = Daemon::start(1);
-    let body = serde_json::json!({
-        "configToml": "schema = \"solvers.nlh/v1\"\n# NEEDS_FILE\n"
-    })
-    .to_string();
-    let (status, error) = daemon.post("/v1/runs", &body);
-    assert_eq!(status, 400);
-    assert_eq!(error["code"], "config-not-self-contained");
+    for config in [
+        "[tree]\nsource = '/host/secret.tree'\n",
+        "tree.source = '../../secret.tree'\n",
+        "['tree']\n'source' = 'secret.tree'\n",
+    ] {
+        let body = serde_json::json!({ "configToml": config }).to_string();
+        for endpoint in ["/v1/validate", "/v1/line", "/v1/tree", "/v1/runs"] {
+            let (status, error) = daemon.post(endpoint, &body);
+            assert_eq!(status, 400, "{endpoint}: {error}");
+            assert_eq!(
+                error["code"], "config-not-self-contained",
+                "{endpoint}: {error}"
+            );
+        }
+    }
 }
 
 #[test]

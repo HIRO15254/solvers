@@ -221,6 +221,7 @@ export function SetupStart({
   // Each replay finds who can still act on its street; a newer replay drops an older search.
   useEffect(() => {
     let current = true;
+    setBuildError(null);
     setTurns([]);
     setOpened(null);
     if (cursor?.next)
@@ -231,7 +232,7 @@ export function SetupStart({
     return () => {
       current = false;
     };
-    // The search reads only `[table]` and the replay's moves.
+    // The cursor changes when the table, line, moves or request's freeze path changes.
   }, [cursor]);
 
   const build = async (moves: string[]) => {

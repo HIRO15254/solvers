@@ -29,8 +29,9 @@ export function writeDoc(doc: Doc): string {
   while (JSON.stringify(doc).includes(mark)) mark += "X";
   const swap = (value: unknown): unknown => {
     if (typeof value === "string") {
-      if (!value.includes("\n") || !MULTILINE_LITERAL.test(value)) return value;
-      literals.push(value);
+      const normalized = value.replace(/\r\n/g, "\n");
+      if (!normalized.includes("\n") || !MULTILINE_LITERAL.test(normalized)) return value;
+      literals.push(normalized);
       return `${mark}${literals.length - 1}N`;
     }
     if (Array.isArray(value)) return value.map(swap);

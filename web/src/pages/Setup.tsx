@@ -146,8 +146,8 @@ function issueStep(issue: Issue): { step: Step; onField: boolean } | undefined {
   if (step === undefined) return undefined;
   const onField =
     step !== "toml" &&
-    (issue.path.startsWith("ranges.") ||
-      issue.path.startsWith("table.stacks.") ||
+    (issue.path === "ranges" || issue.path.startsWith("ranges.") ||
+      issue.path === "table.stacks" || issue.path.startsWith("table.stacks.") ||
       [...FORM_KEYS].some((key) => issue.path === key || issue.path.startsWith(`${key}.`)));
   const below = [...FORM_KEYS].some((key) => key.startsWith(`${issue.path}.`));
   return { step: onField || below ? step : "toml", onField };
@@ -199,13 +199,13 @@ function spotName(cursor: LineCursor | null, roles: Record<SizeRole, string> | n
  * the table does not allow falls back to the Preflop root; the line field
  * shows why (validation names `spot.line`).
  */
-function useLineCursor(toml: string, tableKey: string, line: string, draft: string[] | null) {
+function useLineCursor(toml: string, replayKey: string, line: string, draft: string[] | null) {
   const [cursor, setCursor] = useState<LineCursor | null>(null);
   const sequence = useRef(0);
   useEffect(() => {
     const timer = setTimeout(async () => {
       const id = ++sequence.current;
-      for (const moves of [draft ?? undefined, []]) {
+      for (const moves of draft ? [draft, undefined, []] : [undefined, []]) {
         try {
           const next = await api.line(toml, moves);
           if (id === sequence.current) setCursor({ ...next, line: replayedLine(next.line, line, moves === undefined || moves === draft) });
@@ -217,8 +217,8 @@ function useLineCursor(toml: string, tableKey: string, line: string, draft: stri
       if (id === sequence.current) setCursor(null);
     }, 250);
     return () => { clearTimeout(timer); sequence.current++; };
-    // The line API reads only `[table]` and `spot.line`.
-  }, [tableKey, line, draft?.join(",")]);
+    // The replay depends on the table, line and request's upstream freeze.
+  }, [replayKey, line, draft?.join(",")]);
   return cursor;
 }
 
@@ -318,6 +318,7 @@ export function SetupPage() {
   const [treeParams, setTreeParams] = useState<{ script: string; params: TreeParam[] } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [openError, setOpenError] = useState<string | null>(null);
   const [tomlText, setTomlText] = useState<string | null>(null);
   const [tomlError, setTomlError] = useState<Error | null>(null);
   const [picked, setPicked] = useState<string[] | null>(null);
@@ -325,7 +326,7 @@ export function SetupPage() {
   // The last settled validation's key-bound error; a pending validation keeps it, so fields do not flicker.
   const [issue, setIssue] = useState<Issue | null>(null);
   // The moves the line was last built from by picking actions, with the line they spelled.
-  const [draft, setDraft] = useState<{ moves: string[]; line: string } | null>(null);
+  const [draft, setDraft] = useState<{ moves: string[]; line: string; table: string } | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const body = useRef<HTMLElement>(null);
   const sequence = useRef(0);
@@ -379,10 +380,15 @@ export function SetupPage() {
   }, [step]);
 
   const line = fieldText(getAt(doc, ["spot", "line"]));
-  // The built moves stand for the line until the line changes some other way.
-  const draftMoves = draft && draft.line === line ? draft.moves : null;
+  const tableKey = JSON.stringify(getAt(doc, ["table"]) ?? null);
+  // Picked moves apply only to the line and table they were built on.
+  const draftMoves = draft && draft.line === line && draft.table === tableKey ? draft.moves : null;
   const cursorToml = useMemo(() => freezeBaseRunId ? writeDoc(freezeRequestDoc(doc, freezeBaseRunId)) : toml, [doc, toml, freezeBaseRunId]);
-  const cursor = useLineCursor(cursorToml, JSON.stringify(getAt(doc, ["table"]) ?? null), line, draftMoves);
+  const replayKey = JSON.stringify([tableKey, getAt(readDoc(cursorToml), ["profile", "freeze_upstream"]) ?? null]);
+  const cursor = useLineCursor(cursorToml, replayKey, line, draftMoves);
+  useEffect(() => {
+    setDraft((current) => current && (current.line !== line || current.table !== tableKey) ? null : current);
+  }, [line, tableKey]);
   const boardText = fieldText(getAt(doc, ["spot", "board"]));
   const fullBoard = useMemo(() => parseBoard(boardText) ?? [], [boardText]);
   // Cards past those the line deals are kept in the document, for a longer
@@ -463,6 +469,7 @@ export function SetupPage() {
   // A new document starts its range history afresh.
   const replace = (next: Doc) => {
     setTreeParams(null);
+    setDraft(null);
     setFreezeBaseRunId("");
     setDoc(next);
     setRangeNote(null);
@@ -491,11 +498,9 @@ export function SetupPage() {
   const openFile = async (file: File) => {
     try {
       replace(readDoc(await file.text()));
+      setOpenError(null);
     } catch (error) {
-      setValidation({
-        state: "error",
-        message: `${file.name}: ${(error as Error).message}`,
-      });
+      setOpenError(`${file.name}: ${(error as Error).message}`);
     }
   };
 
@@ -540,7 +545,7 @@ export function SetupPage() {
         >
           Save TOML
         </Button>
-        <Button icon="player-play" disabled={!canSolve} onClick={solve}>
+        <Button icon="player-play" disabled={!canSolve} title={tomlError ? "Fix the unreadable TOML before solving" : undefined} onClick={solve}>
           Solve
         </Button>
       </header>
@@ -578,14 +583,15 @@ export function SetupPage() {
               size="sm"
               icon={TOML_STEP.icon}
               aria-pressed={step === "toml"}
-              title={step === "toml" ? "Back to the steps" : "Edit the whole document as TOML"}
+              title={tomlError ? "TOML is not readable" : step === "toml" ? "Back to the steps" : "Edit the whole document as TOML"}
               onClick={() => openStep(step === "toml" ? stepBeforeToml.current : "toml")}
             >
               Edit TOML
-              {errorStep?.id === "toml" && <Icon name="alert-circle" size={14} className="step-alert" />}
+              {(errorStep?.id === "toml" || tomlError) && <Icon name="alert-circle" size={14} className="step-alert" />}
             </Button>
           </div>
           {submitError && <Notice variant="destructive" title="Cannot create the run" description={submitError} />}
+          {openError && <Notice variant="destructive" title="Cannot open TOML" description={openError} />}
           {stepIssue && (
             <Notice
               variant="destructive"
@@ -607,7 +613,7 @@ export function SetupPage() {
               ignored={ignored}
               onBoardDialog={() => setBoardDialog(true)}
               onBuilt={(built) => {
-                setDraft({ moves: built.moves, line: built.line });
+                setDraft({ moves: built.moves, line: built.line, table: tableKey });
                 setDoc((d) => setAt(d, ["spot", "line"], built.line || undefined));
               }}
             />
@@ -645,7 +651,7 @@ export function SetupPage() {
 
           {step === "solver" ? (
             <div className="step-footer">
-              <Button icon="player-play" disabled={!canSolve} onClick={solve}>
+              <Button icon="player-play" disabled={!canSolve} title={tomlError ? "Fix the unreadable TOML before solving" : undefined} onClick={solve}>
                 Solve
               </Button>
             </div>

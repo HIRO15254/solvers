@@ -43,12 +43,23 @@ fn internal(error: impl std::fmt::Display) -> ErrorResponse {
     ErrorResponse::new(ErrorCode::Internal, error.to_string())
 }
 
-/// Reject client-selected upstream files before invoking any CLI parser.
-fn reject_external_profile(config: &str) -> ApiResult<()> {
+/// Reject client-selected host files before invoking any CLI parser.
+fn reject_external_paths(config: &str) -> ApiResult<()> {
     let Ok(document) = config.parse::<toml::Value>() else {
         // The CLI reports malformed TOML; it cannot resolve a path from it.
         return Ok(());
     };
+    if document
+        .get("tree")
+        .and_then(|tree| tree.get("source"))
+        .is_some()
+    {
+        return Err(ErrorResponse::new(
+            ErrorCode::ConfigNotSelfContained,
+            "tree.source refers to a file on the daemon host; submit the effective config \
+             (solvers validate --write-effective)",
+        ));
+    }
     if document
         .get("profile")
         .and_then(|profile| profile.get("freeze_upstream"))
@@ -74,7 +85,7 @@ impl Api {
     /// Normalizes a config by running `solvers validate` over a temporary
     /// copy of the submitted text.
     ///
-    /// Reject external profile paths before the CLI can resolve them.
+    /// Reject external paths before the CLI can resolve them.
     pub fn validate(&self, request: &ValidateRequest) -> ApiResult<ValidateResponse> {
         let mut response = self.validate_config(request)?;
         if request.freeze_base_run_id.is_some() {
@@ -92,7 +103,7 @@ impl Api {
     }
 
     fn validate_config(&self, request: &ValidateRequest) -> ApiResult<ValidateResponse> {
-        reject_external_profile(&request.config_toml)?;
+        reject_external_paths(&request.config_toml)?;
         let config_text = if let Some(run_id) = request.freeze_base_run_id.as_deref() {
             let (_, solution) = self.freeze_source(run_id)?;
             let mut config: toml::Value =
@@ -160,7 +171,7 @@ impl Api {
 
     /// Delegates table-only line replay to the CLI and passes its JSON through.
     pub fn line(&self, request: &LineRequest) -> ApiResult<serde_json::Value> {
-        reject_external_profile(&request.config_toml)?;
+        reject_external_paths(&request.config_toml)?;
         let scratch = tempfile::tempdir().map_err(internal)?;
         let config = scratch.path().join("submitted.toml");
         std::fs::write(&config, &request.config_toml).map_err(internal)?;
@@ -181,7 +192,7 @@ impl Api {
 
     /// Builds a config's tree through the CLI and passes its JSON rows through.
     pub fn tree(&self, request: &TreeRequest) -> ApiResult<serde_json::Value> {
-        reject_external_profile(&request.config_toml)?;
+        reject_external_paths(&request.config_toml)?;
         let scratch = tempfile::tempdir().map_err(internal)?;
         let config = scratch.path().join("submitted.toml");
         std::fs::write(&config, &request.config_toml).map_err(internal)?;
@@ -221,26 +232,14 @@ impl Api {
     /// Creates a run directory, writes the config into it, and submits the
     /// job.
     ///
-    /// The config is normalized first; external profile paths are rejected
-    /// before the CLI is started.
+    /// The config is normalized first; external paths are rejected before
+    /// the CLI is started.
     pub fn create_run(&self, request: &CreateRunRequest) -> ApiResult<CreateRunResponse> {
-        let effective = self
-            .validate_config(&ValidateRequest {
-                config_toml: request.config_toml.clone(),
-                resources: false,
-                freeze_base_run_id: request.freeze_base_run_id.clone(),
-            })
-            .map_err(|error| match error.code {
-                ErrorCode::InvalidConfig if mentions_a_path(&error.message) => ErrorResponse::new(
-                    ErrorCode::ConfigNotSelfContained,
-                    format!(
-                        "the config refers to a file this daemon cannot resolve; \
-                         submit the effective config instead ({})",
-                        error.message
-                    ),
-                ),
-                _ => error,
-            })?;
+        let effective = self.validate_config(&ValidateRequest {
+            config_toml: request.config_toml.clone(),
+            resources: false,
+            freeze_base_run_id: request.freeze_base_run_id.clone(),
+        })?;
 
         self.submit_config(
             &effective.effective_config_toml,
@@ -661,22 +660,6 @@ fn content_type(name: &str) -> &'static str {
     }
 }
 
-/// Whether a validation failure looks like an unresolvable file reference.
-///
-/// The CLI reports these as ordinary validation errors, so the daemon
-/// recognizes them to give the client the more useful code. A miss only
-/// costs the client a less specific error, never a wrong result.
-fn mentions_a_path(message: &str) -> bool {
-    // Needles are the error texts themselves, never a bare extension: a
-    // `.tree` needle would also match every message naming the `[game.tree]`
-    // table, so an `SLV002` about a retired key would come back to the
-    // client as "your config is not self-contained".
-    message.contains("mwtree")
-        || message.contains("reading tree script")
-        || message.contains("No such file")
-        || message.contains("requires a config file path")
-}
-
 /// Where the daemon looks for the CLI when it was not told.
 pub fn default_solver_path() -> std::path::PathBuf {
     std::env::current_exe()
@@ -705,23 +688,5 @@ mod tests {
         assert_eq!(content_type("manifest.json"), "application/json");
         assert_eq!(content_type("events.jsonl"), "text/plain");
         assert_eq!(content_type("solution.mwsol"), "application/octet-stream");
-    }
-
-    #[test]
-    fn a_validation_error_naming_a_missing_file_is_classified_as_not_self_contained() {
-        assert!(mentions_a_path("reading mwtree source /x/y.mwtree"));
-        assert!(mentions_a_path("No such file or directory"));
-        assert!(mentions_a_path(
-            "SLV004: reading tree script /x/trees/srp.tree: Permission denied"
-        ));
-        assert!(mentions_a_path(
-            "SLV004: [game.tree] source requires a config file path for relative resolution"
-        ));
-        assert!(!mentions_a_path("MWP001: rollout-kmeans was removed"));
-        // Naming the `[game.tree]` table is not naming a file.
-        assert!(!mentions_a_path(
-            "SLV002: [game.tree.flop] was removed; every street's betting menu is now a tree \
-             script under [game.tree]"
-        ));
     }
 }

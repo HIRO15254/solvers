@@ -78,9 +78,12 @@ impl RunsRoot {
         let observed = manifest.observed_state();
         let progress_row = last_progress_row(directory)
             .with_context(|| format!("reading progress in {}", directory.display()))?;
-        let events_offset = std::fs::metadata(runfiles::RunEventLog::path_in(directory))
-            .map(|metadata| metadata.len())
-            .unwrap_or(0);
+        let events_offset =
+            match runfiles::complete_record_boundary(&runfiles::RunEventLog::path_in(directory)) {
+                Ok(boundary) => boundary,
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => 0,
+                Err(error) => return Err(error).context("reading the event record boundary"),
+            };
         let checkpoint = directory.join(runfiles::RUN_CHECKPOINT_FILE).is_file()
             || directory.join(runfiles::RUN_HU_CHECKPOINT_FILE).is_file();
 
@@ -201,6 +204,18 @@ mod tests {
         assert_eq!(runs[0].run_id, "run-a");
         assert_eq!(runs[0].state, RunState::Completed);
         assert_eq!(runs[0].progress, Some(7));
+    }
+
+    #[test]
+    fn event_offset_excludes_partial_records() {
+        let (_guard, root) = root();
+        write_run(&root, "run-a", RunState::Completed);
+        assert_eq!(root.summary("run-a").unwrap().events_offset, 0);
+        let path = runfiles::RunEventLog::path_in(&root.directory("run-a").unwrap());
+        std::fs::write(&path, b"first\npartial").unwrap();
+        assert_eq!(root.summary("run-a").unwrap().events_offset, 6);
+        std::fs::write(&path, b"first\nsecond\n").unwrap();
+        assert_eq!(root.summary("run-a").unwrap().events_offset, 13);
     }
 
     #[test]

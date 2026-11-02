@@ -95,7 +95,10 @@ export function TreeCard({
   const stacks = useMemo(() => rootStacks(start), [start]);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready) {
+      setLoading(false);
+      return;
+    }
     const id = ++sequence.current;
     setLoading(true);
     const timer = setTimeout(async () => {
@@ -103,6 +106,7 @@ export function TreeCard({
         const fetched = await api.tree(toml, roots.map(selector), true);
         if (id !== sequence.current) return;
         setRows(splitStreets(fetched, roots));
+        setFocused(null);
         setError(null);
       } catch (e) {
         if (id !== sequence.current) return;
@@ -111,6 +115,7 @@ export function TreeCard({
           setStreets([{ root: "", cards: [], via: [] }]);
           setViewing(0);
           setDealing(null);
+          setFocused(null);
         } else {
           setError((e as Error).message);
         }
@@ -133,12 +138,14 @@ export function TreeCard({
   const first = streetRows[0];
 
   const isOpen = (history: string, depth: number) => open[history] ?? depth < OPEN_DEPTH;
-  const setAll = (value: boolean) =>
+  const setAll = (value: boolean) => {
     setOpen((all) => {
       const next = { ...all };
       for (const row of streetRows) next[row.history] = value;
       return next;
     });
+    if (!value) setFocused(null);
+  };
 
   const deal = async (from: number, chance: string, via: string[], cards: string[]) => {
     setLoading(true);
@@ -162,6 +169,9 @@ export function TreeCard({
       return;
     }
     setStreets([...streets.slice(0, dealing.from + 1), { root: child, cards, via: dealing.via }]);
+    if (streets.length !== dealing.from + 2 || streets[dealing.from + 1]?.root !== child) {
+      setRows((all) => all?.slice(0, dealing.from + 1) ?? null);
+    }
     setViewing(dealing.from + 1);
     setDealing(null);
     setFocused(null);
@@ -187,7 +197,10 @@ export function TreeCard({
   const activate = (row: PreviewTreeRow, index: number, depth: number) => {
     const child = row.children[index]!;
     const where = outcome(row, index);
-    if (where === "decision") setOpen((all) => ({ ...all, [child]: !isOpen(child, depth) }));
+    if (where === "decision") {
+      if (isOpen(child, depth)) setFocused(null);
+      setOpen((all) => ({ ...all, [child]: !isOpen(child, depth) }));
+    }
     if (where === "deal") void deal(shown, child, lineTo(row, row.actions[index] ?? ""), []);
   };
 

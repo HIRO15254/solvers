@@ -161,7 +161,7 @@ export function ResultsPage({ runId }: { runId?: string }) {
 
   useEffect(() => {
     const first = runs?.find((run) => run.state === "completed") ?? runs?.[0];
-    if (!runId && first) navigate({ page: "results", runId: first.runId });
+    if (!runId && first) window.location.replace(`#/results/${encodeURIComponent(first.runId)}`);
   }, [runId, runs]);
 
   const run = runs?.find((r) => r.runId === runId);

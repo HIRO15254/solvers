@@ -124,7 +124,10 @@ export function SetupProfile({ prefill = null, freezeBases, freezeBaseRunId, fre
       <p className="muted meta">Choose a stopped heads-up postflop run with a saved solution. The daemon checks that its solution matches this setup. The selection is not stored in the TOML.</p>
       <Button variant="outline" onClick={onRefreshFreezeBases}>Refresh base runs</Button>
       {freezeBaseError && <p role="alert">Cannot load base runs: {freezeBaseError}</p>}
-      <Input label="CLI-only upstream solution path (optional)" value={fieldText(getAt(doc, ["profile", "freeze_upstream", "solution"]))} onChange={(e) => setDoc((d) => setAt(d, ["profile", "freeze_upstream", "solution"], e.target.value || undefined))} />
+      <Input label="CLI-only upstream solution path (optional)" value={fieldText(getAt(doc, ["profile", "freeze_upstream", "solution"]))} onChange={(e) => {
+        const value = e.target.value;
+        setDoc((d) => value ? setAt(d, ["profile", "freeze_upstream", "solution"], value) : setAt(d, ["profile", "freeze_upstream"], undefined));
+      }} />
       <p className="muted meta">Host paths are for CLI use only. With a base run selected, the path remains in the saved TOML but is omitted from daemon requests; without a base run, remove the path before solving in the GUI.</p>
     </Card>
     {(["lock", "incentive", "frequency"] as const).map((kind) => {

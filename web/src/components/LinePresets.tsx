@@ -3,7 +3,7 @@ import { api } from "../api/client";
 import type { LineCursor } from "../api/types";
 import { Button, Label, SegmentedControl, Select } from "../cryst";
 import { STREET_LABEL } from "../lib/cards";
-import { getAt, setAt, writeDoc, type Doc } from "../lib/config";
+import { getAt, readDoc, setAt, writeDoc, type Doc } from "../lib/config";
 import { chipDisplay } from "../lib/format";
 import { Notice } from "./common";
 
@@ -119,6 +119,7 @@ export function LinePresets({
   const written = useRef<string | null>(null);
 
   const tableKey = JSON.stringify(getAt(doc, ["table"]) ?? null);
+  const freezeKey = JSON.stringify(getAt(readDoc(toml), ["profile", "freeze_upstream"]) ?? null);
   useEffect(() => {
     let live = true;
     api.line(toml, []).then(
@@ -128,7 +129,7 @@ export function LinePresets({
     return () => {
       live = false;
     };
-  }, [tableKey]);
+  }, [tableKey, freezeKey]);
 
   // Preflop order: clockwise from the root's first actor.
   const seats = root?.seats ?? [];
@@ -144,7 +145,7 @@ export function LinePresets({
   const apply = async (preset: Preset, next: { start: Street; flows: Flows }) => {
     const id = ++sequence.current;
     setError(null);
-    const replay = (text: string) => api.line(writeDoc(setAt(doc, ["spot", "line"], text)));
+    const replay = (text: string) => api.line(writeDoc(setAt(readDoc(toml), ["spot", "line"], text)));
     try {
       if (!root) throw new Error("Table is not ready");
       const amount = (value: number) => presetAmount(value, root.bbChips, getAt(doc, ["table", "chip_rounding"]));
@@ -178,7 +179,7 @@ export function LinePresets({
   // The picked players changed: the chosen history follows them when it still exists.
   const pairKey = pair.join(",");
   // A replay for an older line, table or selection must not overwrite newer input.
-  useEffect(() => () => { sequence.current++; }, [line, tableKey, pairKey]);
+  useEffect(() => () => { sequence.current++; }, [line, tableKey, freezeKey, pairKey]);
 
   useEffect(() => {
     const preset = chosen === null ? undefined : list.find((p) => p.id === chosen);

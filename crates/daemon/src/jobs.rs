@@ -32,6 +32,7 @@ pub enum JobCommand {
 struct Running {
     run_id: String,
     child: Child,
+    signalled: bool,
 }
 
 /// Runs jobs, at most `max_concurrent` at a time.
@@ -73,31 +74,31 @@ impl JobRunner {
     /// manifest still says `queued` until one is spawned.
     pub fn submit(&self, run_id: &str, directory: &Path, command: JobCommand) -> Result<bool> {
         let mut state = self.state.lock().expect("job state");
-        self.reap(&mut state);
-        if state.running.len() >= self.max_concurrent || !state.queue.is_empty() {
-            state.queue.push_back(Queued {
-                run_id: run_id.to_string(),
-                directory: directory.to_path_buf(),
-                command,
-            });
-            return Ok(false);
-        }
-        self.spawn(&mut state, run_id, directory, command)?;
-        Ok(true)
+        state.queue.push_back(Queued {
+            run_id: run_id.to_string(),
+            directory: directory.to_path_buf(),
+            command,
+        });
+        self.drain(&mut state)?;
+        Ok(state.running.iter().any(|running| running.run_id == run_id))
     }
 
     /// Starts anything the freed slots can take. Called after reaping.
     pub fn pump(&self) -> Result<()> {
         let mut state = self.state.lock().expect("job state");
+        self.drain(&mut state)
+    }
+
+    fn drain(&self, state: &mut RunnerState) -> Result<()> {
+        self.reap(state);
         loop {
-            self.reap(&mut state);
             if state.running.len() >= self.max_concurrent {
                 return Ok(());
             }
             let Some(job) = state.queue.pop_front() else {
                 return Ok(());
             };
-            self.spawn(&mut state, &job.run_id, &job.directory, job.command)?;
+            self.spawn(state, &job.run_id, &job.directory, job.command)?;
         }
     }
 
@@ -130,13 +131,16 @@ impl JobRunner {
         }
         let Some(running) = state
             .running
-            .iter()
+            .iter_mut()
             .find(|running| running.run_id == run_id)
         else {
             return Ok(CancelOutcome::NotRunning);
         };
-        signal_interrupt(running.child.id())
-            .with_context(|| format!("interrupting the solver of run {run_id:?}"))?;
+        if !running.signalled {
+            signal_interrupt(running.child.id())
+                .with_context(|| format!("interrupting the solver of run {run_id:?}"))?;
+            running.signalled = true;
+        }
         Ok(CancelOutcome::Signalled)
     }
 
@@ -198,6 +202,7 @@ impl JobRunner {
         state.running.push(Running {
             run_id: run_id.to_string(),
             child,
+            signalled: false,
         });
         Ok(())
     }
@@ -216,7 +221,7 @@ impl JobRunner {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CancelOutcome {
-    /// A signal was delivered to a running child.
+    /// The running child was signalled, either now or by an earlier cancel.
     Signalled,
     /// The job was still queued and never started.
     Dequeued,
@@ -314,6 +319,7 @@ mod tests {
             state.running.push(Running {
                 run_id: "hold".into(),
                 child: sleeping_child(),
+                signalled: false,
             });
             drop(state);
             runner.submit("b", &second, JobCommand::Solve).unwrap()
@@ -333,6 +339,42 @@ mod tests {
     }
 
     #[test]
+    fn submit_starts_older_queued_work_when_a_slot_is_free() {
+        let (base, runner) = runner(1);
+        let first = run_dir(base.path(), "first");
+        let later = run_dir(base.path(), "later");
+        {
+            let mut state = runner.state.lock().unwrap();
+            state.queue.push_back(Queued {
+                run_id: "first".into(),
+                directory: first.clone(),
+                command: JobCommand::Solve,
+            });
+        }
+        runner.submit("later", &later, JobCommand::Solve).unwrap();
+        assert!(first.join("stdout.log").is_file());
+    }
+
+    #[test]
+    fn repeated_cancel_does_not_signal_again() {
+        let (_base, runner) = runner(1);
+        {
+            let mut state = runner.state.lock().unwrap();
+            state.running.push(Running {
+                run_id: "hold".into(),
+                child: sleeping_child(),
+                signalled: true,
+            });
+        }
+        assert_eq!(runner.cancel("hold").unwrap(), CancelOutcome::Signalled);
+        let mut state = runner.state.lock().unwrap();
+        let child = &mut state.running[0].child;
+        assert!(child.try_wait().unwrap().is_none());
+        child.kill().unwrap();
+        child.wait().unwrap();
+    }
+
+    #[test]
     fn failed_queued_spawn_does_not_block_later_jobs() {
         let (base, runner) = runner(1);
         let later = run_dir(base.path(), "later");
@@ -344,8 +386,7 @@ mod tests {
                 command: JobCommand::Solve,
             });
         }
-        assert!(!runner.submit("later", &later, JobCommand::Solve).unwrap());
-        assert!(runner.pump().is_err());
+        assert!(runner.submit("later", &later, JobCommand::Solve).is_err());
         let state = runner.state.lock().unwrap();
         assert_eq!(state.queue.len(), 1);
         assert_eq!(state.queue[0].run_id, "later");
