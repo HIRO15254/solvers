@@ -30,9 +30,8 @@ pub use cond::{
     Value, VarKind, VarSource, Vars,
 };
 
-/// An error compiling a tree script. Every error -- tokenizing, `param` /
-/// `define` resolution, or the block/condition/size grammar -- carries the
-/// 1-based source line it was detected on.
+/// An error compiling a tree script. The line is 1-based when associated
+/// with script source, or 0 for an override with no declaration.
 #[derive(Debug, Clone, PartialEq, thiserror::Error)]
 #[error("line {line}: {message}")]
 pub struct ScriptError {

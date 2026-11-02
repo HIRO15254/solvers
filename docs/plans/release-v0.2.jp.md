@@ -7,7 +7,7 @@
 
 ## 1. 範囲
 
-v0.1.0（tag `v0.1.0`）から配布するmainまでの変更をすべて含める。内容は`CHANGELOG.md`の`[Unreleased]`を正本とし、主なものは次である。
+v0.1.0（tag `v0.1.0`）から配布するmainまでの変更をすべて含める。内容は`CHANGELOG.md`の`[0.2.0]`を正本とし、主なものは次である。
 
 - P1のNodelock・相手profile（lock・incentive・頻度目標・`freeze_upstream`・relock、GUIでの表示と編集。N0〜N6）
 - tree-scriptの`jam`・`merge`と、構造的なall-in設定（`tree.allin_threshold`、`[tree.max_aggressive_actions]`、
@@ -15,7 +15,7 @@ v0.1.0（tag `v0.1.0`）から配布するmainまでの変更をすべて含め�
 - `no-rivers`の未保存Riverの遅延再solve（CLI・daemon・GUI）、`decision`・`--rest-of-street`
 - GUIのCodeMirror editorとTree previewの刷新
 - P1の速度・memoryの改善とmemory見積りの較正
-- chip額面（`table.bb_chips`・`table.chip_rounding`・`_chips` key）と、P1の履歴・labelのstreet内raise-to表記（`7cbc129c`。`.sol` version 7〜9）
+- chip額面（`table.bb_chips`・`table.chip_rounding`・`Nc`値）と、P1の履歴・labelのstreet内raise-to表記（`7cbc129c`。`.sol` version 7〜9）
 - 配布版の既知の欠陥の修正（手順2・3）
 
 ## 2. 利用者決定（2026-10-29、30）
@@ -38,7 +38,7 @@ v0.1.0（tag `v0.1.0`）から配布するmainまでの変更をすべて含め�
 
 | ID | 決定 |
 |---|---|
-| RV7 | 単位の作り直しを済ませてからv0.2.0を配布する。`_chips` keyと`Nc`は0.2.0で入るため、配布後に消すと利用者の移行が2回になる |
+| RV7 | 単位の作り直しを済ませてからv0.2.0を配布する。当初の`_chips` key案を見直し、RV8の単位付き値へ統一する |
 | RV8 | 1つの量に1つのkeyとし、単位は値に書く。数値と接尾辞なしはBB、`"Nbb"`はBB、`"Nc"`はchip。対象は`stack`・`[table.stacks]`・`sb`・`ante`・`bb_ante`・`straddles`・`outside_field`・`cap`・`rounding_unit`。旧`*_bb`・`*_chips` keyは`NLH002`とし、新しいkey名を示す |
 | RV9 | tree scriptのsize literalも接尾辞なしはBBとする。pot比は`N%`と書く。`Nbb`・`Nc`・`Nx`・`Ne`・`N%stack`・`N%effective`・`a`・`min`は維持する。v0.1.0の`bet [50]`は意味が変わるため、移行表と削除keyの`NLH002`の案内で`50`→`50%`を示す |
 | RV10 | 実効config（`run.toml`・`--print-config`・`.sol`とcheckpointに埋め込むconfig）の額は、どの卓でも`"Nc"`と`Nc`のlineで書く。scriptは書いたまま保存する |

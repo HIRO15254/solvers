@@ -22,7 +22,7 @@ const STRUCTURES: { id: string; label: string; shares: (places: number) => numbe
 /**
  * Edits `economics.payouts` in place order. Presets fill the rows from a
  * structure and an optional prize pool; the rows stay editable. Whether the
- * list is valid (non-increasing, not all equal) is the daemon's to report.
+ * list is valid (non-increasing, not equal across all players) is the daemon's to report.
  */
 export function PayoutsDialog({
   initial,
@@ -33,7 +33,7 @@ export function PayoutsDialog({
   onClose: () => void;
   onApply: (payouts: number[] | undefined) => void;
 }) {
-  const [rows, setRows] = useState(initial.map((value) => bb(value)));
+  const [rows, setRows] = useState(initial.map(String));
   const [pool, setPool] = useState("");
   const [structure, setStructure] = useState("");
   const [places, setPlaces] = useState("3");

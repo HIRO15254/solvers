@@ -185,10 +185,10 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   `solvers tree`.
 - **Breaking:** heads-up postflop `.sol` files are format 7 (8 with a profile,
   9 for `no-rivers` with River constraints). Formats 1–6 are rejected; re-solve
-  from a current config. Checkpoint formats are unchanged, but checkpoints
-  written before this release cannot be resumed because the effective config,
-  and with it the compatibility hash, now records `bb_chips` and
-  `chip_rounding`.
+  from a current config. The ordinary checkpoint format remains 5; profiles
+  can also use formats 6 or 8 as described above. Checkpoints written before
+  this release cannot be resumed because the effective config, and with it
+  the compatibility hash, now records `bb_chips` and `chip_rounding`.
 - Showdown ties split the pot into whole chips, and an odd chip goes to OOP.
   With rake or odd dead money, tied payoffs can differ by one chip from the
   previous half-chip split.

@@ -33,10 +33,9 @@
 //! reflects incentives correlated across *every* river-entry node through
 //! the shared regret-matching/averaging dynamics, whereas a re-solve seeds
 //! each river subgame independently from a snapshotted reach and solves it
-//! in isolation. The two agree in the limit of exact convergence at every
-//! node (both compute a best response to the same fixed opponent range) but
-//! are not bit-identical at any finite iteration count — this is standard
-//! viewer-artifact practice (PioSOLVER, TexasSolver), not a bug.
+//! in isolation. Even at convergence, equilibrium strategies need not be
+//! unique, so structural equivalence does not guarantee identical strategies
+//! or a bit-identical replay.
 
 use std::fmt;
 

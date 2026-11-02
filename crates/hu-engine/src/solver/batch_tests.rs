@@ -207,6 +207,8 @@ fn fixture(turn: bool) -> (PublicTree, Evaluator) {
     )
 }
 fn relative(exact: &[f32], actual: &[f32]) -> f64 {
+    assert_eq!(exact.len(), actual.len());
+    assert!(exact.iter().all(|v| v.is_finite()));
     let scale = exact.iter().map(|v| f64::from(v.abs())).fold(0.0, f64::max);
     let error = exact
         .iter()

@@ -723,6 +723,12 @@ pub(crate) fn read_index(
         ));
     }
     let deal_count = read_u64(input)?;
+    let deal_weight_bytes = deal_count
+        .checked_mul(4)
+        .ok_or(SolError::Malformed("index deal count is too large"))?;
+    let deal_map_bytes = deal_count
+        .checked_mul(8)
+        .ok_or(SolError::Malformed("index deal count is too large"))?;
     let mask_count = read_u32(input)?;
     let transition_count = read_u32(input)?;
     let label_count = read_u32(input)?;
@@ -769,8 +775,8 @@ pub(crate) fn read_index(
         })
         .collect();
 
-    let weights = take(input, deal_count * 4)?;
-    let maps = take(input, deal_count * 8)?;
+    let weights = take(input, deal_weight_bytes)?;
+    let maps = take(input, deal_map_bytes)?;
     let mut map_words = words(&maps);
     let deals = words(&weights)
         .map(|weight| {
@@ -920,6 +926,18 @@ iso_merging = false
 [run]
 memory = "1GiB"
 "#;
+
+    #[test]
+    fn rejects_overflowing_deal_count() {
+        let prepared = crate::prepare::prepare(TURN, std::path::Path::new("test.toml")).unwrap();
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(&0u64.to_le_bytes());
+        bytes.extend_from_slice(&u64::MAX.to_le_bytes());
+        assert!(matches!(
+            read_index(&mut bytes.as_slice(), &prepared.config, 0),
+            Err(SolError::Malformed(_))
+        ));
+    }
 
     #[test]
     fn second_street_wager_history_uses_street_target() {

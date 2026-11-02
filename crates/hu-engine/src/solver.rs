@@ -626,7 +626,8 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         }
     }
 
-    /// Expected value of the average strategy profile for `p`, per deal.
+    /// Expected value of the average strategy profile for `p`, per deal,
+    /// excluding incentive bonuses.
     pub fn expected_value(&self, p: Player) -> f64 {
         let ctx = ValueCtx {
             tree: &self.game.tree,
@@ -788,7 +789,8 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
         );
     }
 
-    /// Best-response value against the opponent's average strategy, per deal.
+    /// Constrained best-response value against the opponent's average
+    /// strategy, per deal, including incentive bonuses.
     pub fn best_response_value(&self, p: Player) -> f64 {
         let ctx = ValueCtx {
             tree: &self.game.tree,
@@ -813,9 +815,9 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
     }
 
     /// Per-player exploitability `BR_p(avg_{-p}) - u_p(avg)`. Reported
-    /// separately per player because raked (general-sum) games are
-    /// asymmetric; for zero-sum games the sum is NashConv and half the sum
-    /// is the conventional exploitability.
+    /// separately per player because raked and incentivized games can be
+    /// general-sum. Their sum is NashConv; in zero-sum heads-up games, half
+    /// that sum is the conventional exploitability.
     pub fn exploitability(&self) -> PerPlayer<f64> {
         if self.profile.is_none() && !self.game.zero_sum {
             return self.evaluate().1;

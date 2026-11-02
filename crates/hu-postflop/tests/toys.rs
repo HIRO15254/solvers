@@ -140,7 +140,7 @@ fn discount_schedules_beat_vanilla() {
 }
 
 #[test]
-fn raked_game_is_not_zero_sum_and_asymmetric() {
+fn raked_game_is_not_zero_sum() {
     let rake = PercentCapRake {
         rate: 0.10,
         cap: 1.0,

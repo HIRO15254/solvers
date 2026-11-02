@@ -199,6 +199,7 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
   /** Counts River card picks; a load started before the latest pick must not bring back the re-solves it dropped. */
   const riverPicks = useRef(0);
   const [error, setError] = useState<string | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("strategy");
   const [rangeSeat, setRangeSeat] = useState<Seat>("oop");
   const [side, setSide] = useState<Side>("overview");
@@ -251,10 +252,15 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
   };
 
   const exportCsv = async () => {
-    const resolved = node?.resolved ?? false;
-    const blob = await api.solutionCsv(run.runId, "strategy", [selector(current)], { resolveRivers: resolved });
-    const name = selector(current).replace(/[^\w.-]+/g, "_");
-    saveBlob(blob, `${run.runId}-${name}-strategy${resolved ? "-resolved" : ""}.csv`);
+    setExportError(null);
+    try {
+      const resolved = node?.resolved ?? false;
+      const blob = await api.solutionCsv(run.runId, "strategy", [selector(current)], { resolveRivers: resolved });
+      const name = selector(current).replace(/[^\w.-]+/g, "_");
+      saveBlob(blob, `${run.runId}-${name}-strategy${resolved ? "-resolved" : ""}.csv`);
+    } catch (e) {
+      setExportError(e instanceof Error ? e.message : String(e));
+    }
   };
 
 
@@ -296,6 +302,7 @@ function Solution({ run, runs }: { run: RunSummary; runs: RunSummary[] }) {
       </header>
       <main className="page-body padded stack" style={{ gap: 16 }}>
         {error && <Notice variant="destructive" title="Cannot load solution" description={error} />}
+        {exportError && <Notice variant="destructive" title="Cannot export strategy" description={exportError} />}
         {run.relockedFrom && <div>Relocked from <a href={`#/results/${encodeURIComponent(run.relockedFrom)}`}>{run.relockedFrom}</a></div>}
         <div hidden={!showRelock}><RelockPanel runId={run.runId} history={current} row={node?.row} strategy={node?.strategy} profile={summary?.profile ?? undefined} config={summary?.profile_config ?? null} /></div>
         {summary?.profile?.general_sum && (

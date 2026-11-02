@@ -1,11 +1,9 @@
 //! Flattens a parsed street-block list into the flat [`Rule`] list a
 //! compiled [`Script`](super::Script) carries.
 //!
-//! The walk is pre-order: outer blocks are visited before the statements
-//! nested inside them, so a rule from an outer `when` always lands before
-//! the rules its inner `when`s produce. Rules come out in exactly that
-//! order, and source order is the whole priority model -- there is no
-//! separate priority field (see the spec's "flattening" section).
+//! Statements are visited in source order, including across nested blocks.
+//! Each action becomes a rule at its source position; there is no separate
+//! priority field (see the spec's "flattening" section).
 
 use super::ast::{Rule, StmtAst, StreetBlockAst};
 use super::cond::{Condition, Vars, and_simplify};

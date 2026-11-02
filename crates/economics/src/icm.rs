@@ -234,8 +234,9 @@ impl Quadrature {
             .iter()
             .rposition(|&payout| payout != 0.0)
             .map_or(0, |place| place + 1);
-        // Coefficients with j ≥ paid only meet zero prizes.
-        let kept = (outside.len() + 1).min(paid);
+        // Coefficients with j ≥ paid only meet zero prizes. Retain the
+        // constant coefficient even when every payout is zero.
+        let kept = (outside.len() + 1).min(paid).max(1);
         let outside_rates: Vec<f64> = outside
             .iter()
             .map(|stack| stack.raw() as f64 * rate_per_chip)
@@ -458,6 +459,16 @@ mod tests {
 
     fn chips(stacks: &[u64]) -> Vec<MwChips> {
         stacks.iter().copied().map(MwChips).collect()
+    }
+
+    #[test]
+    fn quadrature_accepts_zero_payouts() {
+        let icm = PreparedIcm::new(seats(&[100, 100]), chips(&[100; 14]), vec![0.0; 16]).unwrap();
+        assert_eq!(icm.baseline().as_slice(), &[0.0, 0.0]);
+        assert_eq!(
+            icm.terminal_values(&seats(&[0, 200])).unwrap().as_slice(),
+            &[0.0, 0.0]
+        );
     }
 
     fn assert_relative(actual: &[f64], expected: &[f64], tolerance: f64) {

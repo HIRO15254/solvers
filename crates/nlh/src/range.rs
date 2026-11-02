@@ -179,7 +179,7 @@ impl FromStr for Range {
 
 fn apply_spec(range: &mut Range, spec: &str, weight: f32) -> Option<()> {
     // Explicit combo like "AhKs".
-    if spec.len() == 4 {
+    if spec.len() == 4 && spec.is_ascii() {
         let (a, b) = (spec[..2].parse::<Card>(), spec[2..].parse::<Card>());
         if let (Ok(a), Ok(b)) = (a, b) {
             if a == b {
@@ -368,6 +368,8 @@ mod tests {
     fn rejects_garbage() {
         assert!("XX".parse::<Range>().is_err());
         assert!("AAs".parse::<Range>().is_err());
+        assert!("A€".parse::<Range>().is_err());
+        assert!("€A".parse::<Range>().is_err());
         assert!("AA:1.5".parse::<Range>().is_err());
         // Different rank gap between the two dash endpoints (T9 is gap 1,
         // 53 is gap 2): not a valid connector/gapper run.

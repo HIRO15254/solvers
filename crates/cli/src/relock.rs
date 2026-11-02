@@ -139,7 +139,7 @@ pub fn run(args: Args) -> Result<()> {
         if prepared.document.spot.profile.is_some() {
             hu_postflop::run::validate_profile(&prepared)?;
         }
-        print!("{config}");
+        print!("{}", prepared.effective);
         Ok(())
     } else {
         crate::nlh_v1::solve(

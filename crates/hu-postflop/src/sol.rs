@@ -418,6 +418,11 @@ struct ChunkBlock {
 
 impl Chunk {
     fn parse(section: Section, entry: &ChunkEntry, bytes: Vec<u8>) -> Result<Self, SolError> {
+        if entry.nodes as usize > bytes.len() / section.entry_bytes() {
+            return Err(SolError::Malformed(
+                "chunk node count exceeds decoded length",
+            ));
+        }
         let mut blocks = Vec::with_capacity(entry.nodes as usize);
         let mut at = 0;
         let word = |at: usize| u32::from_le_bytes(bytes[at..at + 4].try_into().expect("4 bytes"));
@@ -506,7 +511,9 @@ impl SolReader {
         file.read_exact(&mut header_buf)?;
         let header = parse_header(&header_buf);
 
-        let index_offset = HEADER_LEN as u64 + header.metadata_len;
+        let index_offset = (HEADER_LEN as u64)
+            .checked_add(header.metadata_len)
+            .ok_or(SolError::Malformed("metadata frame length overflows"))?;
         let chunks_start = (HEADER_LEN as u64)
             .checked_add(header.metadata_len)
             .and_then(|end| end.checked_add(header.index_len))
@@ -1314,7 +1321,9 @@ fn dequantize_values_into(
     len: usize,
     out: &mut Vec<f32>,
 ) -> Result<(), SolError> {
-    let expected = len * 2;
+    let expected = len
+        .checked_mul(2)
+        .ok_or(SolError::Malformed("value dimensions overflow"))?;
     if bytes.len() != expected {
         return Err(SolError::Truncated {
             expected,
@@ -1376,7 +1385,19 @@ fn dequantize_probs_into(
     num_hands: usize,
     out: &mut Vec<f32>,
 ) -> Result<(), SolError> {
-    out.resize(num_actions * num_hands, 0.0);
+    let elements = num_actions
+        .checked_mul(num_hands)
+        .ok_or(SolError::Malformed("strategy dimensions overflow"))?;
+    let expected = elements
+        .checked_mul(2)
+        .ok_or(SolError::Malformed("strategy dimensions overflow"))?;
+    if bytes.len() != expected {
+        return Err(SolError::Truncated {
+            expected,
+            actual: bytes.len(),
+        });
+    }
+    out.resize(elements, 0.0);
     dequantize_probs_into_slice(bytes, num_actions, num_hands, out)
 }
 
@@ -1386,7 +1407,12 @@ fn dequantize_probs_into_slice(
     num_hands: usize,
     out: &mut [f32],
 ) -> Result<(), SolError> {
-    let expected = num_actions * num_hands * 2;
+    let elements = num_actions
+        .checked_mul(num_hands)
+        .ok_or(SolError::Malformed("strategy dimensions overflow"))?;
+    let expected = elements
+        .checked_mul(2)
+        .ok_or(SolError::Malformed("strategy dimensions overflow"))?;
     if bytes.len() != expected {
         return Err(SolError::Truncated {
             expected,
@@ -1394,9 +1420,9 @@ fn dequantize_probs_into_slice(
         });
     }
 
-    if out.len() != num_actions * num_hands {
+    if out.len() != elements {
         return Err(SolError::Truncated {
-            expected: num_actions * num_hands,
+            expected: elements,
             actual: out.len(),
         });
     }
@@ -1438,6 +1464,47 @@ mod tests {
             id,
             name
         ))
+    }
+
+    #[test]
+    fn rejects_overflowing_metadata_length() {
+        let path = temp_path("overflow.sol");
+        let mut header = [0u8; HEADER_LEN];
+        header[..8].copy_from_slice(MAGIC);
+        header[8..10].copy_from_slice(&FORMAT_VERSION.to_le_bytes());
+        header[50..58].copy_from_slice(&u64::MAX.to_le_bytes());
+        std::fs::write(&path, header).unwrap();
+        assert!(matches!(
+            SolReader::open(&path),
+            Err(SolError::Malformed(_))
+        ));
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn rejects_chunk_node_count_larger_than_its_headers() {
+        let entry = ChunkEntry {
+            first_sref: 0,
+            last_sref: u32::MAX,
+            nodes: u32::MAX,
+            offset: 0,
+            compressed_len: 0,
+            decoded_len: 0,
+            checksum: [0; 32],
+        };
+        assert!(matches!(
+            Chunk::parse(Section::Strategy, &entry, Vec::new()),
+            Err(SolError::Malformed(_))
+        ));
+    }
+
+    #[test]
+    fn rejects_invalid_dimensions_before_allocating() {
+        let mut out = Vec::new();
+        assert!(dequantize_probs_into(&[], usize::MAX, 2, &mut out).is_err());
+        assert!(dequantize_probs_into(&[], usize::MAX / 4, 1, &mut out).is_err());
+        assert!(out.is_empty());
+        assert!(dequantize_values(&[], 1.0, usize::MAX).is_err());
     }
 
     fn sample_payload() -> SolPayload {

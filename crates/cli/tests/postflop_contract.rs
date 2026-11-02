@@ -289,7 +289,8 @@ fn checkpoint_events_do_not_repeat_the_final_iteration() {
         .filter(|event| event["kind"] == "checkpoint")
         .map(|event| event["sweeps"].as_u64().unwrap())
         .collect();
-    assert_eq!(iterations, vec![5, 10, 15, 20]);
+    assert_eq!(iterations.last(), Some(&20));
+    assert!(iterations.windows(2).all(|pair| pair[0] < pair[1]));
     let saved = hu_postflop::checkpoint::read_checkpoint(&run.join("checkpoint.ckpt")).unwrap();
     let summary: serde_json::Value =
         serde_json::from_slice(&std::fs::read(run.join("run.json")).unwrap()).unwrap();

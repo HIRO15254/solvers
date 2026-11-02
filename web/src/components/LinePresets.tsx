@@ -177,6 +177,9 @@ export function LinePresets({
 
   // The picked players changed: the chosen history follows them when it still exists.
   const pairKey = pair.join(",");
+  // A replay for an older line, table or selection must not overwrite newer input.
+  useEffect(() => () => { sequence.current++; }, [line, tableKey, pairKey]);
+
   useEffect(() => {
     const preset = chosen === null ? undefined : list.find((p) => p.id === chosen);
     if (preset && written.current === line) void apply(preset, { start, flows });

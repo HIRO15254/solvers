@@ -262,7 +262,7 @@ fn cfr_precision_contract_and_legacy_checkpoint() {
         let doc = parse(&format!("{base}\n[solver]\ncfr_precision={value}"));
         let error = Settings::parse(&doc.spot, &doc.solver, &doc.output).unwrap_err();
         assert_eq!(error.code, code);
-        assert!(error.to_string().contains("solver.cfr_precision"));
+        assert_eq!(error.key.as_deref(), Some("solver.cfr_precision"));
     }
     // Recreate a legacy checkpoint identity using an effective config with no key.
     let p = prepare::prepare(&base, Path::new("input.toml")).unwrap();

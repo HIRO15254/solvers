@@ -33,7 +33,7 @@ solvers (cli)
 hu-postflop / mw-preflop       runfiles
 ```
 
-CLIのnormal workspace依存は`spot`・`hu-postflop`・`mw-preflop`・`runfiles`である。
+CLIのnormal workspace依存は`spot`・`hu-postflop`・`runfiles`と、`p2` featureで有効になる`mw-preflop`である。
 `spot`が共通InputとSpot IRを、製品がgame/session・資源判定・solve/resume・成果物とtyped queryを持つ。
 P1のpayoff builderは`hu_postflop::input::NlhPayoff`であり、共通のrake/ICMは`economics`にある。
 P2のsession・abstraction・停止評価は`mw_preflop::{prepare,session,run,views}`にある。
@@ -215,8 +215,8 @@ statusの`eventsOffset`も最後の改行までの完全record境界を返す。
 
 ## 6. CLI 表面
 
-`config new` / `validate` / `line` / `tree` が入力、`solve` / `resume` が計算、`status` / `watch` / `runs ls` が監視、
-`inspect` / `evaluate` / `export` / `compare` / `report` が閲覧・評価を担う。
+`config new` / `validate` / `line` / `tree` が入力、`solve` / `resume` / `relock` が計算、
+`status` / `watch` / `runs ls` が監視、`inspect` / `evaluate` / `export` / `compare` / `report` が閲覧・評価を担う。
 P1 compareは通常spot・seat別comboリスト・size込みaction labelのidentityも検証し、
 `--cross-game`で形状だけの対応付けを明示する。木/index共有は保存index checksumと復元support・root range・開始streetの一致時だけ行い、右index frameも検証する。
 `derive`はP2 runとPreflop line・Flop boardからP1の実効Inputを生成する。
@@ -288,7 +288,7 @@ UI directory内のfileを配信する。`/`は`index.html`、
 存在しない拡張子なしpathはSPA fallback、拡張子ありpathは404となる。復号後の`..`・absolute・
 backslash・drive指定を拒否し、canonical pathがDIR外へ出るfileも配信しない。
 `index.html`には`Cache-Control: no-cache`を付ける。起動時は従来の3行の後に
-`gui: {scheme}://{host}:{port}/#token={token}`を表示する。UIが無い場合は全requestにtokenが必要である。
+`gui: {scheme}://{host}:{port}/#token={token}`を表示する。fragmentのtokenはpercent-encodeする。UIが無い場合は全requestにtokenが必要である。
 `--open`はlistenと`gui:`表示後、そのtoken付きURLを既定browserへshellを介さず渡す。
 Windowsは`rundll32 url.dll,FileProtocolHandler`、macOSは`open`、その他は`xdg-open`を使い、
 launcherの終了待ちは別threadに置く。browser起動失敗はstderr警告のみでdaemonを止めない。

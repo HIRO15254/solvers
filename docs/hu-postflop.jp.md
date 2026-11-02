@@ -234,7 +234,7 @@ scheduleは入力規範第10節の5つである。iteration tの更新前にs = 
 | `linear-cfr` | DCFRのalpha = beta = gamma = 1、平均reset無し |
 | `hs-dcfr` | 予算nに対してalpha = 1＋3t/n、beta = −1−2t/n、gamma = gamma0−5t/n、reset無し |
 
-初回の平均係数は0、初回regret係数は1である。DCFRの既定係数はalpha = 1.25、beta = 0.5、gamma = 4である。pow4_resetは未指定時にstorageがi16ならtrue、auto・f32・i16-f32avgならfalseで、明示値は常に優先する（利用者決定PF8、2026-10-07）。trueならt = 4, 16, 64, …で平均を捨てる。実効configに値を明示保存する。互換性hashが異なる旧checkpointは再開できず、現行configから再solveする。
+初回の平均係数はvanillaでは1、それ以外では0であり、初回regret係数は1である。DCFRの既定係数はalpha = 1.25、beta = 0.5、gamma = 4である。pow4_resetは未指定時にstorageがi16ならtrue、auto・f32・i16-f32avgならfalseで、明示値は常に優先する（利用者決定PF8、2026-10-07）。trueならt = 4, 16, 64, …で平均を捨てる。実効configに値を明示保存する。互換性hashが異なる旧checkpointは再開できず、現行configから再solveする。
 HS-DCFRはplanned iteration予算を使う。パラメータの既定と受理範囲は入力規範に従う。
 
 `storage`は次の4値を受け付ける。利用者決定PF11（2026-10-09）により既定は`auto`である。Lはstorage要素数、Nはaction node数。
@@ -247,7 +247,7 @@ HS-DCFRはplanned iteration予算を使う。パラメータの既定と受理�
 | `i16-f32avg` | regretは旧i16と同じ量子化、戦略累積はf32 | 6L＋4N | 戦略累積の量子化を避け、旧i16の精度床を改善する。regretの量子化誤差は残り、任意の木で0.1%到達を保証しない |
 
 旧i16の精度床は[収束測定](../experiments/p1-perf-2026-10/convergence-20261007/README.md)でTurn最良0.120%、GTO Wizard風の木で最良0.292%だった。
-`i16-f32avg`は`update_regrets_i16_impl`・`normalize_columns_i16`を旧i16と共用し、平均戦略はf32の累積・正規化を使う。
+`i16-f32avg`は`update_regrets_i16_impl`と共通の`normalize_columns` / `normalize_columns_f32`を旧i16と共用し、平均戦略はf32の累積・正規化を使う。
 同じ木・schedule・反復数ではregret配列とregret scaleが旧i16とbit一致する。
 i16の量子化blockはnodeごとのactorの席別support次元であり、support外handの除去でblock scaleと反復結果が変わり得る。
 新旧layoutのbit一致をi16に要求せず、同じconfig・反復予算で収束品質を照合する。
@@ -437,8 +437,8 @@ P1のmemory見積りはstorage、full出力のpacked値blockとsref索引slot、
 戦略はstorageからsref昇順の連続区間（合計8,388,608要素以下）ごとに、node単位で平均戦略・量子化をrun threadsのRayon poolで並列生成し、書き手がsref順にchunkへ詰める。上限を超えるnodeは単独batchとし、同時に保持するbatchは1個。全nodeの戦略blockは保持しない。その後、両席EV passのworkerで値blockをscaleと量子化bytesとしてslotに保持し、書き手がsref昇順にchunkへ詰める。
 `saveWorkspaceBytes`は値block bytes＋action node数×（`Mutex<Option<(f32, Vec<u8>)>>`と保存対象boolのsize）＋node数×Streetのsize＋戦略batch予算である。
 戦略batch予算はB×6 bytes（f32平均戦略4＋u16量子化bytes 2）＋K×H＋外側Vec headerである。B＝min（全戦略要素数、max（8,388,608、最大node要素数））、K＝min（action node数、floor（B / max（1、最小node要素数）））、H＝size_of((StorageRef, Vec<u8>))＋size_of(Vec<f32>)。量子化Vecは2×node要素数bytesを事前確保する。thread数によらず全batchのf32/u16作業領域まで保守的に含める。値slotと同時には必要ないが加算する。
-`compressionWorkspaceBytes`は`.sol`の書き手の作業領域で、thread数によらない。P＝min（16、floor（payload bytes / 1 MiB）＋1）を同時に圧縮するchunk数として、（P＋2）×2×（1 MiB＋12＋最大block bytes）（封じたchunk P個と各列の書込み中chunk、その圧縮frame）＋P×4 MiB（圧縮context）＋保存action node数×4（値blockと照合するsref列）＋chunk数上界×3×directory entry size＋実効config長×2（metadata frame）である。
-payload bytesは全戦略要素数×2＋全値block bytes、最大block bytesは最大node要素数×2と値block bytesの大きい方、chunk数上界は2×（floor（payload bytes / 1 MiB）＋1）である。chunkは1 MiBに達して初めて封じるため、封じたchunkはpayloadが満たせる数を超えない。
+`compressionWorkspaceBytes`は`.sol`の書き手の作業領域の見積りで、thread数によらない。P＝min（16、floor（payload bytes / 1 MiB）＋1）を同時に圧縮するchunk数の見積りとして、（3P＋4）×（1 MiB＋12＋最大block bytes）＋P×8 MiB（圧縮context）＋保存action node数×4（値blockと照合するsref列）＋chunk数の見積り×3×directory entry sizeである。これにprepare時に実効config長×2（metadata frame）を加える。
+payload bytesは全戦略要素数×2＋全値block bytes、最大block bytesは最大node要素数×2と値block bytesの大きい方、chunk数の見積りは2×（floor（payload bytes / 1 MiB）＋1）である。chunkはentry headerを含めて1 MiBに達すると封じるため、このpayload bytesだけによる見積りは実際のchunk数の上界とは限らない。
 Eはcheckpointのzstd encoderである。run threads数Tが2以上なら、zstdは4 MiB（window_log 20＋2）のjobを（T＋3）job分の入力ringから切り出し、1 jobの圧縮上限長の出力bufferを最大2T＋3個poolし、workerごとにlevel 1 contextを持つため、E＝（3T＋6）×4 MiB＋T×1 MiBとする。T＝1では4 MiBである。
 常駐量Mは構築から保存まで残るstorage以外のmemoryで、process領域32 MiB＋G＋G/16＋P＋T×Xである。
 Gは`game_bytes`で、dry-runの数え上げから公開木（node・tag・storage span・部分木chance有無・edge・street・親）、action・terminal・deal配列、card除去mask、iso変換表、payoff表、rank table（live hand数を同順位群数の上限とする）、hand map、viewer索引の配列と、label予算256 KiBを数える。構築した配列は容量を詰めて保持し、Gは実際の確保量以上である（`memory_usage_matches_allocated`）。同順位群数の上限、共有前のpayoff key、label予算の分だけ確保量を上回り、広いrangeの小さい木ほど比が大きい。G/16は構築の一時領域のうちallocatorが保持し続ける分である。
@@ -452,7 +452,7 @@ P1のresume互換性hashは正規化configから`[run]`・`[meta]`・`solver.cfr
 CFR精度はgame定義にもstate形式にも影響しないため互換性hashから除外し、keyの無い旧runは新既定f32で再開する。
 実効config全文のmanifest/solution hashとは別である。
 resumeは外部configとcheckpoint埋込みconfigの互換性を照合する。
-再開後のcheckpoint / solution / run.jsonは同じ最終iterationを記録する。
+再開後のsolution / run.jsonは同じ最終iterationを記録する。終了時checkpointを新たに保存した場合はそれも同じiterationを記録し、定期checkpointのみの場合は最後の保存境界のiterationを記録する。
 
 ## 8. exportとreportの値
 
@@ -506,7 +506,7 @@ support外のcombo照会は「rangeに無い」旨のerrorまたは空結果で�
 未保存Riverの再解決ではnode reachを新しいrangeとし、親子のsupportをglobal comboで対応付ける。
 再解決はRiver配牌直後のnodeから下の部分木を1つのsubgameとして解き、同じ読込みの照会では再利用する。
 部分木内の節点の到達weightはtrunkの保存戦略と再解決した戦略の積である。再解決のEVは同じpayoff基準（trunkの開始時点へのoffset込み）で、
-保存値と同じsubgame開始基準の値となる。一方の席の到達が全handで0の線は再解決せずerrorとする。
+保存値と同じ元のspot開始基準の値となる。一方の席の到達が全handで0の線は再解決せずerrorとする。
 
 reportの先頭7列は`board,iterations,wall_s,nash_conv,ev_oop,ev_ip,oop_equity`で固定である。
 続く`freq_*`列は入力board順で初めて現れたroot action labelの和集合である。

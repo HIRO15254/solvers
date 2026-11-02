@@ -6,7 +6,12 @@ export type Route =
 
 export function parseRoute(hash: string): Route {
   const [page, id] = hash.replace(/^#\/?/, "").split("/");
-  const runId = id ? decodeURIComponent(id) : undefined;
+  let runId: string | undefined;
+  try {
+    runId = id ? decodeURIComponent(id) : undefined;
+  } catch {
+    runId = undefined;
+  }
   if (page === "runs") return { page, runId };
   if (page === "results") return { page, runId };
   if (page === "guide") return { page };

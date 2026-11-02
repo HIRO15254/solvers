@@ -65,7 +65,7 @@ pub enum SolutionStreets {
 }
 
 /// P1 schedule parameters. Standalone defaults assume auto storage;
-/// `Settings::parse` resolves omitted DCFR resets using the final storage.
+/// `Settings::parse` resolves omitted DCFR resets using the specified storage choice.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(deny_unknown_fields, tag = "schedule", rename_all = "kebab-case")]
 pub enum Algorithm {

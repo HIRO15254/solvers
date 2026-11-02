@@ -118,7 +118,10 @@ export function TreeCard({
         if (id === sequence.current) setLoading(false);
       }
     }, 300);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      sequence.current += 1;
+    };
     // `roots` is read through `rootsKey`.
   }, [toml, ready, rootsKey]);
 

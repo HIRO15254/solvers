@@ -313,6 +313,7 @@ export function SetupPage() {
   const [validation, setValidation] = useState<Validation>({
     state: "pending",
   });
+  const [validatedKey, setValidatedKey] = useState<string | null>(null);
   // Keep parameter controls available while validation is pending or an override is invalid.
   const [treeParams, setTreeParams] = useState<{ script: string; params: TreeParam[] } | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -339,6 +340,7 @@ export function SetupPage() {
     try {
       const response = await api.validate(text, true, freezeBaseRunId || undefined);
       if (id !== sequence.current) return;
+      setValidatedKey(JSON.stringify([text, freezeBaseRunId]));
       setValidation({ state: "ok", response });
       setTreeParams({
         script: fieldText(getAt(readDoc(text), ["tree", "script"])),
@@ -347,6 +349,7 @@ export function SetupPage() {
       setIssue(null);
     } catch (error) {
       if (id !== sequence.current) return;
+      setValidatedKey(JSON.stringify([text, freezeBaseRunId]));
       const message = (error as Error).message;
       setValidation({ state: "error", message });
       setIssue(parseIssue(message));
@@ -436,10 +439,11 @@ export function SetupPage() {
   // Validate shortly after the last edit; the daemon answers from the CLI.
   useEffect(() => {
     const timer = setTimeout(() => void validate(requestToml), 700);
-    return () => clearTimeout(timer);
+    return () => { clearTimeout(timer); sequence.current++; };
   }, [requestToml, freezeBaseRunId]);
 
-  const summary = validation.state === "ok" ? validation.response.summary : null;
+  const currentValidation = validatedKey === JSON.stringify([requestToml, freezeBaseRunId]) ? validation : { state: "pending" as const };
+  const summary = currentValidation.state === "ok" ? currentValidation.response.summary : null;
   const start = summary?.start;
   const roles = lineRoles ?? (start ? { oop: start.oop.position, ip: start.ip.position } : null);
   const routed = issue ? issueStep(issue) : undefined;
@@ -482,7 +486,7 @@ export function SetupPage() {
       setSubmitting(false);
     }
   };
-  const canSolve = !submitting && validation.state === "ok" && tomlError === null;
+  const canSolve = !submitting && currentValidation.state === "ok" && tomlError === null;
 
   const openFile = async (file: File) => {
     try {
@@ -672,14 +676,14 @@ export function SetupPage() {
             onBoardDialog={() => setBoardDialog(true)}
           />
           <ValidationCard
-            validation={validation}
+            validation={currentValidation}
             storageAuto={!getAt(doc, ["solver", "storage"]) || getAt(doc, ["solver", "storage"]) === "auto"}
             errorStep={
               errorStep && errorStep.id !== step ? { label: errorStep.label, open: () => openStep(errorStep.id) } : null
             }
             onRevalidate={() => void validate(requestToml)}
           />
-          <TreeCard toml={requestToml} ready={validation.state === "ok"} roles={lineRoles} start={start ?? null} bbChips={cursor?.bbChips || 1000} />
+          <TreeCard toml={requestToml} ready={currentValidation.state === "ok"} roles={lineRoles} start={start ?? null} bbChips={cursor?.bbChips || 1000} />
         </aside>
       </main>
 

@@ -135,7 +135,7 @@ solvers config new --product p2 --template full --out table-full.toml
 ```
 
 `config new`の既定は`p2`である。P1専用配布buildでは既定が`p1`になり、`--product p2`は`NLH005`（exit 2）になる。
-`full`は既定値を含む全keyを並べ、額は既定tableでは`stack = 10`、`sb = 0.5`のようなBB数値で書く（runの実効configは`"10000c"`のようなchip表記）。
+`full`は既定値のある全keyを並べ、額は既定tableでは`stack = 10`、`sb = 0.5`のようなBB数値で書く（runの実効configは`"10000c"`のようなchip表記）。既定の無い任意keyは省略する。
 P1の`full`末尾にはcommentのprofile例がある。`freeze_upstream`以外はそのtemplateの木でそのままcomment解除して使える。
 
 先頭のschemaは常に`solvers.nlh/v1`である。table、economics、spot、ranges、treeを編集する。
@@ -148,7 +148,7 @@ BB額と計算したsizeは`table.chip_rounding`（`down` / `nearest` / `up`、�
 丸めで変わったBB値はvalidateの警告に位置（key、line action、script位置または既定SB）、元のBB値、結果のchip数と丸め方式が表示される。構文と丸め後の合法性は引き続き検査する。
 rakeの丸めは`economics.rake.rounding_unit`（既定`"1c"`）と`economics.rake.rounding`で別に指定する。P1のrange指定やline文法は規範の例に従う。
 P1ではPreflop ruleは効果を持たず、指定すると警告が出る。
-`checkdown`は一致した手番をcheck、賭けに直面していればfoldにする。
+`checkdown`は一致した手番のmenuをcheck、賭けに直面していればfoldだけにする。後続ruleはこのmenuをさらに編集できる。
 外部`.tree`を使う場合はconfigからの相対pathと`tree.params`を記し、
 [river_script.toml](../examples/hu-postflop/river_script.toml)を参照する。
 tree scriptのsizeは接尾辞なし数値と`Nbb`がBB、`Nc`がchip、`N%`がpot比である。例えばpot 33%は`33%`で、`33`は33 BBである。`[tree.params]`の数値overrideもBBなので、pot比は`cb = "33%"`とする。`Nx`、`Ne`、`N%stack`、`N%effective`、`a`、`min`も使える。旧`50%pot`などは使えない。

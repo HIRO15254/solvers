@@ -14,6 +14,16 @@ fn string(t: &Table, key: &str, path: &str) -> Result<String, SpotError> {
     }
     Ok(s.to_owned())
 }
+fn node(t: &Table, path: &str) -> Result<String, SpotError> {
+    let value = t
+        .get("node")
+        .and_then(Value::as_str)
+        .ok_or_else(|| value_error(format!("{path}.node"), "required string"))?;
+    if !value.is_empty() && value.trim().is_empty() {
+        return Err(value_error(format!("{path}.node"), "must not be empty"));
+    }
+    Ok(value.to_owned())
+}
 fn number(v: &Value) -> f64 {
     v.as_float()
         .unwrap_or_else(|| v.as_integer().unwrap() as f64)
@@ -101,7 +111,7 @@ pub(crate) fn parse(t: &Table, config_path: &Path, embedded: bool) -> Result<Pro
     };
     for (i, row) in entries(t, "lock").enumerate() {
         let path = format!("profile.lock.{i}");
-        let node = string(row, "node", &path)?;
+        let node = node(row, &path)?;
         let confidence = match row.get("confidence") {
             Some(v) => probability(v, &format!("{path}.confidence"))?,
             None => 1.0,
@@ -180,7 +190,7 @@ pub(crate) fn parse(t: &Table, config_path: &Path, embedded: bool) -> Result<Pro
             return Err(value_error(&path, "amount must be finite"));
         }
         profile.incentives.push(IncentiveIr {
-            node: string(row, "node", &path)?,
+            node: node(row, &path)?,
             hands: selector(row, &path)?,
             action: string(row, "action", &path)?,
             amount,
@@ -194,7 +204,7 @@ pub(crate) fn parse(t: &Table, config_path: &Path, embedded: bool) -> Result<Pro
             &format!("{path}.target"),
         )?;
         profile.frequencies.push(FrequencyIr {
-            node: string(row, "node", &path)?,
+            node: node(row, &path)?,
             hands: selector(row, &path)?,
             action: string(row, "action", &path)?,
             target,
@@ -352,4 +362,32 @@ pub(crate) fn normalize(p: &ProfileIr) -> String {
     let mut wrapper = Table::new();
     wrapper.insert("profile".into(), Value::Table(root));
     toml::to_string(&wrapper).expect("profile contains valid TOML")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empty_node_selects_root_for_all_profile_entries() {
+        let table: Table = r#"
+            [[lock]]
+            node = ""
+            strategy = { check = 1 }
+            [[incentive]]
+            node = ""
+            action = "check"
+            bb = 1
+            [[frequency]]
+            node = ""
+            action = "check"
+            target = 0.5
+        "#
+        .parse()
+        .unwrap();
+        let profile = parse(&table, Path::new("config.toml"), false).unwrap();
+        assert_eq!(profile.locks[0].node, "");
+        assert_eq!(profile.incentives[0].node, "");
+        assert_eq!(profile.frequencies[0].node, "");
+    }
 }

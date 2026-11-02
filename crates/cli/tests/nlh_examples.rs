@@ -13,11 +13,13 @@ fn every_user_example_validates_and_normalizes_idempotently() {
     #[cfg(feature = "p2")]
     let products = ["hu-postflop", "mw-preflop"];
     for product in products {
+        let mut examples = 0;
         for entry in std::fs::read_dir(root().join("examples").join(product)).unwrap() {
             let path = entry.unwrap().path();
             if path.extension().and_then(|s| s.to_str()) != Some("toml") {
                 continue;
             }
+            examples += 1;
             let output = Command::new(env!("CARGO_BIN_EXE_solvers"))
                 .args(["validate", path.to_str().unwrap(), "--format", "json"])
                 .output()
@@ -44,6 +46,7 @@ fn every_user_example_validates_and_normalizes_idempotently() {
                 path.display()
             );
         }
+        assert!(examples > 0, "no TOML examples for {product}");
     }
 }
 

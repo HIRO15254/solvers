@@ -48,10 +48,12 @@ pub fn compute(
         })
         .collect::<Result<Vec<_>>>()?;
     let mut hits = prepared.first().map(|p| p.estimate.rule_hits.clone());
-    for p in &prepared {
+    for p in prepared.iter().skip(1) {
         if let Some(hits) = &mut hits {
             prepare::merge_rule_hits(hits, &p.estimate.rule_hits);
         }
+    }
+    for p in &prepared {
         let row = run::with_threads(prepare::threads(p)?, || match p.settings.solver.storage {
             crate::input::Storage::F32 => board_row::<F32Storage>(p, cancel),
             crate::input::Storage::I16 => board_row::<I16Storage>(p, cancel),

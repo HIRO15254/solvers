@@ -48,8 +48,8 @@ flowchart LR
 - 製品はspotから決まり、利用者は製品名を書かない。boardなし → P2、boardありでPreflopを2人が通過 → P1、
   それ以外（Multiway Postflop等）は明示error。
 - 卓は2〜9人で、position別のstack、SB・ante・BB ante、live straddle（re-straddleの連続を含む）を書ける。
-- chip量の単位はすべてBB（内部は0.001 BBの整数）。旧P1のchip単位・`min_bet`は廃止する。
-- P1の開始局面に至るlineは`BTN r2.5, BB c`形式の1通りの表記だけを受け、foldは書かない。
+- chip量は数値・`Nbb`でBB、`Nc`で正確なchip数を指定する。内部は整数chipで、`table.bb_chips`（既定1000）が1 BBあたりのchip数を定める。BBの額は`table.chip_rounding`で丸める。旧P1の`min_bet`は廃止する。
+- P1の開始局面に至るlineは`BTN r2.5, BB c`のようにpositionとactionを書く形式を受け、foldは書かない。額はBBまたはchipで指定できる。
 - strict・冪等・自己完結。未知key、他製品専用key、廃止keyはerror。正規化した実効configを
   `run.toml`へ保存し、外部fileは本文をinline化する。cache pathはconfigに書かない。
 

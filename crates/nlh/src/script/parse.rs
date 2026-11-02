@@ -36,9 +36,8 @@ use crate::{SizeSpec, Street};
 
 impl<V: Vars> Script<V> {
     /// Compiles a `.tree` script source against `dialect`, applying
-    /// `overrides` to any `param` they name. `overrides` keys that do not
-    /// name a declared `param` are an error, as is an override, `param`, or
-    /// `define` value that does not resolve to a single token.
+    /// `overrides` to any `param` they name. Unknown override keys and
+    /// `param` values that do not resolve to a single token are errors.
     pub fn compile(
         source: &str,
         overrides: &BTreeMap<String, String>,
@@ -249,6 +248,12 @@ fn scan_top_level<V: Vars>(
                         }
                         when_tokens.push(token.clone());
                         i += 1;
+                    }
+                    if when_tokens.is_empty() {
+                        return Err(ScriptError {
+                            line: line_at(tokens, i),
+                            message: "expected a condition after 'when'".to_string(),
+                        });
                     }
                 }
                 expect_punct(tokens, &mut i, "{")?;
@@ -527,6 +532,14 @@ fn resolve_declarations<V: Vars>(
                 check_self_and_forward_references(name, tokens, &declared_names, &resolved)?;
                 let expanded = substitute_tokens(tokens, &resolved);
                 check_finite_numbers(&expanded)?;
+                let mut pos = 0;
+                cond::parse_condition(&expanded, &mut pos, dialect)?;
+                if pos != expanded.len() {
+                    return Err(ScriptError {
+                        line: line_at(&expanded, pos),
+                        message: "unexpected token after 'define' condition".to_string(),
+                    });
+                }
                 resolved.insert(name.clone(), Resolution::Define(expanded));
             }
             TopLevel::Street(_) => {}
@@ -923,6 +936,19 @@ mod tests {
             .map(|(k, v)| (k.to_string(), v.to_string()))
             .collect();
         Script::compile(source, &overrides, &TEST_DIALECT)
+    }
+
+    #[test]
+    fn shorthand_when_requires_a_condition() {
+        assert!(compile("flop when { checkdown }").is_err());
+        assert!(compile("flop when unopened { checkdown }").is_ok());
+    }
+
+    #[test]
+    fn unused_define_must_be_a_complete_condition() {
+        assert!(compile("define bad = unknown\nflop { checkdown }").is_err());
+        assert!(compile("define bad = unopened unopened\nflop { checkdown }").is_err());
+        assert!(compile("define good = unopened\nflop { checkdown }").is_ok());
     }
 
     fn base_ctx() -> RuleContext {

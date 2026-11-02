@@ -72,44 +72,42 @@ impl JobRunner {
     /// Returns whether it started; a queued job has no process yet, and its
     /// manifest still says `queued` until one is spawned.
     pub fn submit(&self, run_id: &str, directory: &Path, command: JobCommand) -> Result<bool> {
-        {
-            let mut state = self.state.lock().expect("job state");
-            self.reap(&mut state);
-            if state.running.len() >= self.max_concurrent {
-                state.queue.push_back(Queued {
-                    run_id: run_id.to_string(),
-                    directory: directory.to_path_buf(),
-                    command,
-                });
-                return Ok(false);
-            }
+        let mut state = self.state.lock().expect("job state");
+        self.reap(&mut state);
+        if state.running.len() >= self.max_concurrent || !state.queue.is_empty() {
+            state.queue.push_back(Queued {
+                run_id: run_id.to_string(),
+                directory: directory.to_path_buf(),
+                command,
+            });
+            return Ok(false);
         }
-        self.spawn(run_id, directory, command)?;
+        self.spawn(&mut state, run_id, directory, command)?;
         Ok(true)
     }
 
     /// Starts anything the freed slots can take. Called after reaping.
     pub fn pump(&self) -> Result<()> {
+        let mut state = self.state.lock().expect("job state");
         loop {
-            let next = {
-                let mut state = self.state.lock().expect("job state");
-                self.reap(&mut state);
-                if state.running.len() >= self.max_concurrent {
-                    return Ok(());
-                }
-                state.queue.pop_front()
+            self.reap(&mut state);
+            if state.running.len() >= self.max_concurrent {
+                return Ok(());
+            }
+            let Some(job) = state.queue.pop_front() else {
+                return Ok(());
             };
-            let Some(job) = next else { return Ok(()) };
-            self.spawn(&job.run_id, &job.directory, job.command)?;
+            self.spawn(&mut state, &job.run_id, &job.directory, job.command)?;
         }
     }
 
     /// Asks a running job to stop.
     ///
     /// An interrupt rather than a kill: the CLI treats it as a cooperative
-    /// cancel, finishing the current evaluation boundary and writing a
-    /// checkpoint, so the run stays resumable. Unix sends SIGINT; Windows
-    /// sends Ctrl-Break to the child's own process group. A queued job is
+    /// cancel, finishing at an evaluation boundary and saving a final
+    /// checkpoint when configured. Resumability depends on a checkpoint
+    /// actually being present. Unix sends SIGINT; Windows sends Ctrl-Break
+    /// to the child's own process group. A queued job is
     /// persisted as canceled before it is removed from the queue. A signal
     /// or manifest write that fails is an error, never a silent no-op.
     pub fn cancel(&self, run_id: &str) -> Result<CancelOutcome> {
@@ -151,7 +149,13 @@ impl JobRunner {
             || state.queue.iter().any(|queued| queued.run_id == run_id)
     }
 
-    fn spawn(&self, run_id: &str, directory: &Path, command: JobCommand) -> Result<()> {
+    fn spawn(
+        &self,
+        state: &mut RunnerState,
+        run_id: &str,
+        directory: &Path,
+        command: JobCommand,
+    ) -> Result<()> {
         let mut process = Command::new(&self.solver);
         if let Some(cache) = &self.cache_dir {
             process.arg("--cache-dir").arg(cache);
@@ -191,7 +195,7 @@ impl JobRunner {
             .spawn()
             .with_context(|| format!("spawning {}", self.solver.display()))?;
 
-        self.state.lock().expect("job state").running.push(Running {
+        state.running.push(Running {
             run_id: run_id.to_string(),
             child,
         });
@@ -326,6 +330,25 @@ mod tests {
         }
         drop(state);
         runner.pump().unwrap();
+    }
+
+    #[test]
+    fn failed_queued_spawn_does_not_block_later_jobs() {
+        let (base, runner) = runner(1);
+        let later = run_dir(base.path(), "later");
+        {
+            let mut state = runner.state.lock().unwrap();
+            state.queue.push_back(Queued {
+                run_id: "first".into(),
+                directory: base.path().join("missing"),
+                command: JobCommand::Solve,
+            });
+        }
+        assert!(!runner.submit("later", &later, JobCommand::Solve).unwrap());
+        assert!(runner.pump().is_err());
+        let state = runner.state.lock().unwrap();
+        assert_eq!(state.queue.len(), 1);
+        assert_eq!(state.queue[0].run_id, "later");
     }
 
     #[test]

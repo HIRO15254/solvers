@@ -18,6 +18,7 @@ const SECTIONS: Section[] = [
     steps: [
       "Setup builds one spot in steps: Table, Start, Range, Tree and Solver. The tabs switch steps; Next goes on in order.",
       "On the Table step, set the players, stacks, blinds, antes and the economics (cash or tournament).",
+      "Table stack, blind, ante and rake-cap amounts default to BB. In those fields, enter an Nc suffix for exact chips; BB amounts are rounded to chips using the table's chip rounding setting.",
       "The name above the table names the spot, the run and the saved TOML (in the run id and file name, spaces and other symbols become _). Leave it empty to use the automatic name shown as its placeholder; it follows the spot.",
       "The table view shows the replayed spot: the street, the pot, the effective stack and SPR, the board, and OOP / IP tags on the two players left.",
     ],

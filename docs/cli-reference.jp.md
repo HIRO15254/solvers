@@ -427,11 +427,12 @@ iso併合dealは代表cardに`*`を付ける。member表示のremapは未対応�
 ## `solvers report`
 
 ```sh
-solvers report <CONFIG> [--boards LIST] [--boards-file PATH] [--output PATH]
+solvers report <CONFIG> (--boards LIST | --boards-file PATH) [--output PATH]
 ```
 
 P1専用。各boardで`spot.board`を置き換えてlineを再生し、root集計のCSVを出す。
 boardはlineの開始streetに合う必要がある。storage・並列設定を使い、max_timeはboardごとに判定する。
+`--boards`と`--boards-file`はどちらか一方を必ず指定する。
 
 | flag | 意味 |
 |---|---|

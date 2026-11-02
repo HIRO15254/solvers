@@ -192,6 +192,9 @@ struct ShapeCursor {
 }
 
 impl PublicTree {
+    /// Compiles a builder-owned tree, panicking if a node has no children or
+    /// exceeds the child-count or node-index limits, or a reach map reference
+    /// or input dimension is invalid.
     pub fn compile(spec: TreeSpec) -> PublicTree {
         let mut tree = PublicTree {
             nodes: Vec::new(),
@@ -257,6 +260,9 @@ impl PublicTree {
         let count = shape.nodes.len();
         if count == 0 {
             return Err(ShapeError("a tree needs a root"));
+        }
+        if count > u32::MAX as usize {
+            return Err(ShapeError("tree exceeds the node index limit"));
         }
         for tr in &shape.transitions {
             if tr
@@ -499,6 +505,17 @@ impl PublicTree {
     }
 
     fn reserve_children(&mut self, n: usize) -> u32 {
+        assert!(
+            u16::try_from(n).is_ok(),
+            "node exceeds the child count limit"
+        );
+        assert!(
+            self.nodes
+                .len()
+                .checked_add(n)
+                .is_some_and(|end| end <= u32::MAX as usize),
+            "tree exceeds the node index limit"
+        );
         let first = self.nodes.len() as u32;
         self.nodes.extend((0..n).map(|_| placeholder_node()));
         self.tags.extend((0..n).map(|_| 0));
@@ -648,6 +665,30 @@ mod tests {
             player,
             children,
             tag: 0,
+        }
+    }
+
+    #[test]
+    fn compile_rejects_oversized_child_blocks() {
+        let maps = PerPlayer::new(ReachMap::Identity, ReachMap::Identity);
+        for chance in [false, true] {
+            let root = if chance {
+                TempNode::Chance {
+                    deals: (0..=u16::MAX).map(|_| (1.0, maps, terminal(0))).collect(),
+                    tag: 0,
+                }
+            } else {
+                action(Player::P0, (0..=u16::MAX).map(|_| terminal(0)).collect())
+            };
+            assert!(
+                std::panic::catch_unwind(|| PublicTree::compile(TreeSpec {
+                    root,
+                    masks: Vec::new(),
+                    transitions: Vec::new(),
+                    root_dims: PerPlayer::new(1, 1),
+                }))
+                .is_err()
+            );
         }
     }
 

@@ -112,6 +112,8 @@ fn frozen_relock_agrees_with_equivalently_restricted_base() {
     }
     let a = results[0].1.stored_strategy(0).unwrap().unwrap();
     let b = results[1].1.stored_strategy(0).unwrap().unwrap();
+    assert!(!a.is_empty());
+    assert_eq!(a.len(), b.len());
     for (x, y) in a.iter().zip(b) {
         assert!((x - y).abs() <= tolerance as f32);
     }

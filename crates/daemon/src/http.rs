@@ -63,7 +63,10 @@ impl Daemon {
                     }
                 })
                 .unwrap_or_else(|| "127.0.0.1".to_string());
-            let url = format!("{scheme}://{host}:{port}/#token={}", self.token);
+            let url = format!(
+                "{scheme}://{host}:{port}/#token={}",
+                encode_fragment(&self.token)
+            );
             println!("gui: {url}");
             if open {
                 // Some browser launchers wait for the browser to close. Never
@@ -288,6 +291,21 @@ impl Daemon {
     }
 }
 
+/// Encode a token as one URL fragment parameter value.
+fn encode_fragment(value: &str) -> String {
+    use std::fmt::Write;
+
+    let mut encoded = String::new();
+    for byte in value.bytes() {
+        if byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'.' | b'_' | b'~') {
+            encoded.push(char::from(byte));
+        } else {
+            write!(encoded, "%{byte:02X}").expect("writing to a String cannot fail");
+        }
+    }
+    encoded
+}
+
 fn open_browser(url: &str) -> Result<()> {
     #[cfg(target_os = "windows")]
     let mut command = {
@@ -404,6 +422,14 @@ fn send_bytes(request: Request, status: u16, body: &[u8], content_type: &str) ->
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn fragment_token_is_encoded_as_one_value() {
+        let token = "a&b=%# +";
+        let encoded = encode_fragment(token);
+        assert_eq!(encoded, "a%26b%3D%25%23%20%2B");
+        assert_eq!(decode_component(&encoded, false).unwrap(), token);
+    }
 
     #[test]
     fn query_values_are_read_by_name() {

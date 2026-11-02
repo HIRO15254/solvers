@@ -352,8 +352,8 @@ BB = "random"
 - 169 classはpair（`AA`、6 combo）、suited（`AKs`、4 combo）、offsuit（`AKo`、12 combo）である。
   suffix無しの非pair（`AK`）はsuitedとoffsuitの両方である。rank順は入れ替えられる。
   rankと`s`/`o`は大小文字を受ける。pairに`s`/`o`は付けられない。
-- `22+`は22〜AA。`A2s+`は先頭rankを固定し、kickerを2〜Kへ上げる。両端を含む。
-- `TT-77`はpair区間、`ATs-A5s`は同じ先頭rankのkicker区間、`T9s-54s`・`J9s-64s`は
+- `22+`は22〜AA。`A2s+`は高いrankを固定し、kickerを2〜Kへ上げる。両端を含む。
+- `TT-77`はpair区間、`ATs-A5s`は同じ高いrankのkicker区間、`T9s-54s`・`J9s-64s`は
   同じrank差を保つ区間である。両端の順序はどちらでもよい。suitednessは両端で一致させる。
 - `AhKh`は具体的な2枚のcomboである。同じcardを2回使えない。comboのcard順は問わない。
 - `AA:0.5`・`A2s+:0.25`はそのentryのweightを指定する。省略時1。有限の`f32`、0..1である。
@@ -394,7 +394,7 @@ flop { replace bet [33%, 75%] }
 
 ### scriptの構造
 
-scriptは宣言とstreet blockの列である。コメントは`#`から行末までである。
+scriptは宣言とstreet blockの列である。引用textの外では`#`から行末までがコメントである。
 streetは`preflop` / `flop` / `turn` / `river`、actionは`fold` / `check` / `call` / `bet` / `raise`である。
 
 ```text
@@ -492,7 +492,7 @@ street blockは宣言を解決した後に展開する。正規化はscript本�
 `add`、`remove`、`replace`、`force`、`jam`、`merge`、`within`、`checkdown`、`fold`、`check`、`call`、`bet`、`raise`、
 `true`、`false`、`a`、`e`、`min`である。param/defineに使うと`NLH003`である。
 
-param schemaは名前、実効値、型、説明を持つ。説明は宣言直前の連続するコメント行である。
+param schemaは名前、実効値、型、説明を持つ。説明は宣言直前の連続するコメント専用行である。
 型は解決後の実効tokenから数値なら`number`、true/falseなら`bool`、他は`token`とする。
 範囲や選択肢は宣言せず、使用箇所で検証する。
 `validate`の`tree.params`は`name` / `kind` / `value`（string）/ `description`（無ければnull）の配列である。
@@ -581,7 +581,7 @@ hole cardと任意historyは条件変数に含めない。
 ### size literalと解決順序
 
 sizeは引用符無しのtokenである。数値部は符号・指数表記無しの10進数、有限かつ正である。
-接尾辞なしの数値と`Nbb`はBB、`Nc`は正の整数N chip、`N%`はpot比である（第5節の額の値と同じ単位規則）。
+接尾辞なしの数値と`Nbb`はBB、`Nc`は先頭に0を付けない正の整数N chip、`N%`はpot比である（第5節の額の値と同じ単位規則）。
 BBのsizeは第5節の方式で整数chipへ丸め、書いた額が丸めで変わればwarningにscriptの位置と丸め後のchip数を示す。
 `N%`のNは1以上、`Nx`はN > 1、`Ne`は整数1..255である。
 `%stack`と`%effective`のNに100の上限は無く、候補sizeの解決時にstack capを適用する（`jam`の閾値と`merge`の幅には適用しない）。
@@ -830,7 +830,7 @@ final_checkpoint = true      # P1のみ。既定true。falseは終了時の再�
 
 | 製品 | key | 値 |
 |---|---|---|
-| P1 | `solution_streets` | 既定`"full"`。`"no-rivers"`はriverのnodeを保存しない（旧`--sol-streets`） |
+| P1 | `solution_streets` | 既定`"full"`。`"no-rivers"`は木と索引を保持し、riverの戦略・値blockを保存しない（旧`--sol-streets`）。River開始のspotでは`"full"`に切り替える |
 | P2 | `probability_encoding` | 既定`"u16"`。`"f32"`は研究・確認用 |
 
 ## 13. 正規化・診断・error

@@ -12,8 +12,8 @@
 //! under suit permutations that fix both players' ranges.
 //!
 //! The terminal kernels (sorted-rank showdown sweep, inclusion-exclusion
-//! fold) live in [`crate::kernel`] and are shared verbatim with the
-//! river-only shim in [`crate::river`].
+//! fold) live in [`crate::kernel`] and are shared across all starting streets,
+//! including river-only games.
 
 use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet};
@@ -103,7 +103,7 @@ pub struct PostflopConfig {
     /// Chips behind for each player, at the start of the subgame.
     pub effective_stack: Chips,
     /// Betting grammar per street: the tree-script rules that build each
-    /// node's action menu, plus the optional all-in default.
+    /// node's action menu.
     pub streets: PerStreet<StreetTree>,
     /// Smallest legal opening bet and smallest legal raise increment — the
     /// big blind's role in a game that has no blinds. `SizeSpec::MinRaise`
@@ -126,8 +126,8 @@ pub struct PostflopConfig {
     /// The last player to bet or raise before this subgame began. Exists
     /// only to define the `cbet`/`donk` tree-script variables on the
     /// starting street (see `rule_context`); it affects nothing else, and in
-    /// particular is unrelated to `StreetTree`'s own `previous_aggressor`
-    /// bookkeeping across streets *within* the subgame.
+    /// particular is unrelated to the previous-aggressor bookkeeping across
+    /// streets *within* the subgame.
     pub preflop_aggressor: Option<Player>,
 }
 

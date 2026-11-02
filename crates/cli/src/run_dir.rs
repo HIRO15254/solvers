@@ -73,12 +73,12 @@ pub(crate) fn lock_directory(directory: &Path) -> Result<()> {
 /// state, and a daemon restart has to find them again.
 pub fn create_or_adopt(directory: &Path) -> Result<()> {
     lock_directory(directory)?;
-    let entries: Vec<String> = std::fs::read_dir(directory)
+    let mut entries: Vec<String> = std::fs::read_dir(directory)
         .with_context(|| format!("reading {}", directory.display()))?
-        .filter_map(Result::ok)
-        .map(|entry| entry.file_name().to_string_lossy().into_owned())
-        .filter(|name| name != runfiles::RUN_LOCK_FILE)
-        .collect();
+        .map(|entry| entry.map(|entry| entry.file_name().to_string_lossy().into_owned()))
+        .collect::<std::io::Result<Vec<_>>>()
+        .with_context(|| format!("reading {}", directory.display()))?;
+    entries.retain(|name| name != runfiles::RUN_LOCK_FILE);
     if entries.is_empty() {
         return Ok(());
     }
@@ -161,18 +161,26 @@ impl RunRecorder {
         effective_config: &str,
         command: Vec<String>,
     ) -> Result<Self> {
+        let previous = match RunManifest::read(directory) {
+            Ok(previous) => previous,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                return Self::start(
+                    directory,
+                    game_kind,
+                    config_schema,
+                    config_hash,
+                    effective_config,
+                    command,
+                );
+            }
+            Err(error) => {
+                return Err(error).with_context(|| {
+                    format!("reading the run manifest in {}", directory.display())
+                });
+            }
+        };
         std::fs::write(directory.join(RUN_CONFIG_FILE), effective_config)
             .with_context(|| format!("writing {RUN_CONFIG_FILE} in {}", directory.display()))?;
-        let Ok(previous) = RunManifest::read(directory) else {
-            return Self::start(
-                directory,
-                game_kind,
-                config_schema,
-                config_hash,
-                effective_config,
-                command,
-            );
-        };
         let mut manifest = RunManifest::new(
             previous.run_id,
             game_kind,
@@ -305,6 +313,28 @@ mod tests {
         std::fs::write(run.join("stray.txt"), "x").unwrap();
         let error = create_or_adopt(&run).unwrap_err().to_string();
         assert!(error.contains("not empty"), "{error}");
+    }
+
+    #[test]
+    fn reopening_a_corrupt_manifest_preserves_existing_files() {
+        let directory = tempfile::tempdir().unwrap();
+        let manifest = directory.path().join(RUN_MANIFEST_FILE);
+        let config = directory.path().join(RUN_CONFIG_FILE);
+        std::fs::write(&manifest, b"invalid json").unwrap();
+        std::fs::write(&config, b"original config").unwrap();
+        assert!(
+            RunRecorder::reopen(
+                directory.path(),
+                "hu-postflop",
+                None,
+                [0; 32],
+                "new",
+                vec![]
+            )
+            .is_err()
+        );
+        assert_eq!(std::fs::read(manifest).unwrap(), b"invalid json");
+        assert_eq!(std::fs::read(config).unwrap(), b"original config");
     }
 
     #[test]

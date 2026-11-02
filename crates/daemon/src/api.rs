@@ -337,8 +337,13 @@ impl Api {
         let directory = self
             .runs
             .allocate(requested_id, runfiles::unix_millis())
-            .map_err(|error| ErrorResponse::new(ErrorCode::Conflict, error.to_string()))?;
-        std::fs::create_dir_all(&directory).map_err(internal)?;
+            .map_err(|error| {
+                if error.downcast_ref::<std::io::Error>().is_some() {
+                    internal(error)
+                } else {
+                    ErrorResponse::new(ErrorCode::Conflict, error.to_string())
+                }
+            })?;
         std::fs::write(directory.join(runfiles::RUN_CONFIG_FILE), config).map_err(internal)?;
 
         let run_id = directory
@@ -377,6 +382,10 @@ impl Api {
     /// A page of a run's event log, starting at `from` bytes.
     pub fn events(&self, run_id: &str, from: u64) -> ApiResult<EventPage> {
         let directory = self.run_directory(run_id)?;
+        // Observe terminal state before reading the log: the writer appends
+        // final events before publishing the terminal manifest.
+        let manifest = RunManifest::read(&directory).map_err(internal)?;
+        let terminal = manifest.observed_state().is_terminal();
         let path = RunEventLog::path_in(&directory);
         let (events, next_offset) = match read_events(&path, from) {
             Ok(page) => page,
@@ -385,11 +394,10 @@ impl Api {
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => (Vec::new(), from),
             Err(error) => return Err(internal(error)),
         };
-        let manifest = RunManifest::read(&directory).map_err(internal)?;
         Ok(EventPage {
             events,
             next_offset,
-            terminal: manifest.observed_state().is_terminal(),
+            terminal,
         })
     }
 
@@ -581,10 +589,9 @@ impl Api {
     /// dropped them would make "the daemon keeps no state" a lie rather
     /// than a design (R2, R11).
     ///
-    /// Runs the previous daemon was *executing* are left alone. Their
-    /// process died with it, so they read as `interrupted`, and continuing
-    /// one is a decision with a cost -- it re-solves from the last
-    /// checkpoint -- that belongs to whoever asks for it.
+    /// Runs the previous daemon was *executing* are left alone. A still-live
+    /// child continues; a dead owner is observed as `interrupted`. Continuing
+    /// an interrupted run from its checkpoint requires an explicit request.
     pub fn recover(&self) -> Recovered {
         let mut recovered = Recovered::default();
         let Ok(runs) = self.runs.list() else {

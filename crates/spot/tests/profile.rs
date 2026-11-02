@@ -89,11 +89,6 @@ fn invalid_profiles_are_diagnosed() {
             Code::NLH003,
         ),
         (
-            "[[profile.lock]]\nnode = ''\nstrategy = { check = 1 }",
-            "must not be empty",
-            Code::NLH003,
-        ),
-        (
             "[[profile.lock]]\nnode = 'x'\nhands = 'AA'\ncategory = 'x'\nstrategy = { check = 1 }",
             "mutually exclusive",
             Code::NLH003,

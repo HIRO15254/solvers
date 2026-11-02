@@ -22,7 +22,7 @@ CIの定義は次の3つである。
 |---|---|---|
 | [CI](../.github/workflows/ci.yml) | mainへのpush、pull request | 文書・Python、Web GUI、必須検証とP1専用build、Windows・macOSのCLI・daemon smoke |
 | [Long-running acceptance](../.github/workflows/acceptance.yml) | 手動 | release buildでignored試験を含む全試験（3.4節） |
-| [Release](../.github/workflows/release.yml) | `v*` tagのpush、手動 | 第三者表記の照合、配布archiveのbuildとsmoke、draft Release（第6節） |
+| [Release](../.github/workflows/release.yml) | `v*` tagのpush、手動 | 第三者表記の照合、配布archiveのbuildとsmoke。tagの場合はdraft Releaseも作成（第6節） |
 
 `.cargo/config.toml`はローカルCPU向けの`target-cpu=native`を設定する。CIとReleaseはRUSTFLAGSで上書きしてportableにbuildする。
 CIはstableを追うため、再現性が必要な実行と受入証拠には`rustc -Vv`、`cargo -V`、OS、CPU/RAM、Cargo.lockとビルド設定を記録する。

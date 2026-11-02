@@ -914,8 +914,8 @@ fn drive_ready<S: Storage>(
     if let Some(profile) = &summary.profile {
         summary.frequencies.clone_from(&profile.frequencies);
     }
-    diagnostics(Diagnostic::Done(summary.clone()));
     summary.canceled = canceled;
+    diagnostics(Diagnostic::Done(summary.clone()));
     let final_checkpoint =
         p.document.spot.run.final_checkpoint && saved_iteration != Some(solver.iteration());
     let spec = crate::artifact::SolExportSpec {
@@ -1334,6 +1334,7 @@ target = 0.5
         )
         .unwrap();
         let mut history = Vec::new();
+        let mut diagnostic_canceled = None;
         let partial = run(
             request(&p, &cancel, &partial_ckpt, &partial_sol, None, Vec::new()),
             &mut |event| {
@@ -1345,10 +1346,15 @@ target = 0.5
                 }
                 Ok(())
             },
-            &mut |_| {},
+            &mut |event| {
+                if let Diagnostic::Done(summary) = event {
+                    diagnostic_canceled = Some(summary.canceled);
+                }
+            },
         )
         .unwrap();
         assert!(partial.canceled);
+        assert_eq!(diagnostic_canceled, Some(true));
         cancel.store(false, Ordering::SeqCst);
         let changed = p.effective.replace("target = 0.5", "target = 0.6");
         assert!(crate::prepare::restore(&changed, &partial_ckpt).is_err());

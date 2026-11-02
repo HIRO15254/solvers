@@ -55,8 +55,8 @@ export const ALL_CLASSES: string[] = RANKS.split("").flatMap((_, i) => RANKS.spl
 const RANK = "[AKQJT2-9]";
 const COMBO = new RegExp(`^(${RANK})([shdc])(${RANK})([shdc])$`, "i");
 const SINGLE = new RegExp(`^(${RANK})(${RANK})([so]?)(\\+?)$`, "i");
-const SPAN = new RegExp(`^(${RANK})(${RANK})([so]?)-(${RANK})(${RANK})([so]?)$`, "i");
-const WEIGHT = /^\d+(\.\d+)?$/;
+const SPAN = new RegExp(`^(${RANK})(${RANK})([so]?)\\s*-\\s*(${RANK})(${RANK})([so]?)$`, "i");
+const WEIGHT = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/;
 
 /** One class described by rank indexes (`hi <= lo`) and suitedness (`""` = both). */
 interface ClassRef {
@@ -121,7 +121,7 @@ function expand(entry: string): ClassRef[] | string {
 export function parseRange(text: string): ParsedRange {
   const weights: Weights = new Map();
   const errors: string[] = [];
-  if (text.trim() === "random") {
+  if (text === "random") {
     for (const name of ALL_CLASSES) for (const combo of classCombos(name)) weights.set(combo, 1);
     return { weights, errors };
   }
@@ -132,9 +132,9 @@ export function parseRange(text: string): ParsedRange {
     const colon = entry.indexOf(":");
     if (colon >= 0) {
       const value = entry.slice(colon + 1).trim();
-      weight = Number(value);
-      if (!WEIGHT.test(value) || weight > 1) {
-        errors.push(`${raw.trim()}: weight must be a decimal number in 0..1`);
+      weight = Math.fround(Number(value));
+      if (!WEIGHT.test(value) || !Number.isFinite(weight) || weight < 0 || weight > 1) {
+        errors.push(`${raw.trim()}: weight must be a finite number in 0..1`);
         continue;
       }
       entry = entry.slice(0, colon).trim();

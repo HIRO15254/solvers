@@ -37,7 +37,7 @@ pub use tree::{
 };
 
 /// Arithmetic precision of CFR terminals and current-strategy regret matching.
-/// Evaluation and average strategy retain their f64 arithmetic in either mode.
+/// Evaluation and average-strategy computation are independent of this setting.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "lowercase"))]

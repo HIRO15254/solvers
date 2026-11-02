@@ -595,8 +595,7 @@ pub(crate) fn decimal_amount(
     nonzero(amount, key, zero)
 }
 
-/// Whole chips of a decoded BB key; [`validate_bb_literals`] already proved
-/// the shortest `f64` spelling is the written decimal.
+/// Whole chips of a decoded BB key when its original spelling is unavailable.
 fn bb_amount(
     number: f64,
     key: &str,
@@ -629,7 +628,7 @@ fn numeric_decimal(text: &str) -> Option<String> {
     let cleaned = text.replace('_', "");
     let cleaned = cleaned.strip_prefix('+').unwrap_or(&cleaned);
     if cleaned.starts_with('-') {
-        return None;
+        return (exact_decimal(cleaned) == Some((0, 0))).then(|| "0".to_owned());
     }
     for (prefix, radix) in [("0x", 16), ("0o", 8), ("0b", 2)] {
         if let Some(digits) = cleaned.strip_prefix(prefix) {
@@ -1328,7 +1327,8 @@ fn tree(
     warnings: &mut Vec<String>,
 ) -> Result<Tree, SpotError> {
     if raw.script.is_some() && raw.source.is_some() {
-        return Err(value_error(
+        return Err(SpotError::new(
+            Code::NLH002,
             "tree.source",
             "script and source are mutually exclusive",
         ));
@@ -1525,6 +1525,57 @@ fn run(raw: RawRun, product: Product) -> Result<Run, SpotError> {
 #[cfg(test)]
 mod rounding_warning_tests {
     use super::*;
+
+    #[test]
+    fn tree_source_and_script_conflict_is_a_shape_error() {
+        let raw = RawTree {
+            script: Some(String::new()),
+            source: Some("tree.txt".into()),
+            ..Default::default()
+        };
+        let error = tree(
+            raw,
+            Path::new("config.toml"),
+            Product::HuPostflop,
+            ChipScale::DEFAULT,
+            Rounding::Nearest,
+            &mut Vec::new(),
+        )
+        .unwrap_err();
+        assert_eq!(error.code, Code::NLH002);
+    }
+
+    #[test]
+    fn numeric_negative_zero_is_zero_but_negative_amounts_are_rejected() {
+        let scale = ChipScale::DEFAULT;
+        for spelling in ["-0", "-0.0", "-0e10"] {
+            let value = Value::String(format!("\0{spelling}"));
+            assert_eq!(
+                amount(
+                    &value,
+                    "table.ante",
+                    true,
+                    scale,
+                    Rounding::Nearest,
+                    &mut Vec::new()
+                )
+                .unwrap(),
+                MwChips::ZERO
+            );
+        }
+        let value = Value::String("\0-0.001".into());
+        assert!(
+            amount(
+                &value,
+                "table.ante",
+                true,
+                scale,
+                Rounding::Nearest,
+                &mut Vec::new()
+            )
+            .is_err()
+        );
+    }
 
     #[test]
     fn warnings_follow_effective_size_uses_not_parameter_declarations() {

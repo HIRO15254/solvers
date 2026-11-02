@@ -56,7 +56,7 @@ HU-R0-001の参照と同じライブラリだが、fixtureはSOL-8の取得か�
 
 | cases.csvの列 | `solvers.nlh/v1` |
 |---|---|
-| `table_players`、`stack_bb` | `[table] players`、`stack_bb` |
+| `table_players`、`stack_bb` | `[table] players`、`stack`（BB値） |
 | `preflop_actions`（例 `UTG F; HJ F; CO F; BTN R2.5; SB F; BB C`） | `[spot] line`のPreflop部（`BTN r2.5, BB c`） |
 | `postflop_actions`（例 `Flop X-X; Turn X-X`） | `[spot] line`のPostflop部（`BB x, BTN x / BB x, BTN x`） |
 | `board` | `[spot] board` |

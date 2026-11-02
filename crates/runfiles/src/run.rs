@@ -445,15 +445,18 @@ pub fn unix_millis() -> u64 {
 
 #[cfg(unix)]
 fn process_is_alive(pid: u32, _started_unix_ms: u64) -> bool {
-    // `kill` treats pid 0 as "every process in my group", so it would report
-    // alive for a manifest that never recorded a real pid. Rule it out first.
+    // Non-positive values address process groups (or all permitted processes)
+    // rather than one process. Reject both zero and out-of-range manifest pids.
+    let Ok(pid) = libc::pid_t::try_from(pid) else {
+        return false;
+    };
     if pid == 0 {
         return false;
     }
     // Signal 0 performs the permission and existence checks without
     // delivering anything. EPERM means the process exists but belongs to
     // someone else, which still counts as alive.
-    let result = unsafe { libc::kill(pid as libc::pid_t, 0) };
+    let result = unsafe { libc::kill(pid, 0) };
     if result == 0 {
         return true;
     }
@@ -641,6 +644,14 @@ mod tests {
         // so it stands in for "no owning process was recorded".
         current.pid = 0;
         assert!(current.is_stale());
+        assert_eq!(current.observed_state(), RunState::Interrupted);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn out_of_range_pid_does_not_probe_a_process_group() {
+        let mut current = manifest();
+        current.pid = u32::MAX;
         assert_eq!(current.observed_state(), RunState::Interrupted);
     }
 

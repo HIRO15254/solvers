@@ -711,7 +711,7 @@ fn flop_solve_is_zero_sum() {
 /// deviating.
 #[test]
 #[ignore = "flop-starting trees run two chance deals (~6k nodes); CI runs it in release"]
-fn allin_runout_matches_direct_equity() {
+fn allin_runout_is_zero_sum_and_nearly_unexploitable() {
     let config = PostflopConfig {
         board: merged_flop(),
         ranges: PerPlayer::new("AA".parse().unwrap(), "KK".parse().unwrap()),

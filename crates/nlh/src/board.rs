@@ -20,7 +20,7 @@ use crate::card::{Card, Rank};
 /// `BoardFacts` to plain counts also keeps it small and `Copy`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct BoardFacts {
-    /// Number of cards summarized: 3, 4, or 5.
+    /// Number of cards summarized: 1 through 5.
     pub cards: u8,
     /// Distinct suits present on the board.
     pub suits: u8,
@@ -42,7 +42,7 @@ pub struct BoardFacts {
 }
 
 impl BoardFacts {
-    /// Summarizes a dealt board of 3 (flop), 4 (turn), or 5 (river) cards.
+    /// Summarizes a nonempty board of at most five cards.
     ///
     /// Panics if `board` is empty, has more than 5 cards, or repeats a
     /// card.

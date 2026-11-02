@@ -33,7 +33,11 @@ export class ApiError extends Error {
 export function adoptTokenFromLocation(): void {
   const match = /(?:^#|&)token=([^&]+)/.exec(window.location.hash);
   if (!match?.[1]) return;
-  localStorage.setItem(TOKEN_KEY, decodeURIComponent(match[1]));
+  try {
+    localStorage.setItem(TOKEN_KEY, decodeURIComponent(match[1]));
+  } catch (error) {
+    if (!(error instanceof URIError)) throw error;
+  }
   const rest = window.location.hash.replace(/(^#|&)token=[^&]+/, "$1").replace(/^#&/, "#");
   history.replaceState(null, "", window.location.pathname + window.location.search + (rest === "#" ? "" : rest));
 }

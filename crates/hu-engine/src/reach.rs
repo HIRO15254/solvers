@@ -50,7 +50,7 @@ pub fn path_from_root(parents: &[NodeId], target: NodeId) -> Vec<NodeId> {
 }
 
 /// Mapped dimension of one player's reach vector across a chance deal.
-/// Mirrors `PublicTree`'s private `mapped_dim` (used at compile time to size
+/// Mirrors `PublicTree::mapped_dim` (used at compile time to size
 /// child storage): `Identity`/`Mask` never change the dimension; only a
 /// `Transition` can, per [`ReachMap`]'s doc comment.
 fn mapped_len(tree: &PublicTree, map: ReachMap, in_len: usize) -> usize {

@@ -1,14 +1,26 @@
 //! How many table chips make one big blind, and exact conversion between
 //! chip counts and big-blind decimals.
 
-use serde::{Deserialize, Serialize};
+use serde::de::Error as _;
+use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::table::{ChipAmountError, MwChips};
 
 /// Table chips per big blind. One internal unit is one table chip.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize)]
 #[serde(transparent)]
 pub struct ChipScale(u64);
+
+impl<'de> Deserialize<'de> for ChipScale {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let chips_per_bb = u64::deserialize(deserializer)?;
+        Self::new(chips_per_bb)
+            .ok_or_else(|| D::Error::custom("chips per big blind must be between 1 and 1000000"))
+    }
+}
 
 impl Default for ChipScale {
     fn default() -> Self {
@@ -261,6 +273,17 @@ mod tests {
 
     fn scale(n: u64) -> ChipScale {
         ChipScale::new(n).unwrap()
+    }
+
+    #[test]
+    fn deserialization_enforces_scale_bounds() {
+        assert!(serde_json::from_str::<ChipScale>("0").is_err());
+        assert!(serde_json::from_str::<ChipScale>("1000001").is_err());
+        assert_eq!(serde_json::from_str::<ChipScale>("1").unwrap(), scale(1));
+        assert_eq!(
+            serde_json::from_str::<ChipScale>("1000000").unwrap(),
+            scale(1_000_000)
+        );
     }
 
     #[test]

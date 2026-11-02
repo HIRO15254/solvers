@@ -127,7 +127,7 @@ N6の結果（2026-10-29）: GUIのLock & re-solveはlock・incentive・頻度�
 （clientはhost pathでなくrun IDを送る）。両方を実daemonとbrowserで確認した。頻度目標は部分木solveで更新し、強制全木との頻度・λの差は`1e-5`以内。
 suit非対称selectorは基準解の手順をprofile木へ写して上流固定する。基準解のgroupingがprofile木より細かく代表が一意に決まらない場合の拒否は残す
 （[P1規範](../hu-postflop.jp.md)）。`no-rivers`の`.sol`はRiverの制約（lock・incentive・頻度目標の最終λ・固定戦略）を保存し、
-遅延再solveに適用する（`.sol` v6）。上流固定runの見積りと時間は[資源効率計画](p1-efficiency.jp.md)のC8に記録した。
+遅延再solveに適用する（現行形式は[P1規範](../hu-postflop.jp.md)を参照）。上流固定runの見積りと時間は[資源効率計画](p1-efficiency.jp.md)のC8に記録した。
 
 ## 6. 制約
 

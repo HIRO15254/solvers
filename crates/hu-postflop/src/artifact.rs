@@ -1941,14 +1941,8 @@ memory = "1GiB"
     /// strength either, not a re-solve defect. Symmetrically, a node the
     /// trunk's average strategy essentially never reaches (e.g. anything
     /// under the root's `bet` line) has an all-but-empty reach vector (no
-    /// two survivors to compute a spread from, so it's filtered out too)
-    /// and is both meaningless to compare and reproducibly crashes
-    /// `SolProvider::solve_river` (`river_resolve_config` builds a `Range`
-    /// with every weight clamped to ~0, and `build_postflop_game` panics
-    /// with "ranges share no compatible combos") -- a pre-existing
-    /// limitation of the re-solve path when asked to navigate to an
-    /// effectively-unreachable node, out of scope for this test to fix, but
-    /// worth steering around here rather than tripping over by accident.
+    /// two survivors to compute a spread from, so it's filtered out too).
+    /// The re-solve rejects a seat whose reaches are all at most 1e-9.
     /// The one spread-passing line this fixture has (facing a turn bet,
     /// where OOP's call/fold split genuinely depends on hand strength)
     /// checks out beautifully (aggregate diffs several orders of magnitude

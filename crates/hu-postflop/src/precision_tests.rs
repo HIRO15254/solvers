@@ -48,6 +48,8 @@ fn game() -> PostflopGame {
 // Zero-valued CFVs make pointwise relative error undefined. Report the relative
 // infinity-norm error max|variant-exact| / max|exact| for each terminal vector.
 fn relative_error(exact: &[f32], variant: &[f32]) -> f64 {
+    assert_eq!(exact.len(), variant.len());
+    assert!(exact.iter().all(|v| v.is_finite()));
     let scale = exact.iter().map(|v| f64::from(v.abs())).fold(0.0, f64::max);
     let error = exact
         .iter()

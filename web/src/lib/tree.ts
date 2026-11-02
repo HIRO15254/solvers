@@ -54,12 +54,14 @@ export function wagersAt(history: string, bbChips: number): { wager: Record<Seat
   return { wager, earlier };
 }
 
-/** The stacks behind at the tree's root, by role, or null when the start is unknown. */
+/** The effective stacks behind at the tree's root, or null when the start is unknown. */
 export function rootStacks(start: StartState | null | undefined): Record<Seat, number> | null {
   const stack = (seat: number) => start?.seats.find((s) => s.seat === seat)?.remaining_stack;
   const oop = start && stack(start.oop.seat);
   const ip = start && stack(start.ip.seat);
-  return oop != null && ip != null ? { oop, ip } : null;
+  if (oop == null || ip == null) return null;
+  const effective = Math.min(oop, ip);
+  return { oop: effective, ip: effective };
 }
 
 /** The action at `index` of an action row, sized against the node's pot and wagers. */

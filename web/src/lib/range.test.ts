@@ -11,6 +11,7 @@ describe("parseRange", () => {
     expect(classesOf("ATs-A8s")).toEqual(new Set(["ATs", "A9s", "A8s"]));
     expect(classesOf("T9s-87s")).toEqual(new Set(["T9s", "98s", "87s"]));
     expect(classesOf("77-99")).toEqual(new Set(["77", "88", "99"]));
+    expect(classesOf("77 - 99")).toEqual(new Set(["77", "88", "99"]));
     expect(classesOf("KA")).toEqual(new Set(["AKs", "AKo"]));
   });
 
@@ -18,6 +19,11 @@ describe("parseRange", () => {
     const { weights, errors } = parseRange("AA, AKs:0.5, AKo, AhKh:1, AKo:0");
     expect(errors).toEqual([]);
     expect(rangeCounts(weights, [])).toEqual({ classes: 2, combos: 6 + 0.5 * 3 + 1 });
+  });
+
+  it("accepts finite f32 weight syntax", () => {
+    expect(parseRange("AA:.5,KK:5e-1,QQ:+0.5").errors).toEqual([]);
+    expect(rangeCounts(parseRange("AA:1e-1").weights, []).combos).toBe(6 * Math.fround(0.1));
   });
 
   it("removes combos that share a card with the board", () => {
@@ -32,7 +38,7 @@ describe("parseRange", () => {
       "AAs: Pairs cannot use s/o",
       "AhAh: the same card cannot be used twice",
       "AKs-QJo: Both ends of an interval must use the same s/o suffix",
-      "Q5s:1.5: weight must be a decimal number in 0..1",
+      "Q5s:1.5: weight must be a finite number in 0..1",
       "ZZ: Cannot parse entry",
     ]);
   });
@@ -40,6 +46,7 @@ describe("parseRange", () => {
   it("reads random only as the whole string", () => {
     expect(rangeCounts(parseRange("random").weights, []).combos).toBe(1326);
     expect(parseRange("random, AA").errors).toHaveLength(1);
+    expect(parseRange(" random ").errors).toHaveLength(1);
   });
 });
 

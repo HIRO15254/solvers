@@ -121,11 +121,6 @@ pub fn deal_groups(board: &Board, dead: &[Card]) -> Vec<DealGroup> {
     deal_groups_with(board, dead, &all_suit_perms())
 }
 
-/// Like [`deal_groups`], but the symmetry group is the intersection of
-/// `board`'s stabilizer with the caller-supplied `allowed` permutations
-/// (e.g. those preserving both players' ranges). Merging two deals is only
-/// sound under a permutation that fixes the *whole* game, not just the
-/// board.
 /// Applies a suit permutation to a single card.
 pub fn permute_card(perm: &SuitPerm, card: Card) -> Card {
     apply_perm(perm, card)
@@ -153,6 +148,11 @@ pub fn orbit_perms(stab: &[SuitPerm], rep: Card, members: &[Card]) -> Vec<SuitPe
         .collect()
 }
 
+/// Like [`deal_groups`], but the symmetry group is the intersection of
+/// `board`'s stabilizer with the caller-supplied `allowed` permutations
+/// (e.g. those preserving both players' ranges). Merging two deals is only
+/// sound under a permutation that fixes the *whole* game, not just the
+/// board. `allowed` must be a subgroup of the suit permutations.
 pub fn deal_groups_with(board: &Board, dead: &[Card], allowed: &[SuitPerm]) -> Vec<DealGroup> {
     let stab: Vec<SuitPerm> = stabilizer(board)
         .into_iter()

@@ -231,6 +231,14 @@ struct Cli {
     command: Command,
 }
 
+fn parse_poll_secs(value: &str) -> Result<f64, String> {
+    let seconds: f64 = value.parse().map_err(|_| "expected a number of seconds")?;
+    if !seconds.is_finite() || std::time::Duration::try_from_secs_f64(seconds.max(0.05)).is_err() {
+        return Err("poll interval is not representable as a duration".into());
+    }
+    Ok(seconds)
+}
+
 #[derive(Subcommand)]
 enum Command {
     /// Generate a heads-up postflop input from a saved preflop average strategy.
@@ -310,7 +318,7 @@ enum Command {
         #[arg(long, default_value_t = 0)]
         from: u64,
         /// Seconds between polls while the run is still going.
-        #[arg(long = "poll-secs", default_value_t = 1.0)]
+        #[arg(long = "poll-secs", default_value_t = 1.0, value_parser = parse_poll_secs)]
         poll_secs: f64,
         #[arg(long, value_enum, default_value = "human")]
         format: runs::ReportFormat,
@@ -822,7 +830,7 @@ pub fn main_impl() -> Result<()> {
                 }
                 (Some(config), None) => inspect::run(&config, iterations, target_nash_conv),
                 (None, Some(sol)) => inspect::run_sol(&sol, river_iterations, river_target),
-                (None, None) => Err(anyhow::anyhow!("inspect requires either <config> or --sol")),
+                (None, None) => Err(inspect_missing_input()),
                 (Some(_), Some(_)) => {
                     unreachable!("clap's conflicts_with prevents both being set")
                 }
@@ -916,6 +924,10 @@ pub fn main_impl() -> Result<()> {
     }
 }
 
+fn inspect_missing_input() -> anyhow::Error {
+    anyhow::anyhow!("either <config> or --sol must be specified for inspect")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -923,6 +935,21 @@ mod tests {
     #[test]
     fn the_command_surface_has_no_experiment_namespace() {
         assert!(Cli::try_parse_from(["solvers", "experiment", "profile"]).is_err());
+    }
+
+    #[test]
+    fn inspect_missing_input_is_an_input_error() {
+        assert_eq!(error_exit_code(&inspect_missing_input()), 2);
+    }
+
+    #[test]
+    fn watch_rejects_unrepresentable_poll_intervals() {
+        for seconds in ["inf", "NaN", "1e100"] {
+            assert!(
+                Cli::try_parse_from(["solvers", "watch", "run", "--poll-secs", seconds]).is_err()
+            );
+        }
+        assert!(Cli::try_parse_from(["solvers", "watch", "run", "--poll-secs", "0"]).is_ok());
     }
 
     #[test]

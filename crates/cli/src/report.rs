@@ -80,8 +80,9 @@ fn collect_board_tokens(
     boards_file: Option<&Path>,
 ) -> Result<Vec<String>> {
     match (boards_arg, boards_file) {
-        (Some(_), Some(_)) => Err(anyhow!("pass exactly one of --boards or --boards-file")),
-        (None, None) => Err(anyhow!("pass exactly one of --boards or --boards-file")),
+        (Some(_), Some(_)) | (None, None) => Err(anyhow!(
+            "exactly one of --boards or --boards-file must be specified"
+        )),
         (Some(s), None) => Ok(s
             .split(',')
             .map(|t| t.trim().to_string())
@@ -120,4 +121,20 @@ fn fmt_sig(x: f64, sig: usize) -> String {
     let d = sig as i32 - 1 - x.abs().log10().floor() as i32;
     let d = d.max(0) as usize;
     format!("{:.*}", d, x)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::collect_board_tokens;
+
+    #[test]
+    fn missing_or_conflicting_board_sources_are_input_errors() {
+        for (boards, file) in [
+            (None, None),
+            (Some("AsKdQc"), Some(std::path::Path::new("boards.txt"))),
+        ] {
+            let error = collect_board_tokens(boards, file).unwrap_err();
+            assert_eq!(crate::error_exit_code(&error), 2);
+        }
+    }
 }

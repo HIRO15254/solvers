@@ -113,17 +113,20 @@ impl RunsRoot {
         })
     }
 
-    /// Picks an unused directory name for a new run.
+    /// Atomically reserves an unused directory name for a new run.
     ///
     /// `requested` is validated the same way as any other id. The generated
     /// form sorts chronologically, since the listing is ordered by name.
     pub fn allocate(&self, requested: Option<&str>, now_unix_ms: u64) -> Result<PathBuf> {
         if let Some(requested) = requested {
             let directory = self.directory(requested)?;
-            if directory.exists() {
-                anyhow::bail!("run {requested:?} already exists");
+            match std::fs::create_dir(&directory) {
+                Ok(()) => return Ok(directory),
+                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
+                    anyhow::bail!("run {requested:?} already exists");
+                }
+                Err(error) => return Err(error.into()),
             }
-            return Ok(directory);
         }
         for suffix in 0..1000 {
             let candidate = if suffix == 0 {
@@ -132,8 +135,10 @@ impl RunsRoot {
                 format!("run-{now_unix_ms}-{suffix}")
             };
             let directory = self.path.join(&candidate);
-            if !directory.exists() {
-                return Ok(directory);
+            match std::fs::create_dir(&directory) {
+                Ok(()) => return Ok(directory),
+                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+                Err(error) => return Err(error.into()),
             }
         }
         anyhow::bail!(
@@ -241,6 +246,7 @@ mod tests {
             root.allocate(Some("fresh"), 1).unwrap(),
             root.path().join("fresh")
         );
+        assert!(root.allocate(Some("fresh"), 1).is_err());
 
         let generated = root.allocate(None, 1_700_000_000_000).unwrap();
         assert!(
@@ -250,5 +256,6 @@ mod tests {
                 .to_string_lossy()
                 .starts_with("run-1700000000000")
         );
+        assert_ne!(generated, root.allocate(None, 1_700_000_000_000).unwrap());
     }
 }

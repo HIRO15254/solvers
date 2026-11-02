@@ -60,7 +60,7 @@ describe("outcome", () => {
 });
 
 describe("rootStacks", () => {
-  it("reads each role's stack behind from the start's seats", () => {
+  it("uses the smaller stack for both roles in the effective-stack tree", () => {
     const start = {
       oop: { position: "BB", seat: 6 },
       ip: { position: "BTN", seat: 4 },
@@ -69,7 +69,10 @@ describe("rootStacks", () => {
         { seat: 6, position: "BB", starting_stack: 80, remaining_stack: 77.5, folded: false },
       ],
     } as StartState;
-    expect(rootStacks(start)).toEqual({ oop: 77.5, ip: 97.5 });
+    expect(rootStacks(start)).toEqual({ oop: 77.5, ip: 77.5 });
+    const effective = rootStacks(start);
+    const deepPlayerShoves = row("x", 5, "ip", ["bet 77.5"], ["action"]);
+    expect(describeAction(deepPlayerShoves, 0, effective, 1000).allIn).toBe(true);
     expect(rootStacks(null)).toBeNull();
   });
 });

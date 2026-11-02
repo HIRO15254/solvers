@@ -12,10 +12,7 @@ use super::cond::{Condition, Vars};
 use crate::{SizeSpec, Street};
 
 /// How a rule changes the action list already built for a node.
-/// `Serialize`/`Deserialize` are here for the same reason as on
-/// [`ActionKind`]: `mw_preflop::config::RuleEffect` is a type alias for this
-/// enum, so its typed `[[..rules]]` TOML surface needs no second copy of the
-/// same spellings.
+/// Serialized for use by consumers that persist rule effects.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum Effect {
@@ -29,8 +26,8 @@ pub enum Effect {
     /// Replaces the whole action list with just the given sizes -- fold and
     /// check are removed too.
     Force,
-    /// Removes every action except check. Takes neither `action` nor
-    /// `sizes`.
+    /// Replaces the menu with check when nothing is owed, otherwise fold.
+    /// Takes neither `action` nor `sizes`.
     Checkdown,
     /// Replaces every current candidate of `action`'s kind whose raise-to
     /// target passes the bound against the single threshold in `sizes` with
@@ -102,8 +99,7 @@ pub enum ParamKind {
 pub struct ParamSchema {
     pub name: String,
     pub kind: ParamKind,
-    /// The literal token as written / overridden, kept verbatim so a caller
-    /// can render it back without reformatting.
+    /// The effective literal token after declaration substitution and overrides.
     pub default: String,
     pub description: Option<String>,
 }

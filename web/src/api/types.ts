@@ -58,9 +58,9 @@ export interface CreateRunResponse {
 
 export interface RelockRequest {
   profileToml: string;
-  replace: boolean;
-  freezeUpstream: boolean;
-  clearProfile: boolean;
+  replace?: boolean;
+  freezeUpstream?: boolean;
+  clearProfile?: boolean;
 }
 
 export interface ValidateResponse {

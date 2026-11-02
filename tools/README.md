@@ -56,8 +56,9 @@ The workspace audit reports `experiments/` separately alongside build output,
 scratch runs, caches, source, and documentation; it does not delete anything.
 
 CI runs the Python checks alongside the standard Rust verification, and exercises
-CLI checkpoint/resume and daemon HTTP behavior on Windows. Expensive acceptance
-tests remain in the manually dispatched acceptance workflow.
+CLI checkpoint and daemon HTTP behavior on Windows and macOS (resume equivalence
+is additionally checked on Windows). Expensive acceptance tests remain in the
+manually dispatched acceptance workflow.
 
 The old Multiway benchmark and cloud runners are retained with the
 [`multiway-2026-09` experiment](../experiments/multiway-2026-09/README.md)
