@@ -58,7 +58,7 @@ solvers config new [--product p2|p1] [--template minimal|full] [--out PATH]
 | flag | 既定 | 意味 |
 |---|---|---|
 | `--product` | `p2`（`p2` featureなしのbuildでは`p1`） | 生成する製品。どちらもschemaは`solvers.nlh/v1` |
-| `--template` | `minimal` | `minimal`は短い有効例、`full`は実効configの全section・key。既定の無い任意keyは省略 |
+| `--template` | `minimal` | `minimal`は短い有効例、`full`は実効configの全section・key。額とlineの額は表示表記（既定tableではBB数値、例`sb = 0.5`）で書く。既定の無い任意keyは省略 |
 | `--out PATH` | stdout | templateの出力先 |
 
 P2のminimalは6max/100bb cash、P1は小さいHU River spotである。

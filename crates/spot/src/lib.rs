@@ -65,7 +65,15 @@ impl Document {
 
     /// Deterministic self-contained TOML; product defaults are supplied by the hook.
     pub fn normalize(&self, product: &impl ProductSections) -> Result<String, SpotError> {
-        normalize::document(self, product)
+        normalize::document(self, product, normalize::AmountSpelling::Chips)
+    }
+
+    /// The normalized document with amounts and line amounts in the table's
+    /// display form (BB numbers on tables whose chips all have a terminating
+    /// BB decimal) for people to edit. Reading it back gives the same chips
+    /// without rounding warnings; run artifacts keep using [`Self::normalize`].
+    pub fn normalize_display(&self, product: &impl ProductSections) -> Result<String, SpotError> {
+        normalize::document(self, product, normalize::AmountSpelling::Display)
     }
 
     /// Common validation evidence; products may add their own operating warnings.

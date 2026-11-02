@@ -135,6 +135,8 @@ solvers config new --product p2 --template full --out table-full.toml
 ```
 
 `config new`の既定は`p2`である。P1専用配布buildでは既定が`p1`になり、`--product p2`は`NLH005`（exit 2）になる。
+`full`は既定値を含む全keyを並べ、額は既定tableでは`stack = 10`、`sb = 0.5`のようなBB数値で書く（runの実効configは`"10000c"`のようなchip表記）。
+P1の`full`末尾にはcommentのprofile例がある。`freeze_upstream`以外はそのtemplateの木でそのままcomment解除して使える。
 
 先頭のschemaは常に`solvers.nlh/v1`である。table、economics、spot、ranges、treeを編集する。
 製品はtable・line・boardから決まる。P1のpot・stack・OOP/IPはlineを再生して導出する。

@@ -1304,6 +1304,31 @@ fn preflop_rules_warn_once_and_normalized_defaults_do_not_warn() {
 }
 
 #[test]
+fn full_p1_template_profile_example_resolves_against_its_tree() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("full.toml");
+    let full = ok(&["config", "new", "--product", "p1", "--template", "full"]).stdout;
+    let full = String::from_utf8(full).unwrap();
+    let (spot, example) = full.split_once("# Optional opponent profile").unwrap();
+    // The upstream solution path is a placeholder; every other example line is live.
+    let profile: String = example
+        .lines()
+        .skip(1)
+        .filter(|line| !line.contains("freeze_upstream"))
+        .map(|line| format!("{}\n", line.strip_prefix("# ").unwrap()))
+        .collect();
+    std::fs::write(&config, format!("{spot}{profile}")).unwrap();
+    let result = ok(&["validate", text(&config), "--format", "json"]);
+    let json: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    let selectors = json["profile"]["selectors"].as_array().unwrap();
+    assert_eq!(selectors.len(), 4, "{json}");
+    for selector in selectors {
+        assert!(selector["matched_nodes"].as_u64().unwrap() > 0, "{json}");
+        assert!(selector["matched_hands"].as_u64().unwrap() > 0, "{json}");
+    }
+}
+
+#[test]
 fn fold_only_checkdown_nodes_solve_save_export_inspect_and_report() {
     let temp = tempfile::tempdir().unwrap();
     let config = temp.path().join("input.toml");

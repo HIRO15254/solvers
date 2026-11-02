@@ -5,20 +5,47 @@ use nlh::{ChipScale, MwChips, SeatId};
 use toml::Value;
 use toml_edit::{InlineTable, Item, Table};
 
-/// Effective amounts are always exact chip strings.
-fn amounts(_scale: ChipScale, base: &str, chips: &[MwChips]) -> (String, Vec<Value>) {
-    (
-        base.to_owned(),
-        chips
-            .iter()
-            .map(|c| Value::String(format!("{}c", c.0)))
-            .collect(),
-    )
+/// How amounts are spelled when the document is written.
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(crate) enum AmountSpelling {
+    /// Exact `"Nc"` strings and `Nc` line amounts: the effective config.
+    Chips,
+    /// The table's display form: BB numbers on tables whose chips all have a
+    /// terminating BB decimal, otherwise `"Nc"`. Both read back to the same chips.
+    Display,
 }
 
-fn insert_amount(table: &mut Table, scale: ChipScale, base: &str, chips: MwChips) {
-    let (key, mut values) = amounts(scale, base, &[chips]);
-    insert(table, &key, values.pop().unwrap());
+fn amount(scale: ChipScale, spelling: AmountSpelling, chips: MwChips) -> Value {
+    if spelling == AmountSpelling::Display && scale.is_decimal() {
+        let text = scale
+            .bb_text(chips)
+            .expect("decimal tables spell every amount");
+        if let Ok(whole) = text.parse::<i64>() {
+            return Value::Integer(whole);
+        }
+        // TOML writes the shortest round-trip float; keep it only when that is
+        // the exact decimal, so the value reads back to the same chips.
+        if let Ok(bb) = text.parse::<f64>()
+            && bb.to_string() == text
+        {
+            return Value::Float(bb);
+        }
+    }
+    Value::String(format!("{}c", chips.0))
+}
+
+fn amounts(scale: ChipScale, spelling: AmountSpelling, chips: &[MwChips]) -> Vec<Value> {
+    chips.iter().map(|c| amount(scale, spelling, *c)).collect()
+}
+
+fn insert_amount(
+    table: &mut Table,
+    scale: ChipScale,
+    spelling: AmountSpelling,
+    key: &str,
+    chips: MwChips,
+) {
+    insert(table, key, amount(scale, spelling, chips));
 }
 
 fn numeric(n: f64) -> Value {
@@ -130,7 +157,11 @@ fn memory(bytes: Option<u64>) -> Value {
     Value::Integer(n as i64)
 }
 
-pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<String, SpotError> {
+pub(crate) fn document(
+    doc: &Document,
+    hook: &impl ProductSections,
+    spelling: AmountSpelling,
+) -> Result<String, SpotError> {
     let spot = &doc.spot;
     let (solver, output) = hook.normalize(spot, &doc.solver, &doc.output)?;
     let mut text = "schema = \"solvers.nlh/v1\"\n".to_owned();
@@ -166,14 +197,14 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
     ]);
     let same_stack = t.stacks.iter().all(|s| *s == t.stacks[SeatId(0)]);
     if same_stack {
-        insert_amount(&mut table, scale, "stack", t.stacks[SeatId(0)]);
+        insert_amount(&mut table, scale, spelling, "stack", t.stacks[SeatId(0)]);
     }
     for (base, v) in [("sb", t.sb), ("ante", t.ante), ("bb_ante", t.bb_ante)] {
-        insert_amount(&mut table, scale, base, v);
+        insert_amount(&mut table, scale, spelling, base, v);
     }
     let straddles: Vec<MwChips> = t.setup.straddles.iter().map(|(_, v)| *v).collect();
-    let (key, values) = amounts(scale, "straddles", &straddles);
-    insert(&mut table, &key, Value::Array(values));
+    let values = amounts(scale, spelling, &straddles);
+    insert(&mut table, "straddles", Value::Array(values));
     insert(
         &mut table,
         "chip_rounding",
@@ -182,12 +213,12 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
     if !same_stack {
         let seats = positions(t);
         let chips: Vec<MwChips> = seats.iter().map(|seat| t.stacks[*seat]).collect();
-        let (key, values) = amounts(scale, "stacks", &chips);
+        let values = amounts(scale, spelling, &chips);
         let mut stacks = Table::new();
         for (seat, value) in seats.into_iter().zip(values) {
             insert(&mut stacks, &t.positions[seat], value);
         }
-        table.insert(&key, Item::Table(stacks));
+        table.insert("stacks", Item::Table(stacks));
     }
     write_table(&mut text, "table", &table);
     let mut economics = Table::new();
@@ -207,8 +238,8 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
                 .iter()
                 .map(|v| MwChips(v.stack_chips))
                 .collect();
-            let (key, values) = amounts(scale, "outside_field", &stacks);
-            insert(&mut economics, &key, Value::Array(values));
+            let values = amounts(scale, spelling, &stacks);
+            insert(&mut economics, "outside_field", Value::Array(values));
         }
     }
     if let RakeConfig::Generic {
@@ -222,7 +253,7 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
     {
         let mut rake = fields([("rate", numeric(*rate))]);
         if let Some(cap) = cap_chips {
-            insert_amount(&mut rake, scale, "cap", MwChips(*cap));
+            insert_amount(&mut rake, scale, spelling, "cap", MwChips(*cap));
         }
         for (key, v) in [
             ("when", Value::String(when.clone())),
@@ -231,14 +262,15 @@ pub(crate) fn document(doc: &Document, hook: &impl ProductSections) -> Result<St
         ] {
             insert(&mut rake, key, v);
         }
-        insert_amount(&mut rake, scale, "rounding_unit", *rounding_unit);
+        insert_amount(&mut rake, scale, spelling, "rounding_unit", *rounding_unit);
         economics.insert("rake", Item::Table(rake));
     }
     write_table(&mut text, "economics", &economics);
-    let mut start = fields([(
-        "line",
-        Value::String(crate::cursor::effective_line_text(&spot.context.actions)),
-    )]);
+    let line = match spelling {
+        AmountSpelling::Chips => crate::cursor::effective_line_text(&spot.context.actions),
+        AmountSpelling::Display => crate::cursor::line_text(&spot.context.actions, scale),
+    };
+    let mut start = fields([("line", Value::String(line))]);
     if let Some(board) = &spot.board_text {
         insert(&mut start, "board", Value::String(board.clone()));
     }

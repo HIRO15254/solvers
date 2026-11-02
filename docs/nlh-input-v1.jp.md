@@ -1029,7 +1029,7 @@ P2の方式と品質保証は製品定義D5により未決定である。
 | 単位がpotより粗い場合（第6節） | 丸めた額がpotを超えればpotの額とする（Q11） | 第6節 |
 | `[meta]`（第4節） | 計算にもresume互換性にも使わない | 第4節 |
 | P2の未使用rule計測（第9節） | 通常の`validate`は未検査を表示する。`validate --resources`のcountと`solve` / `resume`の木構築で実測し、打切り時は不完全として未一致警告を出さない | 第9節・未使用ruleの警告 |
-| `config new`のflag | `--product p2\|p1`（既定`p2`）、`--template minimal\|full`（既定`minimal`）、`--out`を受ける。全templateは共通Input。`full`は同じ製品の`minimal`を正規化した実効configで、節ごとの短いcommentを付ける。既定の無い任意keyは省略する | 第13節・CLI規範 |
+| `config new`のflag | `--product p2\|p1`（既定`p2`）、`--template minimal\|full`（既定`minimal`）、`--out`を受ける。全templateは共通Input。`full`は同じ製品の`minimal`を正規化した実効configと同じsection・keyを持ち、節ごとの短いcommentを付ける。額とlineの額は実効configの`Nc`ではなく表示表記（第5節。既定`bb_chips = 1000`では`stack = 10`、`sb = 0.5`のBB数値）で書き、読み直すと同じchip額になる。P1は木のlabelに合うprofile例をcommentで付ける。既定の無い任意keyは省略する | 第13節・CLI規範 |
 | deriveの強制x/f | P2の`checkdown`がdecision nodeなしで適用したcheck・foldは、lineの同じaction（暗黙のfoldを含む）と一致する（Q14） | CLI reference |
 | deriveの未訪問警告 | 開始rangeにweightのあるclassだけを対象にする（Q14） | CLI reference |
 | deriveでbaseに無い設定 | `[solver]`・`[output]`・`[run]`はP1の既定値とし、P2の値を持ち込まない（Q14） | CLI reference |

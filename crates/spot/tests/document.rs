@@ -479,6 +479,61 @@ fn chip_keys_express_non_decimal_denominations() {
 }
 
 #[test]
+fn display_spelling_reads_back_to_the_same_chips() {
+    let p1 =
+        "[spot]\nline = 'BTN r{open}, BB c'\nboard = 'Ks 7h 2d'\n[ranges]\nBTN = 'AA'\nBB = 'KK'\n";
+    for (raw, expected) in [
+        (
+            format!(
+                "{ROOT}sb = 0.25\nante = 0.125\nstraddles = [2]\n[table.stacks]\nCO = 80.123\n\
+                 [economics.rake]\nrate = 0.05\ncap = 4.001\nrounding_unit = 0.001\n"
+            ),
+            &[
+                "sb = 0.25\n",
+                "ante = 0.125\n",
+                "bb_ante = 0\n",
+                "straddles = [2]\n",
+                "CO = 80.123\n",
+                "BTN = 100\n",
+                "cap = 4.001\n",
+                "rounding_unit = 0.001\n",
+            ][..],
+        ),
+        (
+            format!(
+                "{ROOT}[economics]\nkind = 'tournament'\npayouts = [1]\noutside_field = [20.5]\n"
+            ),
+            &["stack = 100\n", "outside_field = [20.5]\n"][..],
+        ),
+        (
+            format!("{ROOT}{}", p1.replace("{open}", "2.5")),
+            &["line = \"BTN r2.5, BB c\"\n"][..],
+        ),
+        // Non-decimal tables keep exact chips, including line amounts.
+        (
+            format!("{ONE_THREE}stack = 100\n{}", p1.replace("{open}", "8c")),
+            &[
+                "stack = \"300c\"\n",
+                "sb = \"1c\"\n",
+                "line = \"BTN r8c, BB c\"\n",
+            ][..],
+        ),
+    ] {
+        let source = parse(&raw);
+        let display = source.normalize_display(&Stub).unwrap();
+        for expected in expected {
+            assert!(display.contains(expected), "{expected}\n{display}");
+        }
+        let reread = parse(&display);
+        assert!(reread.warnings.is_empty(), "{:?}", reread.warnings);
+        assert_eq!(
+            reread.normalize(&Stub).unwrap(),
+            source.normalize(&Stub).unwrap()
+        );
+    }
+}
+
+#[test]
 fn amount_values_accept_bb_and_exact_chips_and_reject_bad_spellings() {
     for value in ["100", "'100'", "'100bb'", "'300c'"] {
         let doc = parse(&format!("{ONE_THREE}stack = {value}\n"));

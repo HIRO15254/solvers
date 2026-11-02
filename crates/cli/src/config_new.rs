@@ -54,11 +54,26 @@ max_iterations = 100
 "#;
 
 fn normalized(product: ConfigProduct, raw: &str) -> Result<String> {
+    normalize(product, raw, false)
+}
+
+fn normalize(product: ConfigProduct, raw: &str, display: bool) -> Result<String> {
+    fn write(
+        document: &spot::Document,
+        sections: &impl spot::ProductSections,
+        display: bool,
+    ) -> Result<String, spot::SpotError> {
+        if display {
+            document.normalize_display(sections)
+        } else {
+            document.normalize(sections)
+        }
+    }
     let document = spot::Document::parse(raw, Path::new("template.toml"))?;
     Ok(match product {
-        ConfigProduct::P1 => document.normalize(&hu_postflop::input::P1Sections)?,
+        ConfigProduct::P1 => write(&document, &hu_postflop::input::P1Sections, display)?,
         #[cfg(feature = "p2")]
-        ConfigProduct::P2 => document.normalize(&mw_preflop::input::P2Sections)?,
+        ConfigProduct::P2 => write(&document, &mw_preflop::input::P2Sections, display)?,
         #[cfg(not(feature = "p2"))]
         ConfigProduct::P2 => return Err(crate::product_support::input_error()),
     })
@@ -69,13 +84,16 @@ fn render(product: ConfigProduct, template: ConfigTemplate) -> Result<String> {
         ConfigProduct::P1 => P1_MINIMAL,
         ConfigProduct::P2 => P2_MINIMAL,
     };
-    let effective =
-        normalized(product, minimal).context("validating built-in solvers.nlh/v1 template")?;
     if matches!(template, ConfigTemplate::Minimal) {
+        normalized(product, minimal).context("validating built-in solvers.nlh/v1 template")?;
         return Ok(minimal.into());
     }
-    // Render the effective document itself so new default keys cannot drift
-    // from the full template. Optional values without defaults stay omitted.
+    // Render the normalized document itself so new default keys cannot drift
+    // from the full template. Amounts use the table's display form (BB numbers
+    // here) instead of the effective config's exact chips, because people edit
+    // this file. Optional values without defaults stay omitted.
+    let effective =
+        normalize(product, minimal, true).context("validating built-in solvers.nlh/v1 template")?;
     let mut rendered = String::new();
     for line in effective.lines() {
         if line.starts_with('[') && line.ends_with(']') {
@@ -141,19 +159,19 @@ fn render(product: ConfigProduct, template: ConfigTemplate) -> Result<String> {
 # freeze_upstream = { solution = \"runs/base/solution.sol\" }\n\
 # [[profile.lock]]\n\
 # node = \"x\"\n\
-# hands = \"AA,KK\"\n\
-# strategy = { check = 0.5, \"bet 3.3\" = 0.5 }\n\
+# hands = \"KK\"\n\
+# strategy = { check = 0.5, \"bet 2\" = 0.5 }\n\
 # confidence = 1.0\n\
 # [[profile.lock]]\n\
 # node = \"x\"\n\
-# combos = { AsKs = { check = 1.0 } }\n\
+# combos = { AhAd = { check = 1.0 } }\n\
 # [[profile.incentive]]\n\
-# node = \"x\"\n\
-# category = \"toppair\"\n\
+# node = \"root\"\n\
+# category = \"overpair\"\n\
 # action = \"check\"\n\
 # pot = 0.03\n\
 # [[profile.frequency]]\n\
-# node = \"x\"\n\
+# node = \"root\"\n\
 # action = \"check\"\n\
 # target = 0.5\n",
         );
@@ -190,6 +208,7 @@ mod tests {
                 let effective = normalized(product, &raw).unwrap();
                 assert_eq!(normalized(product, &effective).unwrap(), effective);
                 let document = spot::Document::parse(&raw, Path::new("template.toml")).unwrap();
+                assert!(document.warnings.is_empty(), "{:?}", document.warnings);
                 match product {
                     ConfigProduct::P1 => {
                         let settings = hu_postflop::input::Settings::parse(
@@ -247,11 +266,22 @@ mod tests {
     fn full_templates_preserve_the_minimal_spot() {
         for product in PRODUCTS.iter().copied() {
             let minimal = render(product, ConfigTemplate::Minimal).unwrap();
-            let effective: toml::Value =
-                toml::from_str(&normalized(product, &minimal).unwrap()).unwrap();
-            let full: toml::Value =
-                toml::from_str(&render(product, ConfigTemplate::Full).unwrap()).unwrap();
-            assert_eq!(full, effective);
+            let full = render(product, ConfigTemplate::Full).unwrap();
+            assert_eq!(
+                normalized(product, &full).unwrap(),
+                normalized(product, &minimal).unwrap()
+            );
+        }
+    }
+
+    fn leaves(value: &toml::Value, path: &str, out: &mut Vec<(String, toml::Value)>) {
+        match value {
+            toml::Value::Table(table) => {
+                for (key, value) in table {
+                    leaves(value, &format!("{path}.{key}"), out);
+                }
+            }
+            value => out.push((path.to_owned(), value.clone())),
         }
     }
 
@@ -259,14 +289,48 @@ mod tests {
     fn full_templates_list_every_effective_key() {
         for product in PRODUCTS.iter().copied() {
             let raw = render(product, ConfigTemplate::Full).unwrap();
-            let full: toml::Value = toml::from_str(&raw).unwrap();
-            let effective: toml::Value =
-                toml::from_str(&normalized(product, &raw).unwrap()).unwrap();
+            let mut full = Vec::new();
+            leaves(&toml::from_str(&raw).unwrap(), "", &mut full);
+            let mut effective = Vec::new();
+            let text = normalized(product, &raw).unwrap();
+            leaves(&toml::from_str(&text).unwrap(), "", &mut effective);
+            let full: std::collections::BTreeSet<_> = full.into_iter().map(|(k, _)| k).collect();
+            let effective: std::collections::BTreeSet<_> =
+                effective.into_iter().map(|(k, _)| k).collect();
             assert_eq!(full, effective);
             for (i, line) in raw.lines().enumerate() {
                 if line.starts_with('[') && line.ends_with(']') {
                     assert!(raw.lines().nth(i - 1).unwrap().starts_with("# "));
                 }
+            }
+        }
+    }
+
+    #[test]
+    fn full_templates_spell_default_table_amounts_in_bb() {
+        for product in PRODUCTS.iter().copied() {
+            let raw = render(product, ConfigTemplate::Full).unwrap();
+            let full: toml::Value = toml::from_str(&raw).unwrap();
+            let table = &full["table"];
+            assert_eq!(table["bb_chips"].as_integer(), Some(1000));
+            assert_eq!(table["sb"].as_float(), Some(0.5));
+            for key in ["stack", "ante", "bb_ante"] {
+                assert!(table[key].is_integer(), "{key}: {}", table[key]);
+            }
+            let mut values = Vec::new();
+            leaves(&full, "", &mut values);
+            for (key, value) in values {
+                let text = value.to_string();
+                assert!(
+                    !text
+                        .split(|c: char| !c.is_ascii_alphanumeric())
+                        .any(|word| {
+                            word.len() > 1
+                                && word.ends_with('c')
+                                && word[..word.len() - 1].bytes().all(|b| b.is_ascii_digit())
+                        }),
+                    "{key} = {text}"
+                );
             }
         }
     }

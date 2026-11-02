@@ -165,7 +165,11 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   embedded in solutions and checkpoints, write amount keys and line amounts as
   exact `Nc` chips; the script is kept as written. Re-reading an effective
   config gives the same config and repeats no rounding warning for keys or
-  the line.
+  the line. `config new --template full` lists the same keys but writes
+  amounts and line amounts in the table's display form (BB numbers such as
+  `stack = 10` and `sb = 0.5` with the default `bb_chips = 1000`, exact `Nc`
+  chips on tables whose chips have no terminating BB decimal); its commented
+  heads-up postflop profile example now uses the template tree's labels.
 
   Migration: drop `_bb` from amount keys (values stay BB numbers); add `%` to
   every pot percentage in scripts, parameters and overrides (`bet [33, 75]`
