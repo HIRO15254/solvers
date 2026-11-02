@@ -317,8 +317,11 @@ mod tests {
             for key in ["stack", "ante", "bb_ante"] {
                 assert!(table[key].is_integer(), "{key}: {}", table[key]);
             }
+            // Amount keys live in [table] and [economics]; cards such as "2c"
+            // elsewhere are not amounts.
             let mut values = Vec::new();
-            leaves(&full, "", &mut values);
+            leaves(table, ".table", &mut values);
+            leaves(&full["economics"], ".economics", &mut values);
             for (key, value) in values {
                 let text = value.to_string();
                 assert!(
