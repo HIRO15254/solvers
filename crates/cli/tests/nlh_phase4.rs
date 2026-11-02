@@ -54,6 +54,31 @@ fn path(path: &Path) -> &str {
 }
 
 #[test]
+fn inspect_resolves_scaled_action_labels() {
+    let temp = tempfile::tempdir().unwrap();
+    let config = temp.path().join("river.toml");
+    std::fs::write(&config, RIVER).unwrap();
+    let run = temp.path().join("run");
+    ok(&["solve", path(&config), "--out", path(&run)], "");
+    let sol = run.join("solution.sol");
+    let commands =
+        "grid bet 3300c\ngrid bet 3.3bb\ngo bet 3300c\nshow\nroot\ngo bet 3.3bb\nshow\nquit\n";
+    for args in [
+        vec!["inspect", path(&config)],
+        vec!["inspect", "--sol", path(&sol)],
+    ] {
+        let output = ok(&args, commands);
+        assert!(!output.contains("error:"), "{output}");
+        assert_eq!(
+            output.matches("bet 3.3 (overall freq").count(),
+            2,
+            "{output}"
+        );
+        assert_eq!(output.matches("history: r3.3").count(), 2, "{output}");
+    }
+}
+
+#[test]
 fn comparison_requires_combo_and_action_identity_unless_cross_game() {
     let temp = tempfile::tempdir().unwrap();
     let solve = |name: &str, config: &str| {

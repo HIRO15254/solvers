@@ -469,6 +469,53 @@ fn errors_name_correct_spelling() {
 }
 
 #[test]
+fn illegal_moves_use_display_amounts_and_line_tokens() {
+    let e = error(&standard("BTN r1.5, BB c", "Ks 7h 2d"));
+    assert!(
+        e.message
+            .contains("target 1.5 is below the minimum full target 2")
+    );
+    let e = error(&standard("BTN b2.5, BB c", "Ks 7h 2d"));
+    assert!(
+        e.message
+            .contains("b2.5 is illegal with 1 to call; use r2.5")
+    );
+    let e = error(&config(
+        2,
+        "[table.stacks]\nBTN = 20",
+        Some("BTN a, BB a"),
+        Some("Ks 7h 2d"),
+        "BTN = 'random'\nBB = 'random'",
+    ));
+    assert!(e.message.contains("use c"));
+    let e = error(&config(
+        2,
+        "bb_chips = 3\nsb = '1c'",
+        Some("BTN r1, BB c"),
+        Some("Ks 7h 2d"),
+        "BTN = 'random'\nBB = 'random'",
+    ));
+    assert!(
+        e.message
+            .contains("target 3c is below the minimum full target 6c")
+    );
+}
+
+#[test]
+fn board_without_line_requires_closed_preflop() {
+    let e = error(&config(
+        2,
+        "",
+        None,
+        Some("Ks 7h 2d"),
+        "BTN = 'random'\nBB = 'random'",
+    ));
+    assert_eq!(e.code, Code::NLH004);
+    assert_eq!(e.key.as_deref(), Some("spot.board"));
+    assert!(e.message.contains("line that closes Preflop"));
+}
+
+#[test]
 fn implicit_folds_cannot_skip_a_check() {
     for line in ["BTN c", "BTN c, BB c"] {
         let e = error(&standard(line, "Ks 7h 2d"));

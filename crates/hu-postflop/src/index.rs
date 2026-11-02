@@ -260,7 +260,8 @@ impl<'a> TreeView<'a> {
         self.action_labels(node).collect()
     }
 
-    pub(crate) fn resolve_action(&self, node: NodeId, label: &str) -> Result<usize, String> {
+    /// Resolve an action label or index using the tree's chip scale and rounding.
+    pub fn resolve_action(&self, node: NodeId, label: &str) -> Result<usize, String> {
         crate::queries::resolve_scaled_action(
             &self.actions(node),
             label,
@@ -805,6 +806,11 @@ pub(crate) fn read_index(
     for _ in 0..transition_count {
         let in_dim = read_u32(input)?;
         let out_dim = read_u32(input)?;
+        if in_dim != out_dim {
+            return Err(SolError::Malformed(
+                "index transition changes the hand dimension",
+            ));
+        }
         let len = read_u32(input)?;
         let bytes = take(input, u64::from(len) * 12)?;
         let entries = bytes
@@ -867,6 +873,17 @@ pub(crate) fn read_index(
     }
 
     let start = crate::artifact::start_street_from_board_len(config.board.len());
+    let limit = Street::River.index() - start.index();
+    let mut levels = vec![0usize; tree.nodes.len()];
+    for (id, node) in tree.nodes.iter().enumerate() {
+        let level = levels[id] + usize::from(node.kind == NodeKind::Chance);
+        if level > limit {
+            return Err(SolError::Malformed("index deals a card after the river"));
+        }
+        for child in tree.children(id as NodeId) {
+            levels[child as usize] = level;
+        }
+    }
     let root_ranges = crate::postflop::root_ranges(config, &hands);
     let index = GameIndex::assemble(
         &tree,
@@ -936,6 +953,55 @@ memory = "1GiB"
         assert!(matches!(
             read_index(&mut bytes.as_slice(), &prepared.config, 0),
             Err(SolError::Malformed(_))
+        ));
+    }
+
+    #[test]
+    fn rejects_chance_after_river() {
+        let mut p = crate::prepare::prepare(TURN, std::path::Path::new("test.toml")).unwrap();
+        let built = crate::build_postflop_game(&p.config, p.payoff.pipeline());
+        let index = GameIndex::from_game(
+            &built.game,
+            &built.node_info,
+            Street::Turn,
+            p.config.scale,
+            p.config.chip_rounding,
+        );
+        let mut stream = Vec::new();
+        write_index(&mut stream, &built.game.tree, &index).unwrap();
+        p.config.board.push("Ac".parse().unwrap());
+        assert!(matches!(
+            read_index(
+                &mut stream.as_slice(),
+                &p.config,
+                built.game.tree.nodes.len() as u64
+            ),
+            Err(SolError::Malformed("index deals a card after the river"))
+        ));
+    }
+
+    #[test]
+    fn rejects_transition_that_changes_hand_dimension() {
+        let prepared = crate::prepare::prepare(TURN, std::path::Path::new("test.toml")).unwrap();
+        let hands = PostflopHands::new(&prepared.config.board, &prepared.config.ranges);
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(&1u64.to_le_bytes());
+        bytes.extend_from_slice(&0u64.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.extend_from_slice(&1u32.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        for player in Player::BOTH {
+            bytes.extend_from_slice(&(hands.len(player) as u32).to_le_bytes());
+        }
+        bytes.push(3);
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.extend_from_slice(&2u32.to_le_bytes());
+        bytes.extend_from_slice(&1u32.to_le_bytes());
+        assert!(matches!(
+            read_index(&mut bytes.as_slice(), &prepared.config, 1),
+            Err(SolError::Malformed(
+                "index transition changes the hand dimension"
+            ))
         ));
     }
 

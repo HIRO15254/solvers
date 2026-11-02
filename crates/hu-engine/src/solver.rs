@@ -834,7 +834,9 @@ impl<E: TerminalEvaluator, S: Storage> Solver<E, S> {
 
     /// Root EV and exploitability at the same evaluation boundary. The BR
     /// convention (including zero-sum accounting) is identical to
-    /// `exploitability`; actual EVs are returned for both seats.
+    /// `exploitability`; both seats' EVs are computed and, like the BR values,
+    /// include the acting seat's incentive bonuses. Use
+    /// [`Self::true_expected_values`] for bonus-free EVs.
     pub fn evaluate(&self) -> (PerPlayer<f64>, PerPlayer<f64>) {
         let values = dual::evaluate(&self.game, &self.storage, self.profile.as_ref(), self.par);
         let (ev0, br0) = values[Player::P0];
@@ -2247,9 +2249,10 @@ pub(crate) fn ev_pass<E: TerminalEvaluator, S: Storage>(
     );
 }
 
-/// Best-response values for `p` against the opponent's average strategy:
-/// per-hand max over actions (Johanson-style accelerated best response —
-/// every hero hand is maximized simultaneously in one walk).
+/// Best-response values for `p` against the opponent's lock-composed average
+/// strategy. Each hand maximizes over actions unless locked, in which case
+/// [`locked_best_response`] applies the constraint. When enabled,
+/// `ctx.incentives` adds `p`'s bonuses.
 pub(crate) fn br_pass<E: TerminalEvaluator, S: Storage>(
     ctx: &ValueCtx<'_, E, S>,
     scratch: &mut Scratch,

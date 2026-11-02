@@ -143,16 +143,11 @@ const TEST_VARS: &[PostflopVar] = &[
     PostflopVar::LowCard,
 ];
 
-/// Which kind of aggressive-or-not action a rule's `add` / `remove` /
-/// `replace` / `force` names. All five variants live in one enum regardless
-/// of dialect; [`Dialect::actions`] is what actually narrows which names a
-/// given family's grammar accepts (postflop lists only `Bet/Raise` -- its
-/// `node_actions` already skips any rule whose action is not the node's own
-/// wager kind, so `Fold`/`Check`/`Call` simply never match there even if a
-/// caller constructed one directly). `Serialize`/`Deserialize` are here so a
-/// family whose typed rule surface names an action directly in TOML (as
-/// `mw_preflop::config::RuleAction`, a type alias for this enum) needs no
-/// second copy of the same five spellings.
+/// Which action a rule's `add` / `remove` / `replace` / `force` names.
+/// [`Dialect::actions`] controls the accepted names: the common-input dialect
+/// lists all five, while the test dialect lists only `Bet` and `Raise`.
+/// Products apply fold/check/call rules to legal base actions.
+/// Serialization supports typed rule surfaces that name actions directly.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum ActionKind {
@@ -255,10 +250,9 @@ pub enum PreviousAggressor {
     Opponent,
 }
 
-/// Everything a condition may read about one postflop decision node.
-/// Deliberately a concrete struct of primitives, not a trait: it keeps
-/// evaluation allocation-free and dispatch-free on the tree builder's hot
-/// path. Implements [`VarSource<PostflopVar>`] below.
+/// Street and board facts for a postflop decision node. Product adapters
+/// supply position and preflop facts alongside this allocation-free context.
+/// Implements [`VarSource<PostflopVar>`] below for the test dialect.
 #[derive(Clone, Copy, Debug)]
 pub struct RuleContext {
     pub aggressions: u32,
@@ -316,11 +310,9 @@ pub enum Value {
     Text(&'static str),
 }
 
-/// One family's answer to "what is this variable worth here". Implemented
-/// once per (family, node-representation) pair -- postflop's [`RuleContext`]
-/// below, `multiway`'s `(&BettingState, SeatId)` in its own crate -- so
-/// [`Condition::eval`] stays generic over both without ever boxing or
-/// dispatching dynamically.
+/// A source of variable values at a node. Product-specific `NlhContext`
+/// adapters implement this trait, keeping evaluation generic and avoiding
+/// dynamic dispatch.
 pub trait VarSource<V> {
     fn value(&self, var: V) -> Value;
 }
@@ -332,6 +324,7 @@ impl VarSource<PostflopVar> for RuleContext {
             Aggressions | Raises => Value::Number(f64::from(self.aggressions)),
             Unopened => Value::Bool(self.aggressions == 0),
             InPosition => Value::Bool(self.in_position),
+            // Test dialect convention only; production position is a seat name.
             Position => Value::Text(if self.in_position { "IP" } else { "OOP" }),
             Players => Value::Number(2.0),
             Spr => Value::Number(self.spr),

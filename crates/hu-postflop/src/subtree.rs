@@ -158,6 +158,7 @@ pub(crate) fn select_roots(
 }
 
 /// Calculate the frozen residual using a solver with streamed outside averages.
+/// Runs before checkpoint restoration so resumed solves use the same baseline.
 pub(crate) fn prepare_compact<S: Storage>(
     solver: &Solver<crate::PostflopEvaluator, S>,
     index: &GameIndex,
@@ -194,8 +195,7 @@ pub(crate) fn prepare_compact<S: Storage>(
     }
 }
 
-/// Initialize outside averages before calculating a deterministic baseline. This
-/// also runs before checkpoint restoration, so resume gets the same constant.
+/// Initialize outside averages and calculate a deterministic baseline for queries.
 pub(crate) fn prepare<S: Storage>(
     solver: &mut Solver<crate::PostflopEvaluator, S>,
     index: &GameIndex,

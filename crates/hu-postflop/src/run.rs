@@ -164,6 +164,7 @@ pub(crate) fn query<S: Storage>(
     cancel: &AtomicBool,
 ) -> Result<QueryResult<S>> {
     crate::prepare::check_memory_limit(p)?;
+    check_fallback_memory(p, "live query")?;
     let iterations = iterations.unwrap_or(p.settings.solver.stop.max_iterations);
     if iterations == 0 || target_nash_conv.is_some_and(|t| !t.is_finite() || t < 0.0) {
         bail!("NLH003: iterations must be positive and target_nash_conv finite and non-negative");
@@ -580,7 +581,7 @@ fn drive<S: Storage>(
             .estimate
             .subtree_required_bytes(p.settings.solver.storage, &spans);
         diagnostics(Diagnostic::Warning(format!(
-            "freeze_upstream subtree memory estimate: {subtree_peak} bytes (preflight also budgets whole-tree fallback)"
+            "freeze_upstream subtree memory estimate: {subtree_peak} bytes"
         )));
         let mut node_for_ref = vec![0; game.tree.storage_refs.len()];
         for (id, node) in game.tree.nodes.iter().enumerate() {
@@ -1453,6 +1454,32 @@ target = 0.5
         drop(frozen);
         std::fs::remove_file(&base_sol).unwrap();
         assert!(crate::artifact::load_sol(&frozen_sol, 0, None).is_ok());
+        assert!(
+            crate::views::export(
+                &frozen_sol,
+                crate::views::ExportView::Summary,
+                &[],
+                false,
+                None,
+            )
+            .is_ok()
+        );
+        assert!(crate::prepare::lower_config(&p.effective, &path).is_ok());
+    }
+
+    #[test]
+    fn live_query_checks_whole_tree_fallback_budget() {
+        let dir = tempfile::tempdir().unwrap();
+        let raw = RIVER_PROFILE.split("[[profile.frequency]]").next().unwrap();
+        let mut p = crate::prepare::prepare(raw, &dir.path().join("spot.toml")).unwrap();
+        p.limit = crate::prepare::required_bytes(&p);
+        let mut fallback = p.estimate.clone();
+        fallback.game_bytes = u64::MAX;
+        p.fallback_estimate = Some(fallback);
+        let error = query::<F32Storage>(&p, None, None, &AtomicBool::new(false))
+            .err()
+            .unwrap();
+        assert!(format!("{error:#}").contains("freeze_upstream fallback live query"));
     }
 
     #[test]

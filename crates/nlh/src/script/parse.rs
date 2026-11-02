@@ -484,6 +484,16 @@ fn resolve_declarations<V: Vars>(
             } => {
                 let mut raw = vec![value_token.clone()];
                 if let Some(override_value) = overrides.get(name) {
+                    let declared = std::slice::from_ref(value_token);
+                    check_self_and_forward_references(name, declared, &declared_names, &resolved)?;
+                    if substitute_tokens(declared, &resolved).len() != 1 {
+                        return Err(ScriptError {
+                            line: *name_line,
+                            message: format!(
+                                "param {name:?} value must be a single token after substitution"
+                            ),
+                        });
+                    }
                     used_overrides.insert(name.clone());
                     let override_tokens: Vec<Token> = token::tokenize(override_value)
                         .map_err(|error| ScriptError {
@@ -654,9 +664,9 @@ fn parse_braced_body<V: Vars>(
     Ok(body)
 }
 
-/// The dialect's action word at `pos`, if any, without consuming it --
-/// `dialect.actions` is what actually narrows the grammar per family
-/// (postflop's lists only `bet`/`raise`; multiway's lists all five).
+/// The dialect's action word at `pos`, if any, without consuming it.
+/// The common-input dialect lists all five actions; the test dialect lists
+/// only `bet` and `raise`.
 fn peek_action_word<V: Vars>(
     tokens: &[Token],
     pos: usize,
@@ -1055,6 +1065,26 @@ turn, river when monotone {
     fn param_override_replaces_the_effective_value() {
         let script = compile_with(SPEC_COMPLETE_TREE, &[("cb", "50")]).unwrap();
         assert_eq!(script.params[0].default, "50");
+    }
+
+    #[test]
+    fn overrides_do_not_hide_invalid_param_declarations() {
+        for (source, name, expected) in [
+            ("param cb = cb\nflop { checkdown }", "cb", "itself"),
+            (
+                "param a = b\nparam b = 33%\nflop { checkdown }",
+                "a",
+                "declared later",
+            ),
+            (
+                "define wet = paired\nparam p = wet\nflop { checkdown }",
+                "p",
+                "single token after substitution",
+            ),
+        ] {
+            let error = compile_with(source, &[(name, "50%")]).unwrap_err();
+            assert!(error.message.contains(expected), "{}", error.message);
+        }
     }
 
     #[test]

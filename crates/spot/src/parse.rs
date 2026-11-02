@@ -3,9 +3,7 @@ use crate::error::value_error;
 use crate::*;
 use economics::{FieldPlayerConfig, RakeAllocation, RakeConfig, UtilityConfig};
 use nlh::script::Script;
-use nlh::{
-    ChipAmountError, ChipScale, MwChips, Rounding, SeatId, SeatVec, TableSetup, position_name,
-};
+use nlh::{ChipScale, MwChips, Rounding, SeatId, SeatVec, TableSetup, position_name};
 use serde::Deserialize;
 use std::collections::BTreeMap;
 use std::path::Path;
@@ -217,7 +215,13 @@ pub(crate) fn shape(value: &Value, path: &str, kind: &str) -> Result<(), SpotErr
             return if valid {
                 Ok(())
             } else {
-                Err(type_error(path, primitive))
+                let description = match primitive {
+                    "raw" => "table",
+                    "auto_integer" => "string or integer",
+                    "scalar" => "string, integer, float, or boolean",
+                    _ => primitive,
+                };
+                Err(type_error(path, description))
             };
         }
     };
@@ -234,7 +238,11 @@ pub(crate) fn shape(value: &Value, path: &str, kind: &str) -> Result<(), SpotErr
             .ok_or_else(|| {
                 let replacement = key.strip_suffix("_bb").or_else(|| key.strip_suffix("_chips"));
                 if matches!(kind, "table" | "economics" | "rake")
-                    && replacement.is_some_and(|name| fields.iter().any(|(field, _)| *field == name))
+                    && replacement.is_some_and(|name| {
+                        fields.iter().any(|(field, field_kind)| {
+                            *field == name && field_kind.ends_with("amount")
+                        })
+                    })
                 {
                     SpotError::new(Code::NLH002, &full, format!("use {path}.{} instead; tree script bare sizes are now BB, write pot percentages as N%", replacement.unwrap()))
                 } else {
@@ -380,8 +388,8 @@ pub(crate) fn document_with_mode(
         Some(_) => return Err(type_error("schema", "string")),
     }
     shape(&value, "", "document")?;
-    // Preserve numeric spelling for grid checks: TOML's f64 decoder can otherwise
-    // erase a sub-grid tail (e.g. 0.00100000000000000001) before validation.
+    // Preserve numeric spelling for exact BB rounding and warning text: TOML's
+    // f64 decoder can otherwise erase a sub-chip tail before rounding.
     let lexical: toml_edit::DocumentMut =
         text.parse().map_err(|e: toml_edit::TomlError| SpotError {
             code: Code::NLH002,
@@ -542,24 +550,12 @@ pub(crate) fn exact_decimal(text: &str) -> Option<(u128, i32)> {
     Some((significant.parse().ok()?, exponent))
 }
 
-/// Explain a BB amount that does not convert to whole chips.
-pub(crate) fn amount_error(error: ChipAmountError, key: &str, scale: ChipScale) -> SpotError {
-    match error {
-        ChipAmountError::Fractional => {
-            let hint = "; write the amount in chips with a c suffix";
-            value_error(
-                key,
-                format!(
-                    "is not a whole number of chips (table.bb_chips = {}){hint}",
-                    scale.chips_per_bb()
-                ),
-            )
-        }
-        _ => value_error(
-            key,
-            "must be a finite non-negative BB amount within chip capacity",
-        ),
-    }
+/// Explain a BB amount outside chip capacity.
+fn amount_error(key: &str) -> SpotError {
+    value_error(
+        key,
+        "must be a finite non-negative BB amount within chip capacity",
+    )
 }
 
 fn nonzero(amount: MwChips, key: &str, zero: bool) -> Result<MwChips, SpotError> {
@@ -584,7 +580,7 @@ pub(crate) fn decimal_amount(
     }
     let (amount, changed) = scale
         .parse_bb_rounded(text, rounding)
-        .map_err(|e| amount_error(e, key, scale))?;
+        .map_err(|_| amount_error(key))?;
     if changed {
         warnings.push(format!(
             "{key}: {text} BB rounded to {} chips using {}",
@@ -613,7 +609,7 @@ fn bb_amount(
     })?;
     let (amount, changed) = scale
         .from_decimal_rounded(mantissa, exponent, rounding)
-        .map_err(|e| amount_error(e, key, scale))?;
+        .map_err(|_| amount_error(key))?;
     if changed {
         warnings.push(format!(
             "{key}: {text} BB rounded to {} chips using {}",
@@ -1203,7 +1199,8 @@ fn economics(
     })
 }
 
-/// Report rounded BB literals without rewriting the source.
+/// Rewrite BB sizes to exact chips for compilation, reporting rounding. Probe mode
+/// substitutes placeholders for bare sizes and references to extract the schema.
 fn round_tree_bb(
     source: &str,
     params: &[nlh::script::ParamSchema],
@@ -1216,6 +1213,7 @@ fn round_tree_bb(
     let key = "tree.script";
     let mut transformed = String::new();
     let mut copied = 0;
+    let mut significant = 0;
     let mut chars = source.char_indices().peekable();
     let mut in_sizes = false;
     let mut last_word = "";
@@ -1226,7 +1224,8 @@ fn round_tree_bb(
             while let Some(&(_, next)) = chars.peek() {
                 if next == end_char {
                     if c == '"' {
-                        chars.next();
+                        let (i, quote) = chars.next().unwrap();
+                        significant = i + quote.len_utf8();
                     }
                     break;
                 }
@@ -1242,7 +1241,8 @@ fn round_tree_bb(
                 end = i + next.len_utf8();
             }
             let word = &source[start..end];
-            let before = source[..start].trim_end();
+            let before = &source[..significant];
+            significant = end;
             let bare_size = in_sizes
                 || before.ends_with("within")
                 || ((before.ends_with('>') || before.ends_with(">="))
@@ -1283,8 +1283,8 @@ fn round_tree_bb(
                         format!("line {line}: tree size must be positive"),
                     ));
                 }
-                let (amount, changed) = scale.parse_bb_rounded(number, rounding).map_err(|e| {
-                    let error = amount_error(e, key, scale);
+                let (amount, changed) = scale.parse_bb_rounded(number, rounding).map_err(|_| {
+                    let error = amount_error(key);
                     value_error(key, format!("line {line}: {}", error.message))
                 })?;
                 transformed.push_str(&source[copied..start]);
@@ -1305,6 +1305,9 @@ fn round_tree_bb(
                 }
             }
         } else {
+            if !c.is_whitespace() {
+                significant = start + c.len_utf8();
+            }
             if c == '[' {
                 in_sizes = matches!(previous_word, "add" | "replace" | "force")
                     && matches!(last_word, "fold" | "check" | "call" | "bet" | "raise");
@@ -1527,6 +1530,40 @@ mod rounding_warning_tests {
     use super::*;
 
     #[test]
+    fn shape_diagnostics_describe_types_and_only_legacy_amount_keys() {
+        for (kind, value, expected) in [
+            ("raw", Value::Integer(1), "table"),
+            ("auto_integer", Value::Float(1.5), "string or integer"),
+            (
+                "scalar",
+                Value::Array(Vec::new()),
+                "string, integer, float, or boolean",
+            ),
+        ] {
+            let error = shape(&value, "key", kind).unwrap_err();
+            assert!(error.message.contains(expected));
+        }
+        for (kind, key, hint) in [
+            ("table", "stack_bb", true),
+            ("table", "stacks_chips", true),
+            ("economics", "outside_field_bb", true),
+            ("rake", "rounding_unit_chips", true),
+            ("table", "players_bb", false),
+            ("table", "bb_chips_bb", false),
+            ("economics", "kind_chips", false),
+            ("rake", "rate_bb", false),
+        ] {
+            let value = Value::Table(toml::Table::from_iter([(
+                key.to_owned(),
+                Value::Integer(1),
+            )]));
+            let error = shape(&value, kind, kind).unwrap_err();
+            assert_eq!(error.code, Code::NLH002);
+            assert_eq!(error.message.contains("instead"), hint, "{key}");
+        }
+    }
+
+    #[test]
     fn tree_source_and_script_conflict_is_a_shape_error() {
         let raw = RawTree {
             script: Some(String::new()),
@@ -1596,6 +1633,27 @@ mod rounding_warning_tests {
         assert_eq!(warnings.len(), 1);
         assert!(warnings[0].contains("tree.params.size"));
         assert!(warnings[0].contains("3.5 BB"));
+    }
+
+    #[test]
+    fn tree_probe_ignores_comments_when_finding_previous_token() {
+        let source = "# merge bet sizes that are within\nflop { replace bet [33%, 75%] }";
+        let raw = RawTree {
+            script: Some(source.into()),
+            ..Default::default()
+        };
+        let result = tree(
+            raw,
+            Path::new("config.toml"),
+            Product::HuPostflop,
+            ChipScale::DEFAULT,
+            Rounding::Nearest,
+            &mut Vec::new(),
+        )
+        .unwrap();
+        assert_eq!(result.script, source);
+        assert_eq!(result.compiled.rules.len(), 1);
+        assert_eq!(result.compiled.rules[0].sizes.len(), 2);
     }
 
     #[test]

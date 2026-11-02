@@ -92,12 +92,18 @@ fn queries_keep_global_combos_and_exclude_zero_weight_hands() {
     );
     let hands = hu_postflop::PostflopHands::new(&board, &ranges);
     let class = hu_postflop::queries::parse_class("AA,QQ").unwrap();
-    let rows = hu_postflop::queries::combo_rows(&class, &hands, Player::P0, 2, &[0.25, 0.75]);
+    let rows =
+        hu_postflop::queries::combo_rows(&class, &hands, Player::P0, 2, &[0.25], &[0.25, 0.75]);
     assert_eq!(rows.len(), 1);
     assert_eq!(rows[0].combo, "AhAd");
     assert_eq!(rows[0].probabilities, [0.25, 0.75]);
+    assert!(
+        hu_postflop::queries::combo_rows(&class, &hands, Player::P0, 2, &[0.0], &[0.25, 0.75])
+            .is_empty()
+    );
     let absent = hu_postflop::queries::parse_class("QhQd").unwrap();
     assert!(
-        hu_postflop::queries::combo_rows(&absent, &hands, Player::P0, 2, &[0.25, 0.75]).is_empty()
+        hu_postflop::queries::combo_rows(&absent, &hands, Player::P0, 2, &[0.25], &[0.25, 0.75])
+            .is_empty()
     );
 }

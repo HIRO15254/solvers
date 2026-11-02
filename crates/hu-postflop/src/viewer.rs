@@ -22,7 +22,7 @@
 //! silently shipping a viewer that mis-renders river strategies.
 //!
 //! This equivalence licenses the standard "small save" viewer-artifact
-//! trick (see `docs/architecture.md` on compact viewer artifacts): a solved
+//! trick (see `docs/architecture.md` and `docs/hu-postflop.jp.md` §8): a solved
 //! trunk's `.sol` can omit river strategy/value blocks (the tree remains)
 //! and re-solve the river on demand when a viewer navigates there,
 //! using [`river_entry_state`] + [`river_resolve_config`] to reconstruct an
@@ -95,8 +95,7 @@ pub struct RiverEntryState {
     pub pot: Chips,
     pub effective_stack: Chips,
     /// The last player to bet or raise on the turn; `None` if the turn
-    /// checked through (or this is a from-the-turn trunk with no earlier
-    /// street at all). Defines the `cbet`/`donk` tree-script variables on
+    /// checked through. Defines the `cbet`/`donk` tree-script variables on
     /// the resolved river subgame's own first (and only) street.
     pub previous_aggressor: Option<Player>,
 }

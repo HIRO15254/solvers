@@ -405,7 +405,7 @@ flop when cbet {
   when wet { replace bet [cb, 75%] }
 }
 turn, river {
-  if spr <= 2 { force bet [a] }
+  if spr <= 2 { replace bet [a] replace raise [a] }
   else if unopened { replace bet [66%] }
   else { remove raise }
 }

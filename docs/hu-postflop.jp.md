@@ -389,7 +389,7 @@ index frameの展開内容は次の列の連結である。
 | edges | action nodeのid順に、子ごとのu32 label番号 |
 | pots | action nodeのsref順に、u32 pot（chips） |
 
-木の子配置・sref・storage範囲・chance有無はkinds・children・dealsから構築時と同じ規則で決まる。読込みはnode数と`tree_nodes`、root次元と埋込みconfigのsupport、map・transition・label番号の範囲、未使用dealや余剰bytesを検査し、不整合はartifactが木と一致しないerrorである。
+木の子配置・sref・storage範囲・chance有無はkinds・children・dealsから構築時と同じ規則で決まる。読込みはnode数と`tree_nodes`、root次元と埋込みconfigのsupport、transitionの入出力次元の一致、map・transition・label番号の範囲、river後のdeal、未使用dealや余剰bytesを検査し、不整合はartifactが木と一致しないerrorである。
 historyはstreet内raise-toを表すedge labelのtokenとdeal cardから組み立てる。iso統合されたdealは代表card、cardの無いall-in runoutは`dealN`で表示する。streetとparentは木から、handとroot rangeは埋込みconfigから再計算する。
 
 chunkの展開内容はblockの連結を、偶数offset byte列・奇数offset byte列の順に並べ替えたもの（u16のbyte shuffle）である。戦略blockはu32 sref、u32 byte長、action nodeごとのactor support次元のu16戦略（action-major）である。
@@ -408,7 +408,7 @@ support内でもそのnodeで持ち得ないhandの値は0として保存する�
 version 1〜6はversion errorで明示的に拒否する。旧solutionは現行configから再solveする。v0.1.0のconfigは削除済みの`tree.include_allin`と`[tree.max_aggressive_actions]`を含むため、[変更履歴](../CHANGELOG.md)に従って移行する。
 古いartifactの値は読込み時に補正しない。埋め込まれたconfigを現行parserが拒否すれば照会も失敗する。
 
-共通Input checkpointは`SLVRCKPT` magicの同じ50-byte headerを使う。木全体の反復ではcontainer version 5、頻度目標がある場合はversion 6を使い、version 6はversion 5のmetadataとλのf64 vectorをpostcard tupleにする。部分木modeはcompactなstateと部分木identityを持つversion 8を使う。
+共通Input checkpointは`SLVRCKPT` magicの同じ50-byte headerを使う。木全体の反復ではcontainer version 5、頻度目標がある場合はversion 6を使い、version 6はversion 5のmetadataとλのf64 vectorをpostcard tupleにする。部分木modeはcompactなstateを持つversion 8を使い、metadataはversion 5のmetadata、λのf64 vector、`Subtree` mode tag（variant 1）のpostcard tupleである。λ vectorは頻度目標が無い場合も空vectorとして存在する。部分木の一致は互換性hash（profileとbaseのSHA-256を含む）、compact配列の長さ、mode tagで検査する。
 旧buildのcheckpointは互換性hashが異なるためresumeできない。再開したい場合は現行configから再solveする。
 header後はzstd frame（level 1、1 MiB window、run threads数の並列圧縮、frame checksumあり）。
 展開内容は次の順である。整数と浮動小数点配列の各要素はlittle endianである。

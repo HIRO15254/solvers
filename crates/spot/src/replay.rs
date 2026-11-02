@@ -163,20 +163,93 @@ pub(crate) fn apply(
     let seat = state.actor().map_err(|e| line_error(e.to_string()))?;
     let scale = table.setup.scale();
     let action = state.resolve_move(mv).map_err(|e| {
-        let correct = match &e {
+        let (message, correct) = match e {
+            IllegalMove::MissingActor => ("betting state has no player to act".into(), None),
+            IllegalMove::InactiveActor(actor) => (
+                format!(
+                    "{} is not active but was selected to act",
+                    table.positions[actor]
+                ),
+                None,
+            ),
             IllegalMove::WrongMove {
-                correct: Move::BetTo(to) | Move::RaiseTo(to),
-                ..
-            } if *to == state.maximum_target(seat) => Some("a".into()),
-            IllegalMove::WrongMove { correct, .. }
-            | IllegalMove::MustBeAllIn { correct, .. }
-            | IllegalMove::AllInIsCall { correct, .. } => Some(move_text(*correct, scale)),
-            _ => None,
+                attempted,
+                correct,
+                to_call,
+            } => {
+                let hint = match correct {
+                    Move::BetTo(to) | Move::RaiseTo(to) if to == state.maximum_target(seat) => {
+                        "a".into()
+                    }
+                    _ => move_text(correct, scale),
+                };
+                (
+                    format!(
+                        "{} is illegal with {} to call",
+                        move_text(attempted, scale),
+                        scale.amount_text(to_call)
+                    ),
+                    Some(hint),
+                )
+            }
+            IllegalMove::BelowMinimum { target, minimum } => (
+                format!(
+                    "target {} is below the minimum full target {}",
+                    scale.amount_text(target),
+                    scale.amount_text(minimum)
+                ),
+                None,
+            ),
+            IllegalMove::AboveMaximum { target, maximum } => (
+                format!(
+                    "target {} exceeds the maximum target {}",
+                    scale.amount_text(target),
+                    scale.amount_text(maximum)
+                ),
+                None,
+            ),
+            IllegalMove::MustBeAllIn { maximum, correct } => (
+                format!(
+                    "target {} uses the entire stack",
+                    scale.amount_text(maximum)
+                ),
+                Some(move_text(correct, scale)),
+            ),
+            IllegalMove::AllInIsCall {
+                maximum,
+                to_call,
+                correct,
+            } => (
+                format!(
+                    "all-in target {} does not exceed the bet ({} to call)",
+                    scale.amount_text(maximum),
+                    scale.amount_text(to_call)
+                ),
+                Some(move_text(correct, scale)),
+            ),
+            IllegalMove::RaisingClosed {
+                actor,
+                bet_to_match,
+                reopen_at,
+            } => (
+                format!(
+                    "raising is not reopened for {}: bet {}, reopen at {}",
+                    table.positions[actor],
+                    scale.amount_text(bet_to_match),
+                    scale.amount_text(reopen_at)
+                ),
+                None,
+            ),
+            IllegalMove::NoActiveOpponent { actor } => (
+                format!(
+                    "{} cannot bet or raise without another active player",
+                    table.positions[actor]
+                ),
+                (mv == Move::AllIn).then(|| move_text(Move::Call, scale)),
+            ),
         };
-        line_error(match correct {
-            Some(correct) => format!("{}: {e}; use {correct}", table.positions[seat]),
-            None => format!("{}: {e}", table.positions[seat]),
-        })
+        let suffix = correct.map_or_else(String::new, |correct| format!("; use {correct}"));
+        line_error(format!("{}: {message}{suffix}", table.positions[seat]))
     })?;
     actions.push(LineAction {
         street: state.street,
@@ -360,7 +433,14 @@ pub(crate) fn product(
             "line without board: starting partway through preflop is unsupported",
         ));
     }
-    if line.is_empty() || board.len() != state.street.index() + 2 {
+    if line.is_empty() {
+        return Err(SpotError::new(
+            Code::NLH004,
+            "spot.board",
+            "a board requires a line that closes Preflop; an empty line is the Preflop root",
+        ));
+    }
+    if board.len() != state.street.index() + 2 {
         return Err(SpotError::new(
             Code::NLH004,
             "spot.board",

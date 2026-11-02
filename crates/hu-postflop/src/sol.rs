@@ -14,8 +14,12 @@
 //! for. All integers are little-endian:
 //!
 //! ```text
-//! header | metadata frame | index frame | strategy chunks | value chunks | directory frame
+//! header | metadata frame | index frame | strategy chunks | value chunks |
+//! river-constraint chunks (v9) | directory frame
 //! ```
+//!
+//! In version 9 the directory is a postcard tuple of the strategy/value
+//! directory and the river-constraint chunk entries.
 //!
 //! Every frame and chunk is an independent zstd frame whose BLAKE3 is
 //! recorded: the metadata, index and directory hashes in the header, each
@@ -475,7 +479,18 @@ impl Chunk {
 }
 
 fn decompress(compressed: &[u8], limit: usize, what: &'static str) -> Result<Vec<u8>, SolError> {
-    zstd::bulk::decompress(compressed, limit).map_err(|_| SolError::Malformed(what))
+    zstd::zstd_safe::get_frame_content_size(compressed).map_err(|_| SolError::Malformed(what))?;
+    let decoder =
+        zstd::stream::read::Decoder::new(compressed).map_err(|_| SolError::Malformed(what))?;
+    let mut out = Vec::new();
+    decoder
+        .take(limit as u64 + 1)
+        .read_to_end(&mut out)
+        .map_err(|_| SolError::Malformed(what))?;
+    if out.len() > limit {
+        return Err(SolError::Malformed(what));
+    }
+    Ok(out)
 }
 
 /// Random access to a `.sol` file: header, metadata and directory are read
@@ -1961,7 +1976,8 @@ mod tests {
                 .is_some()
         );
 
-        let reader = SolReader::open(&written("intact.sol", &payload).0).unwrap();
+        let (intact, _) = written("intact.sol", &payload);
+        let reader = SolReader::open(&intact).unwrap();
         let second = reader.directory.strategy[1];
         let mut damaged = bytes.clone();
         damaged[second.offset as usize + 4] ^= 1;
@@ -1979,7 +1995,22 @@ mod tests {
             Err(SolError::Checksum("chunk"))
         ));
         assert!(matches!(read_sol(&path), Err(SolError::Checksum("chunk"))));
+        let _ = std::fs::remove_file(&intact);
         let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn decompression_rejects_oversize_and_malformed_frames() {
+        let compressed = zstd::bulk::compress(&[42; 32], 1).unwrap();
+        assert_eq!(decompress(&compressed, 32, "frame").unwrap(), vec![42; 32]);
+        assert!(matches!(
+            decompress(&compressed, 31, "frame"),
+            Err(SolError::Malformed("frame"))
+        ));
+        assert!(matches!(
+            decompress(&[1, 2, 3], 32, "frame"),
+            Err(SolError::Malformed("frame"))
+        ));
     }
 
     #[test]

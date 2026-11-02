@@ -95,10 +95,10 @@ pub struct PostflopConfig {
     /// cancels it out of `stacks_after` algebraically, so it reaches the
     /// baked payoffs only as a per-player constant — the same constant at
     /// every terminal, which no strategy, best response, or exploitability
-    /// can see. It survives in exactly one place: the level of the reported
-    /// root EV, which [`PostflopConfig::starting_share`] adds back so the
-    /// reported number is measured from the start of the subgame (see that
-    /// method).
+    /// can see. With the default `UtilityModel::baseline`, the reported root
+    /// EV is re-based using [`PostflopConfig::starting_share`]. Common-input
+    /// runs instead use `NlhPayoff::ev_offset()`, based on actual
+    /// contributions and expressed in utility units.
     pub pot: Chips,
     /// Chips behind for each player, at the start of the subgame.
     pub effective_stack: Chips,
@@ -123,11 +123,10 @@ pub struct PostflopConfig {
     /// [`PostflopGame::node_by_history`]. Costs a `String` + `Vec<String>`
     /// per action node, so large flop trees may want this off.
     pub track_node_info: bool,
-    /// The last player to bet or raise before this subgame began. Exists
-    /// only to define the `cbet`/`donk` tree-script variables on the
-    /// starting street (see `rule_context`); it affects nothing else, and in
-    /// particular is unrelated to the previous-aggressor bookkeeping across
-    /// streets *within* the subgame.
+    /// The last player to bet or raise on the street immediately before the
+    /// starting street, or `None` if that street checked through. Seeds
+    /// `LineState::previous_aggressor` for the starting street's `cbet` and
+    /// `donk` tree-script variables.
     pub preflop_aggressor: Option<Player>,
 }
 
@@ -135,16 +134,11 @@ impl PostflopConfig {
     /// This player's slice of the starting pot, under the internal
     /// floor/ceil split (see [`PostflopConfig::pot`]).
     ///
-    /// Solve payoffs are measured from before the pot was built, which is
-    /// what keeps an unraked chip-EV game exactly zero-sum. Adding this
-    /// share back to a player's root EV re-bases it on the start of the
-    /// subgame: "chips this player takes out of the pot, minus the chips
-    /// they put in from here". The two re-based EVs then sum to
-    /// `pot - E[rake]`, which is the convention PioSOLVER and GTO Wizard
-    /// report and what the validation workflow compares against. Because
-    /// the solver value already carries `-starting_share`, adding it back
-    /// cancels the split exactly: the reported EV is the same whichever way
-    /// an odd chip was assigned.
+    /// For utility models using the default `UtilityModel::baseline`, solve
+    /// payoffs are measured from before the pot was built. Adding this share
+    /// to a player's root EV re-bases it on the start of the subgame and
+    /// cancels the synthetic split. Common-input runs instead re-base with
+    /// `NlhPayoff::ev_offset()`, using actual contributions in utility units.
     pub fn starting_share(&self, player: Player) -> Chips {
         let oop = Chips(self.pot.0 / 2);
         match player {
@@ -750,11 +744,7 @@ impl PostflopEvaluator {
     }
 }
 
-/// Everything about one betting line needed to keep building: which street,
-/// the board so far, whose turn, chips already committed this subgame
-/// (persists across streets), what's owed this street, and street-local
-/// bookkeeping (raise count, whether the street has seen a check, whether
-/// either player is already all-in).
+/// The line's board so far (3–5 cards), without heap allocation.
 #[derive(Clone, Copy)]
 struct LineBoard {
     cards: [Card; 5],
@@ -785,14 +775,19 @@ impl std::ops::Deref for LineBoard {
     }
 }
 
+/// Everything about one betting line needed to keep building: which street,
+/// the board so far, whose turn, chips already committed this subgame
+/// (persists across streets), what's owed this street, and street-local
+/// bookkeeping (raise count, whether the street has seen a check, whether
+/// either player is already all-in).
 #[derive(Clone)]
 struct LineState {
     street: Street,
     board: LineBoard,
     /// Suit-permutation-invariant summary of `board`, for the tree-script
     /// board predicates (`paired`, `two_tone`, ...). Computed once per
-    /// chance branch -- at the root, and again in `deal_chance` each time a
-    /// card is dealt -- and never recomputed per decision node, since it
+    /// chance branch -- at the root, and again in `LineState::dealt` each
+    /// time a card is dealt -- and never recomputed per decision node, since it
     /// only ever changes when `board` does.
     board_facts: BoardFacts,
     to_act: Player,
@@ -809,18 +804,17 @@ struct LineState {
     /// shared value suffices for both players' street-relative wagers (see
     /// `sized_targets`).
     street_start: Chips,
-    /// Size of the last full bet/raise increment on this street; `ZERO`
-    /// before any bet/raise has happened this street. Reset at each street
-    /// start, alongside `street_start`.
+    /// Size of the last bet/raise increment on this street, including a short
+    /// all-in; `ZERO` before any bet/raise. A short all-in cannot be raised
+    /// in heads-up play. Reset at each street start alongside `street_start`.
     last_full_raise: Chips,
-    /// The last player to bet or raise on the PREVIOUS street; `None` when
-    /// that street checked through, or when this is the subgame's first
-    /// street. Read by the tree-script `donk` variable via `rule_context` --
-    /// see `docs/nlh-input-v1.jp.md`'s effectと合法性 chapter.
+    /// The last player to bet or raise on the previous street, or `None` if
+    /// it checked through. On the starting street, seeded from
+    /// `config.preflop_aggressor`. Read by `cbet` and `donk` via `rule_context`.
     previous_aggressor: Option<Player>,
     /// The last player to bet or raise on THIS street so far; `None` until
     /// someone does. Carried forward into the next street's
-    /// `previous_aggressor` by `street_end`/`deal_chance`.
+    /// `previous_aggressor` by `LineState::dealt`.
     street_aggressor: Option<Player>,
 }
 
@@ -1039,8 +1033,8 @@ fn chance_groups(board: &[Card], iso_merging: bool, sym: &[SuitPerm]) -> Vec<Dea
 /// bumped up to the minimum full raise, clamped to all-in, sorted, deduped,
 /// and filtered down to targets that actually raise the bet faced — the resolution order fixed by
 /// `docs/nlh-input-v1.jp.md`'s `[tree]` size-literal table
-/// (identical to `mw_preflop::betting::BettingState::legal_actions`'s size
-/// resolution, `ToChips`/chip-unit literals instead of `ToBb`/bb). Returned
+/// (the same resolution order as P2 except that P1 caps the minimum at
+/// all-in and bumps to it rather than discarding a smaller size). Returned
 /// as *additional* contribution over the actor's current street wager — the
 /// shape both `Builder::betting` and the counting mirror `Counting::betting`
 /// consume — so the two can never disagree about a node's action count.
@@ -1210,8 +1204,11 @@ fn action_sort_key(action: NodeAction) -> (u8, u32) {
 }
 
 /// This node's common postflop values, filled in from `state`/`config`.
-/// `state.to_act`: `in_position` and `previous_aggressor` are both read
-/// relative to whoever is on the move at this node, not either player fixed.
+/// `spr` is provisional: it uses the actor's stack and is zero for a zero
+/// pot. `pot` and `to_call` are in chips. `node_actions` replaces `spr` with
+/// effective-stack SPR (infinity for a zero pot) and converts those amounts
+/// to big blinds before evaluating conditions. `in_position` and
+/// `previous_aggressor` are relative to the actor at this node.
 fn rule_context(state: &LineState, config: &PostflopConfig) -> RuleContext {
     let actor = state.to_act;
     let pot_now = config.pot + state.contrib[Player::P0] + state.contrib[Player::P1];
@@ -1477,8 +1474,8 @@ struct Builder<'a> {
     shared_rank_tables: SharedRankTables,
     masks: Vec<Vec<f32>>,
     mask_cards: Vec<Card>,
-    /// Per-card reach mask, built lazily and cached by card index (at most
-    /// 52 masks total regardless of how many chance nodes share a card).
+    /// Per-card reach masks, built lazily and cached by card index: at most
+    /// one mask per seat per card (52 pairs).
     card_masks: [Option<PerPlayer<u32>>; 52],
     /// Quotient transitions for merged deal classes, interned by
     /// (board, members).
@@ -2036,7 +2033,7 @@ impl Builder<'_> {
     }
 
     /// Quotient transition for a merged deal class (see the comment at the
-    /// use site in [`Self::deal_chance`]). Interned by (board, members):
+    /// use site in [`Self::deal`]). Interned by (board, members):
     /// identical classes recur across betting lines of the same street.
     fn quotient_transition(&mut self, board: &[Card], group: &DealGroup) -> PerPlayer<u32> {
         let key = (board.to_vec(), group.members.clone());
@@ -2269,7 +2266,7 @@ fn selector_match_bound(selector: &str, max_deals: u64, action_nodes: u64) -> u6
 pub struct MemoryEstimate {
     /// Bytes for an `F32Storage` backend (two `f32` arenas).
     pub f32_bytes: u64,
-    /// Bytes for a hypothetical quantized `i16` backend: two `i16` arenas
+    /// Bytes for a quantized `i16` backend: two `i16` arenas
     /// plus a per-action-node `f32` scale pair (regrets, strategy sum).
     pub i16_bytes: u64,
     /// Bytes for i16 regrets, f32 strategy sums, and one regret scale per node.
@@ -3476,7 +3473,7 @@ memory = "1GiB"
             // Monotone: the three unused suits are freely permutable, so
             // every off-suit turn card merges into one class.
             "As Ks Qs",
-            // Two unused suits: the turn's `d` and `s` cards merge pairwise.
+            // Two unused suits: the river's `d` and `s` cards merge pairwise.
             "Th 9h 8h 2c",
             // Paired and two-tone, a different stabilizer again.
             "2c 2d 9d",

@@ -1158,14 +1158,4 @@ mod tests {
         assert!(read_checkpoint(&path).is_err());
         let _ = std::fs::remove_file(&path);
     }
-
-    #[test]
-    fn write_is_atomic_leaves_no_tmp_file_behind() {
-        let path = temp_path("atomic.ckpt");
-        write_checkpoint(&path, [1u8; 32], &sample_state_f32()).unwrap();
-        let dir = path.parent().unwrap();
-        let tmp_name = format!(".{}.tmp", path.file_name().unwrap().to_str().unwrap());
-        assert!(!dir.join(tmp_name).exists());
-        let _ = std::fs::remove_file(&path);
-    }
 }

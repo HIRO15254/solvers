@@ -214,6 +214,13 @@ impl Walker<'_> {
                 }
             }
             NodeKind::Chance => {
+                let span = self.tree.storage_spans[node as usize];
+                let base_span = self.base.game.tree.storage_spans[base_node as usize];
+                // Runouts without decisions have no strategies to map; their
+                // suit classes can differ even when both trees represent the same deals.
+                if span.sref_start == span.sref_end && base_span.sref_start == base_span.sref_end {
+                    return Ok(());
+                }
                 let base_board: Vec<_> = board
                     .iter()
                     .map(|&card| permute_card(&perm, card))
@@ -304,6 +311,58 @@ check_every = 20
 memory = "1GiB"
 threads = 1
 "#;
+
+    #[test]
+    fn maps_suit_restricted_tree_with_all_in_runouts() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spot.toml");
+        let sol = dir.path().join("base.sol");
+        let input = TURN
+            .replace("turn { checkdown }", "turn { replace bet [a] }")
+            .replace("max_iterations = 20", "max_iterations = 1")
+            .replace("check_every = 20", "check_every = 1");
+        let p = crate::prepare::prepare(&input, &path).unwrap();
+        crate::run::run(
+            crate::run::RunRequest {
+                prepared: &p,
+                checkpoint: &dir.path().join("base.ckpt"),
+                solution: &sol,
+                state: None,
+                evaluation_history: vec![],
+                elapsed_before: Duration::ZERO,
+                cancel: &AtomicBool::new(false),
+            },
+            &mut |_| Ok(()),
+            &mut |_| {},
+        )
+        .unwrap();
+        let base = crate::artifact::load_sol(&sol, 0, None).unwrap();
+        let profiled = format!(
+            "{input}\n[profile]\nfreeze_upstream = {{ solution = '{}' }}\n[[profile.lock]]\nnode = 'xx[?]x'\nhands = '4c4h'\nstrategy = {{ check = 1.0 }}\n",
+            sol.display()
+        );
+        let p = crate::prepare::prepare(&profiled, &path).unwrap();
+        let (game, index, _) = crate::run::build_profiled(&p).unwrap();
+        let map = BaseMap::new(&base, &game.tree, &index, &p.config).unwrap();
+        let view = crate::index::TreeView {
+            tree: &game.tree,
+            index: &index,
+        };
+        assert!(game.tree.nodes.iter().enumerate().any(|(id, node)| {
+            let span = game.tree.storage_spans[id];
+            node.kind == NodeKind::Chance
+                && span.sref_start == span.sref_end
+                && (0..node.num_children as usize)
+                    .any(|pos| view.deal_card(id as u32, pos).is_some())
+                && (0..node.num_children as usize)
+                    .any(|pos| view.deal_card(id as u32, pos).is_none())
+        }));
+        for (id, node) in game.tree.nodes.iter().enumerate() {
+            if node.kind == NodeKind::Action {
+                assert!(map.strategy(&base, id as u32).unwrap().is_some());
+            }
+        }
+    }
 
     #[test]
     fn every_mapped_action_reindexes_the_base_strategy() {

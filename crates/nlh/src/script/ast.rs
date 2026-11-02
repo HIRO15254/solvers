@@ -71,9 +71,8 @@ impl JamBound {
 
 /// One flattened tree-script rule: applied to the base action list at every
 /// decision node on `street` whose `condition` evaluates true. Rules from
-/// one compiled [`Script<V>`] apply in source order -- see the module's
-/// "flattening" doc on [`super::lower`] -- so this carries no separate
-/// priority field.
+/// one compiled [`Script<V>`] apply in source order (see [`super::lower`]
+/// and §9, scriptの構造, 平坦化 bullet), so this carries no separate priority field.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Rule<V> {
     pub street: Street,

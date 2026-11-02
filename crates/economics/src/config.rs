@@ -6,7 +6,8 @@ use thiserror::Error;
 
 use crate::rake_condition::{CompiledRakeCondition, compile as compile_rake_condition};
 
-/// Standalone `[utility]` payload used by both CLI and direct library users.
+/// Utility settings lowered from `[economics]`; the serde shape is kept
+/// byte-stable for the P2 game fingerprint.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum UtilityConfig {

@@ -705,7 +705,7 @@ pub struct ValueRow {
     pub combo: String,
     pub weight: f32,
     /// Expected utility relative to the original subgame start, including
-    /// wagers already made. Chips for chip EV, prize units for ICM.
+    /// wagers already made. Utility units are BB for cash and prize units for ICM.
     pub ev: f32,
 }
 
@@ -948,7 +948,7 @@ pub struct ComparisonReport {
     pub max_strategy_l1: f64,
     pub max_strategy_node: String,
     /// Mean over nodes of that node's largest per-hand EV difference, in
-    /// chips.
+    /// utility units (BB for cash, prize units for ICM).
     pub mean_max_ev_delta: f64,
     pub max_ev_delta: f64,
     pub max_ev_node: String,

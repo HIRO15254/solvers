@@ -41,9 +41,8 @@ pub struct Settlement {
     pub ranks: SeatVec<Option<u16>>,
 }
 
-/// Builds contribution layers before rake.  Eligibility-cap breakpoints are
-/// included in addition to contribution breakpoints because a BBA can make a
-/// short big blind eligible for part of a one-contributor layer.
+/// Builds contribution layers before rake. Layers are cut at each seat's
+/// individual contribution; the BBA is a separate common main pot.
 pub fn build_pots(state: &BettingState) -> Result<PotConstruction, SettlementError> {
     let mut boundaries = Vec::with_capacity(state.num_seats() * 2);
     for seat in state.seats.iter() {

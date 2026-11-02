@@ -58,17 +58,12 @@ pub(crate) fn start_street_from_board_len(len: usize) -> Street {
 
 // --- export (`solve --sol`) ------------------------------------------------
 
-/// Everything common-input P1 solve gathers up front (while the raw config text and
-/// storage-backend choice are still in hand) to export a `.sol` viewer
-/// artifact once the run completes. Threaded through as `Option<SolExportSpec>`
-/// rather than a `RunHooks`-style callback: unlike the per-check-cadence
-/// metrics/checkpoint autosave, this export happens exactly once, after the
-/// convergence loop finishes, so there is nothing to hook into a cadence.
+/// Specification built after the convergence loop for the one `.sol` export.
 pub(crate) struct SolExportSpec {
     pub path: PathBuf,
     pub mode: SolStreets,
-    /// Raw config file text, byte-for-byte -- becomes `SolMetadata::config_toml`
-    /// so the viewer can replay histories and re-solve rivers later.
+    /// Normalized effective config with resolved storage and inlined tree source.
+    /// Becomes `SolMetadata::config_toml` for history replay and river re-solves.
     pub config_toml: String,
     /// The backend the solve ran with (`SolMeta::storage`): "f32", "i16", or
     /// "i16-f32avg". Resolves `storage = "auto"` when the artifact is loaded.
@@ -1495,10 +1490,9 @@ memory='1GiB'
     }
 
     /// Small turn-start config (board "2s 7s Ks 2h", ranges "44,55" vs
-    /// "33,66", pot 2, stack 20, turn [2bb], river [100], no raises),
-    /// copied from `crates/hu-postflop/tests/viewer.rs`'s `small_turn_config`: a
-    /// single chance node whose children are exactly the river-entry nodes,
-    /// small enough to build/solve/re-solve fast even in a debug build.
+    /// "33,66", pot 2, stack 20, turn [2bb], river [100%], no raises),
+    /// copied from `crates/hu-postflop/tests/viewer.rs`'s `small_turn_config`.
+    /// The river is dealt after three turn lines: x-x, x-b-c and b-c.
     const TINY_TURN_TOML: &str = r#"
 schema = "solvers.nlh/v1"
 [table]
@@ -1540,19 +1534,10 @@ check_every = 16
 memory = "1GiB"
 "#;
 
-    /// Builds and solves a common-input P1 fixture
-    /// in-process and returns everything
-    /// `export_sol` needs.
-    ///
-    /// Uses the default (parallel) `ParConfig` rather than a sequential one:
-    /// every assertion in this module compares a value against the *same*
-    /// solver's own output (or checks an internal invariant like "columns
-    /// sum to 1"), never against a second, independently-run solve, so nondet
-    /// float-reduction order across parallel chance-branch fan-out cannot
-    /// make any of these tests flaky. Skipping the sequential-only
-    /// restriction cuts this fixture's already-noted-elsewhere-as-slow
-    /// solve time (see `crates/hu-postflop/tests/viewer.rs`'s comment on
-    /// `small_turn_config`) roughly 3x on this machine's 4 cores.
+    /// Builds and solves a common-input P1 fixture and returns everything
+    /// `export_sol` needs. Uses the configured parallel `ParConfig`.
+    /// Reductions run in fixed order; the streamed test checks identical
+    /// payloads across one- and eight-thread pools.
     fn build_and_solve<S: Storage>(
         raw: &str,
         iterations: u64,
@@ -2066,10 +2051,7 @@ memory = "1GiB"
             let trunk_avg = solver.average_strategy_at(entry);
             assert_eq!(sol_avg.len(), trunk_avg.len());
 
-            // The re-solve's own strategy must be a valid per-hand
-            // distribution -- a cheap stand-in for "the cached RiverSolve
-            // actually converged" without exposing any new public API to
-            // re-derive its `nash_conv` from outside this module.
+            // Check the re-solved strategy's shape and normalization, not convergence.
             for h in 0..num_hands {
                 let sum: f32 = (0..num_actions).map(|a| sol_avg[a * num_hands + h]).sum();
                 assert!(
@@ -2207,7 +2189,7 @@ memory = "1GiB"
     ///
     /// The weights are reach times compatible-opponent-reach: a
     /// counterfactual value was divided by the latter to become a per-hand
-    /// chip amount, so putting it back is what re-forms the aggregate.
+    /// utility value (BB for cash), so putting it back re-forms the aggregate.
     #[test]
     fn stored_values_aggregate_to_the_reported_root_ev() {
         let (solver, index, start_street, summary) =
@@ -2267,7 +2249,7 @@ memory = "1GiB"
         }
     }
 
-    /// Strategies and values are written by the same loop, so they cover
+    /// The batched strategy loop and separate two-seat EV pass must select
     /// exactly the same nodes: a reader that found a strategy can always
     /// find its values. `NoRivers` drops both together — a river node that
     /// has no stored strategy must not have stored values either, or a

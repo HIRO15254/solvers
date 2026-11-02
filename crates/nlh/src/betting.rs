@@ -177,11 +177,10 @@ pub struct BettingState {
     pub flop_dealt: bool,
     pub phase: HandPhase,
     /// Whether any seat has voluntarily called (as opposed to a forced blind
-    /// post) while `street == Preflop`. This is the only thing betting
-    /// history is read for: it decides whether preflop `isolate_sizes`
-    /// (rather than `bet_sizes`) govern a raise. Blinds are posted directly
-    /// in [`BettingState::new`] via `post`, never through [`Self::apply_action`], so
-    /// they never set this flag.
+    /// post) while `street == Preflop`. This decides whether preflop
+    /// `isolate_sizes` (rather than `bet_sizes`) govern a raise. Blinds are
+    /// posted directly in [`BettingState::new`] via `post`, never through
+    /// [`Self::apply_action`], so they never set this flag.
     pub preflop_voluntary_call_seen: bool,
     pub preflop_limpers: u8,
     pub preflop_flats: u8,

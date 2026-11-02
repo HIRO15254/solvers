@@ -34,9 +34,13 @@ fn parse_p1(raw: &str, path: &Path) -> Result<(spot::Document, Settings<input::S
     Ok((document, settings))
 }
 
-/// Parse and lower a P1 input without measuring its tree.
+/// Parse and lower an artifact's embedded P1 config without measuring its tree.
 pub fn lower_config(raw: &str, path: &Path) -> Result<crate::PostflopConfig> {
-    let (document, settings) = parse_p1(raw, path)?;
+    let document = spot::Document::parse_embedded(raw, path)?;
+    if document.spot.product != spot::Product::HuPostflop {
+        bail!("NLH005: this command requires a P1 (HU Postflop) spot");
+    }
+    let settings = Settings::parse(&document.spot, &document.solver, &document.output)?;
     let mut config = input::lower(&document.spot, &settings)?;
     if let Some(profile) = &document.spot.profile {
         crate::profile::restrict_iso(&mut config, profile)?;
@@ -312,11 +316,10 @@ pub(crate) fn threads(p: &Prepared) -> Result<Option<usize>> {
 
 /// Configured worker threads, or every available core.
 fn run_threads(run: &spot::Run) -> Result<usize> {
-    Ok(run
-        .threads
-        .map(usize::try_from)
-        .transpose()?
-        .unwrap_or(std::thread::available_parallelism()?.get()))
+    match run.threads {
+        Some(n) => Ok(usize::try_from(n)?),
+        None => Ok(std::thread::available_parallelism()?.get()),
+    }
 }
 
 /// Reporting unit of the prepared cash or tournament utility.

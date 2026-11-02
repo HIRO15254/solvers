@@ -224,12 +224,13 @@ pub fn parse_class(arg: &str) -> Result<ComboClass, String> {
         .map(ComboClass)
         .map_err(|e| format!("parsing {arg:?}: {e}"))
 }
-/// Probabilities for the concrete combos selected by a parsed expression.
+/// Probabilities for selected concrete combos with positive actor reach.
 pub fn combo_rows(
     class: &ComboClass,
     hands: &crate::PostflopHands,
     player: Player,
     actions: usize,
+    reach: &[f32],
     avg: &[f32],
 ) -> Vec<ComboRow> {
     let num_hands = hands.len(player);
@@ -237,7 +238,7 @@ pub fn combo_rows(
         .combos(player)
         .iter()
         .enumerate()
-        .filter(|&(_, &c)| class.0.weight(c as usize) > 0.0)
+        .filter(|&(local, &c)| reach[local] > 0.0 && class.0.weight(c as usize) > 0.0)
         .map(|(local, &combo)| {
             let (hi, lo) = combo_cards(combo as usize);
             ComboRow {

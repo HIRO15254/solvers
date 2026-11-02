@@ -26,7 +26,8 @@
 //! identical-combo corrections, adding both outcomes in one own-hand loop.
 //! Lone terminals also add directly, without a temporary or an add pass.
 //! Exact evaluation batches preserve the original f64 hand/group order.
-//! Recorded EVs and f64 CFR batches use exact f64 lane kernels; lone calls
+//! Unrecorded EV/BR value walks batch terminals through exact f64 lane kernels
+//! (bit-identical to `eval`); recorded EVs, lone calls and all f64 CFR calls
 //! retain the scalar kernels.
 
 use crate::hands::ABSENT;

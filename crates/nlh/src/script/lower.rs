@@ -2,8 +2,8 @@
 //! compiled [`Script`](super::Script) carries.
 //!
 //! Statements are visited in source order, including across nested blocks.
-//! Each action becomes a rule at its source position; there is no separate
-//! priority field (see the spec's "flattening" section).
+//! Each action becomes one rule per street at its source position; there is
+//! no separate priority field (see §9, scriptの構造, 平坦化 bullet).
 
 use super::ast::{Rule, StmtAst, StreetBlockAst};
 use super::cond::{Condition, Vars, and_simplify};
@@ -118,11 +118,10 @@ mod tests {
         }
     }
 
-    /// The spec's nested-`when` worked example: `flop when cbet { replace
-    /// bet [cb]; when wet { replace bet [cb,75] }; when spr<=3 { replace
-    /// raise [a] } }` must lower to exactly the three rules in its table.
+    /// A nested-`when` example with `replace bet [cb]`, nested
+    /// `replace bet [cb, 75%]`, and `replace raise [a]` lowers to three rules.
     #[test]
-    fn nested_when_matches_the_spec_worked_example() {
+    fn nested_when_lowers_to_three_rules() {
         let cb = SizeSpec::PotAfterCall { fraction: 0.33 };
         let cb75 = SizeSpec::PotAfterCall { fraction: 0.75 };
         let allin = SizeSpec::AllIn;
@@ -184,10 +183,10 @@ mod tests {
         assert!(!rules[2].condition.eval(&deep_ctx));
     }
 
-    /// The spec's `if` / `else if` / `else` worked example: four mutually
-    /// exclusive rows, each ANDed with the negation of every earlier arm.
+    /// This `if` / `else if` / `else` example yields four mutually exclusive
+    /// rows, each ANDed with the negation of every earlier arm.
     #[test]
-    fn if_else_chain_matches_the_spec_worked_example() {
+    fn if_else_chain_lowers_to_exclusive_rules() {
         let size25 = SizeSpec::PotAfterCall { fraction: 0.25 };
         let size33 = SizeSpec::PotAfterCall { fraction: 0.33 };
         let size66 = SizeSpec::PotAfterCall { fraction: 0.66 };

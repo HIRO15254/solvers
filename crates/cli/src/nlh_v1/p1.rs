@@ -536,9 +536,9 @@ pub(crate) fn print_artifact(diagnostic: hu_postflop::artifact::Diagnostic) {
             mode,
         } => {
             let size = if bytes >= 1024 * 1024 {
-                format!("{:.2} MB", bytes as f64 / (1024.0 * 1024.0))
+                format!("{:.2} MiB", bytes as f64 / (1024.0 * 1024.0))
             } else {
-                format!("{:.1} KB", bytes as f64 / 1024.0)
+                format!("{:.1} KiB", bytes as f64 / 1024.0)
             };
             println!(
                 "sol: wrote {} ({}, {} block{}, mode={:?})",

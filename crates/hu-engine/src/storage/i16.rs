@@ -3,10 +3,10 @@ use super::*;
 // --- I16Storage: quantized backend -----------------------------------
 
 /// Re-quantizes `vals` into `out_q` (same length), choosing a fresh scale
-/// with headroom below `i16::MAX` so future in-place updates rarely
-/// saturate, and returns that scale. An all-zero block gets scale `1.0`
-/// (arbitrary — dequantizing zeros is scale-invariant) rather than a
-/// division by zero.
+/// from the block maximum on every write. The pinned legacy target of 32000
+/// also bounds the rounded value for the narrowing in `quantize_value`.
+/// An all-zero block gets scale `1.0` (arbitrary — dequantizing zeros is
+/// scale-invariant) rather than a division by zero.
 pub(super) fn quantize_block(vals: &[f32], max_abs: f32, out_q: &mut [i16]) -> f32 {
     debug_assert_eq!(vals.len(), out_q.len());
     if max_abs == 0.0 {
@@ -178,10 +178,8 @@ pub(super) fn average_strategy_i16_impl(
 
 /// Quantized `i16` backend: two flat `i16` arenas plus one `f32` scale per
 /// action node (`storage_refs` entry) per arena. `value` is approximately
-/// `stored_i16 as f32` times `scale`, with `scale` re-chosen on every write
-/// to keep the block's largest-magnitude element at `32000` (headroom below
-/// `i16::MAX`, so a slightly larger successor value next iteration doesn't
-/// immediately saturate).
+/// `stored_i16 as f32` times `scale`, with `scale` re-chosen from the block
+/// maximum on every write using the pinned legacy target of 32000.
 ///
 /// `regret_matching`/`average_strategy` only need the current sign/ratio of
 /// values within a node, which a shared per-node scale doesn't change, so

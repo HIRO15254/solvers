@@ -8,7 +8,7 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use hu_postflop::artifact::{SolProvider, StrategyProvider};
 use hu_postflop::index::TreeView;
-use hu_postflop::queries::{self, LiveProvider, history_token, resolve_action};
+use hu_postflop::queries::{self, LiveProvider, history_token};
 use hu_postflop::{Card, NodeId, NodeKind, PerPlayer, Player};
 
 const RANKS: [char; 13] = [
@@ -248,7 +248,7 @@ impl<'a> Repl<'a> {
             }
             NodeKind::Action => {
                 let actions = view.actions(self.current);
-                let pos = match resolve_action(&actions, arg) {
+                let pos = match view.resolve_action(self.current, arg) {
                     Ok(p) => p,
                     Err(e) => {
                         println!("error: {e}");
@@ -334,7 +334,7 @@ impl<'a> Repl<'a> {
             return;
         }
         let actions = view.actions(self.current);
-        let pos = match resolve_action(&actions, arg) {
+        let pos = match view.resolve_action(self.current, arg) {
             Ok(p) => p,
             Err(e) => {
                 println!("error: {e}");
@@ -412,6 +412,13 @@ impl<'a> Repl<'a> {
                 return;
             }
         };
+        let reach = match self.reach_here() {
+            Ok(reach) => reach,
+            Err(error) => {
+                println!("error: {error}");
+                return;
+            }
+        };
         let actions = view.actions(self.current);
         let avg = match self.provider.average_strategy(self.current) {
             Ok(avg) => avg,
@@ -421,7 +428,14 @@ impl<'a> Repl<'a> {
             }
         };
         println!("combos {arg}:");
-        let rows = queries::combo_rows(&class, view.hands(), node.player, actions.len(), &avg);
+        let rows = queries::combo_rows(
+            &class,
+            view.hands(),
+            node.player,
+            actions.len(),
+            &reach[node.player],
+            &avg,
+        );
         if rows.is_empty() {
             println!("error: {arg} is not in the acting player range");
             return;
