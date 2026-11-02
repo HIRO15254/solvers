@@ -303,80 +303,45 @@ fn huge_declared_body_disconnect_does_not_stop_the_daemon() {
 #[test]
 fn saturated_slow_requests_receive_server_busy() {
     let daemon = Daemon::start(1);
-    let mut slow = Vec::new();
     // tiny_http buffers bodies up to 1 KiB before yielding the request, so a
     // larger declared body is needed for each handler to block reading it.
-    for _ in 0..64 {
-        let mut stream = TcpStream::connect(("127.0.0.1", daemon.port)).unwrap();
-        stream
-            .write_all(b"POST /v1/validate HTTP/1.1\r\nHost: localhost\r\nAuthorization: Bearer test-token\r\nContent-Length: 4096\r\nConnection: close\r\n\r\n{")
-            .unwrap();
-        slow.push(stream);
-    }
-    let started = std::time::Instant::now();
-    let deadline = started + std::time::Duration::from_secs(60);
-    // Outcome -> (count, first elapsed ms), reported if no 503 arrives.
-    let mut polls = std::collections::BTreeMap::<String, (usize, u128)>::new();
-    let response = loop {
-        let mut stream = TcpStream::connect(("127.0.0.1", daemon.port)).unwrap();
-        stream
-            .set_read_timeout(Some(std::time::Duration::from_secs(2)))
-            .unwrap();
-        stream
-            .write_all(b"GET /v1 HTTP/1.1\r\nHost: localhost\r\nAuthorization: Bearer test-token\r\nConnection: close\r\n\r\n")
-            .unwrap();
-        let mut response = String::new();
-        let outcome = match stream.read_to_string(&mut response) {
-            Ok(_) if response.starts_with("HTTP/1.1 503") => break response,
-            Ok(_) => response.lines().next().unwrap_or("empty").to_string(),
-            Err(error) => format!("{:?} after {:?}", error.kind(), response.lines().next()),
-        };
-        polls
-            .entry(outcome)
-            .or_insert((0, started.elapsed().as_millis()))
-            .0 += 1;
-        assert!(
-            std::time::Instant::now() < deadline,
-            "no 503 within 60 seconds; polls: {polls:?}; slow requests: {:?}",
-            slow_request_states(&mut slow)
-        );
-        std::thread::sleep(std::time::Duration::from_millis(25));
+    // Only these uploads use the daemon: 64 of them fill the handler slots
+    // until the 60-second read timeout, so exactly one is refused, whichever
+    // reaches the request loop last.
+    let slow: Vec<TcpStream> = (0..65)
+        .map(|_| {
+            let mut stream = TcpStream::connect(("127.0.0.1", daemon.port)).unwrap();
+            stream
+                .write_all(b"POST /v1/validate HTTP/1.1\r\nHost: localhost\r\nAuthorization: Bearer test-token\r\nContent-Length: 4096\r\nConnection: close\r\n\r\n{")
+                .unwrap();
+            stream.set_nonblocking(true).unwrap();
+            stream
+        })
+        .collect();
+    let answered = |stream: &TcpStream| match stream.peek(&mut [0]) {
+        Ok(_) => true,
+        Err(error) if error.kind() == std::io::ErrorKind::WouldBlock => false,
+        Err(error) => panic!("reading a slow request failed: {error}"),
     };
+    let refused = poll_until("the daemon to refuse one slow request", || {
+        slow.iter().position(answered)
+    });
+    for (index, stream) in slow.iter().enumerate() {
+        assert!(
+            index == refused || !answered(stream),
+            "request {index} was answered while 64 handlers should be busy"
+        );
+    }
+    let mut stream = &slow[refused];
+    stream.set_nonblocking(false).unwrap();
+    stream
+        .set_read_timeout(Some(std::time::Duration::from_secs(10)))
+        .unwrap();
+    let mut response = String::new();
+    stream.read_to_string(&mut response).unwrap();
+    assert!(response.starts_with("HTTP/1.1 503"), "{response}");
     let (_, body) = response.split_once("\r\n\r\n").unwrap();
     assert_eq!(parse(body)["code"], "server-busy");
-    drop(slow);
-}
-
-/// Groups what the daemon did with each slow request, so a saturation
-/// timeout shows whether their handlers held a slot the whole time.
-fn slow_request_states(slow: &mut [TcpStream]) -> std::collections::BTreeMap<String, usize> {
-    let mut states = std::collections::BTreeMap::new();
-    for stream in slow.iter_mut() {
-        stream
-            .set_read_timeout(Some(std::time::Duration::from_millis(50)))
-            .unwrap();
-        let mut buffer = [0; 512];
-        let state = match stream.read(&mut buffer) {
-            Ok(0) => "closed".to_string(),
-            Ok(read) => {
-                let answer = String::from_utf8_lossy(&buffer[..read]).into_owned();
-                let status = answer.lines().next().unwrap_or_default().to_string();
-                let body = answer.split_once("\r\n\r\n").map_or("", |(_, body)| body);
-                format!("{status} {body}")
-            }
-            Err(error)
-                if matches!(
-                    error.kind(),
-                    std::io::ErrorKind::WouldBlock | std::io::ErrorKind::TimedOut
-                ) =>
-            {
-                "pending".to_string()
-            }
-            Err(error) => format!("{:?}", error.kind()),
-        };
-        *states.entry(state).or_insert(0) += 1;
-    }
-    states
 }
 
 #[test]
