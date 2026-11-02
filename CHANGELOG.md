@@ -248,6 +248,16 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   peak in the measured cases (an earlier estimate reported 9384 MiB for a run
   that peaked at 5797 MiB). Profiled `no-rivers` runs also count the
   River-constraint stream's workspace.
+- Specifying both `tree.script` and `tree.source` now fails with `NLH002`
+  (previously `NLH003`), as the input specification requires.
+- Tree scripts now reject a street shorthand `when` without a condition and
+  type-check `define` declarations even when they are unused. Invalid `param`
+  declarations (self or forward references, values that are not a single token)
+  are rejected even when `[tree.params]` overrides them.
+- The daemon rejects submitted configurations that use `tree.source`, because
+  submitted configurations must be self-contained.
+- `inspect` without a config or `--sol`, and invalid `report` board-source
+  arguments, exit with status 2 like other input errors.
 
 ### Fixed
 
@@ -260,6 +270,50 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   flags), uses user-facing solver names, and `resume --help` describes
   heads-up `.ckpt` checkpoints. Its `--version` suffix is now
   `heads-up postflop only` (was `P1 only`).
+- Numeric negative zero is accepted wherever a zero amount is allowed.
+- A tree-script comment ending in `within` no longer breaks the next line.
+- Malformed Unicode in a range returns a parse error instead of panicking.
+- Type errors name the expected value instead of internal type names.
+- Illegal line actions show amounts and moves in line notation and give the
+  correct all-in call guidance; a board without a line explains that Preflop
+  must be closed first.
+- ICM with all-zero payouts no longer panics on large fields.
+- Opening a `.sol` no longer reserves the full metadata and directory size
+  limits in memory.
+- Malformed `.sol` files (overflowing offsets or lengths, implausible chunk
+  counts or dimensions, transitions that change the hand count, deals after the
+  river) are rejected with an error instead of panicking or over-allocating.
+- `report` rule warnings cover the whole requested board set even when solving
+  is canceled early, and completion diagnostics report cancellation correctly.
+- An explicit `[run] threads` no longer depends on detecting the processor count.
+- `watch --poll-secs` rejects invalid intervals instead of panicking.
+- `resume` refuses an unreadable or malformed manifest without replacing its
+  config, and output-directory adoption fails if the directory cannot be read.
+- Interrupted-run detection handles out-of-range Unix process IDs.
+- `inspect` navigation (`go`, `grid`) accepts BB and chip action labels like
+  `tree` and `export --node`, and `combos` excludes hands the player cannot
+  hold at the node.
+- The `sol: wrote` line reports sizes in binary units (KiB/MiB).
+- Concurrent daemon submissions no longer exceed job slots or overwrite run
+  directories, and waiting jobs start as soon as a slot is free.
+- A repeated cancel no longer interrupts a running solve twice, which could
+  lose its final checkpoint and `.sol`.
+- Polling a finished run no longer misses its final events, and run summaries
+  report a safe event offset for partially written logs.
+- GUI startup links work with tokens containing URL-special characters.
+- GUI setup: stale line-preset, tree-preview and validation responses no
+  longer overwrite newer input; picked line moves reset when the table or
+  document changes; range and stack errors show on their setup steps;
+  file-open errors stay separate from validation; Windows-formatted TOML keeps
+  multiline scripts readable.
+- GUI ranges parse spaced intervals, f32-style weights and `random` like the
+  solver; payouts keep their entered precision; effective-stack all-ins are
+  labeled correctly with unequal stacks.
+- GUI results and tree preview: Back works after opening Results without a
+  run, CSV export failures are shown, malformed URLs no longer crash, the
+  preview spinner stops when validation fails, re-dealing a card no longer
+  shows stale branches, and keyboard focus returns to the tree after its
+  focused item disappears.
 
 ## [0.1.0] - 2026-10-16
 

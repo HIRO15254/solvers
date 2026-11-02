@@ -296,7 +296,7 @@ impl Api {
     /// Merge through the CLI using a daemon-managed source.
     pub fn relock(&self, run_id: &str, request: &RelockRequest) -> ApiResult<CreateRunResponse> {
         let (source, _) = self.freeze_source(run_id)?;
-        reject_external_profile(&request.profile_toml)?;
+        reject_external_paths(&request.profile_toml)?;
         let scratch = tempfile::tempdir().map_err(internal)?;
         let fragment = scratch.path().join("profile.toml");
         std::fs::write(&fragment, &request.profile_toml).map_err(internal)?;
