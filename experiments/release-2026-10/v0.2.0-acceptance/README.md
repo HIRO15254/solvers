@@ -136,3 +136,14 @@ GUIは、release workflow `41046330977`と`41048224388`のLinux x86-64-v2 archiv
 | 10進の卓 | 木の表示は`Bet 1.815`・`Raise to 6.38`、Runsのlineは`BTN r2.5, BB c` |
 | `no-rivers`のRiver再solve | Turnで BB bet 1・BTN call の後、River Ahで「River re-solved on demand」と戦略（check 44.3%、bet 1 55.7%）が出た |
 | cancelとresume | 1,164,212 nodeのflop spotを実行中にcancelするとiteration 50のcheckpointを書いて`canceled`になり、Resumeでiteration 100まで進んだ |
+
+## full templateの可読化
+
+利用者の依頼で、`config new --template full`の額を実効configの`Nc`から卓の表示表記に変えた（既定`bb_chips = 1000`では`stack = 10`・`sb = 0.5`のBB数値、非10進の卓は`"Nc"`）。
+keyは実効configと同じ全keyのまま。P1のcommentのprofile例はtemplateの木のlabel（node `x`の`bet 2`）に合わせ、`freeze_upstream`以外をcomment解除して検証する試験を加えた。
+変更はPR #13（`c2ac927e`・`bb80b1c6`）。受入workflowは実行していない（cliのtemplateとspotの書き出し関数だけの変更で、通常CIのworkspace試験が対象の試験を含む）。
+
+| 検査 | run | commit | 結果 |
+|---|---|---|---|
+| 通常CI（PR #13） | [41450280593](https://github.com/HIRO15254/solvers/actions/runs/41450280593) | `bb80b1c6` | success。新しい試験`display_spelling_reads_back_to_the_same_chips`・`full_templates_spell_default_table_amounts_in_bb`・`full_p1_template_profile_example_resolves_against_its_tree`を含む |
+| tag `v0.2.0`のrelease workflow（付け直したtag） | [41451923805](https://github.com/HIRO15254/solvers/actions/runs/41451923805) | `bb80b1c6` | success。draftの6 archiveを`SHA256SUMS`と照合し、すべて一致した。6 buildのsmokeで`--version`は`solvers 0.2.0 (bb80b1c6), heads-up postflop only` |
