@@ -119,16 +119,6 @@ fn invalid_profiles_are_diagnosed() {
             Code::NLH003,
         ),
         (
-            "[[profile.lock]]\nnode = 'x'\nstrategy = { check = 0.7, call = 0.7 }",
-            "sum to at most 1",
-            Code::NLH003,
-        ),
-        (
-            "[[profile.lock]]\nnode = 'x'\nstrategy = { check = 0.5 }\nconfidence = 0.5",
-            "sum to 1",
-            Code::NLH003,
-        ),
-        (
             "[[profile.lock]]\nnode = 'x'\nstrategy = { check = 1 }\nconfidence = 0",
             "(0,1]",
             Code::NLH003,

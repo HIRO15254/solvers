@@ -58,15 +58,19 @@ fn validate_profile_uses_solver_lock_sum_and_reports_hands() {
     let prepared = hu_postflop::prepare::prepare(&accepted, path).unwrap();
     hu_postflop::run::validate_profile(&prepared).unwrap();
 
-    let rejected = format!(
-        "{RIVER}\n[[profile.lock]]\nnode = 'root'\nhands = 'AA'\nconfidence = 0.5\nstrategy = {{ check = 0.5 }}\n"
-    );
-    let prepared = hu_postflop::prepare::prepare(&rejected, path).unwrap();
-    let message = hu_postflop::run::validate_profile(&prepared)
-        .unwrap_err()
-        .to_string();
-    assert!(message.contains("NLH003"), "{message}");
-    assert!(message.contains("AA"), "{message}");
+    for lock in [
+        "confidence = 0.5\nstrategy = { check = 0.5 }",
+        "strategy = { check = 0.7, '1' = 0.7 }",
+    ] {
+        let rejected = format!("{RIVER}\n[[profile.lock]]\nnode = 'root'\nhands = 'AA'\n{lock}\n");
+        let prepared = hu_postflop::prepare::prepare(&rejected, path).unwrap();
+        let message = hu_postflop::run::validate_profile(&prepared)
+            .unwrap_err()
+            .to_string();
+        assert!(message.contains("NLH003"), "{message}");
+        assert!(message.contains("invalid lock probabilities"), "{message}");
+        assert!(message.contains("AA"), "{message}");
+    }
 }
 
 #[test]
