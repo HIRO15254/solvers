@@ -96,16 +96,12 @@ impl RunsRoot {
             config_hash: manifest.config_hash,
             completion: manifest.completion,
             failure: manifest.failure,
-            // Multiway rows count sweeps, the heads-up engine counts
-            // iterations; both answer "how far has this got".
             progress: progress_row
                 .as_ref()
-                .and_then(|row| row.get("sweeps").or_else(|| row.get("iteration"))?.as_u64()),
-            elapsed_secs: progress_row.as_ref().and_then(|row| {
-                row.get("elapsed_secs")
-                    .or_else(|| row.get("elapsedSecs"))?
-                    .as_f64()
-            }),
+                .and_then(|row| row.get("iteration")?.as_u64()),
+            elapsed_secs: progress_row
+                .as_ref()
+                .and_then(|row| row.get("elapsed_secs")?.as_f64()),
             last_progress: progress_row,
             events_offset,
             resumable: checkpoint
@@ -177,7 +173,7 @@ mod tests {
         manifest.write_atomic(&directory).unwrap();
         std::fs::write(
             directory.join(runfiles::RUN_PROGRESS_FILE),
-            "{\"sweeps\":7,\"elapsedSecs\":0.5}\n",
+            "{\"iteration\":7,\"elapsed_secs\":0.5}\n",
         )
         .unwrap();
     }

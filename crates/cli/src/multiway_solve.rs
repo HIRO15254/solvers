@@ -57,7 +57,7 @@ pub(crate) fn print_diagnostic(diagnostic: Diagnostic) {
             now.memory_bytes / (1024 * 1024)
         ),
         Diagnostic::ResourceCheckpoint(path) => {
-            eprintln!("resource_limit checkpoint: {}", path.display())
+            eprintln!("resource-limit checkpoint: {}", path.display())
         }
     }
 }

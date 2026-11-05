@@ -80,6 +80,11 @@ daemonはCLIの`validate` / `line` / `tree`子processへ委譲する。CLIは`sp
 計算・監視・成果物の意味は CLI でも確認できることを保つ。
 `status` / `watch` / `runs ls` は run directory を読み、daemon の solution view は
 `solvers export` へ委譲する。HTTP transport 固有の認証や queue と solver の機能を区別する。
+P2のsolution viewも繰り返しのnode selectorをCLIへ渡す。exportの行名・額のBB単位はP1と共通だが、
+P2で利用できない値はnull（CSVは空欄）、無い配列は空配列であり、0へ補完しない。
+P2のaction頻度はclass別の手番seat到達weightで加重し、到達量が不明なら頻度も不明である。
+P2のrest-of-streetは拒否し、decision・lock・River再解決はP1専用とする。
+selector構文とHTTP errorの詳細はCLI referenceに従う。
 
 ### R6. production config は schema 必須、solve の出力は run directory
 

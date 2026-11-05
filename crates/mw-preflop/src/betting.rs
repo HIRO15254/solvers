@@ -1,6 +1,6 @@
 //! P2 action-menu and street-transition policy over the shared NLH state.
 use crate::config::{BettingConfig, RuleAction, RuleEffect, SizeSpec, ValidatedMultiwayConfig};
-use crate::types::{MwChips, SeatId, SeatVec, Street};
+use crate::types::{MwChips, SeatId, SeatVec};
 pub use nlh::betting::{Action, BettingError, BettingState, HandPhase, SeatState, SeatStatus};
 use nlh::{StreetPolicy, TableSetup};
 
@@ -34,10 +34,8 @@ impl StreetPolicy for BettingConfig {
             None
         }
     }
-    fn skip_street(&self, street: Street, players: u8) -> bool {
-        self.for_street(street)
-            .max_betting_players
-            .is_some_and(|max| players > max)
+    fn skip_street(&self, _street: crate::types::Street, _players: u8) -> bool {
+        false
     }
 }
 
@@ -65,7 +63,6 @@ impl BettingMenu for BettingState {
             return Ok(Vec::new());
         }
         let actor = self.actor()?;
-        let street_config = config.for_street(self.street);
         let to_call = self.amount_to_call(actor);
         let mut actions = Vec::new();
 
@@ -73,43 +70,9 @@ impl BettingMenu for BettingState {
             actions.push(Action::Check);
         } else {
             actions.push(Action::Fold);
-            let unopened_limp = self.street == Street::Preflop
-                && self.aggressive_actions == 0
-                && self.bet_to_match == self.big_blind;
-            if config.allow_limp || !unopened_limp {
-                actions.push(self.call_action(actor));
-            }
+            actions.push(self.call_action(actor));
         }
 
-        if !self.can_raise(actor) {
-            return apply_tree_rules(self, config, actor, actions);
-        }
-
-        let sizes = if self.aggressive_actions != 0 {
-            &street_config.raise_sizes
-        } else if self.street == Street::Preflop && self.preflop_voluntary_call_seen {
-            street_config
-                .isolate_sizes
-                .as_ref()
-                .unwrap_or(&street_config.bet_sizes)
-        } else {
-            &street_config.bet_sizes
-        };
-        let mut targets = Vec::with_capacity(sizes.len());
-        for size in sizes {
-            let target = self.resolve_size(actor, size);
-            if target > self.bet_to_match {
-                targets.push(target);
-            }
-        }
-        targets.sort_unstable();
-        targets.dedup();
-
-        for target in targets {
-            if let Some(action) = self.action_for_target(actor, target) {
-                actions.push(action);
-            }
-        }
         apply_tree_rules(self, config, actor, actions)
     }
     fn apply(&mut self, action: Action, config: &BettingConfig) -> Result<(), BettingError> {
@@ -185,7 +148,7 @@ fn apply_tree_rules(
             RuleEffect::Jam(bound) => jam(state, actor, &mut actions, action_kind, bound, sizes)?,
             RuleEffect::Merge => merge(state, actor, &mut actions, action_kind, sizes)?,
             _ => {
-                let candidates = rule_candidates(state, config, action_kind, sizes)?;
+                let candidates = rule_candidates(state, actor, action_kind, sizes);
                 match effect {
                     RuleEffect::Add => actions.extend(candidates),
                     RuleEffect::Remove => {
@@ -267,39 +230,28 @@ fn merge(
 
 fn rule_candidates(
     state: &BettingState,
-    config: &BettingConfig,
+    actor: SeatId,
     action_kind: RuleAction,
     sizes: &[SizeSpec],
-) -> Result<Vec<Action>, BettingError> {
-    if !matches!(action_kind, RuleAction::Bet | RuleAction::Raise) {
-        let mut base = config.clone();
-        base.nlh_rules.clear();
-        return Ok(state
-            .legal_actions(&base)?
-            .into_iter()
+) -> Vec<Action> {
+    match action_kind {
+        RuleAction::Fold if state.amount_to_call(actor) != MwChips::ZERO => vec![Action::Fold],
+        RuleAction::Call if state.amount_to_call(actor) != MwChips::ZERO => {
+            vec![state.call_action(actor)]
+        }
+        RuleAction::Check if state.amount_to_call(actor) == MwChips::ZERO => vec![Action::Check],
+        RuleAction::Bet | RuleAction::Raise if state.can_raise(actor) => sizes
+            .iter()
+            .filter_map(|size| {
+                let target = state.resolve_size(actor, size);
+                (target > state.bet_to_match)
+                    .then(|| state.action_for_target(actor, target))
+                    .flatten()
+            })
             .filter(|action| action_matches(action, action_kind))
-            .collect());
+            .collect(),
+        _ => Vec::new(),
     }
-
-    let mut scoped = config.clone();
-    scoped.nlh_rules.clear();
-    let street = match state.street {
-        Street::Preflop => &mut scoped.preflop,
-        Street::Flop => &mut scoped.flop,
-        Street::Turn => &mut scoped.turn,
-        Street::River => &mut scoped.river,
-    };
-    if state.aggressive_actions == 0 {
-        street.bet_sizes = sizes.to_vec();
-        street.isolate_sizes = Some(sizes.to_vec());
-    } else {
-        street.raise_sizes = sizes.to_vec();
-    }
-    Ok(state
-        .legal_actions(&scoped)?
-        .into_iter()
-        .filter(|action| action_matches(action, action_kind))
-        .collect())
 }
 
 fn action_matches(action: &Action, kind: RuleAction) -> bool {
@@ -327,6 +279,7 @@ fn action_sort_key(action: &Action) -> (u8, u64) {
 mod tests {
     use super::*;
     use crate::config::{AbstractionConfig, AnteConfig, BlindConfig, MultiwayConfig, SeatConfig};
+    use crate::types::Street;
 
     fn state(stacks: &[f64], button: u8, ante: AnteConfig) -> (BettingState, BettingConfig) {
         let config = MultiwayConfig {
@@ -334,7 +287,7 @@ mod tests {
                 .iter()
                 .map(|&stack_bb| SeatConfig {
                     name: None,
-                    stack_bb,
+                    stack_chips: nlh::ChipScale::DEFAULT.from_bb(stack_bb).unwrap(),
                     range: String::new(),
                     betting: None,
                 })
@@ -368,54 +321,68 @@ mod tests {
     }
 
     #[test]
-    fn preflop_open_and_isolation_sizes_are_distinct() {
-        let (mut state, mut betting) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
-        betting.preflop.bet_sizes = vec![crate::config::SizeSpec::ToBb { value: 2.5 }];
-        betting.preflop.isolate_sizes = Some(vec![crate::config::SizeSpec::ToBb { value: 4.0 }]);
+    fn baseline_is_passive_and_script_adds_wagers() {
+        let (state, mut betting) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
+        assert!(
+            !state
+                .legal_actions(&betting)
+                .unwrap()
+                .iter()
+                .any(Action::is_aggressive)
+        );
+        with_script(&mut betting, "preflop { add raise [2.5bb] }");
 
         let opening_actions = state.legal_actions(&betting).unwrap();
-        assert!(opening_actions.iter().any(|action| {
-            matches!(
-                action,
-                Action::RaiseTo {
-                    to: MwChips(2_500),
-                    ..
-                }
-            )
-        }));
-        assert!(!opening_actions.iter().any(|action| {
-            matches!(
-                action,
-                Action::RaiseTo {
-                    to: MwChips(4_000),
-                    ..
-                }
-            )
-        }));
+        assert!(opening_actions.iter().any(|action| matches!(
+            action,
+            Action::RaiseTo {
+                to: MwChips(2_500),
+                ..
+            }
+        )));
+    }
 
+    #[test]
+    fn passive_rule_candidates_can_restore_removed_actions() {
+        let (state, mut betting) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
+        with_script(&mut betting, "preflop { remove call add call [] }");
+        assert!(
+            state
+                .legal_actions(&betting)
+                .unwrap()
+                .iter()
+                .any(|action| matches!(action, Action::Call { .. }))
+        );
+    }
+
+    #[test]
+    fn preflop_open_sizes_are_scripted() {
+        let (mut state, mut betting) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
+        with_script(&mut betting, "preflop { add raise [2.5bb, 4bb] }");
+        let opening_actions = state.legal_actions(&betting).unwrap();
+        assert!(opening_actions.iter().any(|action| matches!(
+            action,
+            Action::RaiseTo {
+                to: MwChips(2_500),
+                ..
+            }
+        )));
         let limp = opening_actions
             .into_iter()
             .find(|action| matches!(action, Action::Call { .. }))
             .unwrap();
         state.apply(limp, &betting).unwrap();
         let isolation_actions = state.legal_actions(&betting).unwrap();
-        assert!(isolation_actions.iter().any(|action| {
-            matches!(
-                action,
-                Action::RaiseTo {
-                    to: MwChips(4_000),
-                    ..
-                }
-            )
-        }));
+        assert!(isolation_actions.iter().any(|action| matches!(
+            action,
+            Action::RaiseTo {
+                to: MwChips(4_000),
+                ..
+            }
+        )));
     }
 
-    /// Builds a 3-seat, 100bb table with button=0 (so button is preflop UTG),
-    /// then advances to a node where seat 2 (the big blind) faces a raise:
-    /// button opens to 3bb, SB calls, BB is to act with `aggressive_actions
-    /// == 1` so `raise_sizes` (not `bet_sizes`) governs its menu.
     fn state_with_bb_facing_a_raise(betting: &mut BettingConfig) -> BettingState {
-        betting.preflop.bet_sizes = vec![crate::config::SizeSpec::ToBb { value: 3.0 }];
         let (mut bb_state, _) = state(&[100.0, 100.0, 100.0], 0, AnteConfig::None);
         let open_raise = bb_state
             .legal_actions(betting)
@@ -446,10 +413,10 @@ mod tests {
     #[test]
     fn min_raise_size_emits_exactly_the_minimum_full_raise_target() {
         let (_, mut betting) = state(&[100.0, 100.0, 100.0], 0, AnteConfig::None);
-        betting.preflop.raise_sizes = vec![
-            crate::config::SizeSpec::MinRaise,
-            crate::config::SizeSpec::PreviousBetMultiple { factor: 3.0 },
-        ];
+        with_script(
+            &mut betting,
+            "preflop { add raise [3bb] } preflop when aggressions >= 1 { replace raise [min, 3x] }",
+        );
         let bb_state = state_with_bb_facing_a_raise(&mut betting);
 
         // bet_to_match = 3bb, last_full_raise = 2bb, so the minimum full
@@ -476,10 +443,10 @@ mod tests {
     #[test]
     fn stack_fraction_ladder_scales_off_the_actors_maximum() {
         let (_, mut betting) = state(&[100.0, 100.0, 100.0], 0, AnteConfig::None);
-        betting.preflop.raise_sizes = vec![
-            crate::config::SizeSpec::StackFraction { fraction: 0.25 },
-            crate::config::SizeSpec::StackFraction { fraction: 0.5 },
-        ];
+        with_script(
+            &mut betting,
+            "preflop { add raise [3bb] } preflop when aggressions >= 1 { replace raise [25%stack, 50%stack] }",
+        );
         let bb_state = state_with_bb_facing_a_raise(&mut betting);
 
         // BB's maximum = actor_wager (1bb already posted) + remaining stack
@@ -506,15 +473,12 @@ mod tests {
     fn jam_raise_above_a_third_of_the_stack_is_strict_and_deduplicates_all_in() {
         let actions_for = |raise_to_bb: f64, script: &str| {
             let (mut state, mut betting) = state(&[99.0, 99.0, 99.0], 0, AnteConfig::None);
-            betting.preflop.bet_sizes = vec![
-                crate::config::SizeSpec::ToBb { value: 3.0 },
-                crate::config::SizeSpec::AllIn,
-            ];
-            betting.preflop.raise_sizes = vec![
-                crate::config::SizeSpec::ToBb { value: raise_to_bb },
-                crate::config::SizeSpec::AllIn,
-            ];
-            with_script(&mut betting, script);
+            with_script(
+                &mut betting,
+                &format!(
+                    "preflop {{ add raise [3bb, a] }} preflop when aggressions >= 1 {{ replace raise [{raise_to_bb}bb, a] }} {script}"
+                ),
+            );
 
             let open = state
                 .legal_actions(&betting)
@@ -572,8 +536,10 @@ mod tests {
         // The condition keeps the threshold away from an opening size, even
         // when that open is above one third of the stack.
         let (opening_state, mut opening_betting) = state(&[99.0, 99.0, 99.0], 0, AnteConfig::None);
-        opening_betting.preflop.bet_sizes = vec![crate::config::SizeSpec::ToBb { value: 40.0 }];
-        with_script(&mut opening_betting, above);
+        with_script(
+            &mut opening_betting,
+            &format!("preflop {{ add raise [40bb] }} {above}"),
+        );
         let opening = opening_state.legal_actions(&opening_betting).unwrap();
         assert_eq!(raise_to(&opening, MwChips(40_000), false), 1);
     }
@@ -582,12 +548,10 @@ mod tests {
     fn merge_raise_keeps_the_larger_target_with_a_pot_or_bb_width() {
         let raises_for = |script: &str| {
             let (state, mut betting) = state(&[99.0, 99.0, 99.0], 0, AnteConfig::None);
-            betting.preflop.bet_sizes = [2.0, 2.5, 3.0]
-                .map(|value| crate::config::SizeSpec::ToBb { value })
-                .into_iter()
-                .chain([crate::config::SizeSpec::AllIn])
-                .collect();
-            with_script(&mut betting, script);
+            with_script(
+                &mut betting,
+                &format!("preflop {{ add raise [2bb, 2.5bb, 3bb, a] }} {script}"),
+            );
             let actions = state.legal_actions(&betting).unwrap();
             assert!(actions.contains(&Action::Fold));
             actions
@@ -619,147 +583,6 @@ mod tests {
         );
     }
 
-    #[test]
-    fn max_betting_players_collapses_every_postflop_street_when_persistently_exceeded() {
-        let (mut state, mut betting) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
-        // All three postflop streets cap betting at two players; three
-        // players see the flop and check-down can never fold anyone, so
-        // every later street re-checks the same losing count and collapses
-        // too, all the way to showdown.
-        betting.flop.max_betting_players = Some(2);
-        betting.turn.max_betting_players = Some(2);
-        betting.river.max_betting_players = Some(2);
-
-        for expected_actor in [SeatId(0), SeatId(1)] {
-            assert_eq!(state.to_act, Some(expected_actor));
-            let call = state
-                .legal_actions(&betting)
-                .unwrap()
-                .into_iter()
-                .find(|action| matches!(action, Action::Call { .. }))
-                .unwrap();
-            state.apply(call, &betting).unwrap();
-        }
-        assert_eq!(state.to_act, Some(SeatId(2)));
-        // The big blind's option check is the last preflop action; it must
-        // fast-forward straight to showdown with no postflop decision node
-        // ever created.
-        state.apply(Action::Check, &betting).unwrap();
-
-        assert_eq!(state.phase, HandPhase::Runout);
-        assert_eq!(state.to_act, None);
-        assert_eq!(state.street, Street::River);
-        assert_eq!(state.players_on_street(Street::Flop), 3);
-        assert_eq!(state.players_on_street(Street::Turn), 3);
-        assert_eq!(state.players_on_street(Street::River), 3);
-        assert!(state.legal_actions(&betting).unwrap().is_empty());
-    }
-
-    #[test]
-    fn folds_during_flop_betting_can_reenable_a_stricter_turn_threshold() {
-        let (mut state, mut betting) = state(&[20.0, 20.0, 20.0, 20.0], 0, AnteConfig::None);
-        // Four players is exactly the flop's cap (betting happens); the turn
-        // has a stricter cap that only two folds during the flop can satisfy.
-        betting.flop.max_betting_players = Some(4);
-        betting.turn.max_betting_players = Some(2);
-
-        // Preflop: everyone limps/checks to see a 4-way flop.
-        for _ in 0..3 {
-            let call = state
-                .legal_actions(&betting)
-                .unwrap()
-                .into_iter()
-                .find(|action| matches!(action, Action::Call { .. }))
-                .unwrap();
-            state.apply(call, &betting).unwrap();
-        }
-        state.apply(Action::Check, &betting).unwrap();
-        assert_eq!(state.street, Street::Flop);
-        assert_eq!(state.phase, HandPhase::Betting);
-        assert_eq!(state.players_on_street(Street::Flop), 4);
-
-        // Flop: first actor bets, the next two fold to it, the last calls,
-        // leaving exactly two non-folded players.
-        let bet = state
-            .legal_actions(&betting)
-            .unwrap()
-            .into_iter()
-            .find(Action::is_aggressive)
-            .unwrap();
-        state.apply(bet, &betting).unwrap();
-        state.apply(Action::Fold, &betting).unwrap();
-        state.apply(Action::Fold, &betting).unwrap();
-        let call = state
-            .legal_actions(&betting)
-            .unwrap()
-            .into_iter()
-            .find(|action| matches!(action, Action::Call { .. }))
-            .unwrap();
-        state.apply(call, &betting).unwrap();
-
-        // The turn re-evaluates its own threshold against the post-fold
-        // count (2), which no longer exceeds it, so the turn has betting.
-        assert_eq!(state.street, Street::Turn);
-        assert_eq!(state.players_on_street(Street::Turn), 2);
-        assert_eq!(state.phase, HandPhase::Betting);
-        assert!(state.to_act.is_some());
-        assert!(
-            state
-                .legal_actions(&betting)
-                .unwrap()
-                .iter()
-                .any(|action| matches!(action, Action::Check))
-        );
-    }
-
-    #[test]
-    fn max_betting_players_boundary_equal_count_still_gets_betting() {
-        let (mut state, mut betting) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
-        betting.flop.max_betting_players = Some(2);
-
-        // UTG folds preflop; SB calls, BB checks its option: exactly two
-        // players reach the flop, exactly matching (not exceeding) the
-        // threshold, so the flop still gets betting.
-        state.apply(Action::Fold, &betting).unwrap();
-        let call = state
-            .legal_actions(&betting)
-            .unwrap()
-            .into_iter()
-            .find(|action| matches!(action, Action::Call { .. }))
-            .unwrap();
-        state.apply(call, &betting).unwrap();
-        state.apply(Action::Check, &betting).unwrap();
-
-        assert_eq!(state.street, Street::Flop);
-        assert_eq!(state.players_on_street(Street::Flop), 2);
-        assert_eq!(state.phase, HandPhase::Betting);
-        assert!(state.to_act.is_some());
-    }
-
-    #[test]
-    fn all_in_seat_counts_toward_the_checkdown_threshold() {
-        let (mut state, mut betting) = state(&[20.0, 20.0, 0.7], 0, AnteConfig::None);
-        assert_eq!(state.seats[SeatId(2)].status, SeatStatus::AllIn);
-        betting.flop.max_betting_players = Some(2);
-        betting.turn.max_betting_players = Some(2);
-        betting.river.max_betting_players = Some(2);
-
-        // Both non-all-in seats call to see the flop: three seats remain in
-        // the hand (two active, one all-in), so the flop's threshold of two
-        // is exceeded even though only two players can still act.
-        for _ in 0..2 {
-            let call = state
-                .legal_actions(&betting)
-                .unwrap()
-                .into_iter()
-                .find(|action| matches!(action, Action::Call { .. }))
-                .unwrap();
-            state.apply(call, &betting).unwrap();
-        }
-
-        assert_eq!(state.phase, HandPhase::Runout);
-        assert_eq!(state.players_on_street(Street::Flop), 3);
-    }
     #[test]
     fn tree_checkdown_skips_a_matching_street_without_decision_nodes() {
         let (mut state, mut betting) = state(&[20.0, 20.0, 20.0], 0, AnteConfig::None);
@@ -811,7 +634,10 @@ mod tests {
 
     #[test]
     fn conditional_checkdown_checks_only_button_and_folds_facing_a_bet() {
-        let (mut state, betting) = flop("flop when position == BTN { checkdown }", 3);
+        let (mut state, betting) = flop(
+            "flop { add bet [1bb] } flop when position == BTN { checkdown }",
+            3,
+        );
         assert_eq!(state.to_act, Some(SeatId(1)));
         assert!(state.legal_actions(&betting).unwrap().len() > 1);
         state.apply(Action::Check, &betting).unwrap();
@@ -821,7 +647,10 @@ mod tests {
         assert_eq!(state.street, Street::Turn); // BTN's check was elided.
         assert_eq!(state.seats[SeatId(0)].status, SeatStatus::Active);
 
-        let (mut state, betting) = flop("flop when position == BTN { checkdown }", 3);
+        let (mut state, betting) = flop(
+            "flop { add bet [1bb] } flop when position == BTN { checkdown }",
+            3,
+        );
         let bet = state
             .legal_actions(&betting)
             .unwrap()

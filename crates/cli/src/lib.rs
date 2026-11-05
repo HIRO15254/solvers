@@ -451,7 +451,7 @@ enum Command {
         #[arg(conflicts_with = "sol")]
         config: Option<std::path::PathBuf>,
         #[cfg(feature = "p2")]
-        /// Public node: root, a 32-digit history key, or slash-separated action labels/indices.
+        /// Public node: root, a history (`r2.5c`), slash-separated action labels/indices, or a 32-digit history key.
         #[arg(long, default_value = "root")]
         node: String,
         #[cfg(feature = "p2")]
@@ -459,9 +459,9 @@ enum Command {
         #[arg(long, value_enum, default_value = "node")]
         view: artifact_args::InspectView,
         #[cfg(feature = "p2")]
-        /// Override the acting seat used by the strategy grid.
+        /// Override the acting seat by position name or numeric index.
         #[arg(long)]
-        actor: Option<u8>,
+        actor: Option<String>,
         #[cfg(feature = "p2")]
         /// Samples for on-demand EV/CI evaluation.
         #[arg(long, default_value_t = 4096)]
@@ -519,6 +519,12 @@ enum Command {
         /// for every stored action node. Tree
         /// accepts any node kind; other node views require action nodes.
         /// Repeat to export nodes from one load in the given order.
+        #[cfg_attr(
+            feature = "p2",
+            arg(
+                help = "Which node the per-node views cover: `root`, a betting-line history (`xr10c`; wager amounts are street raise-to targets), slash-separated action labels or indices (`check/check/Th`, `raise to 2.5/0`), or (postflop) `all` for every stored action node; a preflop .mwsol also takes its 32-digit history keys. Tree accepts any node kind; other node views require action nodes. Repeat to export nodes from one load in the given order."
+            )
+        )]
         #[arg(long, default_value = "root")]
         node: Vec<String>,
         /// Postflop only: follow each selected node with the action nodes
@@ -819,7 +825,7 @@ pub fn main_impl() -> Result<()> {
                             &config,
                             &node,
                             view,
-                            actor,
+                            actor.as_deref(),
                             samples,
                             seed,
                             br_traversals,
@@ -867,7 +873,7 @@ pub fn main_impl() -> Result<()> {
                 }
                 #[cfg(feature = "p2")]
                 {
-                    multiway_artifact::export(&solution, view, format, output.as_deref())
+                    multiway_artifact::export(&solution, view, format, &node, output.as_deref())
                 }
                 #[cfg(not(feature = "p2"))]
                 Err(product_support::artifact_error())

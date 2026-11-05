@@ -8,10 +8,8 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
-/// One row of solver progress, written at every exploitability check.
-/// Deliberately flat (no nested game-specific fields) so
-/// `tools/plot_convergence.py` can read any run's file without knowing
-/// what game or algorithm produced it.
+/// One heads-up progress row, written at every exploitability check.
+/// Multiway runs use their own progress schema.
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct MetricsRow {
     pub iteration: u64,

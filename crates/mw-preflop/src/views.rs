@@ -22,38 +22,55 @@ pub struct RangeRow {
 
 /// Public-tree summary for an inspected artifact.
 #[derive(Clone, Debug, serde::Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct InspectSummary {
     pub format_version: u16,
     pub schema_version: u16,
-    pub bb_chips: u64,
-    pub sweeps: u64,
+    pub iterations: u64,
+    pub wall_secs: Option<f64>,
+    pub pot: Option<f64>,
+    pub effective_stack: Option<f64>,
+    pub nodes: usize,
+    pub stored_nodes: usize,
     pub profile_type: String,
     pub visited_infosets: usize,
-    pub public_nodes: usize,
     pub public_history_edges: usize,
     pub typed_action_entries: usize,
-    pub seats: Vec<crate::mwsol::MultiwaySeatResult>,
+    pub seats: Vec<InspectSeatResult>,
+}
+
+/// Saved summary metrics labeled with the table position.
+#[derive(Clone, Debug, serde::Deserialize, Serialize)]
+pub struct InspectSeatResult {
+    pub seat: String,
+    pub profile_ev: Option<crate::metrics::Estimate>,
+    pub average_positive_regret: f64,
+    pub strategy_drift_l1: f64,
+    pub deviation_gain_lower_bound: Option<crate::metrics::Estimate>,
+}
+
+/// One action in an inspected public history.
+#[derive(Clone, Debug, serde::Deserialize, Serialize)]
+pub struct InspectHistoryAction {
+    pub actor: String,
+    pub action_index: u32,
+    pub action: String,
 }
 
 /// One inspected public node, with actions and child history keys.
 #[derive(Clone, Debug, serde::Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct NodeView {
     pub history: String,
-    pub path: Option<Vec<crate::mwsol::MultiwayHistoryAction>>,
-    pub street: u8,
-    pub actor: Option<u8>,
-    pub pot_chips: u64,
-    pub pot_bb: f64,
-    pub remaining_stacks_chips: Vec<u64>,
-    pub legal_actions: Vec<crate::mwsol::MultiwayPublicAction>,
+    pub path: Option<Vec<InspectHistoryAction>>,
+    pub street: String,
+    pub actor: Option<String>,
+    pub pot: f64,
+    pub remaining_stacks: Vec<f64>,
+    pub legal_actions: Vec<String>,
     pub children: Vec<NodeChild>,
 }
 
 /// One child action of an inspected node.
 #[derive(Clone, Debug, serde::Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct NodeChild {
     pub history: String,
     pub action_index: u32,
@@ -66,13 +83,13 @@ pub struct StrategyCell {
     pub hand: String,
     pub bucket: usize,
     pub status: String,
-    pub weight: f64,
+    /// Average per-combo reach; null when reach is unknown.
+    pub weight: Option<f64>,
     pub strategy: Option<BTreeMap<String, f32>>,
 }
 
 /// One class reach weight; unknown reach remains distinct from zero.
 #[derive(Clone, Debug, serde::Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct RangeCell {
     pub hand: String,
     pub bucket: usize,
@@ -84,7 +101,7 @@ pub struct RangeCell {
 /// Conditional range grid for one seat.
 #[derive(Clone, Debug, serde::Deserialize, Serialize)]
 pub struct SeatRange {
-    pub seat: usize,
+    pub seat: String,
     pub grid: Vec<Vec<RangeCell>>,
 }
 
@@ -102,7 +119,7 @@ pub enum InspectData {
     },
     Strategy {
         node: NodeView,
-        actor: Option<u8>,
+        actor: Option<String>,
         grid: Option<Vec<Vec<StrategyCell>>>,
     },
     Range {
@@ -118,7 +135,6 @@ pub enum InspectData {
 
 /// A fresh or cached held-out evaluation of the artifact profile at a node.
 #[derive(Clone, Debug, serde::Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct InspectEv {
     pub scope: String,
     pub history: String,
@@ -133,6 +149,58 @@ pub struct InspectEv {
 fn parse_solution_config(config_toml: &str) -> Result<crate::input::Lowered> {
     crate::prepare::require_artifact_config(config_toml)?;
     Ok(crate::prepare::prepare(config_toml, Path::new("embedded.toml"))?.lowered)
+}
+
+/// Configured position names in artifact seat order.
+pub fn seat_positions(metadata: &crate::mwsol::MultiwaySolutionMetadata) -> Result<Vec<String>> {
+    crate::prepare::require_artifact_config(&metadata.config_toml)?;
+    let prepared = crate::prepare::prepare(&metadata.config_toml, Path::new("embedded.toml"))?;
+    Ok(prepared
+        .document
+        .spot
+        .table
+        .positions
+        .iter()
+        .cloned()
+        .collect())
+}
+
+fn position_at(positions: &[String], seat: usize) -> Result<&str> {
+    positions
+        .get(seat)
+        .map(String::as_str)
+        .ok_or_else(|| anyhow!("seat index {seat} is outside the table"))
+}
+
+fn inspect_ranges(
+    metadata: &crate::mwsol::MultiwaySolutionMetadata,
+    strategies: &[crate::mwsol::MultiwayStrategyBlock],
+    history: [u8; 16],
+    positions: &[String],
+) -> Result<Vec<serde_json::Value>> {
+    let mut ranges = range_matrix(metadata, strategies, history)?;
+    for (seat, range) in ranges.iter_mut().enumerate() {
+        range["seat"] = serde_json::json!(position_at(positions, seat)?);
+        if let Some(rows) = range["grid"].as_array_mut() {
+            for (row, cells) in rows.iter_mut().enumerate() {
+                if let Some(cells) = cells.as_array_mut() {
+                    for (col, cell) in cells.iter_mut().enumerate() {
+                        let combos = if row == col {
+                            6.0
+                        } else if row < col {
+                            4.0
+                        } else {
+                            12.0
+                        };
+                        if let Some(weight) = cell["reach_weight"].as_f64() {
+                            cell["reach_weight"] = serde_json::json!(weight / combos);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Ok(ranges)
 }
 
 fn build_solution_session(
@@ -181,16 +249,77 @@ pub enum InspectView {
 pub struct InspectRequest<'a> {
     pub history: &'a str,
     pub view: InspectView,
-    pub actor: Option<u8>,
+    pub actor: Option<&'a str>,
     pub samples: u64,
     pub seed: u64,
     pub br_traversals: u64,
 }
 
-fn parse_history(
+/// Lower-case street name of a stored street number, as the postflop views print streets.
+pub fn street_name(street: u8) -> &'static str {
+    match street {
+        0 => "preflop",
+        1 => "flop",
+        2 => "turn",
+        3 => "river",
+        _ => "unknown",
+    }
+}
+
+/// Render an action without changing its persisted label.
+pub fn display_action(action: &crate::mwsol::MultiwayPublicAction, bb_chips: u64) -> String {
+    use crate::mwsol::MultiwayPublicAction as Action;
+    let scale = nlh::ChipScale::new(bb_chips).expect("validated chip scale");
+    match action {
+        Action::Fold => "fold".into(),
+        Action::Check => "check".into(),
+        Action::Call { .. } => "call".into(),
+        Action::BetTo { amount_chips, .. } => {
+            format!("bet {}", scale.amount_text(nlh::MwChips(*amount_chips)))
+        }
+        Action::RaiseTo { amount_chips, .. } => format!(
+            "raise to {}",
+            scale.amount_text(nlh::MwChips(*amount_chips))
+        ),
+    }
+}
+
+/// Render a public history in the shared action-token grammar.
+pub fn display_history(metadata: &crate::mwsol::MultiwaySolutionMetadata, key: [u8; 16]) -> String {
+    let mut edges = Vec::new();
+    let mut current = key;
+    while current != [0; 16] {
+        let Some(edge) = metadata.histories.iter().find(|edge| edge.key == current) else {
+            return key_hex(key);
+        };
+        let Some(state) = metadata
+            .public_states
+            .iter()
+            .find(|state| state.history == edge.parent)
+        else {
+            return key_hex(key);
+        };
+        let Some(action) = state.legal_actions.get(edge.action_index as usize) else {
+            return key_hex(key);
+        };
+        edges.push(nlh::history_token(&display_action(
+            action,
+            metadata.bb_chips,
+        )));
+        current = edge.parent;
+    }
+    edges.reverse();
+    edges.concat()
+}
+
+/// Resolve a user-facing node selector without altering artifact labels.
+pub fn parse_history(
     metadata: &crate::mwsol::MultiwaySolutionMetadata,
     requested: &str,
 ) -> Result<[u8; 16]> {
+    if requested.len() > 4096 {
+        bail!("NLH003: invalid node selector");
+    }
     if requested.is_empty() || requested == "root" {
         return Ok([0; 16]);
     }
@@ -200,32 +329,96 @@ fn parse_history(
             *byte = u8::from_str_radix(&requested[index * 2..index * 2 + 2], 16)
                 .context("invalid history hex")?;
         }
-        return Ok(key);
-    }
-
-    let mut current = [0; 16];
-    for segment in requested.split('/').filter(|segment| !segment.is_empty()) {
-        let candidates: Vec<_> = metadata
-            .histories
+        if metadata
+            .public_states
             .iter()
-            .filter(|edge| edge.parent == current)
-            .collect();
-        let edge = if let Ok(index) = segment.parse::<u32>() {
-            candidates
-                .into_iter()
-                .find(|edge| edge.action_index == index)
-        } else {
-            candidates.into_iter().find(|edge| edge.action == segment)
+            .any(|state| state.history == key)
+        {
+            return Ok(key);
         }
-        .ok_or_else(|| {
-            anyhow!(
-                "history segment {segment:?} is not a child of {}",
-                key_hex(current)
-            )
-        })?;
-        current = edge.key;
+        bail!("NLH003: unknown node selector {requested:?}");
     }
-    Ok(current)
+    let scale = nlh::ChipScale::new(metadata.bb_chips).expect("validated chip scale");
+    let rounding = parse_solution_config(&metadata.config_toml)?
+        .game
+        .chip_rounding;
+    walk_selector(
+        requested,
+        scale,
+        rounding,
+        [0; 16],
+        |current| {
+            let state = metadata
+                .public_states
+                .iter()
+                .find(|state| state.history == current)?;
+            Some(
+                state
+                    .legal_actions
+                    .iter()
+                    .map(|action| display_action(action, metadata.bb_chips))
+                    .collect(),
+            )
+        },
+        |current, index| {
+            metadata
+                .histories
+                .iter()
+                .find(|edge| edge.parent == current && edge.action_index as usize == index)
+                .map(|edge| edge.key)
+        },
+    )
+    .ok_or_else(|| anyhow::anyhow!("NLH003: invalid node selector {requested:?}"))
+}
+
+/// Walk a node selector from `root`: P1 history tokens (`r2.5c`), or a `/` path of display
+/// labels and indices, with amounts in display notation, BB, `Nbb` or `Nc` matched after the
+/// table rounding. `labels(node)` lists a node's display labels and `child(node, index)` its
+/// child; `None` from either ends that reading of the selector.
+pub fn walk_selector<N: Copy>(
+    requested: &str,
+    scale: nlh::ChipScale,
+    rounding: nlh::Rounding,
+    root: N,
+    labels: impl Fn(N) -> Option<Vec<String>>,
+    child: impl Fn(N, usize) -> Option<N>,
+) -> Option<N> {
+    let label_path = requested.contains('/')
+        || requested.contains(' ')
+        || requested.parse::<usize>().is_ok()
+        || matches!(requested, "fold" | "check" | "call");
+    let tokenizations = if label_path {
+        vec![
+            requested
+                .split('/')
+                .filter(|part| !part.is_empty())
+                .collect::<Vec<_>>(),
+        ]
+    } else {
+        nlh::selector_history_steps(requested, scale, 512)
+    };
+    'tokenizations: for steps in tokenizations {
+        let mut current = root;
+        for step in steps {
+            let Some(labels) = labels(current) else {
+                continue 'tokenizations;
+            };
+            let refs: Vec<_> = labels.iter().map(String::as_str).collect();
+            let index = if label_path {
+                nlh::resolve_scaled_action(&refs, step, scale, rounding).ok()
+            } else {
+                labels.iter().position(|label| {
+                    nlh::history_token_matches(&nlh::history_token(label), step, scale, rounding)
+                })
+            };
+            let Some(next) = index.and_then(|index| child(current, index)) else {
+                continue 'tokenizations;
+            };
+            current = next;
+        }
+        return Some(current);
+    }
+    None
 }
 
 fn parse_runtime_range(raw: &str) -> Result<nlh::Range> {
@@ -257,14 +450,12 @@ fn matrix(mut cells: Vec<serde_json::Value>) -> Vec<Vec<serde_json::Value>> {
 
 fn strategy_matrix(
     strategies: &[crate::mwsol::MultiwayStrategyBlock],
-    weights: &[crate::mwsol::MultiwayStrategyWeight],
+    ranges: &[serde_json::Value],
     history: [u8; 16],
     actor: u8,
+    actions: &[crate::mwsol::MultiwayPublicAction],
+    bb_chips: u64,
 ) -> Vec<Vec<serde_json::Value>> {
-    let weight_by_key: BTreeMap<_, _> = weights
-        .iter()
-        .map(|entry| (entry.key, entry.weight))
-        .collect();
     let cells = (0..nlh::NUM_CLASSES)
         .map(|bucket| {
             let block = strategies.iter().find(|block| {
@@ -273,13 +464,15 @@ fn strategy_matrix(
                     && block.key.street == 0
                     && block.key.bucket_path[0] == bucket as u32
             });
+            let weight =
+                ranges[actor as usize]["grid"][bucket / 13][bucket % 13]["reach_weight"].as_f64();
             match block {
                 Some(block) => serde_json::json!({
                     "hand": hand_label(bucket),
                     "bucket": bucket,
                     "status": "visited",
-                    "weight": weight_by_key.get(&block.key).copied().unwrap_or(0.0),
-                    "strategy": block.actions.iter().cloned()
+                    "weight": weight,
+                    "strategy": actions.iter().map(|action| display_action(action, bb_chips))
                         .zip(block.probabilities.iter().copied())
                         .collect::<BTreeMap<_, _>>(),
                 }),
@@ -287,7 +480,7 @@ fn strategy_matrix(
                     "hand": hand_label(bucket),
                     "bucket": bucket,
                     "status": "unvisited",
-                    "weight": 0.0,
+                    "weight": weight,
                     "strategy": null,
                 }),
             }
@@ -296,7 +489,8 @@ fn strategy_matrix(
     matrix(cells)
 }
 
-fn range_matrix(
+/// Compute each seat's class reach at a public history.
+pub fn range_matrix(
     metadata: &crate::mwsol::MultiwaySolutionMetadata,
     strategies: &[crate::mwsol::MultiwayStrategyBlock],
     target: [u8; 16],
@@ -359,8 +553,8 @@ fn range_matrix(
                     "hand": hand_label(bucket),
                     "bucket": bucket,
                     "status": if reach.is_some() { "known" } else { "unvisited" },
-                    "reachWeight": reach,
-                    "normalizedWeight": reach.filter(|_| total > 0.0).map(|value| value / total),
+                    "reach_weight": reach,
+                    "normalized_weight": reach.filter(|_| total > 0.0).map(|value| value / total),
                 }))
                 .collect();
             serde_json::json!({ "seat": seat, "grid": matrix(cells) })
@@ -399,6 +593,7 @@ pub(crate) fn apply_class_action(
     for (bucket, reach) in values.iter_mut().enumerate() {
         let probability = action_probability(strategies, history, actor, bucket, action);
         *reach = match (*reach, probability) {
+            (Some(0.0), _) => Some(0.0),
             (Some(reach), Some(probability)) => Some(reach * f64::from(probability)),
             _ => None,
         };
@@ -432,6 +627,7 @@ pub fn inspect(
         );
     }
     let (metadata, strategies) = read_solution(path)?;
+    let format_version = crate::mwsol::MwSolReader::open(path)?.format_version();
     let history = parse_history(&metadata, requested_history)?;
     let state = metadata
         .public_states
@@ -444,37 +640,120 @@ pub fn inspect(
                 key_hex(history)
             )
         })?;
-    let actor = actor_override.or(state.actor);
-    let summary = serde_json::json!({
-        "formatVersion": crate::mwsol::MWSOL_FORMAT_VERSION,
-        "schemaVersion": metadata.schema_version,
-        "bbChips": metadata.bb_chips,
-        "sweeps": metadata.sweeps,
-        "profileType": "approximate-average",
-        "visitedInfosets": strategies.len(),
-        "publicNodes": metadata.public_states.len(),
-        "publicHistoryEdges": metadata.histories.len(),
-        "typedActionEntries": metadata.public_states.iter().map(|state| state.legal_actions.len()).sum::<usize>(),
-        "seats": metadata.seats,
-    });
-    let node = serde_json::json!({
-        "history": key_hex(history),
-        "path": metadata.resolve_history(history),
-        "street": state.street,
-        "actor": state.actor,
-        "potChips": state.pot_chips,
-        "potBb": state.pot_chips as f64 / metadata.bb_chips as f64,
-        "remainingStacksChips": state.remaining_stacks_chips,
-        "legalActions": state.legal_actions,
-        "children": metadata.histories.iter()
-            .filter(|edge| edge.parent == history)
-            .map(|edge| serde_json::json!({
-                "history": key_hex(edge.key),
-                "actionIndex": edge.action_index,
-                "action": edge.action,
+    let positions = seat_positions(&metadata)?;
+    let actor = match actor_override {
+        Some(value) => {
+            let index = value
+                .parse::<usize>()
+                .ok()
+                .or_else(|| positions.iter().position(|position| position == value))
+                .ok_or_else(|| {
+                    anyhow!("unknown actor {value:?}; expected a position name or seat index")
+                })?;
+            position_at(&positions, index)?;
+            Some(u8::try_from(index).map_err(|_| anyhow!("seat index {index} is too large"))?)
+        }
+        None => state.actor,
+    };
+    if let Some(seat) = actor {
+        position_at(&positions, seat as usize)?;
+    }
+    let summary_seats = metadata
+        .seats
+        .iter()
+        .map(|seat| {
+            Ok(serde_json::json!({
+                "seat": position_at(&positions, seat.seat as usize)?,
+                "profile_ev": seat.profile_ev,
+                "average_positive_regret": seat.average_positive_regret,
+                "strategy_drift_l1": seat.strategy_drift_l1,
+                "deviation_gain_lower_bound": seat.deviation_gain_lower_bound,
             }))
-            .collect::<Vec<_>>(),
+        })
+        .collect::<Result<Vec<_>>>()?;
+    let path = metadata
+        .resolve_history(history)
+        .map(|path| {
+            let mut current = [0; 16];
+            path.into_iter()
+                .map(|step| {
+                    let action = metadata
+                        .public_states
+                        .iter()
+                        .find(|state| state.history == current)
+                        .and_then(|parent| parent.legal_actions.get(step.action_index as usize))
+                        .map(|action| display_action(action, metadata.bb_chips))
+                        .unwrap_or(step.action);
+                    if let Some(edge) = metadata.histories.iter().find(|edge| {
+                        edge.parent == current && edge.action_index == step.action_index
+                    }) {
+                        current = edge.key;
+                    }
+                    Ok(InspectHistoryAction {
+                        actor: position_at(&positions, step.actor as usize)?.to_owned(),
+                        action_index: step.action_index,
+                        action,
+                    })
+                })
+                .collect::<Result<Vec<_>>>()
+        })
+        .transpose()?;
+    let stored_histories: BTreeSet<_> = strategies.iter().map(|block| block.key.history).collect();
+    let stored_nodes = metadata
+        .public_states
+        .iter()
+        .filter(|node| node.actor.is_some() && stored_histories.contains(&node.history))
+        .count();
+    let summary = serde_json::json!({
+        "format_version": format_version,
+        "schema_version": metadata.schema_version,
+        "iterations": metadata.sweeps,
+        "wall_secs": null,
+        "pot": metadata.public_states.iter().find(|node| node.history == [0; 16]).map(|node| node.pot_chips as f64 / metadata.bb_chips as f64),
+        "effective_stack": null,
+        "nodes": metadata.public_states.len(),
+        "stored_nodes": stored_nodes,
+        "profile_type": "approximate-average",
+        "visited_infosets": strategies.len(),
+        "public_history_edges": metadata.histories.len(),
+        "typed_action_entries": metadata.public_states.iter().map(|state| state.legal_actions.len()).sum::<usize>(),
+        "seats": summary_seats,
     });
+    // Children follow `legal_actions` order, as in the postflop views.
+    let mut child_edges = metadata
+        .histories
+        .iter()
+        .filter(|edge| edge.parent == history)
+        .collect::<Vec<_>>();
+    child_edges.sort_by_key(|edge| edge.action_index);
+    let children = child_edges
+        .into_iter()
+        .map(|edge| {
+            serde_json::json!({
+                "history": display_history(&metadata, edge.key),
+                "action_index": edge.action_index,
+                "action": state.legal_actions.get(edge.action_index as usize).map(|action| display_action(action, metadata.bb_chips)),
+            })
+        })
+        .collect::<Vec<_>>();
+    let node = serde_json::json!({
+        "history": display_history(&metadata, history),
+        "path": path,
+        "street": street_name(state.street),
+        "actor": state.actor.map(|seat| position_at(&positions, seat as usize)).transpose()?,
+        "pot": state.pot_chips as f64 / metadata.bb_chips as f64,
+        "remaining_stacks": state.remaining_stacks_chips.iter().map(|chips| *chips as f64 / metadata.bb_chips as f64).collect::<Vec<_>>(),
+        "legal_actions": state.legal_actions.iter().map(|action| display_action(action, metadata.bb_chips)).collect::<Vec<_>>(),
+        "children": children,
+    });
+    let ranges = if matches!(
+        view,
+        InspectView::Node | InspectView::Strategy | InspectView::Range
+    ) {
+        inspect_ranges(&metadata, &strategies, history, &positions)?
+    } else {
+        Vec::new()
+    };
     let rendered = match view {
         InspectView::Summary => summary,
         InspectView::Node => serde_json::json!({
@@ -482,25 +761,29 @@ pub fn inspect(
             "node": node,
             "strategy13x13": actor.map(|actor| strategy_matrix(
                 &strategies,
-                &metadata.strategy_weights,
+                &ranges,
                 history,
                 actor,
+                &state.legal_actions,
+                metadata.bb_chips,
             )),
-            "ranges13x13": range_matrix(&metadata, &strategies, history)?,
+            "ranges13x13": ranges,
         }),
         InspectView::Strategy => serde_json::json!({
             "node": node,
-            "actor": actor,
+            "actor": actor.map(|seat| position_at(&positions, seat as usize)).transpose()?,
             "grid": actor.map(|actor| strategy_matrix(
                 &strategies,
-                &metadata.strategy_weights,
+                &ranges,
                 history,
                 actor,
+                &state.legal_actions,
+                metadata.bb_chips,
             )),
         }),
         InspectView::Range => serde_json::json!({
             "node": node,
-            "ranges": range_matrix(&metadata, &strategies, history)?,
+            "ranges": ranges,
         }),
         InspectView::Ev => unreachable!(),
     };
@@ -1120,13 +1403,13 @@ fn inspect_ev(
     let fingerprint = runfiles::config_hash_hex(&metadata.config_fingerprint);
     if let Ok(contents) = std::fs::read_to_string(&cache_path)
         && let Ok(mut cached) = serde_json::from_str::<serde_json::Value>(&contents)
-        && cached["solutionFingerprint"] == fingerprint
-        && cached["history"] == key_hex(history)
+        && cached["solution_fingerprint"] == fingerprint
+        && cached["history"] == display_history(&metadata, history)
         && cached["samples"] == samples
         && cached["seed"] == seed
-        && cached["brTraversals"] == br_traversals
+        && cached["br_traversals"] == br_traversals
     {
-        cached["cacheHit"] = serde_json::Value::Bool(true);
+        cached["cache_hit"] = serde_json::Value::Bool(true);
         return Ok(InspectData::CachedEv(cached));
     }
     let (scope, evaluation) = if history == [0; 16] {
@@ -1152,12 +1435,12 @@ fn inspect_ev(
     };
     let rendered = serde_json::json!({
         "scope": scope,
-        "history": key_hex(history),
-        "solutionFingerprint": fingerprint,
+        "history": display_history(&metadata, history),
+        "solution_fingerprint": fingerprint,
         "samples": samples,
         "seed": seed,
-        "brTraversals": br_traversals,
-        "cacheHit": false,
+        "br_traversals": br_traversals,
+        "cache_hit": false,
         "evaluation": evaluation,
     });
     std::fs::write(
@@ -1202,9 +1485,9 @@ pub(crate) mod tests {
         let solution = test_solution();
         crate::mwsol::write_mwsol_with(&path, &solution, crate::mwsol::MwsolStorage::F32).unwrap();
         let mut cached = serde_json::json!({
-            "solutionFingerprint": runfiles::config_hash_hex(&solution.config_fingerprint),
-            "history": key_hex([0; 16]), "samples": 2, "seed": 1, "brTraversals": 0,
-            "cacheHit": false, "evaluation": {"opaque": true}, "extension": [1, 2, 3],
+            "solution_fingerprint": runfiles::config_hash_hex(&solution.config_fingerprint),
+            "history": "", "samples": 2, "seed": 1, "br_traversals": 0,
+            "cache_hit": false, "evaluation": {"opaque": true}, "extension": [1, 2, 3],
         });
         std::fs::write(
             path.with_extension("mwsol.inspect-cache.json"),
@@ -1225,7 +1508,7 @@ pub(crate) mod tests {
             &mut |_| panic!("a matching evaluation cache must not rebuild the session"),
         )
         .unwrap();
-        cached["cacheHit"] = serde_json::Value::Bool(true);
+        cached["cache_hit"] = serde_json::Value::Bool(true);
         assert_eq!(serde_json::to_value(data).unwrap(), cached);
     }
 

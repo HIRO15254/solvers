@@ -170,18 +170,12 @@ fn preflight_multiway_impl(
             outside_field,
             payouts,
         } => {
-            let scale = nlh::ChipScale::new(game_config.bb_chips).expect("validated chip scale");
             let mut total_chips = outside_field
                 .iter()
                 .map(|player| u128::from(player.stack_chips))
                 .sum::<u128>();
             for seat in &game_config.seats {
-                total_chips += u128::from(
-                    scale
-                        .from_bb(seat.stack_bb)
-                        .context("converting ICM table stacks")?
-                        .raw(),
-                );
+                total_chips += u128::from(seat.stack_chips.raw());
             }
             let field_players = game_config.seats.len() + outside_field.len();
             let paid_places = payouts
@@ -257,6 +251,12 @@ fn preflight_multiway_impl(
                 },
                 game.tree_rule_hits().unwrap_or_default(),
             ));
+        }
+        Err(
+            error @ (crate::tree::TreeError::DepthLimit { .. }
+            | crate::tree::TreeError::StructuralDepth { .. }),
+        ) => {
+            return Err(spot::SpotError::new(spot::Code::NLH003, "tree", error.to_string()).into());
         }
         Err(error) => {
             return Err(error).context("counting public tree and sizing the policy arena");
@@ -904,7 +904,8 @@ mod tests {
                 observed.decision_visits_by_street
             );
             assert_eq!(
-                json["seats"][seat]["candidatePolicyCoverage"]["uniformFallbackVisitsByStreet"]["flop"],
+                json["seats"][seat]["candidate_policy_coverage"]["uniform_fallback_visits_by_street"]
+                    ["flop"],
                 expected.uniform_fallback_visits_by_street.flop
             );
         }

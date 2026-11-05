@@ -42,12 +42,6 @@ pub enum RakeAllocation {
 pub enum RakeConfig {
     #[default]
     None,
-    PercentCap {
-        rate: f64,
-        cap_bb: f64,
-        #[serde(default)]
-        no_flop_no_drop: bool,
-    },
     Generic {
         rate: f64,
         cap_chips: Option<u64>,
@@ -60,21 +54,11 @@ pub enum RakeConfig {
         )]
         rounding_unit: MwChips,
     },
-    GgPreflop {
-        rate: f64,
-        cap_bb: f64,
-        exempt_pot_bb: f64,
-    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CompiledRake {
     None,
-    PercentCap {
-        rate: f64,
-        cap: MwChips,
-        no_flop_no_drop: bool,
-    },
     Generic {
         rate: f64,
         cap: Option<MwChips>,
@@ -82,11 +66,6 @@ pub enum CompiledRake {
         allocation: RakeAllocation,
         rounding: Rounding,
         rounding_unit: MwChips,
-    },
-    GgPreflop {
-        rate: f64,
-        cap: MwChips,
-        exempt_pot: MwChips,
     },
 }
 
@@ -142,28 +121,10 @@ impl UtilityConfig {
 }
 
 impl RakeConfig {
-    /// Compile BB amounts onto whole chips of `scale`.
-    pub fn compile(&self, scale: ChipScale) -> Result<CompiledRake, ConfigError> {
-        let chips = |field: &str, bb: f64| {
-            scale
-                .from_bb(bb)
-                .map_err(|_| ConfigError::Number(field.into()))
-        };
+    /// Compile and validate the rake configuration.
+    pub fn compile(&self, _scale: ChipScale) -> Result<CompiledRake, ConfigError> {
         match *self {
             RakeConfig::None => Ok(CompiledRake::None),
-            RakeConfig::PercentCap {
-                rate,
-                cap_bb,
-                no_flop_no_drop,
-            } => {
-                rate_value(rate)?;
-                nonnegative_finite("rake.cap_bb", cap_bb)?;
-                Ok(CompiledRake::PercentCap {
-                    rate,
-                    cap: chips("rake.cap_bb", cap_bb)?,
-                    no_flop_no_drop,
-                })
-            }
             RakeConfig::Generic {
                 rate,
                 cap_chips,
@@ -185,20 +146,6 @@ impl RakeConfig {
                     allocation,
                     rounding,
                     rounding_unit,
-                })
-            }
-            RakeConfig::GgPreflop {
-                rate,
-                cap_bb,
-                exempt_pot_bb,
-            } => {
-                rate_value(rate)?;
-                nonnegative_finite("rake.cap_bb", cap_bb)?;
-                nonnegative_finite("rake.exempt_pot_bb", exempt_pot_bb)?;
-                Ok(CompiledRake::GgPreflop {
-                    rate,
-                    cap: chips("rake.cap_bb", cap_bb)?,
-                    exempt_pot: chips("rake.exempt_pot_bb", exempt_pot_bb)?,
                 })
             }
         }
@@ -277,6 +224,16 @@ mod tests {
         assert!(serde_json::from_str::<RakeConfig>(
             r#"{"kind":"generic","rate":0.05,"cap_bb":1.0,"when":"true","allocation":"main-first","rounding":"down"}"#
         ).is_err());
+    }
+
+    #[test]
+    fn legacy_rake_variants_are_rejected() {
+        for json in [
+            r#"{"kind":"percent-cap","rate":0.05,"cap_bb":3.0}"#,
+            r#"{"kind":"gg-preflop","rate":0.05,"cap_bb":3.0,"exempt_pot_bb":1.0}"#,
+        ] {
+            assert!(serde_json::from_str::<RakeConfig>(json).is_err());
+        }
     }
 
     #[test]

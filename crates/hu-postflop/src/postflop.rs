@@ -2639,8 +2639,8 @@ fn selector_walk(
                         .collect();
                     let selected = if history {
                         labels.iter().position(|label| {
-                            crate::queries::history_token_matches(
-                                &crate::queries::history_token(label),
+                            nlh::selector::history_token_matches(
+                                &nlh::history_token(label),
                                 step,
                                 config.scale,
                                 config.chip_rounding,
@@ -2648,7 +2648,7 @@ fn selector_walk(
                         })
                     } else {
                         let refs: Vec<&str> = labels.iter().map(String::as_str).collect();
-                        crate::queries::resolve_scaled_action(
+                        nlh::selector::resolve_scaled_action(
                             &refs,
                             step,
                             config.scale,
@@ -2739,7 +2739,8 @@ fn selector_targets(config: &PostflopConfig, selector: &str) -> Option<Vec<Selec
     if selector.is_empty() || selector == "root" {
         return selector_walk(config, &[], false, false);
     }
-    let history_steps = crate::queries::selector_history_steps(selector, config.scale);
+    let history_steps =
+        nlh::selector::selector_history_steps(selector, config.scale, hu_engine::MAX_TREE_DEPTH);
     // Try canonical tokenization first, then other equivalent spellings.
     let history = history_steps.iter().find_map(|steps| {
         let targets = selector_walk(config, steps, true, !selector.contains("[?]"))?;

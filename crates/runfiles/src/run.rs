@@ -271,9 +271,8 @@ pub enum RunEventLevel {
 
 /// One discrete lifecycle event.
 ///
-/// This is deliberately not where periodic metrics go: those stay in
-/// `progress.jsonl`, whose rows are a fixed numeric schema that charting
-/// tools parse. Mixing the two would force every reader to filter.
+/// Periodic metrics stay in `progress.jsonl`; their schema depends on the
+/// product. Mixing events into that file would force readers to filter.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RunEvent {

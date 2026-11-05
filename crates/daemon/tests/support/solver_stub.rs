@@ -16,8 +16,18 @@ fn main() {
         "validate" => validate(&args[1..]),
         "line" => line(&args[1..]),
         "solve" | "resume" => solve_or_resume(command, &args[1..]),
+        "export" => export(&args[1..]),
         _ => {}
     }
+}
+
+fn export(args: &[std::ffi::OsString]) {
+    let node = args
+        .windows(2)
+        .find(|pair| pair[0] == "--node")
+        .map(|pair| format!("{:?}", pair[1].to_string_lossy()))
+        .unwrap_or_else(|| "null".to_string());
+    println!(r#"{{"node":{node}}}"#);
 }
 
 fn validate(args: &[std::ffi::OsString]) {
@@ -116,7 +126,7 @@ fn solve_or_resume(command: &str, args: &[std::ffi::OsString]) {
     // also sees the final progress row and the terminal event.
     std::fs::write(
         directory.join("progress.jsonl"),
-        "{\"iteration\":42,\"elapsedSecs\":0.5}\n",
+        "{\"iteration\":42,\"elapsed_secs\":0.5}\n",
     )
     .expect("write progress");
     let completed_event = format!(
