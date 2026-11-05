@@ -399,9 +399,7 @@ fn expand_parallel_frontier<G: ExternalSamplingGame>(
     frontier: &ParallelFrontier<G::State>,
     max_depth: u32,
 ) -> Result<ParallelPlanNode<G::State>, TreeError> {
-    if frontier.depth > max_depth {
-        return Err(TreeError::DepthLimit { limit: max_depth });
-    }
+    check_depth(frontier.depth, max_depth)?;
     let actor = game
         .actor(&frontier.state)
         .expect("frontier contains only decision states");
@@ -436,9 +434,7 @@ fn expand_parallel_frontier<G: ExternalSamplingGame>(
             .depth
             .checked_add(1)
             .ok_or(TreeError::DepthLimit { limit: max_depth })?;
-        if child_depth > max_depth {
-            return Err(TreeError::DepthLimit { limit: max_depth });
-        }
+        check_depth(child_depth, max_depth)?;
         let child_state = game.next_state_with(&frontier.state, &actions, index);
         if game.actor(&child_state).is_none() {
             children.push(ParallelPlanChild::Terminal);
@@ -639,9 +635,7 @@ fn preflight_node<G: ExternalSamplingGame>(
     max_depth: u32,
     preflight: &mut TreePreflight,
 ) -> Result<(), TreeError> {
-    if depth > max_depth {
-        return Err(TreeError::DepthLimit { limit: max_depth });
-    }
+    check_depth(depth, max_depth)?;
     let actor = game
         .actor(&state)
         .expect("caller only recurses into decision states");
@@ -709,13 +703,19 @@ fn preflight_node<G: ExternalSamplingGame>(
         });
     }
 
-    for index in 0..num_actions {
+    for (index, action_label) in action_labels.iter().enumerate() {
         let child_depth = depth
             .checked_add(1)
             .ok_or(TreeError::DepthLimit { limit: max_depth })?;
-        if child_depth > max_depth {
-            return Err(TreeError::DepthLimit { limit: max_depth });
-        }
+        check_depth(child_depth, max_depth).map_err(|error| {
+            let child = game.next_state_with(&state, &actions, index);
+            let street = if game.actor(&child).is_some() {
+                game.dense_node_context(&child).street
+            } else {
+                context.street
+            };
+            structural_depth_error(error, child_depth, max_depth, street, action_label)
+        })?;
         let child_state = game.next_state_with(&state, &actions, index);
         if game.actor(&child_state).is_some() {
             preflight_node(
@@ -726,7 +726,8 @@ fn preflight_node<G: ExternalSamplingGame>(
                 max_memory_bytes,
                 max_depth,
                 preflight,
-            )?;
+            )
+            .map_err(|error| error.prepend_action(action_label))?;
         } else {
             preflight.terminal_edges = preflight
                 .terminal_edges
@@ -752,9 +753,7 @@ fn enumerate_node<G: ExternalSamplingGame>(
     record_history: bool,
     parallel_nodes_remaining: Option<&AtomicUsize>,
 ) -> Result<NodeId, TreeError> {
-    if depth > max_depth {
-        return Err(TreeError::DepthLimit { limit: max_depth });
-    }
+    check_depth(depth, max_depth)?;
     let actor = game
         .actor(&state)
         .expect("caller only recurses into decision states");
@@ -815,9 +814,21 @@ fn enumerate_node<G: ExternalSamplingGame>(
         let child_depth = depth
             .checked_add(1)
             .ok_or(TreeError::DepthLimit { limit: max_depth })?;
-        if child_depth > max_depth {
-            return Err(TreeError::DepthLimit { limit: max_depth });
-        }
+        check_depth(child_depth, max_depth).map_err(|error| {
+            let child = game.next_state_with(&state, &actions, index);
+            let street = if game.actor(&child).is_some() {
+                game.dense_node_context(&child).street
+            } else {
+                context.street
+            };
+            structural_depth_error(
+                error,
+                child_depth,
+                max_depth,
+                street,
+                &nodes[node_id as usize].action_labels[index],
+            )
+        })?;
         let child_state = game.next_state_with(&state, &actions, index);
         let child_history = history.child(actor, index);
         if game.actor(&child_state).is_none() {
@@ -836,7 +847,8 @@ fn enumerate_node<G: ExternalSamplingGame>(
                 by_history,
                 record_history,
                 parallel_nodes_remaining,
-            )?;
+            )
+            .map_err(|error| error.prepend_action(&nodes[node_id as usize].action_labels[index]))?;
             children.push(Child::Decision(child_id));
         }
     }
@@ -1159,6 +1171,72 @@ const fn size_of_f32() -> u64 {
     std::mem::size_of::<f32>() as u64
 }
 
+fn structural_depth_error(
+    error: TreeError,
+    depth: u32,
+    max_depth: u32,
+    street: Street,
+    action: &str,
+) -> TreeError {
+    if depth >= hu_engine::MAX_TREE_DEPTH as u32 && max_depth >= hu_engine::MAX_TREE_DEPTH as u32 {
+        TreeError::StructuralDepth {
+            street,
+            line: DepthLine {
+                steps: vec![action.to_owned()],
+                count: 1,
+            },
+        }
+    } else {
+        error
+    }
+}
+
+#[derive(Debug)]
+pub struct DepthLine {
+    steps: Vec<String>,
+    count: usize,
+}
+
+impl std::fmt::Display for DepthLine {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for (index, step) in self.steps.iter().rev().enumerate() {
+            if index > 0 {
+                write!(f, " / ")?;
+            }
+            if index == 4 && self.count > 8 {
+                write!(f, "… / ")?;
+            }
+            write!(f, "{step}")?;
+        }
+        write!(f, " ({} steps)", self.count)
+    }
+}
+
+impl TreeError {
+    fn prepend_action(mut self, action: &str) -> Self {
+        if let Self::StructuralDepth { line, .. } = &mut self {
+            line.count += 1;
+            if line.steps.len() == 8 {
+                line.steps.remove(4);
+            }
+            line.steps.push(action.to_owned());
+        }
+        self
+    }
+}
+
+fn check_depth(depth: u32, max_depth: u32) -> Result<(), TreeError> {
+    if depth >= hu_engine::MAX_TREE_DEPTH as u32 {
+        return Err(TreeError::DepthLimit {
+            limit: hu_engine::MAX_TREE_DEPTH as u32,
+        });
+    }
+    if depth > max_depth {
+        return Err(TreeError::DepthLimit { limit: max_depth });
+    }
+    Ok(())
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum TreeError {
     #[error("root state has no acting seat; nothing to enumerate")]
@@ -1167,6 +1245,11 @@ pub enum TreeError {
     TooManyNodes { limit: usize },
     #[error("public betting tree exceeds the {limit}-action structural depth limit")]
     DepthLimit { limit: u32 },
+    #[error(
+        "action line {line} on {street:?} exceeds the maximum tree depth of {}",
+        hu_engine::MAX_TREE_DEPTH
+    )]
+    StructuralDepth { street: Street, line: DepthLine },
     #[error("decision node for actor {actor} has no legal actions")]
     NoActions { actor: usize },
     #[error("public tree node {node} produced an empty action label")]
@@ -1224,7 +1307,7 @@ mod tests {
             seats: (0..3)
                 .map(|_| SeatConfig {
                     name: None,
-                    stack_bb: 10.0,
+                    stack_chips: nlh::MwChips(10_000),
                     range: String::new(),
                     betting: None,
                 })
@@ -1232,7 +1315,18 @@ mod tests {
             button: SeatId(0),
             blinds: BlindConfig::default(),
             ante: AnteConfig::None,
-            betting: BettingConfig::default(),
+            betting: BettingConfig {
+                nlh_rules: nlh::script::Script::compile(
+                    "preflop { add raise [2.5x, a] } preflop when aggressions >= 1 { replace raise [3x, a] } flop, turn, river { add bet [50%, a] add raise [75%, a] }",
+                    &Default::default(),
+                    &spot::NLH_V1,
+                )
+                .unwrap()
+                .rules
+                .into_iter()
+                .map(crate::tree_rules::NlhTreeRule::from_compiled)
+                .collect(),
+            },
             forced_bets: None,
             abstraction: AbstractionConfig::default(),
             bb_chips: 1000,
@@ -1598,6 +1692,40 @@ mod tests {
     }
 
     #[test]
+    fn structural_depth_diagnostic_includes_action_line_and_street() {
+        let limit = hu_engine::MAX_TREE_DEPTH as u32;
+        let error = structural_depth_error(
+            TreeError::DepthLimit { limit },
+            limit,
+            limit,
+            Street::Flop,
+            "call",
+        )
+        .prepend_action("raise");
+        assert_eq!(
+            error.to_string(),
+            format!(
+                "action line raise / call (2 steps) on Flop exceeds the maximum tree depth of {limit}"
+            )
+        );
+    }
+
+    #[test]
+    fn shared_depth_limit_is_exclusive() {
+        let limit = hu_engine::MAX_TREE_DEPTH as u32;
+        assert!(check_depth(limit - 1, u32::MAX).is_ok());
+        assert!(matches!(
+            check_depth(limit, u32::MAX),
+            Err(TreeError::DepthLimit { limit: actual }) if actual == limit
+        ));
+        assert!(check_depth(1, 1).is_ok());
+        assert!(matches!(
+            check_depth(2, 1),
+            Err(TreeError::DepthLimit { limit: 1 })
+        ));
+    }
+
+    #[test]
     fn production_depth_guard_fails_before_unbounded_recursion() {
         let game = smoke_game();
         assert!(matches!(
@@ -1683,20 +1811,22 @@ mod tests {
     }
 
     #[test]
-    fn max_betting_players_threshold_shrinks_the_enumerated_tree() {
-        // No special-casing is needed in this module: check-down thresholds
-        // are entirely a `BettingState`/`HoldemGame` concern, so the public
-        // tree simply enumerates whatever legal actions (and thus decision
-        // nodes) the engine produces. This test is the regression guard that
-        // a low threshold really does shrink the tree instead of silently
-        // no-op'ing.
+    fn scripted_checkdown_shrinks_the_enumerated_tree() {
         let baseline_game = smoke_game();
         let baseline_tree = enumerate_tree(&baseline_game).unwrap();
 
         let mut capped_config = smoke_config();
-        capped_config.betting.flop.max_betting_players = Some(1);
-        capped_config.betting.turn.max_betting_players = Some(1);
-        capped_config.betting.river.max_betting_players = Some(1);
+        capped_config.betting.nlh_rules.extend(
+            nlh::script::Script::compile(
+                "flop, turn, river { checkdown }",
+                &Default::default(),
+                &spot::NLH_V1,
+            )
+            .unwrap()
+            .rules
+            .into_iter()
+            .map(crate::tree_rules::NlhTreeRule::from_compiled),
+        );
         let capped_game = HoldemGame::new(
             &capped_config,
             &UtilityConfig::ChipEv,
@@ -1707,10 +1837,7 @@ mod tests {
         let capped_tree = enumerate_tree(&capped_game).unwrap();
 
         assert!(capped_tree.nodes.len() < baseline_tree.nodes.len());
-        // A threshold of 1 checks down every postflop street: at least two
-        // players always remain non-folded whenever a hand reaches the flop
-        // (fewer would already be an uncontested terminal, not a decision
-        // node), so no postflop decision node can survive.
+        // Scripted checkdown elides every postflop decision.
         assert!(
             capped_tree
                 .nodes

@@ -750,6 +750,7 @@ dependencies = [
  "anyhow",
  "blake3",
  "economics",
+ "hu-engine",
  "libc",
  "nlh",
  "postcard",

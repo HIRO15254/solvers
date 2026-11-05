@@ -5,6 +5,21 @@ use super::*;
 use nlh::Range;
 use rand::RngCore;
 
+fn fixture_betting() -> crate::config::BettingConfig {
+    crate::config::BettingConfig {
+        nlh_rules: nlh::script::Script::compile(
+            "preflop { add raise [2.5x, a] } preflop when aggressions >= 1 { replace raise [3x, a] } flop, turn, river { add bet [50%, a] add raise [75%, a] }",
+            &Default::default(),
+            &spot::NLH_V1,
+        )
+        .unwrap()
+        .rules
+        .into_iter()
+        .map(crate::tree_rules::NlhTreeRule::from_compiled)
+        .collect(),
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum ToyState {
     Choose,
@@ -3399,9 +3414,7 @@ fn street_recall_node_children_and_strategies_at_use_the_enumerated_tree() {
 #[test]
 fn street_recall_holdem_game_reaches_every_street_without_error() {
     use crate::abstraction::FeatureHashAbstraction;
-    use crate::config::{
-        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, SeatConfig,
-    };
+    use crate::config::{AbstractionConfig, AnteConfig, BlindConfig, MultiwayConfig, SeatConfig};
     use crate::holdem::HoldemGame;
     use crate::types::SeatId;
     use economics::{RakeConfig, UtilityConfig};
@@ -3413,7 +3426,7 @@ fn street_recall_holdem_game_reaches_every_street_without_error() {
                 // Shallow stacks so a meaningful fraction of sampled
                 // hands actually reach the turn/river instead of
                 // resolving preflop.
-                stack_bb: 6.0,
+                stack_chips: crate::types::MwChips(6000),
                 range: String::new(),
                 betting: None,
             })
@@ -3421,7 +3434,7 @@ fn street_recall_holdem_game_reaches_every_street_without_error() {
         button: SeatId(0),
         blinds: BlindConfig::default(),
         ante: AnteConfig::None,
-        betting: BettingConfig::default(),
+        betting: fixture_betting(),
         forced_bets: None,
         abstraction: AbstractionConfig::default(),
         bb_chips: 1000,
@@ -3559,9 +3572,7 @@ fn street_recall_holdem_game_reaches_every_street_without_error() {
 #[test]
 fn real_holdem_vector_bucket_cache_separates_opponent_contexts_on_one_street() {
     use crate::abstraction::{BucketContext, MultiwayAbstraction};
-    use crate::config::{
-        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, SeatConfig,
-    };
+    use crate::config::{AbstractionConfig, AnteConfig, BlindConfig, MultiwayConfig, SeatConfig};
     use crate::holdem::HoldemGame;
     use crate::types::SeatId;
     use economics::{RakeConfig, UtilityConfig};
@@ -3587,7 +3598,7 @@ fn real_holdem_vector_bucket_cache_separates_opponent_contexts_on_one_street() {
         seats: (0..3)
             .map(|_| SeatConfig {
                 name: None,
-                stack_bb: 6.0,
+                stack_chips: crate::types::MwChips(6000),
                 range: String::new(),
                 betting: None,
             })
@@ -3595,7 +3606,7 @@ fn real_holdem_vector_bucket_cache_separates_opponent_contexts_on_one_street() {
         button: SeatId(0),
         blinds: BlindConfig::default(),
         ante: AnteConfig::None,
-        betting: BettingConfig::default(),
+        betting: fixture_betting(),
         forced_bets: None,
         abstraction: AbstractionConfig::default(),
         bb_chips: 1000,
@@ -3768,9 +3779,7 @@ fn vector_traverser_regret_trends_down_as_sweeps_accumulate() {
 #[test]
 fn vector_traverser_root_strategy_sum_is_dense_after_few_sweeps() {
     use crate::abstraction::FeatureHashAbstraction;
-    use crate::config::{
-        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, SeatConfig,
-    };
+    use crate::config::{AbstractionConfig, AnteConfig, BlindConfig, MultiwayConfig, SeatConfig};
     use crate::holdem::HoldemGame;
     use crate::types::SeatId;
     use economics::{RakeConfig, UtilityConfig};
@@ -3779,7 +3788,7 @@ fn vector_traverser_root_strategy_sum_is_dense_after_few_sweeps() {
         seats: (0..3)
             .map(|_| SeatConfig {
                 name: None,
-                stack_bb: 6.0,
+                stack_chips: crate::types::MwChips(6000),
                 range: String::new(),
                 betting: None,
             })
@@ -3787,7 +3796,7 @@ fn vector_traverser_root_strategy_sum_is_dense_after_few_sweeps() {
         button: SeatId(0),
         blinds: BlindConfig::default(),
         ante: AnteConfig::None,
-        betting: BettingConfig::default(),
+        betting: fixture_betting(),
         forced_bets: None,
         abstraction: AbstractionConfig::default(),
         bb_chips: 1000,
@@ -3852,9 +3861,7 @@ fn vector_traverser_root_strategy_sum_is_dense_after_few_sweeps() {
 #[test]
 fn vector_traverser_holdem_game_reaches_every_street_without_error() {
     use crate::abstraction::FeatureHashAbstraction;
-    use crate::config::{
-        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, SeatConfig,
-    };
+    use crate::config::{AbstractionConfig, AnteConfig, BlindConfig, MultiwayConfig, SeatConfig};
     use crate::holdem::HoldemGame;
     use crate::types::SeatId;
     use economics::{RakeConfig, UtilityConfig};
@@ -3863,7 +3870,7 @@ fn vector_traverser_holdem_game_reaches_every_street_without_error() {
         seats: (0..3)
             .map(|_| SeatConfig {
                 name: None,
-                stack_bb: 6.0,
+                stack_chips: crate::types::MwChips(6000),
                 range: String::new(),
                 betting: None,
             })
@@ -3871,7 +3878,7 @@ fn vector_traverser_holdem_game_reaches_every_street_without_error() {
         button: SeatId(0),
         blinds: BlindConfig::default(),
         ante: AnteConfig::None,
-        betting: BettingConfig::default(),
+        betting: fixture_betting(),
         forced_bets: None,
         abstraction: AbstractionConfig::default(),
         bb_chips: 1000,
@@ -3948,9 +3955,7 @@ fn vector_traverser_holdem_game_reaches_every_street_without_error() {
 #[test]
 fn vector_traverser_icm_smoke_test() {
     use crate::abstraction::FeatureHashAbstraction;
-    use crate::config::{
-        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, SeatConfig,
-    };
+    use crate::config::{AbstractionConfig, AnteConfig, BlindConfig, MultiwayConfig, SeatConfig};
     use crate::holdem::HoldemGame;
     use crate::types::SeatId;
     use economics::{FieldPlayerConfig, RakeConfig, UtilityConfig};
@@ -3959,7 +3964,7 @@ fn vector_traverser_icm_smoke_test() {
         seats: (0..3)
             .map(|_| SeatConfig {
                 name: None,
-                stack_bb: 8.0,
+                stack_chips: crate::types::MwChips(8000),
                 range: String::new(),
                 betting: None,
             })
@@ -3967,7 +3972,7 @@ fn vector_traverser_icm_smoke_test() {
         button: SeatId(0),
         blinds: BlindConfig::default(),
         ante: AnteConfig::None,
-        betting: BettingConfig::default(),
+        betting: fixture_betting(),
         forced_bets: None,
         abstraction: AbstractionConfig::default(),
         bb_chips: 1000,
@@ -4066,15 +4071,13 @@ pub(super) fn initialization_holdem_fixture() -> (
     SolverConfig,
 ) {
     use crate::abstraction::{FeatureHashAbstraction, FeatureHashParams};
-    use crate::config::{
-        AbstractionConfig, AnteConfig, BettingConfig, BlindConfig, MultiwayConfig, SeatConfig,
-    };
+    use crate::config::{AbstractionConfig, AnteConfig, BlindConfig, MultiwayConfig, SeatConfig};
     use economics::{RakeConfig, UtilityConfig};
     let game_config = MultiwayConfig {
         seats: (0..3)
             .map(|_| SeatConfig {
                 name: None,
-                stack_bb: 6.0,
+                stack_chips: crate::types::MwChips(6000),
                 range: String::new(),
                 betting: None,
             })
@@ -4082,7 +4085,7 @@ pub(super) fn initialization_holdem_fixture() -> (
         button: crate::types::SeatId(0),
         blinds: BlindConfig::default(),
         ante: AnteConfig::None,
-        betting: BettingConfig::default(),
+        betting: fixture_betting(),
         forced_bets: None,
         abstraction: AbstractionConfig {
             flop_buckets: 4,

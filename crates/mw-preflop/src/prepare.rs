@@ -138,8 +138,13 @@ fn oracle_rule_hits(p: &Prepared) -> Result<Vec<bool>> {
         if hits.iter().all(|hit| *hit) || state.phase.is_terminal() {
             return Ok(());
         }
-        if depth > 512 {
-            bail!("NLH003: tree: exceeds the P2 traversal depth limit");
+        if depth >= hu_engine::MAX_TREE_DEPTH {
+            return Err(spot::SpotError::new(
+                spot::Code::NLH003,
+                "tree",
+                "exceeds the maximum tree depth",
+            )
+            .into());
         }
         let key = serde_json::to_vec(&state)?;
         let mut hash = DefaultHasher::new();
@@ -176,14 +181,24 @@ fn oracle_rule_hits(p: &Prepared) -> Result<Vec<bool>> {
 
 /// Return unmatched tree rule warnings in source order.
 pub fn warnings_for_hits(game: &crate::MultiwayConfig, hits: &[bool]) -> Vec<String> {
-    game.betting
-        .nlh_rules
-        .iter()
-        .zip(hits)
-        .enumerate()
-        .filter(|(_, (_, hit))| !**hit)
-        .map(|(i, (rule, _))| format!("unmatched {:?} tree rule {}", rule.street, i + 1))
-        .collect()
+    let mut counts = [0usize; 4];
+    let mut warnings = Vec::new();
+    for (rule, hit) in game.betting.nlh_rules.iter().zip(hits) {
+        let street = match rule.street {
+            nlh::Street::Preflop => 0,
+            nlh::Street::Flop => 1,
+            nlh::Street::Turn => 2,
+            nlh::Street::River => 3,
+        };
+        counts[street] += 1;
+        if !hit {
+            warnings.push(format!(
+                "unmatched {:?} tree rule {}",
+                rule.street, counts[street]
+            ));
+        }
+    }
+    warnings
 }
 
 /// Reject embedded input that requires a removed family before artifact computation.
@@ -281,6 +296,21 @@ mod tests {
         compare_hits(
             "schema = 'solvers.nlh/v1'\n[table]\nplayers = 2\nstack = 2\n",
             Path::new("no-rules.toml"),
+        );
+    }
+
+    #[test]
+    fn warnings_number_rules_within_each_street_including_matched_rules() {
+        let raw = "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack = 2\n[tree]\nscript = '''\npreflop { remove bet }\nflop { checkdown }\npreflop { remove raise }\nturn { checkdown }\nflop { checkdown }\n'''\n";
+        let prepared = prepare(raw, Path::new("warnings.toml")).unwrap();
+        assert_eq!(
+            warnings_for_hits(&prepared.lowered.game, &[true, false, false, false, false]),
+            [
+                "unmatched Flop tree rule 1",
+                "unmatched Preflop tree rule 2",
+                "unmatched Turn tree rule 1",
+                "unmatched Flop tree rule 2",
+            ]
         );
     }
 

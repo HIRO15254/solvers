@@ -1,7 +1,7 @@
 //! P2-owned common-input settings and typed lowering. No method choices live in `spot`.
 use crate::config::{
     AbstractionConfig, AbstractionKind, AnteConfig, BettingConfig, BlindConfig, ForcedBetConfig,
-    MultiwayConfig, RecallMode, SeatConfig, StreetBettingConfig,
+    MultiwayConfig, RecallMode, SeatConfig,
 };
 use crate::solver::{DEFAULT_PRUNE_SKIP_PROBABILITY, DEFAULT_PRUNE_THRESHOLD, SolverConfig};
 use economics::{RakeConfig, UtilityConfig};
@@ -469,18 +469,7 @@ pub struct Lowered {
 /// Pure lowering; session construction accepts this typed result directly.
 pub fn lower(spot: &Spot, settings: &Settings) -> Result<Lowered, SpotError> {
     settings.validate(spot)?;
-    let street = || StreetBettingConfig {
-        bet_sizes: Vec::new(),
-        isolate_sizes: None,
-        raise_sizes: Vec::new(),
-        max_betting_players: None,
-    };
     let betting = BettingConfig {
-        allow_limp: true,
-        preflop: street(),
-        flop: street(),
-        turn: street(),
-        river: street(),
         nlh_rules: spot
             .tree
             .compiled
@@ -499,7 +488,7 @@ pub fn lower(spot: &Spot, settings: &Settings) -> Result<Lowered, SpotError> {
             .seats()
             .map(|seat| SeatConfig {
                 name: None,
-                stack_bb: setup.scale().to_bb(spot.table.stacks[seat]),
+                stack_chips: spot.table.stacks[seat],
                 range: if spot.ranges[seat].text == "random" {
                     String::new()
                 } else {
@@ -511,30 +500,18 @@ pub fn lower(spot: &Spot, settings: &Settings) -> Result<Lowered, SpotError> {
         // The forced-bet vector is authoritative, as in the old-family adapter.
         button: setup.button,
         blinds: BlindConfig {
-            small_bb: setup.scale().to_bb(spot.table.sb),
-            big_bb: 1.0,
+            small_chips: spot.table.sb,
+            big_chips: setup.scale().bb(),
         },
         ante: AnteConfig::None,
         betting,
         forced_bets: Some(ForcedBetConfig {
-            blinds_bb: setup
-                .forced_blinds
-                .iter()
-                .map(|&v| setup.scale().to_bb(v))
-                .collect(),
-            antes_bb: setup
-                .forced_antes
-                .iter()
-                .map(|&v| setup.scale().to_bb(v))
-                .collect(),
-            common_ante_bb: setup.scale().to_bb(setup.common_ante),
-            nominal_big_blind_bb: 1.0,
+            blinds_chips: setup.forced_blinds.iter().copied().collect(),
+            antes_chips: setup.forced_antes.iter().copied().collect(),
+            common_ante_chips: setup.common_ante,
+            nominal_big_blind_chips: setup.scale().bb(),
             first_to_act: setup.preflop_first_to_act,
-            straddles: setup
-                .straddles
-                .iter()
-                .map(|&(seat, amount)| (seat, setup.scale().to_bb(amount)))
-                .collect(),
+            straddles: setup.straddles.clone(),
         }),
         abstraction: AbstractionConfig {
             flop_buckets: buckets.flop,
@@ -553,7 +530,22 @@ pub fn lower(spot: &Spot, settings: &Settings) -> Result<Lowered, SpotError> {
         chip_rounding: setup.chip_rounding,
     };
     game.validate_economics(&spot.economics.utility, &spot.economics.rake)
-        .map_err(|e| invalid("tree", e.to_string()))?;
+        .map_err(|e| {
+            use crate::config::ConfigError;
+            let key = match &e {
+                ConfigError::Economics(_) | ConfigError::IcmWithRake => "economics",
+                ConfigError::TreeRule(_) | ConfigError::RaiseFactor => "tree",
+                ConfigError::Buckets
+                | ConfigError::RolloutSamples
+                | ConfigError::TrainingPointsPerBucket
+                | ConfigError::KMeansIterations
+                | ConfigError::Ehs2TableTraining
+                | ConfigError::OpponentBucketProfile(_)
+                | ConfigError::Ehs2TableOpponentBuckets => "solver",
+                _ => "spot",
+            };
+            invalid(key, e.to_string())
+        })?;
     let s = &settings.solver;
     let threads = match spot.run.threads {
         Some(n) => usize::try_from(n).map_err(|_| invalid("run.threads", "exceeds usize"))?,
@@ -576,13 +568,17 @@ pub fn lower(spot: &Spot, settings: &Settings) -> Result<Lowered, SpotError> {
     };
     let prune = s.pruning == Pruning::RegretBased;
     let stakes: f64 = match &spot.economics.utility {
-        UtilityConfig::ChipEv => game.seats.iter().map(|s| s.stack_bb).sum(),
+        UtilityConfig::ChipEv => game
+            .seats
+            .iter()
+            .map(|s| setup.scale().to_bb(s.stack_chips))
+            .sum(),
         UtilityConfig::TournamentIcm { payouts, .. } => payouts.iter().sum(),
     };
     let solver = SolverConfig {
         seed: s.seed,
         max_memory_bytes: memory_bytes,
-        max_traversal_depth: 512,
+        max_traversal_depth: hu_engine::MAX_TREE_DEPTH as u32,
         exploration_epsilon: s.opponent_exploration,
         discount_every,
         discount_until,

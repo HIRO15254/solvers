@@ -349,9 +349,15 @@ probability_encoding = "f32"
     assert_eq!(lowered.solver.discount_every, u64::MAX);
     assert!(!lowered.solver.traverser_vector && !lowered.solver.prune);
     let antes = lower(&config(3, "[]", "").replace("stack = 100", "stack = 100\nante = 0.125"));
-    assert_eq!(antes.game.forced_bets.unwrap().antes_bb, vec![0.125; 3]);
+    assert_eq!(
+        antes.game.forced_bets.unwrap().antes_chips,
+        vec![MwChips(125); 3]
+    );
     let bb_ante = lower(&config(3, "[]", "").replace("stack = 100", "stack = 100\nbb_ante = 0.5"));
-    assert_eq!(bb_ante.game.forced_bets.unwrap().common_ante_bb, 0.5);
+    assert_eq!(
+        bb_ante.game.forced_bets.unwrap().common_ante_chips,
+        MwChips(500)
+    );
     let huge_prizes = economics::UtilityConfig::TournamentIcm {
         outside_field: Vec::new(),
         payouts: vec![1e308, 9e307, 0.0],
@@ -778,19 +784,17 @@ fn p2_chip_and_rounded_bb_tree_sizes_reach_the_action_menu() {
 fn straddle_configuration_rejects_invalid_posts_without_panicking() {
     let game = lower(&config(6, "[2, 4]", "")).game;
     for posts in [
-        vec![(3, 1.5)],
-        vec![(4, 2.0)],
-        vec![(3, 2.0), (3, 4.0)],
-        vec![(3, 2.0001)],
-        vec![(3, 100.0)],
+        vec![(3, 1500)],
+        vec![(4, 2000)],
+        vec![(3, 2000), (3, 4000)],
+        vec![(3, 100_000)],
     ] {
         let mut invalid = game.clone();
         invalid.forced_bets.as_mut().unwrap().straddles = posts
             .into_iter()
-            .map(|(seat, amount)| (SeatId::new_unchecked(seat), amount))
+            .map(|(seat, amount)| (SeatId::new_unchecked(seat), MwChips(amount)))
             .collect();
-        // Make first actor valid independently, so an off-grid post cannot
-        // pass this test merely because it also changed the chain length.
+        // Make first actor valid independently of the chain length.
         let forced = invalid.forced_bets.as_mut().unwrap();
         forced.first_to_act = forced.straddles.last().unwrap().0.next(6);
         assert!(invalid.validated().is_err());

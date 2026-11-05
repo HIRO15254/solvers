@@ -62,7 +62,20 @@ pub fn build_session<A: MultiwayAbstraction>(
             input.run.threads,
         )
     }
-    .map_err(|e| error(e.to_string()))?;
+    .map_err(|e| {
+        let key = if matches!(
+            &e,
+            crate::solver::SolverError::Tree(
+                crate::tree::TreeError::DepthLimit { .. }
+                    | crate::tree::TreeError::StructuralDepth { .. }
+            )
+        ) {
+            "tree"
+        } else {
+            "solver"
+        };
+        SpotError::new(Code::NLH003, key, e.to_string())
+    })?;
     solver.game_mut().finish_tree_rule_hits();
     Ok(Session {
         solver,
