@@ -483,6 +483,9 @@ CSV・P2は使えない。既定のformat指定のままTOMLを出力する。�
 P2もP1と共通のexport field名・BB単位を使う。artifactに無い値はJSONのnull、CSVの空欄、
 無い配列は空配列であり、ゼロの測定値ではない。actionsの頻度はclassごとの当該seatの
 到達weightで加重し、未訪問等で到達量が不明なら頻度もnullとなる。
+P2のseat/actorは埋め込みInputの`table.positions`のseat順に対応するposition名（`BTN`、`SB`、`BB`など）であり、P1の`oop` / `ip`ではない。inspectのactor指定はposition名またはseat indexを受け付ける。
+`range`・`strategy`・`ev`の`combo`は個別comboではなく169 starting-hand classで、weightはclass内の全comboに対する平均per-combo weight（0..1）である。部分的なcombo指定は平均され、個別weightを復元できない。後続nodeの到達weightは自席の過去actionで条件付けたもので、他席のactionやcard removalを反映した正確な条件付き確率ではない。class別EVは保存されない。
+P2 `tree`の`stored`はそのnodeに保存strategy blockが1つ以上あることを示し、全classが訪問済みとは限らない。`summary`の`pot`はroot potのBB値、`iterations`はsweep数、`nodes`はpublic state数、`stored_nodes`はblockを持つ異なるhistoryの数である。単一effective stackを定義しないため`effective_stack`はnull、artifactに経過時間がないため`wall_secs`もnull（CSVでは空欄）であり、run metadataから補わない。
 P2 inspect JSONのstateには`bbChips`・`potChips`・`remainingStacksChips`を使う。
 
 P1のcombo照会・exportは開始rangeの正weight supportだけを対象とする。support外の照会は空結果またはrange外errorである。

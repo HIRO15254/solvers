@@ -428,6 +428,8 @@ P2のexportとinspectはroot、履歴token、32桁history key、`/`区切りacti
 額は表示表記、BB、`Nbb`、`Nc`を受け、卓の丸め方式で照合する。exportのfield名とBB単位はP1と共通だが、
 保存されていない値はJSONのnull、CSVの空欄、無い配列は空配列であり、0とは異なる。
 actionsの頻度はclassごとの手番seatの到達weightで加重し、未訪問等で到達量が不明なら頻度も不明である。
+seat/actorは`table.positions`のseat順のposition名（`BTN`、`SB`、`BB`など）で、inspectのactor指定には名前またはseat indexを使える。`combo`は個別comboではなく169 class、weightはclass内全comboの平均per-combo weight（0..1）である。部分指定の個別combo weightは復元できず、後続nodeの到達weightも自席の過去actionだけで条件付けた近似で、他席のactionやcard removalは反映しない。class別EVは保存されない。
+`tree`の`stored`はそのnodeにstrategy blockが1つ以上保存されていることを示し、全classの訪問を保証しない。`summary`は共通名を使い、`pot`はroot potのBB値、`iterations`はsweep数、`nodes`はpublic state数、`stored_nodes`はblockを持つ異なるhistory数である。P2に単一effective stackはなく、artifactに経過時間もないため`effective_stack`と`wall_secs`はnull（CSVでは空欄）となる。
 P2では`--rest-of-street`を拒否し、`decision`・`lock`・`--resolve-rivers`はP1専用である。
 
 evaluateは保存averageを復元し、deviation gainとCI、coverageを再測定する。

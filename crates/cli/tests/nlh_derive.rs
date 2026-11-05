@@ -130,6 +130,85 @@ fn saved_preflop_profile_derives_reproducible_solvable_p1_and_rejects_invalid_in
     let root = export("tree", "root");
     let root_row = &root[0];
     assert_eq!(root_row["history"], "");
+    assert_eq!(root_row["actor"], "BTN");
+    let after_call = export("tree", "c");
+    assert_eq!(after_call[0]["actor"], "SB");
+    let after_fold = export("tree", "cf");
+    assert_eq!(after_fold[0]["actor"], "BB");
+    for (name, number) in [("BTN", "0"), ("SB", "1"), ("BB", "2")] {
+        let query = |actor| -> serde_json::Value {
+            serde_json::from_slice(
+                &ok(&[
+                    "inspect",
+                    text(&solution),
+                    "--view",
+                    "strategy",
+                    "--actor",
+                    actor,
+                ])
+                .stdout,
+            )
+            .unwrap()
+        };
+        assert_eq!(query(name), query(number));
+    }
+    let invalid_actor = cli(&[
+        "inspect",
+        text(&solution),
+        "--view",
+        "strategy",
+        "--actor",
+        "UTG",
+    ]);
+    assert!(!invalid_actor.status.success());
+    let strategies = export("strategy", "root");
+    let aa = strategies
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["combo"] == "AA")
+        .expect("saved AA class");
+    assert_eq!(aa["actor"], "BTN");
+    // A class row represents its per-combo weight, not six times that weight.
+    assert_eq!(aa["weight"], 1.0);
+    let summary = export("summary", "root");
+    assert_eq!(summary["iterations"], 64);
+    assert!(summary["nodes"].as_u64().unwrap() > 0);
+    assert!(summary["stored_nodes"].as_u64().unwrap() > 0);
+    assert_eq!(summary["pot"], root_row["pot"]);
+    assert!(summary["wall_secs"].is_null());
+    assert!(summary["effective_stack"].is_null());
+    assert!(summary.get("sweeps").is_none());
+    let mut saved = mw_preflop::mwsol::MwSolReader::open(&solution).unwrap();
+    let metadata = saved.metadata().clone();
+    let blocks = saved.read_strategy_page(0, 4096).unwrap().strategies;
+    let tree = export("tree", "all");
+    assert!(
+        tree.as_array()
+            .unwrap()
+            .iter()
+            .any(|row| row["kind"] == "terminal" && row["stored"] == false)
+    );
+    assert_eq!(summary["nodes"], tree.as_array().unwrap().len());
+    for row in tree.as_array().unwrap() {
+        let history =
+            mw_preflop::views::parse_history(&metadata, row["history"].as_str().unwrap()).unwrap();
+        assert_eq!(
+            row["stored"],
+            blocks.iter().any(|block| block.key.history == history),
+            "{row}"
+        );
+    }
+    let stored_count = metadata
+        .public_states
+        .iter()
+        .filter(|state| {
+            blocks
+                .iter()
+                .any(|block| block.key.history == state.history)
+        })
+        .count();
+    assert_eq!(summary["stored_nodes"], stored_count);
     assert!(
         root_row["actions"]
             .as_array()
@@ -141,6 +220,20 @@ fn saved_preflop_profile_derives_reproducible_solvable_p1_and_rejects_invalid_in
     let inspect = |node: &str| -> serde_json::Value {
         serde_json::from_slice(&ok(&["inspect", text(&solution), "--node", node]).stdout).unwrap()
     };
+    let inspected = inspect("root");
+    for key in [
+        "iterations",
+        "wall_secs",
+        "pot",
+        "effective_stack",
+        "nodes",
+        "stored_nodes",
+    ] {
+        assert_eq!(inspected["summary"][key], summary[key], "{key}");
+    }
+    assert_eq!(inspected["node"]["actor"], "BTN");
+    assert_eq!(inspected["summary"]["seats"][0]["seat"], "BTN");
+    assert_eq!(inspected["strategy13x13"][0][0]["weight"], 1.0);
     assert_eq!(inspect("r2"), inspect("r2000c"));
     let bad_inspect = cli(&["inspect", text(&solution), "--node", "r999"]);
     assert_eq!(bad_inspect.status.code(), Some(2));
@@ -181,6 +274,26 @@ fn saved_preflop_profile_derives_reproducible_solvable_p1_and_rejects_invalid_in
         let csv = String::from_utf8(output.stdout).unwrap();
         assert_eq!(csv.lines().next().unwrap(), columns);
         assert!(csv.ends_with('\n'));
+        if view == "actions" || view == "strategy" {
+            let mut checked = 0;
+            for line in csv.lines().skip(1) {
+                let fields: Vec<_> = line.split(',').collect();
+                let numbers: Vec<_> = if view == "actions" {
+                    vec![fields[4]]
+                } else {
+                    std::iter::once(fields[3])
+                        .chain(fields[4].split('|'))
+                        .collect()
+                };
+                for number in numbers.into_iter().filter(|number| !number.is_empty()) {
+                    let (_, decimals) = number.split_once('.').expect("decimal CSV value");
+                    assert_eq!(decimals.len(), 6, "{line}");
+                    assert!(decimals.bytes().all(|byte| byte.is_ascii_digit()), "{line}");
+                    checked += 1;
+                }
+            }
+            assert!(checked > 0, "{view} CSV has no numeric values");
+        }
     }
     let output_path = dir.path().join("tree.json");
     ok(&[

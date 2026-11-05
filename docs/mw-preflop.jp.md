@@ -180,7 +180,7 @@ Preflop-only exportは未達である。これを完全な全street profileと�
 |---|---|
 | `export summary` | 共通summary fieldと保存block数・seat別の記録評価などのP2固有情報 |
 | `export tree` | public node/history/action。数値の額はBB、historyとaction labelは表示表記 |
-| `export strategy` / `range` | 保存bucket/classの平均確率 / 開始range weight。確率は0..1 |
+| `export strategy` / `range` | 保存classの平均確率 / 選択nodeのclass到達weight。確率とweightは0..1 |
 | `export actions` | public stateのhistory、actor、street、legal actionと到達量加重頻度 |
 | `export ev` | 選択nodeのclass別到達weight。class別EVは保存されないためnull |
 | `evaluate` | artifactの保存averageを再評価し、baseline utility、候補gain・CI、coverageを報告 |
@@ -190,6 +190,10 @@ Preflop-only exportは未達である。これを完全な全street profileと�
 P2の`export`はP1と共通の行・field名を使い、額をBBで返す。Preflopのnodeは
 `root`（空文字列も可）、履歴token、`/`区切りのaction labelまたはindex、32桁history keyで選べる。
 額は表示表記、BB、`Nbb`、`Nc`を受け付け、卓の丸め方式で照合する。複数selectorは指定順に処理する。
+seat/actorは埋め込みInputの`table.positions`のseat順に対応するposition名（`BTN`、`SB`、`BB`など）であり、P1の`oop` / `ip`ではない。`inspect`のactor指定はposition名またはseat indexを受け付ける。
+`range`・`strategy`・`ev`の`combo`は個別comboではなく169 starting-hand classである。weightはそのclassの全comboに対する平均per-combo weight（0..1）で、combo数の合計ではない。開始rangeの部分的なcombo指定も平均されるため、個々のcomboのweightはこの出力から復元できない。後続nodeでは自席の過去actionで条件付けた到達weightであり、他席のactionやcard removalを反映した正確な条件付き確率ではない。
+`summary`は`iterations`、`wall_secs`、`nodes`、`stored_nodes`など共通名を使う。P2には単一のeffective stackがなく`effective_stack`はnull、artifactに経過時間がないため`wall_secs`もnull（CSVでは空欄）である。近傍のrun metadataから補わない。
+`summary`の`pot`はroot potのBB値、`iterations`はsweep数、`nodes`はpublic state数、`stored_nodes`はstrategy blockを持つ異なるhistoryの数である。`tree`の`stored`はそのnodeに保存strategy blockが1つ以上ある場合だけtrueであり、全classの訪問や戦略の完全性を保証しない。
 `actions`の頻度はclassごとの当該seatの到達weightで加重する。未訪問などで到達量が不明なら
 頻度も不明であり0と扱わない。P2 artifactに存在しない値はJSONではnull、CSVでは空欄、
 存在しない配列は空配列とする。これは計算値の0を意味しない。

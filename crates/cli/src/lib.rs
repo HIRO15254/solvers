@@ -459,9 +459,9 @@ enum Command {
         #[arg(long, value_enum, default_value = "node")]
         view: artifact_args::InspectView,
         #[cfg(feature = "p2")]
-        /// Override the acting seat used by the strategy grid.
+        /// Override the acting seat by position name or numeric index.
         #[arg(long)]
-        actor: Option<u8>,
+        actor: Option<String>,
         #[cfg(feature = "p2")]
         /// Samples for on-demand EV/CI evaluation.
         #[arg(long, default_value_t = 4096)]
@@ -816,7 +816,7 @@ pub fn main_impl() -> Result<()> {
                             &config,
                             &node,
                             view,
-                            actor,
+                            actor.as_deref(),
                             samples,
                             seed,
                             br_traversals,

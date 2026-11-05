@@ -19,7 +19,7 @@ pub fn inspect(
     path: &Path,
     requested_history: &str,
     view: InspectView,
-    actor_override: Option<u8>,
+    actor_override: Option<&str>,
     samples: u64,
     seed: u64,
     br_traversals: u64,
@@ -103,6 +103,12 @@ pub fn export(
     };
     let data = views::export(path, requested)?;
     let metadata = &data.metadata;
+    let positions = views::seat_positions(metadata)?;
+    let stored_histories: std::collections::BTreeSet<_> = data
+        .strategies
+        .iter()
+        .map(|block| block.key.history)
+        .collect();
     let mut selected = Vec::new();
     if !matches!(view, ExportView::Summary) {
         for node in nodes {
@@ -151,9 +157,9 @@ pub fn export(
                 rows.push(serde_json::json!({
                     "history": views::display_history(metadata, state.history),
                     "kind": kind, "street": street_name(state.street),
-                    "actor": state.actor.map(|actor| actor.to_string()),
+                    "actor": state.actor.map(|actor| &positions[actor as usize]),
                     "pot": state.pot_chips as f64 / metadata.bb_chips as f64,
-                    "stored": true,
+                    "stored": stored_histories.contains(&state.history),
                     "actions": state.legal_actions.iter().map(|action| views::display_action(action, metadata.bb_chips)).collect::<Vec<_>>(),
                     "children": children.iter().map(|edge| views::display_history(metadata, edge.key)).collect::<Vec<_>>(),
                     "child_kinds": children.iter().map(|edge| if metadata.public_states.iter().find(|child| child.history == edge.key).is_some_and(|child| child.actor.is_some()) { "action" } else { "terminal" }).collect::<Vec<_>>(),
@@ -210,8 +216,8 @@ pub fn export(
                     if matches!(view, ExportView::Strategy) {
                         rows.push(serde_json::json!({
                             "history": views::display_history(metadata, state.history),
-                            "actor": actor.to_string(), "combo": cell["hand"],
-                            "weight": weight, "probabilities": block.probabilities,
+                            "actor": positions[actor as usize], "combo": cell["hand"],
+                            "weight": class_weight(cell), "probabilities": block.probabilities,
                         }));
                     }
                 }
@@ -219,7 +225,7 @@ pub fn export(
                     for (action, total) in state.legal_actions.iter().zip(totals) {
                         rows.push(serde_json::json!({
                             "history": views::display_history(metadata, state.history),
-                            "street": street_name(state.street), "actor": actor.to_string(),
+                            "street": street_name(state.street), "actor": positions[actor as usize],
                             "action": views::display_action(action, metadata.bb_chips),
                             "frequency": if complete && mass > 0.0 { Some(total / mass) } else { None },
                         }));
@@ -237,7 +243,8 @@ pub fn export(
                 for seat in views::range_matrix(metadata, &data.strategies, state.history)? {
                     for row in seat["grid"].as_array().into_iter().flatten() {
                         for cell in row.as_array().into_iter().flatten() {
-                            rows.push(serde_json::json!({ "seat": seat["seat"], "combo": cell["hand"], "weight": cell["reach_weight"] }));
+                            let seat_index = seat["seat"].as_u64().expect("range seat") as usize;
+                            rows.push(serde_json::json!({ "seat": positions[seat_index], "combo": cell["hand"], "weight": class_weight(cell) }));
                         }
                     }
                 }
@@ -251,9 +258,9 @@ pub fn export(
                         for cell in row.as_array().into_iter().flatten() {
                             rows.push(serde_json::json!({
                                 "history": views::display_history(metadata, state.history),
-                                "seat": seat["seat"],
+                                "seat": positions[seat["seat"].as_u64().expect("range seat") as usize],
                                 "combo": cell["hand"],
-                                "weight": cell["reach_weight"],
+                                "weight": class_weight(cell),
                                 "ev": null,
                             }));
                         }
@@ -263,14 +270,39 @@ pub fn export(
             &["history", "seat", "combo", "weight", "ev"]
         }
         ExportView::Summary => {
+            let mut seats = serde_json::to_value(&metadata.seats)?;
+            for seat in seats.as_array_mut().expect("seat array") {
+                let index = seat["seat"].as_u64().expect("seat index") as usize;
+                seat["seat"] = serde_json::json!(positions[index]);
+            }
+            let root = metadata
+                .public_states
+                .iter()
+                .find(|state| state.history == [0; 16]);
+            let stored_nodes = metadata
+                .public_states
+                .iter()
+                .filter(|state| state.actor.is_some() && stored_histories.contains(&state.history))
+                .count();
             rows.push(serde_json::json!({
                 "schema_version": metadata.schema_version,
-                "sweeps": metadata.sweeps, "approximate_profile": metadata.approximate_profile,
-                "visited_infosets": data.strategies.len(), "seats": metadata.seats,
+                "iterations": metadata.sweeps,
+                "wall_secs": null,
+                "pot": root.map(|state| state.pot_chips as f64 / metadata.bb_chips as f64),
+                "effective_stack": null,
+                "nodes": metadata.public_states.len(),
+                "stored_nodes": stored_nodes,
+                "approximate_profile": metadata.approximate_profile,
+                "visited_infosets": data.strategies.len(), "seats": seats,
             }));
             &[
+                "pot",
+                "effective_stack",
+                "iterations",
+                "wall_secs",
+                "nodes",
+                "stored_nodes",
                 "schema_version",
-                "sweeps",
                 "approximate_profile",
                 "visited_infosets",
             ]
@@ -290,7 +322,7 @@ pub fn export(
             for row in &rows {
                 let fields: Vec<_> = columns
                     .iter()
-                    .map(|column| csv_value(&row[*column]))
+                    .map(|column| csv_column(&row[*column], column))
                     .collect();
                 result.push_str(&fields.join(","));
                 result.push('\n');
@@ -316,6 +348,39 @@ fn street_name(street: u8) -> &'static str {
         3 => "river",
         _ => "unknown",
     }
+}
+
+fn class_weight(cell: &serde_json::Value) -> Option<f64> {
+    let hand = cell["hand"].as_str()?;
+    let combos = if hand.ends_with('s') {
+        4.0
+    } else if hand.ends_with('o') {
+        12.0
+    } else {
+        6.0
+    };
+    cell["reach_weight"].as_f64().map(|weight| weight / combos)
+}
+
+fn csv_column(value: &serde_json::Value, column: &str) -> String {
+    if matches!(column, "weight" | "frequency" | "probabilities" | "ev") {
+        if let Some(values) = value.as_array() {
+            return values
+                .iter()
+                .map(|v| csv_column(v, column))
+                .collect::<Vec<_>>()
+                .join("|");
+        }
+        if let Some(number) = value.as_f64() {
+            return crate::postflop_artifact::csv_six(number);
+        }
+    }
+    if column == "wall_secs"
+        && let Some(number) = value.as_f64()
+    {
+        return format!("{number:.3}");
+    }
+    csv_value(value)
 }
 
 fn csv_value(value: &serde_json::Value) -> String {
