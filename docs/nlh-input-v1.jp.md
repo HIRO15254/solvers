@@ -686,6 +686,9 @@ acting seatに対する条件が一度でも真になればhitである。
 通常の`validate`は木を走査せず、未使用ruleは未検査であることと`--resources`で検査できることを表示する。
 memoryまたはnode上限でcountが打ち切られた場合は不完全と表示し、未一致ruleの警告を出さない。
 P2のvalidate JSONは`ruleHitStatus`（`"not-checked"` / `"complete"` / `"incomplete"`）と`warnings`を返す。
+警告のrule番号はstreetごとに1から数える展開後ruleの番号であり、他streetのruleを含めない。
+P2のpublic treeはrootからの構造的深さが最大512（`MAX_TREE_DEPTH`）であり、超過は
+資源上限ではなく`NLH003`の入力error（exit 2）とする。
 
 ## 10. `[solver]`
 

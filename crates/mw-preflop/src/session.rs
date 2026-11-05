@@ -904,7 +904,8 @@ mod tests {
                 observed.decision_visits_by_street
             );
             assert_eq!(
-                json["seats"][seat]["candidatePolicyCoverage"]["uniformFallbackVisitsByStreet"]["flop"],
+                json["seats"][seat]["candidate_policy_coverage"]["uniform_fallback_visits_by_street"]
+                    ["flop"],
                 expected.uniform_fallback_visits_by_street.flop
             );
         }

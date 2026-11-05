@@ -15,10 +15,6 @@ impl From<InspectView> for views::InspectView {
     }
 }
 
-fn key_hex(key: [u8; 16]) -> String {
-    key.iter().map(|byte| format!("{byte:02x}")).collect()
-}
-
 pub fn inspect(
     path: &Path,
     requested_history: &str,
@@ -40,7 +36,17 @@ pub fn inspect(
         },
         crate::cache::root().as_deref(),
         &mut crate::multiway_solve::print_abstraction,
-    )?;
+    )
+    .map_err(|error| {
+        if error
+            .chain()
+            .any(|cause| cause.to_string().contains("NLH003:"))
+        {
+            anyhow::Error::new(crate::derive::InputError(error))
+        } else {
+            error
+        }
+    })?;
     println!(
         "{}",
         serde_json::to_string_pretty(&serde_json::to_value(data)?)?
@@ -76,216 +82,254 @@ pub fn evaluate(path: &Path, samples: u64, seed: u64, br_traversals: u64) -> Res
     Ok(())
 }
 
-fn action_fields(
-    action: &mw_preflop::mwsol::MultiwayPublicAction,
-) -> (&'static str, Option<u64>, bool, bool) {
-    match action {
-        mw_preflop::mwsol::MultiwayPublicAction::Fold => ("fold", None, false, false),
-        mw_preflop::mwsol::MultiwayPublicAction::Check => ("check", None, false, false),
-        mw_preflop::mwsol::MultiwayPublicAction::Call {
-            amount_chips,
-            all_in,
-        } => ("call", Some(*amount_chips), *all_in, false),
-        mw_preflop::mwsol::MultiwayPublicAction::BetTo {
-            amount_chips,
-            all_in,
-            full_raise,
-        } => ("bet-to", Some(*amount_chips), *all_in, *full_raise),
-        mw_preflop::mwsol::MultiwayPublicAction::RaiseTo {
-            amount_chips,
-            all_in,
-            full_raise,
-        } => ("raise-to", Some(*amount_chips), *all_in, *full_raise),
-    }
-}
-
+/// Render P2 class-level data using the same row-oriented surface as P1.
 pub fn export(
     path: &Path,
     view: ExportView,
     format: ExportFormat,
+    nodes: &[String],
     output: Option<&Path>,
 ) -> Result<()> {
-    let view = match view {
+    let requested = match view {
         ExportView::Strategy => views::ExportView::Strategy,
         ExportView::Actions => views::ExportView::Actions,
         ExportView::Range => views::ExportView::Range,
         ExportView::Ev => views::ExportView::Ev,
         ExportView::Tree => views::ExportView::Tree,
         ExportView::Summary => views::ExportView::Summary,
-        ExportView::Lock => {
-            anyhow::bail!("export lock: the solution must be a postflop .sol artifact")
-        }
-        ExportView::Decision => {
-            anyhow::bail!("export decision: the solution must be a postflop .sol artifact")
+        ExportView::Lock | ExportView::Decision => {
+            anyhow::bail!("this view requires a postflop .sol artifact")
         }
     };
-    let views::ExportData {
-        metadata,
-        strategies,
-        ranges,
-    } = views::export(path, view)?;
-    let rendered = match (view, format) {
-        (views::ExportView::Summary, ExportFormat::Json) => {
-            serde_json::to_string_pretty(&serde_json::json!({
-                "schemaVersion": metadata.schema_version,
-                "bbChips": metadata.bb_chips,
-                "sweeps": metadata.sweeps,
-                "approximateProfile": metadata.approximate_profile,
-                "visitedInfosets": strategies.len(),
-                "seats": metadata.seats,
-            }))?
-        }
-        (views::ExportView::Tree, ExportFormat::Json) => {
-            serde_json::to_string_pretty(&serde_json::json!({
-                "bbChips": metadata.bb_chips,
-                "states": metadata.public_states,
-                "edges": metadata.histories,
-            }))?
-        }
-        (views::ExportView::Strategy, ExportFormat::Json) => {
-            serde_json::to_string_pretty(&strategies)?
-        }
-        (views::ExportView::Ev, ExportFormat::Json) => {
-            serde_json::to_string_pretty(&metadata.seats)?
-        }
-        (views::ExportView::Range, ExportFormat::Json) => export_ranges_json(&ranges)?,
-        (views::ExportView::Actions, ExportFormat::Json) => {
-            let rows: Vec<_> = metadata
+    let data = views::export(path, requested)?;
+    let metadata = &data.metadata;
+    let mut selected = Vec::new();
+    if !matches!(view, ExportView::Summary) {
+        for node in nodes {
+            if node == "all" {
+                selected.extend(
+                    metadata
+                        .public_states
+                        .iter()
+                        .filter(|state| matches!(view, ExportView::Tree) || state.actor.is_some()),
+                );
+                continue;
+            }
+            let key = views::parse_history(metadata, node).map_err(crate::derive::InputError)?;
+            let state = metadata
                 .public_states
                 .iter()
-                .filter(|state| !state.legal_actions.is_empty())
-                .map(|state| {
-                    serde_json::json!({
-                        "history": key_hex(state.history),
-                        "actor": state.actor,
-                        "street": state.street,
-                        "bbChips": metadata.bb_chips,
-                        "actions": state.legal_actions,
-                    })
-                })
-                .collect();
-            serde_json::to_string_pretty(&rows)?
+                .find(|state| state.history == key)
+                .ok_or_else(|| {
+                    crate::derive::InputError(anyhow::anyhow!(
+                        "node {node:?} is absent from the public tree"
+                    ))
+                })?;
+            if matches!(view, ExportView::Actions | ExportView::Strategy) && state.actor.is_none() {
+                return Err(crate::derive::InputError(anyhow::anyhow!(
+                    "node {node:?} is not an action node"
+                ))
+                .into());
+            }
+            selected.push(state);
         }
-        (views::ExportView::Strategy, ExportFormat::Csv) => {
-            let mut csv = String::from(
-                "history,actor,street,active_opponents,bucket_path,action,probability\n",
-            );
-            for block in &strategies {
-                for (action, probability) in block.actions.iter().zip(&block.probabilities) {
-                    csv.push_str(&format!(
-                        "{},{},{},{},\"{:?}\",\"{}\",{}\n",
-                        key_hex(block.key.history),
-                        block.key.actor,
-                        block.key.street,
-                        block.key.active_opponents,
-                        block.key.bucket_path,
-                        action.replace('"', "\"\""),
-                        probability
-                    ));
+    }
+    let mut rows = Vec::new();
+    let columns: &[&str] = match view {
+        ExportView::Tree => {
+            for state in selected {
+                let children: Vec<_> = metadata
+                    .histories
+                    .iter()
+                    .filter(|edge| edge.parent == state.history)
+                    .collect();
+                let kind = if state.actor.is_some() {
+                    "action"
+                } else {
+                    "terminal"
+                };
+                rows.push(serde_json::json!({
+                    "history": views::display_history(metadata, state.history),
+                    "kind": kind, "street": street_name(state.street),
+                    "actor": state.actor.map(|actor| actor.to_string()),
+                    "pot": state.pot_chips as f64 / metadata.bb_chips as f64,
+                    "stored": true,
+                    "actions": state.legal_actions.iter().map(|action| views::display_action(action, metadata.bb_chips)).collect::<Vec<_>>(),
+                    "children": children.iter().map(|edge| views::display_history(metadata, edge.key)).collect::<Vec<_>>(),
+                    "child_kinds": children.iter().map(|edge| if metadata.public_states.iter().find(|child| child.history == edge.key).is_some_and(|child| child.actor.is_some()) { "action" } else { "terminal" }).collect::<Vec<_>>(),
+                }));
+            }
+            &[
+                "history",
+                "kind",
+                "street",
+                "actor",
+                "pot",
+                "stored",
+                "actions",
+                "children",
+                "child_kinds",
+            ]
+        }
+        ExportView::Actions | ExportView::Strategy => {
+            for state in selected {
+                let actor = state.actor.expect("selected action node");
+                let ranges = views::range_matrix(metadata, &data.strategies, state.history)?;
+                let cells = ranges[actor as usize]["grid"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .flat_map(|row| row.as_array().into_iter().flatten());
+                let mut mass = 0.0;
+                let mut complete = true;
+                let mut totals = vec![0.0; state.legal_actions.len()];
+                for cell in cells {
+                    let Some(weight) = cell["reach_weight"].as_f64() else {
+                        complete = false;
+                        continue;
+                    };
+                    let Some(bucket) = cell["bucket"].as_u64() else {
+                        complete = false;
+                        continue;
+                    };
+                    let Some(block) = data.strategies.iter().find(|block| {
+                        block.key.history == state.history
+                            && block.key.actor == actor
+                            && block.key.street == 0
+                            && block.key.bucket_path[0] == bucket as u32
+                    }) else {
+                        if weight > 0.0 {
+                            complete = false;
+                        }
+                        continue;
+                    };
+                    mass += weight;
+                    for (total, probability) in totals.iter_mut().zip(&block.probabilities) {
+                        *total += weight * f64::from(*probability);
+                    }
+                    if matches!(view, ExportView::Strategy) {
+                        rows.push(serde_json::json!({
+                            "history": views::display_history(metadata, state.history),
+                            "actor": actor.to_string(), "combo": cell["hand"],
+                            "weight": weight, "probabilities": block.probabilities,
+                        }));
+                    }
+                }
+                if matches!(view, ExportView::Actions) {
+                    for (action, total) in state.legal_actions.iter().zip(totals) {
+                        rows.push(serde_json::json!({
+                            "history": views::display_history(metadata, state.history),
+                            "street": street_name(state.street), "actor": actor.to_string(),
+                            "action": views::display_action(action, metadata.bb_chips),
+                            "frequency": if complete && mass > 0.0 { Some(total / mass) } else { None },
+                        }));
+                    }
                 }
             }
-            csv
+            if matches!(view, ExportView::Actions) {
+                &["history", "street", "actor", "action", "frequency"]
+            } else {
+                &["history", "actor", "combo", "weight", "probabilities"]
+            }
         }
-        (views::ExportView::Actions, ExportFormat::Csv) => {
-            let mut csv = String::from(
-                "history,actor,street,action_index,kind,amount_chips,bb_chips,all_in,full_raise,label\n",
-            );
-            for state in &metadata.public_states {
-                for (index, action) in state.legal_actions.iter().enumerate() {
-                    let (kind, amount, all_in, full_raise) = action_fields(action);
-                    csv.push_str(&format!(
-                        "{},{},{},{},{},{},{},{},{},{}\n",
-                        key_hex(state.history),
-                        state
-                            .actor
-                            .map_or_else(String::new, |actor| actor.to_string()),
-                        state.street,
-                        index,
-                        kind,
-                        amount.map_or_else(String::new, |amount| amount.to_string()),
-                        metadata.bb_chips,
-                        all_in,
-                        full_raise,
-                        action.label(),
-                    ));
+        ExportView::Range => {
+            for state in selected {
+                for seat in views::range_matrix(metadata, &data.strategies, state.history)? {
+                    for row in seat["grid"].as_array().into_iter().flatten() {
+                        for cell in row.as_array().into_iter().flatten() {
+                            rows.push(serde_json::json!({ "seat": seat["seat"], "combo": cell["hand"], "weight": cell["reach_weight"] }));
+                        }
+                    }
                 }
             }
-            csv
+            &["seat", "combo", "weight"]
         }
-        (views::ExportView::Tree, ExportFormat::Csv) => {
-            let mut csv = String::from("history,parent,actor,action_index,action\n");
-            for node in &metadata.histories {
-                csv.push_str(&format!(
-                    "{},{},{},{},\"{}\"\n",
-                    key_hex(node.key),
-                    key_hex(node.parent),
-                    node.actor,
-                    node.action_index,
-                    node.action.replace('"', "\"\"")
-                ));
+        ExportView::Ev => {
+            for state in selected {
+                for seat in views::range_matrix(metadata, &data.strategies, state.history)? {
+                    for row in seat["grid"].as_array().into_iter().flatten() {
+                        for cell in row.as_array().into_iter().flatten() {
+                            rows.push(serde_json::json!({
+                                "history": views::display_history(metadata, state.history),
+                                "seat": seat["seat"],
+                                "combo": cell["hand"],
+                                "weight": cell["reach_weight"],
+                                "ev": null,
+                            }));
+                        }
+                    }
+                }
             }
-            csv
+            &["history", "seat", "combo", "weight", "ev"]
         }
-        (views::ExportView::Summary, ExportFormat::Csv) => {
-            format!(
-                "schema_version,bb_chips,sweeps,approximate_profile,visited_infosets\n{},{},{},{},{}\n",
-                metadata.schema_version,
-                metadata.bb_chips,
-                metadata.sweeps,
-                metadata.approximate_profile,
-                strategies.len()
-            )
+        ExportView::Summary => {
+            rows.push(serde_json::json!({
+                "schema_version": metadata.schema_version,
+                "sweeps": metadata.sweeps, "approximate_profile": metadata.approximate_profile,
+                "visited_infosets": data.strategies.len(), "seats": metadata.seats,
+            }));
+            &[
+                "schema_version",
+                "sweeps",
+                "approximate_profile",
+                "visited_infosets",
+            ]
         }
-        (views::ExportView::Range, ExportFormat::Csv) => export_ranges_csv(&ranges)?,
-        (views::ExportView::Ev, ExportFormat::Csv) => export_ev_csv(&metadata.seats),
+        ExportView::Lock | ExportView::Decision => unreachable!(),
+    };
+    let rendered = match format {
+        ExportFormat::Json => {
+            if matches!(view, ExportView::Summary) {
+                serde_json::to_string_pretty(&rows[0])? + "\n"
+            } else {
+                serde_json::to_string_pretty(&rows)? + "\n"
+            }
+        }
+        ExportFormat::Csv => {
+            let mut result = columns.join(",") + "\n";
+            for row in &rows {
+                let fields: Vec<_> = columns
+                    .iter()
+                    .map(|column| csv_value(&row[*column]))
+                    .collect();
+                result.push_str(&fields.join(","));
+                result.push('\n');
+            }
+            result
+        }
     };
     if let Some(output) = output {
         std::fs::write(output, rendered)
             .with_context(|| format!("writing {}", output.display()))?;
+        println!("wrote {}", output.display());
     } else {
-        println!("{rendered}");
+        print!("{rendered}");
     }
     Ok(())
 }
 
-fn export_ranges_json(ranges: &[views::RangeRow]) -> Result<String> {
-    let rows: Vec<_> = ranges
-        .iter()
-        .enumerate()
-        .map(|(seat, value)| serde_json::json!({ "seat": seat, "range": value.range }))
-        .collect();
-    Ok(serde_json::to_string_pretty(&rows)?)
+fn street_name(street: u8) -> &'static str {
+    match street {
+        0 => "preflop",
+        1 => "flop",
+        2 => "turn",
+        3 => "river",
+        _ => "unknown",
+    }
 }
 
-fn export_ranges_csv(ranges: &[views::RangeRow]) -> Result<String> {
-    let mut csv = String::from("seat,range\n");
-    for (seat, value) in ranges.iter().enumerate() {
-        csv.push_str(&format!(
-            "{},\"{}\"\n",
-            seat,
-            value.range.replace('"', "\"\"")
-        ));
+fn csv_value(value: &serde_json::Value) -> String {
+    let text = match value {
+        serde_json::Value::Null => String::new(),
+        serde_json::Value::String(text) => text.clone(),
+        serde_json::Value::Array(values) => {
+            values.iter().map(csv_value).collect::<Vec<_>>().join("|")
+        }
+        _ => value.to_string(),
+    };
+    if text.contains([',', '"', '\n', '\r']) {
+        format!("\"{}\"", text.replace('"', "\"\""))
+    } else {
+        text
     }
-    Ok(csv)
-}
-
-fn export_ev_csv(seats: &[mw_preflop::mwsol::MultiwaySeatResult]) -> String {
-    let mut csv = String::from(
-        "seat,profile_ev,stderr,ci95_low,ci95_high,measured_deviation_mean,measured_deviation_ci95_high\n",
-    );
-    for seat in seats {
-        let ev = seat.profile_ev.as_ref();
-        let deviation = seat.deviation_gain_lower_bound.as_ref();
-        csv.push_str(&format!(
-            "{},{},{},{},{},{},{}\n",
-            seat.seat,
-            ev.map(|value| value.mean).unwrap_or(f64::NAN),
-            ev.map(|value| value.stderr).unwrap_or(f64::NAN),
-            ev.map(|value| value.ci95[0]).unwrap_or(f64::NAN),
-            ev.map(|value| value.ci95[1]).unwrap_or(f64::NAN),
-            deviation.map(|value| value.mean).unwrap_or(f64::NAN),
-            deviation.map(|value| value.ci95[1]).unwrap_or(f64::NAN),
-        ));
-    }
-    csv
 }

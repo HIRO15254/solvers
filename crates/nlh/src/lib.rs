@@ -18,6 +18,7 @@ mod types;
 pub mod category;
 pub mod decimal;
 pub mod iso;
+pub mod selector;
 
 /// Tree-script front end: `.tree` source in, compiled rules out. Kept a
 /// module rather than re-exported flat, because `Rule`, `Effect`, `Var` and
@@ -33,6 +34,9 @@ pub use range::{
 };
 pub use rounding::{PotSplit, Rounding, split_pot};
 pub use scale::ChipScale;
+pub use selector::{
+    history_token, history_token_matches, resolve_scaled_action, selector_history_steps,
+};
 pub use set::CardSet;
 pub use sizing::{
     ParseSizeError, SizeContext, SizeSpec, SizeUnit, geometric_allin_target, merge_targets,

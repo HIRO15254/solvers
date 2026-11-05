@@ -22,7 +22,7 @@ pub type ApiResult<T> = std::result::Result<T, ErrorResponse>;
 /// What a solution view request asks of `solvers export` beyond the view.
 pub struct SolutionQuery {
     pub csv: bool,
-    /// P1 node selectors, in request order.
+    /// Node selectors, in request order.
     pub nodes: Vec<String>,
     /// P1: re-solve the river nodes a `no-rivers` artifact does not store.
     pub resolve_rivers: bool,
@@ -522,14 +522,12 @@ impl Api {
                 format!("run {run_id:?} has no solution.sol or solution.mwsol"),
             ));
         };
-        let postflop_only = !query.nodes.is_empty()
-            || query.resolve_rivers
-            || query.rest_of_street
-            || view == SolutionView::Decision;
+        let postflop_only =
+            query.resolve_rivers || query.rest_of_street || view == SolutionView::Decision;
         if !is_postflop && postflop_only {
             return Err(ErrorResponse::new(
                 ErrorCode::InvalidRequest,
-                "node selectors, restOfStreet, river re-solves and the decision view are \
+                "restOfStreet, river re-solves and the decision view are \
                  supported only for postflop solution.sol artifacts",
             ));
         }

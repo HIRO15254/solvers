@@ -513,12 +513,9 @@ enum Command {
         view: artifact_args::ExportView,
         #[arg(long, value_enum, default_value = "json")]
         format: artifact_args::ExportFormat,
-        /// Postflop only: which node the per-node views cover. `root`, a
-        /// betting-line history (`xr10c`; wager amounts are street raise-to targets),
-        /// slash-separated action/chance labels (`check/check/Th`), or `all`
-        /// for every stored action node. Tree
-        /// accepts any node kind; other node views require action nodes.
-        /// Repeat to export nodes from one load in the given order.
+        /// Which node the per-node views cover. Repeat to select nodes in order.
+        /// Postflop accepts betting lines and `all`; preflop accepts `root`,
+        /// slash-separated actions or indices, and stored history keys.
         #[arg(long, default_value = "root")]
         node: Vec<String>,
         /// Postflop only: follow each selected node with the action nodes
@@ -867,7 +864,7 @@ pub fn main_impl() -> Result<()> {
                 }
                 #[cfg(feature = "p2")]
                 {
-                    multiway_artifact::export(&solution, view, format, output.as_deref())
+                    multiway_artifact::export(&solution, view, format, &node, output.as_deref())
                 }
                 #[cfg(not(feature = "p2"))]
                 Err(product_support::artifact_error())

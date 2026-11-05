@@ -24,6 +24,23 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
 
 ## [Unreleased]
 
+### Changed
+
+- P2 solution exports use the shared P1 field names and BB units, with node
+  selectors available through the CLI and daemon. Unavailable values are null
+  in JSON or empty in CSV, not zero; action frequencies use acting-seat
+  class reach weights and remain unknown when reach is unknown.
+- P2 rejects rest-of-street expansion; decision and lock exports and river
+  re-solving remain P1-only.
+- P2 run and progress metadata use the shared iteration and elapsed-time
+  field names while retaining P2-specific metrics.
+- P2 game fingerprint scheme v3 identifies chip-based game configuration
+  independently of abstraction. Legacy game identities are incompatible;
+  re-solve their solutions and checkpoints from current configs.
+- P2 public trees deeper than 512 are rejected as input errors (NLH003,
+  exit 2), distinct from resource exhaustion. Unused-rule warning numbers
+  count expanded rules separately per street.
+
 ## [0.2.1] - 2026-11-03
 
 This patch release reads `.sol` files and resumes checkpoints and run

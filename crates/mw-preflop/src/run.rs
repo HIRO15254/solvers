@@ -19,15 +19,12 @@ const APPROXIMATION_NOTICE: &str = "3人以上は多人数・一般和ゲーム�
 const LIVE_OBSERVATION_PERIOD: Duration = Duration::from_secs(2);
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "kebab-case")]
 /// Terminal reason for a P2 solve segment.
 pub enum CompletionStatus {
     ResourceLimit,
-    #[serde(rename = "sweep-limit")]
     SweepLimit,
-    #[serde(rename = "target-reached")]
     TargetReached,
-    #[serde(rename = "time-limit")]
     TimeLimit,
     Cancelled,
 }
@@ -77,6 +74,7 @@ pub struct RunResult {
     pub status: CompletionStatus,
     pub approximate_profile: bool,
     pub approximation_notice: &'static str,
+    #[serde(rename = "iterations")]
     pub sweeps: u64,
     pub traversals: u64,
     pub infosets: u64,
@@ -88,6 +86,7 @@ pub struct RunResult {
     pub preallocated_bytes: u64,
     pub preallocated_pages_committed: bool,
     pub policy_arena_limit_bytes: u64,
+    #[serde(rename = "wallSecs")]
     pub elapsed_secs: f64,
     pub traversals_per_second: f64,
     pub total_deal_attempts: u64,
@@ -306,8 +305,8 @@ fn run_inner(
     let run_settings = config.run.clone();
     let output_settings = config.output.clone();
     let utility_unit = match &config.utility {
-        UtilityConfig::ChipEv => "bb",
-        UtilityConfig::TournamentIcm { .. } => "prize",
+        UtilityConfig::ChipEv => "BB",
+        UtilityConfig::TournamentIcm { .. } => "prizes",
     };
     let algorithm = config.solver;
     #[cfg(not(test))]
@@ -729,7 +728,7 @@ fn run_inner(
         );
     }
     last_row.phase = match status {
-        CompletionStatus::ResourceLimit => "resource_limit",
+        CompletionStatus::ResourceLimit => "resource-limit",
         CompletionStatus::SweepLimit => "sweep-limit",
         CompletionStatus::TargetReached => "target-reached",
         CompletionStatus::TimeLimit => "time-limit",
@@ -796,7 +795,7 @@ fn run_inner(
 
     let result = RunResult {
         schema_version: MULTIWAY_SCHEMA_VERSION,
-        kind: "preflop-multiway",
+        kind: "mw-preflop",
         game_kind: Some("mw-preflop"),
         config_schema: Some("solvers.nlh/v1"),
         status,
@@ -1226,8 +1225,21 @@ mod tests {
             .unwrap();
             let result = serde_json::to_value(summary).unwrap();
             assert_eq!(result["status"], expected_status);
-            assert_eq!(result["sweeps"], expected_sweeps);
+            assert_eq!(result["iterations"], expected_sweeps);
+            assert_eq!(result["kind"], "mw-preflop");
+            assert_eq!(result["utilityUnit"], "BB");
+            assert!(result["wallSecs"].as_f64().is_some());
+            assert!(result.get("sweeps").is_none());
+            assert!(result.get("elapsedSecs").is_none());
             assert_eq!(quality.iter().filter(|s| **s == expected_sweeps).count(), 1);
         }
+    }
+
+    #[test]
+    fn resource_limit_status_uses_kebab_case() {
+        assert_eq!(
+            serde_json::to_value(CompletionStatus::ResourceLimit).unwrap(),
+            "resource-limit"
+        );
     }
 }

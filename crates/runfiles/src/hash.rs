@@ -1,8 +1,7 @@
-//! blake3 hashing of raw config-file bytes, used to stamp checkpoints
-//! against the exact config that produced them (see `checkpoint.rs`).
+//! BLAKE3 helpers for configuration and artifact identity.
 
-/// Hashes the raw bytes of a config file (not the parsed struct — CLI
-/// flags like `--iterations` overrides must never change this).
+/// Hashes the supplied configuration bytes. Callers choose the effective
+/// configuration or compatibility subset appropriate to their artifact.
 pub fn config_hash(raw_toml_bytes: &[u8]) -> [u8; 32] {
     *blake3::hash(raw_toml_bytes).as_bytes()
 }

@@ -8,8 +8,8 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use hu_postflop::artifact::{SolProvider, StrategyProvider};
 use hu_postflop::index::TreeView;
-use hu_postflop::queries::{self, LiveProvider, history_token};
-use hu_postflop::{Card, NodeId, NodeKind, PerPlayer, Player};
+use hu_postflop::queries::{self, LiveProvider};
+use hu_postflop::{Card, NodeId, NodeKind, PerPlayer, Player, history_token};
 
 const RANKS: [char; 13] = [
     'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2',
