@@ -61,7 +61,7 @@ pub struct InspectHistoryAction {
 pub struct NodeView {
     pub history: String,
     pub path: Option<Vec<InspectHistoryAction>>,
-    pub street: u8,
+    pub street: String,
     pub actor: Option<String>,
     pub pot: f64,
     pub remaining_stacks: Vec<f64>,
@@ -253,6 +253,17 @@ pub struct InspectRequest<'a> {
     pub samples: u64,
     pub seed: u64,
     pub br_traversals: u64,
+}
+
+/// Lower-case street name of a stored street number, as the postflop views print streets.
+pub fn street_name(street: u8) -> &'static str {
+    match street {
+        0 => "preflop",
+        1 => "flop",
+        2 => "turn",
+        3 => "river",
+        _ => "unknown",
+    }
 }
 
 /// Render an action without changing its persisted label.
@@ -686,22 +697,32 @@ pub fn inspect(
         "typed_action_entries": metadata.public_states.iter().map(|state| state.legal_actions.len()).sum::<usize>(),
         "seats": summary_seats,
     });
+    // Children follow `legal_actions` order, as in the postflop views.
+    let mut child_edges = metadata
+        .histories
+        .iter()
+        .filter(|edge| edge.parent == history)
+        .collect::<Vec<_>>();
+    child_edges.sort_by_key(|edge| edge.action_index);
+    let children = child_edges
+        .into_iter()
+        .map(|edge| {
+            serde_json::json!({
+                "history": display_history(&metadata, edge.key),
+                "action_index": edge.action_index,
+                "action": state.legal_actions.get(edge.action_index as usize).map(|action| display_action(action, metadata.bb_chips)),
+            })
+        })
+        .collect::<Vec<_>>();
     let node = serde_json::json!({
         "history": display_history(&metadata, history),
         "path": path,
-        "street": state.street,
+        "street": street_name(state.street),
         "actor": state.actor.map(|seat| position_at(&positions, seat as usize)).transpose()?,
         "pot": state.pot_chips as f64 / metadata.bb_chips as f64,
         "remaining_stacks": state.remaining_stacks_chips.iter().map(|chips| *chips as f64 / metadata.bb_chips as f64).collect::<Vec<_>>(),
         "legal_actions": state.legal_actions.iter().map(|action| display_action(action, metadata.bb_chips)).collect::<Vec<_>>(),
-        "children": metadata.histories.iter()
-            .filter(|edge| edge.parent == history)
-            .map(|edge| serde_json::json!({
-                "history": display_history(&metadata, edge.key),
-                "action_index": edge.action_index,
-                "action": state.legal_actions.get(edge.action_index as usize).map(|action| display_action(action, metadata.bb_chips)),
-            }))
-            .collect::<Vec<_>>(),
+        "children": children,
     });
     let ranges = if matches!(
         view,

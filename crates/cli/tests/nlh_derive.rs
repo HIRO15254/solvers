@@ -131,6 +131,18 @@ fn saved_preflop_profile_derives_reproducible_solvable_p1_and_rejects_invalid_in
     let root_row = &root[0];
     assert_eq!(root_row["history"], "");
     assert_eq!(root_row["actor"], "BTN");
+    // `actions`, `children` and `child_kinds` are parallel lists: child i is reached by action i.
+    let actions = root_row["actions"].as_array().unwrap();
+    assert!(actions.len() >= 3);
+    assert_eq!(
+        actions.len(),
+        root_row["children"].as_array().unwrap().len()
+    );
+    for (index, action) in actions.iter().enumerate() {
+        let child = export("tree", action.as_str().unwrap());
+        assert_eq!(child[0]["history"], root_row["children"][index]);
+        assert_eq!(child[0]["kind"], root_row["child_kinds"][index]);
+    }
     let after_call = export("tree", "c");
     assert_eq!(after_call[0]["actor"], "SB");
     let after_fold = export("tree", "cf");

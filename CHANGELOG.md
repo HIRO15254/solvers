@@ -33,6 +33,13 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
   cannot be recovered, and node reach does not account for other seats' actions
   or card removal. Action frequencies use acting-seat class reach weights and
   remain unknown when reach is unknown.
+- P2 `export` and `inspect` show actions as P1 does (`fold`, `check`, `call`,
+  `bet X`, `raise to X` with the street raise-to amount in display notation)
+  and histories in P1's token grammar (`r2.5c`; the root is empty). Node
+  selectors accept P1's forms (tokens, `/` label paths, indices, BB, `Nbb`,
+  `Nc`) plus the 32-hex history key; a bad selector exits 2. `.mwsol` files
+  keep their stored labels. Tree `children` and inspect children follow the
+  action order, and streets are named (`preflop`).
 - P2 tree `stored` means at least one strategy block exists at that history,
   not that every class was visited. Summary uses common names including
   `iterations`, `nodes`, and `stored_nodes`; `effective_stack` and `wall_secs`

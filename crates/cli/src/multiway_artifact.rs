@@ -144,11 +144,13 @@ pub fn export(
     let columns: &[&str] = match view {
         ExportView::Tree => {
             for state in selected {
-                let children: Vec<_> = metadata
+                let mut children: Vec<_> = metadata
                     .histories
                     .iter()
                     .filter(|edge| edge.parent == state.history)
                     .collect();
+                // `actions`, `children` and `child_kinds` are parallel lists, as in the postflop tree view.
+                children.sort_by_key(|edge| edge.action_index);
                 let kind = if state.actor.is_some() {
                     "action"
                 } else {
@@ -156,7 +158,7 @@ pub fn export(
                 };
                 rows.push(serde_json::json!({
                     "history": views::display_history(metadata, state.history),
-                    "kind": kind, "street": street_name(state.street),
+                    "kind": kind, "street": views::street_name(state.street),
                     "actor": state.actor.map(|actor| &positions[actor as usize]),
                     "pot": state.pot_chips as f64 / metadata.bb_chips as f64,
                     "stored": stored_histories.contains(&state.history),
@@ -225,7 +227,7 @@ pub fn export(
                     for (action, total) in state.legal_actions.iter().zip(totals) {
                         rows.push(serde_json::json!({
                             "history": views::display_history(metadata, state.history),
-                            "street": street_name(state.street), "actor": positions[actor as usize],
+                            "street": views::street_name(state.street), "actor": positions[actor as usize],
                             "action": views::display_action(action, metadata.bb_chips),
                             "frequency": if complete && mass > 0.0 { Some(total / mass) } else { None },
                         }));
@@ -338,16 +340,6 @@ pub fn export(
         print!("{rendered}");
     }
     Ok(())
-}
-
-fn street_name(street: u8) -> &'static str {
-    match street {
-        0 => "preflop",
-        1 => "flop",
-        2 => "turn",
-        3 => "river",
-        _ => "unknown",
-    }
 }
 
 fn class_weight(cell: &serde_json::Value) -> Option<f64> {
