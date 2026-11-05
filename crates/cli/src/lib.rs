@@ -451,7 +451,7 @@ enum Command {
         #[arg(conflicts_with = "sol")]
         config: Option<std::path::PathBuf>,
         #[cfg(feature = "p2")]
-        /// Public node: root, a 32-digit history key, or slash-separated action labels/indices.
+        /// Public node: root, a history (`r2.5c`), slash-separated action labels/indices, or a 32-digit history key.
         #[arg(long, default_value = "root")]
         node: String,
         #[cfg(feature = "p2")]
@@ -513,9 +513,18 @@ enum Command {
         view: artifact_args::ExportView,
         #[arg(long, value_enum, default_value = "json")]
         format: artifact_args::ExportFormat,
-        /// Which node the per-node views cover. Repeat to select nodes in order.
-        /// Postflop accepts betting lines and `all`; preflop accepts `root`,
-        /// slash-separated actions or indices, and stored history keys.
+        /// Postflop only: which node the per-node views cover. `root`, a
+        /// betting-line history (`xr10c`; wager amounts are street raise-to targets),
+        /// slash-separated action/chance labels (`check/check/Th`), or `all`
+        /// for every stored action node. Tree
+        /// accepts any node kind; other node views require action nodes.
+        /// Repeat to export nodes from one load in the given order.
+        #[cfg_attr(
+            feature = "p2",
+            arg(
+                help = "Which node the per-node views cover: `root`, a betting-line history (`xr10c`; wager amounts are street raise-to targets), slash-separated action labels or indices (`check/check/Th`, `raise to 2.5/0`), or (postflop) `all` for every stored action node; a preflop .mwsol also takes its 32-digit history keys. Tree accepts any node kind; other node views require action nodes. Repeat to export nodes from one load in the given order."
+            )
+        )]
         #[arg(long, default_value = "root")]
         node: Vec<String>,
         /// Postflop only: follow each selected node with the action nodes
