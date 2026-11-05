@@ -1,0 +1,10 @@
+error: failed to load source for dependency `tiny_http`
+
+Caused by:
+  unable to update /home/ubuntu/src/third_party/tiny_http
+
+Caused by:
+  failed to read `/home/ubuntu/src/third_party/tiny_http/Cargo.toml`
+
+Caused by:
+  No such file or directory (os error 2)

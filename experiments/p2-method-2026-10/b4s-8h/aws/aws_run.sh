@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Run an idempotent ~/job.sh on an Ubuntu 24.04 EC2 Spot instance launched as docs/development.md §5.5 requires.
 # Usage: aws_run.sh <name> <deadline hours> <local out dir> <remote job script> [files...]
-# Uploads src.tar (Cargo.toml Cargo.lock crates examples .cargo), job.sh and flat extras.
+# Uploads src.tar (Cargo.toml Cargo.lock crates examples .cargo third_party), job.sh and flat extras.
 # Job contract: ~/results is downloaded every 300s; progress.txt contains ALL_DONE only
 # after ~/final.tgz is ready, or terminal JOB_FAILED on solver failure. Both delete the instance.
 # Requires AWS CLI v2, curl, tar, ssh/scp/ssh-keygen and a default VPC whose default subnets assign public IPv4
@@ -170,7 +170,7 @@ refresh_ssh_ingress() {
   fi
   log "ssh ingress refreshed ip=$public_ip"
 }
-tar -cf "$tmp/src.tar" -C "$repo" Cargo.toml Cargo.lock crates examples .cargo
+tar -cf "$tmp/src.tar" -C "$repo" Cargo.toml Cargo.lock crates examples .cargo third_party
 cp "$job" "$tmp/job.sh"
 uploads=("$tmp/src.tar" "$tmp/job.sh")
 for file in "$@"; do

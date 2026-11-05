@@ -1,0 +1,6 @@
+# notes/30-abs-level.md §10: two iterations of each variant on one flop before the real runs
+fd128x8b128	ITERS=2 OUT_ROOT=$HOME/out/fine-check TRAIN_ARGS='--l1-boards 128' bash ~/run_fine_cloud.sh fd128x8b128 '2c 4d Qh' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fe128x8ro	ITERS=2 OUT_ROOT=$HOME/out/fine-check bash ~/run_fine_cloud.sh fe128x8ro '2c 4d Qh' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024 --l1-runout flush,pair,straight,over
+fc128x8	ITERS=2 OUT_ROOT=$HOME/out/fine-check bash ~/run_fine_cloud.sh fc128x8 '2c 4d Qh' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fb32x8	ITERS=2 OUT_ROOT=$HOME/out/fine-check bash ~/run_fine_cloud.sh fb32x8 '2c 4d Qh' --l1-relative 32x8:$EHS2_DIR/v2-f128-t128-r128.postcard
+fa16x4	ITERS=2 OUT_ROOT=$HOME/out/fine-check bash ~/run_fine_cloud.sh fa16x4 '2c 4d Qh'

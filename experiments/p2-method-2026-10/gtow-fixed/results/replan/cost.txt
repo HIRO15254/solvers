@@ -214,4 +214,9 @@ sb-j 0.229100 0.84 0.192
 sb-k 0.229100 0.84 0.192
 sb-l 0.229100 1.01 0.231
 sb-m 0.364500 0.80 0.291
-TOTAL-2026-11 7.31
+# fn-a.stopped: m6a.8xlarge stopped by hand to relaunch on the compute types (terminated 06:37:28, the launcher had been killed).
+fn-a.stopped 0.385800 0.04 0.014
+# fn-a.build: the build failed (the source tarball lacked third_party/tiny_http; aws_run.sh now uploads it).
+fn-a.build 0.540700 0.13 0.069
+fn-a 0.540700 1.94 0.730
+TOTAL-2026-11 8.12
