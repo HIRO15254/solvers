@@ -1,0 +1,1 @@
+bash ~/override_solve.sh ~/out/ruler ovm-gt5c-sd0 0 ~/xm-gt5c.json ~/truth-multi.json

@@ -20,7 +20,7 @@ cargo build --release -p cli -p daemon --no-default-features
 |---|---|
 | `config new` | 製品の既定は`p1`。`--product`はhelpに表示しないが、`--product p2`は`NLH005`（exit 2） |
 | `validate` / `solve` / `tree` / `inspect`（config）/ `report` | P2入力は型付き`spot::SpotError`の`NLH005`（exit 2） |
-| `derive` / `evaluate` | 含まれず、helpにも表示しない |
+| `derive` / `evaluate` / `browse` | 含まれず、helpにも表示しない |
 | `resume` / `inspect`（成果物、`--sol`を含む）/ `export` / `compare` | P2の`.mwsol`・`.mwckpt`、またはmanifestのgame kindが`mw-preflop`のrunはexit 3で拒否。compareは左右とも対象 |
 | `line` | 製品のsolveに依存せず、P2卓のline再生も利用可能 |
 | `status` / `watch` / `runs ls` | 製品非依存。P2のrunも監視・一覧可能 |
@@ -432,6 +432,47 @@ P1のREPLは次を使う。
 iso併合dealは代表cardに`*`を付ける。member表示のremapは未対応である。
 複数のsuit同型cardを表し代表cardが記録されない`[dealN]`の先では`eq`を拒否する。親streetのnodeまたは具体的なcardを持つbranchでは使える。
 未保存Riverの戦略・値は再計算値であり、保存時の値ではない。`export --resolve-rivers`も同じ再解決を使う。
+
+## `solvers browse`
+
+```sh
+solvers browse <FILE> [--config TOML] [--color auto|always|never] [--node NODE]
+```
+
+P2の保存解をstdin/stdoutのREPLで見る。pipeからのcommandも同じように読む。
+拡張子ではなく内容で`.mwsol`または`"format": "p2-class-profile"`、version 1のJSONを判別する。
+class-profile JSONは実験用trunk出力であり、headerにexperimentalと表示する。
+`.mwsol`の閲覧対象はPreflopだけであり、Postflopへ進むedgeはPreflop境界として表示する。
+P1の`.sol`やその他の入力、無効な開始nodeは入力error（exit 2）である。
+`.mwsol`の破損・非互換はexit 3である。
+
+| flag | 既定 | 意味 |
+|---|---|---|
+| `--config TOML` | なし | class-profile JSONに対応する設定。L1 trunk treeを構築しdecision数・path・actor・actionを検証。`.mwsol`との併用は入力error（exit 2） |
+| `--node NODE` | `root` | `.mwsol`はinspectと同じroot、32桁history key、`/`区切りaction label/index。JSONはrootまたは`/`区切りaction label/index |
+| `--color` | `auto` | autoはstdoutがterminalかつ`NO_COLOR`未設定のときANSI truecolorを使う。alwaysは常に色を使い、neverはplain text |
+
+| command | 意味 |
+|---|---|
+| `show` / 空行 | file kind、席名付きpath、actor、保存されているpot/stack、action indexと集計頻度 |
+| `go <action\|index>` / 裸のindex | 子へ進む |
+| `up` / `root` / `path` | 親 / rootへ戻る / `--node`で使えるselectorを出す |
+| `strat` / `mix` | pathとactorの1行headerに続くactorの13×13 class strategy。最大確率actionの短縮名と%。下に短縮名と集計頻度のlegend |
+| `grid <action\|index>` | 指定actionのclass別確率（%） |
+| `range [seat\|position]` | actor（既定）または指定seat indexまたは既知のposition名（例`range BTN`）の到達range。最大class weight比（%）と総combo数 |
+| `combos <class>` | AA、AKs、AKo等のclass単位のaction確率 |
+| `ev` | `.mwsol`の保存済みroot summary（node別EVではない）。JSONではnot available |
+| `help` / `quit` / `exit` | help / 終了 |
+
+gridは行・列A〜2、対角にpair、上にsuited、下にoffsuitを置く。range外・確率未保存は`--`。
+strategyの色はaction mixで合成し、foldは青、check/callは緑、raiseは小さいsizeの橙から大きいsizeの赤、all-inは暗赤である。
+到達rangeは開始combo weightに、その席自身がpath上で選んだaction確率だけを掛ける。
+range gridはclass内の1 comboあたりweightを最大値で割る。頻度はactorの到達combo数で加重し、
+戦略・到達量が既知のclassに条件付ける。既知coverageをcombo数で示し、不明値を0や一様戦略へ補完しない。
+`--config`ありのJSONは設定の開始range・positionを使い、各edgeをbetting stateで再生したpot・残stack（BB）を表示する。
+照合はtree構造の一致であり、profileの生成元configの同一性を保証しない。EVはnot availableのままである。
+`--config`なしのJSONには開始range・position・pot・stackが無いので、全席の開始rangeをfullと仮定してheaderで明示し、
+他の値はnot availableとする。REPL内の誤commandはerrorを表示して継続する。
 
 ## `solvers report`
 

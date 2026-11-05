@@ -14,7 +14,7 @@ impl fmt::Display for ArtifactError {
 impl std::error::Error for ArtifactError {}
 
 #[derive(Debug)]
-pub(crate) struct InputError(anyhow::Error);
+pub(crate) struct InputError(pub(crate) anyhow::Error);
 impl fmt::Display for InputError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:#}", self.0)

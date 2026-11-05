@@ -1,0 +1,14 @@
+{
+  "label": "E2 raise5-plateau final",
+  "profile": "../../../../../.cache/p2-trunk/gtow-fixed/raise5-plateau/final/traise5+p10+g25+hd.profile.json",
+  "solve": "../raise5-plateau/traise5+p10+g25+hd.json",
+  "metadata": "../raise5-plateau/time.txt",
+  "leaf_biases": {
+    "co4": "../flop-recall/co-rel8x2@raise5+g25+hd.it4000.json",
+    "sb4": "../flop-recall/sb-rel8x2@raise5+g25+hd.it4000.json",
+    "utg5": "../flop-recall/utg5b-rel8x2@raise5+g25+hd.it4000.json",
+    "co5": "../flop-recall/co5b-rel8x2@raise5+g25+hd.it4000.json"
+  },
+  "ghostline": {"path": "../ghostline/summary.json", "label": "final"},
+  "notes": "GTOW・checkpoint・ghostlineは6000/final。leafは別の固定GTOW preflop/rangeのE2 it4000、同じ100 flop、実カードP1との対。final trunk自身のrangeでのleaf biasは未測定。peak memoryはGNU timeの最大RSS（KiB→bytes）。"
+}

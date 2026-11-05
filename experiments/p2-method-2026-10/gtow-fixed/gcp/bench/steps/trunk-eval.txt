@@ -1,0 +1,2 @@
+bash ~/trunk_eval.sh ~/out/trunk e2 ~/e2.profile.json ~/e2.postflop.bin 0 ~/e2-l1.json ~/e2-p1.json ~/e2-p1-dev.json ~/e2-p1-held.json
+bash ~/trunk_eval.sh ~/out/trunk e2sd1 ~/e2sd1.profile.json ~/e2sd1.postflop.bin 1 ~/e2sd1-l1.json ~/e2sd1-p1.json

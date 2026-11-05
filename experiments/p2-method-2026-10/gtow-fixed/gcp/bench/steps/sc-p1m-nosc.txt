@@ -1,0 +1,1 @@
+python3 $X/p1_classes.py ~/nosc.profile.json ~/tasks-sc-multi.txt ~ ~/out/sc/p1m/nosc --solvers $S --min-weight 0.0001

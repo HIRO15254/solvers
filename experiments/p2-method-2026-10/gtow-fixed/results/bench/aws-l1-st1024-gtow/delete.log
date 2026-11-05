@@ -1,0 +1,23 @@
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-r7qqq7yh",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "TerminatingInstances": [
+        {
+            "InstanceId": "i-0829fdd3d6a87a84e",
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "PreviousState": {
+                "Code": 16,
+                "Name": "running"
+            }
+        }
+    ]
+}

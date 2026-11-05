@@ -1,0 +1,8 @@
+cargo build --release -p mw-preflop --example trunk_solve -j 4: PASS (69.39 s)
+cargo test -j 4: PASS (1010 passed, 40 ignored, 57 suites; 231.61 s)
+cargo fmt --all --check: PASS (1.63 s)
+cargo clippy --workspace --all-targets -- -D warnings: PASS (9.76 s)
+python tools/check_docs.py: PASS (27 Markdown files; includes final gate tables and memory-failure record; 0.38 s)
+bash -n experiments/p2-method-2026-10/relative-reach/gcp/job.sh: PASS
+QRE resume test: 1-thread uninterrupted vs 4-thread first segment / 2-thread resumed segment; trunk profile, postflop regrets/sums and checkpoints bit-identical.
+Local inertness gate: 50 iterations each, 16 threads, seed 0; E2, E2 without training regression, QRE lambda 0.5. Both comparisons non-identical; no cloud APIs or resources used.

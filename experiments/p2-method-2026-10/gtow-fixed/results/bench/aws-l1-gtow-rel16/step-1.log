@@ -1,0 +1,27 @@
+rel16x2@raise5+g25+hd+sd1 94s 
+rel16x2@raise5+g25+hd+sd1 302s 
+rel16x2@raise5+g25+hd+sd1 351s 
+rel16x2@raise5+g25+hd+sd1 23s 
+	Command being timed: "bash -c DIAG_RIVERS=4 DIAG_JOBS=1 bash $X/bench_diag.sh ~/gtow.profile.json ~/rel16x2@raise5+g25+hd+sd1.bin ~/out/l1/gtow rel16x2@raise5+g25+hd+sd1 ~/bands.txt"
+	User time (seconds): 3376.03
+	System time (seconds): 74.11
+	Percent of CPU this job got: 448%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 12:49.66
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 2678584
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 30602337
+	Voluntary context switches: 650360
+	Involuntary context switches: 198282
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 65952
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

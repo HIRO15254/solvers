@@ -1,0 +1,24 @@
+rel32x2@raise5+g49+hd+sd1 3444s L1: 181 leaves; 16100 postflop decisions; 255885056 slots; 4094160896 storage bytes
+	Command being timed: "bash -c NODIAG=1 LINES=~/all36-lines.txt bash $X/buckets.sh ~/gtow.profile.json ~/out/train/gtow 2000 rel32x2@raise5+g49+hd+sd1"
+	User time (seconds): 36242.83
+	System time (seconds): 4104.75
+	Percent of CPU this job got: 1171%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 57:23.53
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 13872568
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 2010965056
+	Voluntary context switches: 3034915
+	Involuntary context switches: 1024907
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 3998256
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

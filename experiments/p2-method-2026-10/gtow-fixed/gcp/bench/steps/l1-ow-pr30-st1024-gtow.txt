@@ -1,0 +1,3 @@
+sed -E "/^\[solver\.abstraction\.buckets\]/,/^\[/ s/^(flop|turn|river) = 32$/\1 = 1024/" examples/bench/hu_20bb_postflop.toml > /tmp/b6-1024.toml && target/release/examples/trunk_solve --config /tmp/b6-1024.toml --leaf-model l1 --ehs2-cache ~/ehs2/v2-f1024-t1024-r1024.postcard --iterations 1 --eval-every 0 && sha256sum ~/ehs2/v2-f1024-t1024-r1024.postcard
+NODIAG=1 LINES=~/all36-lines.txt bash $X/buckets.sh ~/gtow.profile.json ~/out/train/gtow 2000 rel8x2@raise5+g25+hd+sd1+ow+pr30+st1024
+DIAG_RIVERS=4 DIAG_JOBS=1 bash $X/bench_diag.sh ~/gtow.profile.json ~/out/train/gtow/rel8x2@raise5+g25+hd+sd1+ow+pr30+st1024/postflop.bin ~/out/l1/gtow rel8x2@raise5+g25+hd+sd1+ow+pr30+st1024 ~/bands.txt

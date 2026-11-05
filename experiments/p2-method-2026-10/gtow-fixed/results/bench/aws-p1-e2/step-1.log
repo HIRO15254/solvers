@@ -1,0 +1,2709 @@
+SKIP L01-raise
+SKIP L02-raise
+SKIP L03-raise
+SKIP L04-raise
+SKIP L05-raise
+SKIP L06-raise
+SKIP L07-raise
+SKIP L08-raise
+SKIP L09-raise
+SKIP L10-raise
+SKIP L11-raise
+SKIP L12-raise
+SKIP L13-raise
+SKIP L14-raise
+SKIP L15-raise
+SKIP L16-raise
+SKIP L17-raise
+SKIP L18-raise
+SKIP L19-raise
+SKIP L20-raise
+SKIP L21-raise
+SKIP L22-raise
+SKIP L23-raise
+SKIP L24-raise
+SKIP L25-raise
+SKIP L26-raise
+SKIP L27-raise
+SKIP L28-raise
+SKIP L29-raise
+SKIP L30-raise
+SKIP L31-raise
+SKIP L32-raise
+SKIP L33-raise
+tree: nodes=303022 terminals=191300 rank_tables=810 storage=166.6 MiB (f32) / 84.2 MiB (i16) / 125.4 MiB (i16-f32avg)
+memory estimate: 717.2 MiB (f32) / 675.9 MiB (i16) / 717.2 MiB (i16-f32avg)
+iter=      25 expl_p0=3.534e-1 expl_p1=1.283e0 nash_conv=1.637e0
+iter=      50 expl_p0=1.315e-1 expl_p1=3.721e-1 nash_conv=5.036e-1
+iter=      69 expl_p0=6.771e-2 expl_p1=1.924e-1 nash_conv=2.601e-1
+done: iterations=69 wall=0.60s ev_p0=0.796253 ev_p1=41.368700 nash_conv=2.601e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (596.6 KB, 1268 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (303022 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (303022 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise Kc Ad Ah wall_s=0.6 it=69 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=377.5 MiB (f32) / 190.1 MiB (i16) / 283.8 MiB (i16-f32avg)
+memory estimate: 897.5 MiB (f32) / 777.8 MiB (i16) / 871.5 MiB (i16-f32avg)
+iter=      25 expl_p0=4.321e0 expl_p1=1.544e0 nash_conv=5.865e0
+iter=      50 expl_p0=1.555e0 expl_p1=4.972e-1 nash_conv=2.052e0
+iter=     100 expl_p0=4.680e-1 expl_p1=1.176e-1 nash_conv=5.857e-1
+iter=     144 expl_p0=2.429e-1 expl_p1=7.313e-2 nash_conv=3.160e-1
+iter=     157 expl_p0=2.217e-1 expl_p1=5.988e-2 nash_conv=2.815e-1
+iter=     163 expl_p0=2.047e-1 expl_p1=5.492e-2 nash_conv=2.596e-1
+done: iterations=163 wall=2.62s ev_p0=28.165585 ev_p1=13.280645 nash_conv=2.596e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (1.05 MB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.36s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 5c 7d 8h wall_s=2.6 it=163 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=375.9 MiB (f32) / 189.3 MiB (i16) / 282.6 MiB (i16-f32avg)
+memory estimate: 895.9 MiB (f32) / 776.6 MiB (i16) / 869.9 MiB (i16-f32avg)
+iter=      25 expl_p0=3.424e0 expl_p1=1.573e0 nash_conv=4.997e0
+iter=      50 expl_p0=9.860e-1 expl_p1=4.575e-1 nash_conv=1.443e0
+iter=     100 expl_p0=2.483e-1 expl_p1=1.126e-1 nash_conv=3.609e-1
+iter=     114 expl_p0=2.623e-1 expl_p1=8.692e-2 nash_conv=3.492e-1
+iter=     164 expl_p0=1.222e-1 expl_p1=3.978e-2 nash_conv=1.620e-1
+done: iterations=164 wall=2.53s ev_p0=9.824117 ev_p1=31.608545 nash_conv=1.620e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (1.13 MB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 5c 7d Jh wall_s=2.5 it=164 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=331.2 MiB (f32) / 167.0 MiB (i16) / 249.1 MiB (i16-f32avg)
+memory estimate: 851.3 MiB (f32) / 756.9 MiB (i16) / 839.0 MiB (i16-f32avg)
+iter=      25 expl_p0=1.168e0 expl_p1=2.461e0 nash_conv=3.629e0
+iter=      50 expl_p0=3.793e-1 expl_p1=8.818e-1 nash_conv=1.261e0
+iter=     100 expl_p0=1.206e-1 expl_p1=2.177e-1 nash_conv=3.383e-1
+iter=     111 expl_p0=9.639e-2 expl_p1=1.561e-1 nash_conv=2.525e-1
+done: iterations=111 wall=1.59s ev_p0=8.963682 ev_p1=32.833959 nash_conv=2.525e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (1.06 MB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.36s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 6c 7d Ah wall_s=1.6 it=111 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=232.6 MiB (f32) / 117.1 MiB (i16) / 174.9 MiB (i16-f32avg)
+memory estimate: 764.5 MiB (f32) / 706.8 MiB (i16) / 764.5 MiB (i16-f32avg)
+iter=      25 expl_p0=5.880e0 expl_p1=1.427e0 nash_conv=7.307e0
+iter=      50 expl_p0=1.979e0 expl_p1=4.432e-1 nash_conv=2.422e0
+iter=     100 expl_p0=4.405e-1 expl_p1=1.228e-1 nash_conv=5.633e-1
+iter=     135 expl_p0=2.070e-1 expl_p1=6.668e-2 nash_conv=2.737e-1
+iter=     138 expl_p0=1.973e-1 expl_p1=6.500e-2 nash_conv=2.623e-1
+done: iterations=138 wall=1.50s ev_p0=17.455701 ev_p1=23.962274 nash_conv=2.623e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (746.5 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 3c 4c 7d wall_s=1.5 it=138 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=228.9 MiB (f32) / 115.3 MiB (i16) / 172.1 MiB (i16-f32avg)
+memory estimate: 761.8 MiB (f32) / 705.0 MiB (i16) / 761.8 MiB (i16-f32avg)
+iter=      25 expl_p0=3.210e0 expl_p1=1.923e0 nash_conv=5.133e0
+iter=      50 expl_p0=1.169e0 expl_p1=5.172e-1 nash_conv=1.686e0
+iter=     100 expl_p0=3.878e-1 expl_p1=1.570e-1 nash_conv=5.449e-1
+iter=     144 expl_p0=2.097e-1 expl_p1=8.845e-2 nash_conv=2.981e-1
+iter=     152 expl_p0=1.814e-1 expl_p1=7.890e-2 nash_conv=2.603e-1
+done: iterations=152 wall=1.63s ev_p0=31.070458 ev_p1=10.352826 nash_conv=2.603e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (747.3 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 4c 7d 8d wall_s=1.6 it=152 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=225.1 MiB (f32) / 113.4 MiB (i16) / 169.3 MiB (i16-f32avg)
+memory estimate: 759.0 MiB (f32) / 703.1 MiB (i16) / 759.0 MiB (i16-f32avg)
+iter=      25 expl_p0=5.183e0 expl_p1=1.240e0 nash_conv=6.423e0
+iter=      50 expl_p0=1.643e0 expl_p1=3.310e-1 nash_conv=1.974e0
+iter=     100 expl_p0=2.226e-1 expl_p1=6.439e-2 nash_conv=2.870e-1
+iter=     103 expl_p0=2.075e-1 expl_p1=6.003e-2 nash_conv=2.675e-1
+iter=     106 expl_p0=1.926e-1 expl_p1=5.682e-2 nash_conv=2.494e-1
+done: iterations=106 wall=1.13s ev_p0=9.337647 ev_p1=32.091866 nash_conv=2.494e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (794.1 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 5c 7d Qd wall_s=1.1 it=106 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=217.6 MiB (f32) / 109.6 MiB (i16) / 163.6 MiB (i16-f32avg)
+memory estimate: 753.0 MiB (f32) / 699.0 MiB (i16) / 753.0 MiB (i16-f32avg)
+iter=      25 expl_p0=5.761e-1 expl_p1=4.803e-1 nash_conv=1.056e0
+iter=      50 expl_p0=7.002e-2 expl_p1=1.257e-1 nash_conv=1.957e-1
+done: iterations=50 wall=0.51s ev_p0=0.710640 ev_p1=41.397229 nash_conv=1.957e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (789.8 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 5c 7c Kd wall_s=0.5 it=50 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=365.1 MiB (f32) / 183.9 MiB (i16) / 274.5 MiB (i16-f32avg)
+memory estimate: 885.1 MiB (f32) / 772.4 MiB (i16) / 863.0 MiB (i16-f32avg)
+iter=      25 expl_p0=5.013e0 expl_p1=2.437e0 nash_conv=7.450e0
+iter=      50 expl_p0=1.867e0 expl_p1=8.272e-1 nash_conv=2.694e0
+iter=     100 expl_p0=5.827e-1 expl_p1=2.174e-1 nash_conv=8.001e-1
+iter=     150 expl_p0=2.483e-1 expl_p1=9.150e-2 nash_conv=3.398e-1
+iter=     165 expl_p0=1.993e-1 expl_p1=7.301e-2 nash_conv=2.723e-1
+iter=     168 expl_p0=1.933e-1 expl_p1=7.139e-2 nash_conv=2.647e-1
+done: iterations=168 wall=2.64s ev_p0=26.632050 ev_p1=14.755777 nash_conv=2.647e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (1.09 MB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.36s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 6c 8d Th wall_s=2.6 it=168 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=366.7 MiB (f32) / 184.7 MiB (i16) / 275.7 MiB (i16-f32avg)
+memory estimate: 886.7 MiB (f32) / 772.7 MiB (i16) / 863.7 MiB (i16-f32avg)
+iter=      25 expl_p0=2.391e0 expl_p1=1.956e0 nash_conv=4.346e0
+iter=      50 expl_p0=9.773e-1 expl_p1=5.366e-1 nash_conv=1.514e0
+iter=     100 expl_p0=2.743e-1 expl_p1=1.505e-1 nash_conv=4.249e-1
+iter=     124 expl_p0=1.933e-1 expl_p1=9.867e-2 nash_conv=2.920e-1
+iter=     130 expl_p0=1.770e-1 expl_p1=8.898e-2 nash_conv=2.660e-1
+done: iterations=130 wall=1.97s ev_p0=11.704443 ev_p1=29.619868 nash_conv=2.660e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (1.18 MB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.36s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 4c 9d Jh wall_s=2.0 it=130 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=349.7 MiB (f32) / 176.2 MiB (i16) / 263.0 MiB (i16-f32avg)
+memory estimate: 869.7 MiB (f32) / 765.0 MiB (i16) / 851.8 MiB (i16-f32avg)
+iter=      25 expl_p0=1.579e0 expl_p1=2.573e0 nash_conv=4.152e0
+iter=      50 expl_p0=5.727e-1 expl_p1=7.775e-1 nash_conv=1.350e0
+iter=     100 expl_p0=1.480e-1 expl_p1=1.994e-1 nash_conv=3.474e-1
+iter=     112 expl_p0=1.217e-1 expl_p1=1.569e-1 nash_conv=2.786e-1
+iter=     115 expl_p0=1.163e-1 expl_p1=1.483e-1 nash_conv=2.645e-1
+done: iterations=115 wall=1.74s ev_p0=17.787479 ev_p1=23.701973 nash_conv=2.645e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (1.14 MB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.36s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 8c Jd Qh wall_s=1.7 it=115 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=211.1 MiB (f32) / 106.3 MiB (i16) / 158.7 MiB (i16-f32avg)
+memory estimate: 748.6 MiB (f32) / 696.2 MiB (i16) / 748.6 MiB (i16-f32avg)
+iter=      25 expl_p0=5.178e-1 expl_p1=1.024e0 nash_conv=1.542e0
+iter=      50 expl_p0=4.158e-2 expl_p1=2.145e-1 nash_conv=2.560e-1
+done: iterations=50 wall=0.50s ev_p0=5.895046 ev_p1=36.146220 nash_conv=2.560e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (831.5 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 6c Tc Kd wall_s=0.5 it=50 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=198.9 MiB (f32) / 100.3 MiB (i16) / 149.6 MiB (i16-f32avg)
+memory estimate: 740.0 MiB (f32) / 690.7 MiB (i16) / 740.0 MiB (i16-f32avg)
+iter=      25 expl_p0=5.872e-1 expl_p1=1.742e0 nash_conv=2.329e0
+iter=      50 expl_p0=2.443e-1 expl_p1=4.366e-1 nash_conv=6.809e-1
+iter=      78 expl_p0=7.706e-2 expl_p1=1.499e-1 nash_conv=2.269e-1
+done: iterations=78 wall=0.73s ev_p0=2.557698 ev_p1=39.489119 nash_conv=2.269e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (759.3 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 7c Jc Ad wall_s=0.7 it=78 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=188.6 MiB (f32) / 95.1 MiB (i16) / 141.8 MiB (i16-f32avg)
+memory estimate: 732.6 MiB (f32) / 685.8 MiB (i16) / 732.6 MiB (i16-f32avg)
+iter=      25 expl_p0=6.589e-1 expl_p1=1.155e0 nash_conv=1.814e0
+iter=      50 expl_p0=1.139e-1 expl_p1=2.498e-1 nash_conv=3.638e-1
+iter=      56 expl_p0=9.629e-2 expl_p1=1.740e-1 nash_conv=2.702e-1
+iter=      59 expl_p0=8.906e-2 expl_p1=1.473e-1 nash_conv=2.363e-1
+done: iterations=59 wall=0.56s ev_p0=0.920167 ev_p1=41.282937 nash_conv=2.363e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (703.9 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 7c Kc Ad wall_s=0.6 it=59 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=224.2 MiB (f32) / 112.9 MiB (i16) / 168.6 MiB (i16-f32avg)
+memory estimate: 758.8 MiB (f32) / 703.1 MiB (i16) / 758.8 MiB (i16-f32avg)
+iter=      25 expl_p0=4.561e0 expl_p1=1.729e0 nash_conv=6.290e0
+iter=      50 expl_p0=1.734e0 expl_p1=5.003e-1 nash_conv=2.234e0
+iter=     100 expl_p0=5.017e-1 expl_p1=1.908e-1 nash_conv=6.926e-1
+iter=     150 expl_p0=1.927e-1 expl_p1=1.056e-1 nash_conv=2.983e-1
+iter=     157 expl_p0=1.758e-1 expl_p1=9.566e-2 nash_conv=2.714e-1
+iter=     160 expl_p0=1.670e-1 expl_p1=9.265e-2 nash_conv=2.597e-1
+done: iterations=160 wall=1.73s ev_p0=22.826478 ev_p1=18.615375 nash_conv=2.597e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (795.3 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 3c 8d 9c wall_s=1.7 it=160 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=224.2 MiB (f32) / 112.9 MiB (i16) / 168.6 MiB (i16-f32avg)
+memory estimate: 758.3 MiB (f32) / 702.7 MiB (i16) / 758.3 MiB (i16-f32avg)
+iter=      25 expl_p0=4.277e0 expl_p1=1.755e0 nash_conv=6.032e0
+iter=      50 expl_p0=1.455e0 expl_p1=5.310e-1 nash_conv=1.986e0
+iter=     100 expl_p0=4.616e-1 expl_p1=1.967e-1 nash_conv=6.583e-1
+iter=     150 expl_p0=1.879e-1 expl_p1=1.015e-1 nash_conv=2.894e-1
+iter=     155 expl_p0=1.754e-1 expl_p1=9.606e-2 nash_conv=2.714e-1
+iter=     158 expl_p0=1.648e-1 expl_p1=9.291e-2 nash_conv=2.577e-1
+done: iterations=158 wall=1.71s ev_p0=25.729274 ev_p1=15.674484 nash_conv=2.577e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (804.7 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 4c 8d Tc wall_s=1.7 it=158 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=218.6 MiB (f32) / 110.1 MiB (i16) / 164.3 MiB (i16-f32avg)
+memory estimate: 753.8 MiB (f32) / 699.6 MiB (i16) / 753.8 MiB (i16-f32avg)
+iter=      25 expl_p0=9.363e-1 expl_p1=1.951e0 nash_conv=2.887e0
+iter=      50 expl_p0=2.323e-1 expl_p1=6.458e-1 nash_conv=8.781e-1
+iter=      91 expl_p0=6.541e-2 expl_p1=1.922e-1 nash_conv=2.576e-1
+done: iterations=91 wall=0.95s ev_p0=17.107078 ev_p1=24.381750 nash_conv=2.576e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (826.3 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 8c Td Jc wall_s=0.9 it=91 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=366.7 MiB (f32) / 184.7 MiB (i16) / 275.7 MiB (i16-f32avg)
+memory estimate: 886.7 MiB (f32) / 772.3 MiB (i16) / 863.3 MiB (i16-f32avg)
+iter=      25 expl_p0=9.477e-1 expl_p1=1.303e0 nash_conv=2.251e0
+iter=      50 expl_p0=3.138e-1 expl_p1=2.574e-1 nash_conv=5.712e-1
+iter=      69 expl_p0=1.825e-1 expl_p1=1.491e-1 nash_conv=3.316e-1
+iter=      77 expl_p0=1.466e-1 expl_p1=1.251e-1 nash_conv=2.717e-1
+iter=      80 expl_p0=1.328e-1 expl_p1=1.140e-1 nash_conv=2.468e-1
+done: iterations=80 wall=1.23s ev_p0=6.929834 ev_p1=34.573165 nash_conv=2.468e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (1.12 MB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 4c Td Jh wall_s=1.2 it=80 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=346.7 MiB (f32) / 174.7 MiB (i16) / 260.7 MiB (i16-f32avg)
+memory estimate: 866.7 MiB (f32) / 762.8 MiB (i16) / 848.8 MiB (i16-f32avg)
+iter=      25 expl_p0=2.980e-1 expl_p1=3.070e-1 nash_conv=6.050e-1
+iter=      50 expl_p0=1.046e-2 expl_p1=5.890e-2 nash_conv=6.936e-2
+done: iterations=50 wall=0.70s ev_p0=0.015417 ev_p1=42.257073 nash_conv=6.936e-2
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (1.01 MB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.36s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 7c Jd Kh wall_s=0.7 it=50 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=315.8 MiB (f32) / 159.3 MiB (i16) / 237.6 MiB (i16-f32avg)
+memory estimate: 835.8 MiB (f32) / 749.2 MiB (i16) / 827.5 MiB (i16-f32avg)
+iter=      25 expl_p0=4.117e-1 expl_p1=2.300e0 nash_conv=2.712e0
+iter=      50 expl_p0=2.381e-1 expl_p1=1.173e0 nash_conv=1.411e0
+iter=     100 expl_p0=7.616e-2 expl_p1=4.287e-1 nash_conv=5.049e-1
+iter=     143 expl_p0=6.019e-2 expl_p1=2.560e-1 nash_conv=3.162e-1
+iter=     159 expl_p0=9.130e-2 expl_p1=4.451e-1 nash_conv=5.364e-1
+iter=     184 expl_p0=6.243e-2 expl_p1=3.115e-1 nash_conv=3.740e-1
+iter=     206 expl_p0=4.693e-2 expl_p1=2.450e-1 nash_conv=2.920e-1
+iter=     213 expl_p0=4.362e-2 expl_p1=2.257e-1 nash_conv=2.693e-1
+iter=     216 expl_p0=4.307e-2 expl_p1=2.173e-1 nash_conv=2.603e-1
+done: iterations=216 wall=2.96s ev_p0=4.847989 ev_p1=37.204940 nash_conv=2.603e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (1.02 MB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.36s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise Tc Qd Ah wall_s=3.0 it=216 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=231.7 MiB (f32) / 116.7 MiB (i16) / 174.2 MiB (i16-f32avg)
+memory estimate: 764.1 MiB (f32) / 706.6 MiB (i16) / 764.1 MiB (i16-f32avg)
+iter=      25 expl_p0=4.047e0 expl_p1=1.450e0 nash_conv=5.497e0
+iter=      50 expl_p0=1.452e0 expl_p1=4.962e-1 nash_conv=1.949e0
+iter=     100 expl_p0=3.045e-1 expl_p1=1.357e-1 nash_conv=4.402e-1
+iter=     121 expl_p0=2.435e-1 expl_p1=9.358e-2 nash_conv=3.371e-1
+iter=     139 expl_p0=1.957e-1 expl_p1=7.322e-2 nash_conv=2.690e-1
+iter=     142 expl_p0=1.870e-1 expl_p1=6.985e-2 nash_conv=2.569e-1
+done: iterations=142 wall=1.55s ev_p0=16.563843 ev_p1=24.850008 nash_conv=2.569e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (784.6 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 4c 4d 6c wall_s=1.5 it=142 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=224.2 MiB (f32) / 112.9 MiB (i16) / 168.6 MiB (i16-f32avg)
+memory estimate: 758.6 MiB (f32) / 703.0 MiB (i16) / 758.6 MiB (i16-f32avg)
+iter=      25 expl_p0=4.183e0 expl_p1=1.717e0 nash_conv=5.901e0
+iter=      50 expl_p0=1.729e0 expl_p1=4.085e-1 nash_conv=2.137e0
+iter=     100 expl_p0=2.597e-1 expl_p1=9.379e-2 nash_conv=3.535e-1
+iter=     110 expl_p0=2.015e-1 expl_p1=7.953e-2 nash_conv=2.810e-1
+iter=     113 expl_p0=1.882e-1 expl_p1=7.465e-2 nash_conv=2.628e-1
+done: iterations=113 wall=1.21s ev_p0=8.262830 ev_p1=33.143635 nash_conv=2.628e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (846.9 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 3c 3d Qc wall_s=1.2 it=113 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=197.9 MiB (f32) / 99.8 MiB (i16) / 148.9 MiB (i16-f32avg)
+memory estimate: 739.2 MiB (f32) / 690.1 MiB (i16) / 739.2 MiB (i16-f32avg)
+iter=      25 expl_p0=1.283e0 expl_p1=1.447e0 nash_conv=2.730e0
+iter=      50 expl_p0=4.798e-1 expl_p1=3.401e-1 nash_conv=8.198e-1
+iter=      87 expl_p0=1.409e-1 expl_p1=1.289e-1 nash_conv=2.699e-1
+iter=      90 expl_p0=1.313e-1 expl_p1=1.183e-1 nash_conv=2.496e-1
+done: iterations=90 wall=0.86s ev_p0=4.884967 ev_p1=37.111887 nash_conv=2.496e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (770.1 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 6c Kc Kd wall_s=0.9 it=90 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=346.7 MiB (f32) / 174.7 MiB (i16) / 260.7 MiB (i16-f32avg)
+memory estimate: 866.7 MiB (f32) / 762.9 MiB (i16) / 848.9 MiB (i16-f32avg)
+iter=      25 expl_p0=4.064e-1 expl_p1=5.571e-1 nash_conv=9.636e-1
+iter=      50 expl_p0=3.473e-2 expl_p1=1.116e-1 nash_conv=1.464e-1
+done: iterations=50 wall=0.71s ev_p0=0.231741 ev_p1=42.035839 nash_conv=1.464e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (1.07 MB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.36s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.36s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 3c Jd Kh wall_s=0.7 it=50 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=326.6 MiB (f32) / 164.7 MiB (i16) / 245.6 MiB (i16-f32avg)
+memory estimate: 846.6 MiB (f32) / 754.1 MiB (i16) / 835.1 MiB (i16-f32avg)
+iter=      25 expl_p0=7.808e-1 expl_p1=2.332e0 nash_conv=3.113e0
+iter=      50 expl_p0=3.480e-1 expl_p1=7.182e-1 nash_conv=1.066e0
+iter=     100 expl_p0=8.435e-2 expl_p1=2.476e-1 nash_conv=3.320e-1
+iter=     112 expl_p0=9.793e-2 expl_p1=5.173e-1 nash_conv=6.152e-1
+iter=     137 expl_p0=7.163e-2 expl_p1=3.092e-1 nash_conv=3.808e-1
+iter=     155 expl_p0=5.580e-2 expl_p1=2.207e-1 nash_conv=2.765e-1
+iter=     158 expl_p0=5.916e-2 expl_p1=2.099e-1 nash_conv=2.691e-1
+iter=     161 expl_p0=5.660e-2 expl_p1=1.993e-1 nash_conv=2.559e-1
+done: iterations=161 wall=2.29s ev_p0=5.781629 ev_p1=36.199778 nash_conv=2.559e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (1.07 MB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.36s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 4c Jd Ah wall_s=2.3 it=161 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=225.1 MiB (f32) / 113.4 MiB (i16) / 169.3 MiB (i16-f32avg)
+memory estimate: 759.0 MiB (f32) / 703.1 MiB (i16) / 759.0 MiB (i16-f32avg)
+iter=      25 expl_p0=5.072e0 expl_p1=1.294e0 nash_conv=6.366e0
+iter=      50 expl_p0=1.686e0 expl_p1=3.492e-1 nash_conv=2.035e0
+iter=     100 expl_p0=4.012e-1 expl_p1=9.760e-2 nash_conv=4.988e-1
+iter=     129 expl_p0=2.100e-1 expl_p1=6.384e-2 nash_conv=2.739e-1
+iter=     132 expl_p0=1.992e-1 expl_p1=6.205e-2 nash_conv=2.613e-1
+done: iterations=132 wall=1.40s ev_p0=15.103899 ev_p1=26.313683 nash_conv=2.613e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (780.8 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 6c 7d Jd wall_s=1.4 it=132 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=221.4 MiB (f32) / 111.5 MiB (i16) / 166.4 MiB (i16-f32avg)
+memory estimate: 756.4 MiB (f32) / 701.5 MiB (i16) / 756.4 MiB (i16-f32avg)
+iter=      25 expl_p0=2.811e0 expl_p1=1.144e0 nash_conv=3.955e0
+iter=      50 expl_p0=6.449e-1 expl_p1=3.979e-1 nash_conv=1.043e0
+iter=      92 expl_p0=1.895e-1 expl_p1=1.308e-1 nash_conv=3.203e-1
+iter=     100 expl_p0=1.598e-1 expl_p1=1.149e-1 nash_conv=2.747e-1
+iter=     103 expl_p0=1.520e-1 expl_p1=1.081e-1 nash_conv=2.601e-1
+done: iterations=103 wall=1.07s ev_p0=14.789046 ev_p1=26.610567 nash_conv=2.601e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (801.3 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 6c 9d Jc wall_s=1.1 it=103 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=195.1 MiB (f32) / 98.4 MiB (i16) / 146.7 MiB (i16-f32avg)
+memory estimate: 737.6 MiB (f32) / 689.2 MiB (i16) / 737.6 MiB (i16-f32avg)
+iter=      25 expl_p0=1.499e0 expl_p1=3.611e0 nash_conv=5.110e0
+iter=      50 expl_p0=6.299e-1 expl_p1=1.204e0 nash_conv=1.834e0
+iter=     100 expl_p0=1.859e-1 expl_p1=3.576e-1 nash_conv=5.434e-1
+iter=     140 expl_p0=9.974e-2 expl_p1=1.183e-1 nash_conv=2.180e-1
+done: iterations=140 wall=1.28s ev_p0=11.851045 ev_p1=29.884492 nash_conv=2.180e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (761.9 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 8c Jd Ac wall_s=1.3 it=140 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=213.9 MiB (f32) / 107.8 MiB (i16) / 160.8 MiB (i16-f32avg)
+memory estimate: 751.0 MiB (f32) / 698.0 MiB (i16) / 751.0 MiB (i16-f32avg)
+iter=      25 expl_p0=9.728e-1 expl_p1=1.474e0 nash_conv=2.447e0
+iter=      50 expl_p0=2.276e-1 expl_p1=3.124e-1 nash_conv=5.400e-1
+iter=      66 expl_p0=1.565e-1 expl_p1=1.851e-1 nash_conv=3.416e-1
+iter=      75 expl_p0=1.245e-1 expl_p1=1.525e-1 nash_conv=2.770e-1
+iter=      78 expl_p0=1.121e-1 expl_p1=1.399e-1 nash_conv=2.520e-1
+done: iterations=78 wall=0.81s ev_p0=5.492660 ev_p1=36.519027 nash_conv=2.520e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (831.4 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.23s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 3c 6c Kd wall_s=0.8 it=78 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=199.8 MiB (f32) / 100.7 MiB (i16) / 150.3 MiB (i16-f32avg)
+memory estimate: 740.8 MiB (f32) / 691.3 MiB (i16) / 740.8 MiB (i16-f32avg)
+iter=      25 expl_p0=7.052e-1 expl_p1=1.844e0 nash_conv=2.549e0
+iter=      50 expl_p0=2.090e-1 expl_p1=7.399e-1 nash_conv=9.490e-1
+iter=     100 expl_p0=9.232e-2 expl_p1=2.187e-1 nash_conv=3.110e-1
+iter=     108 expl_p0=8.312e-2 expl_p1=1.731e-1 nash_conv=2.562e-1
+done: iterations=108 wall=1.01s ev_p0=2.793306 ev_p1=39.211149 nash_conv=2.562e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (772.0 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 3c Jd Ac wall_s=1.0 it=108 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=229.8 MiB (f32) / 115.7 MiB (i16) / 172.8 MiB (i16-f32avg)
+memory estimate: 762.5 MiB (f32) / 705.4 MiB (i16) / 762.5 MiB (i16-f32avg)
+iter=      25 expl_p0=5.655e0 expl_p1=1.211e0 nash_conv=6.866e0
+iter=      50 expl_p0=1.806e0 expl_p1=4.132e-1 nash_conv=2.219e0
+iter=     100 expl_p0=5.396e-1 expl_p1=1.488e-1 nash_conv=6.884e-1
+iter=     150 expl_p0=1.776e-1 expl_p1=8.046e-2 nash_conv=2.581e-1
+done: iterations=150 wall=1.61s ev_p0=21.434002 ev_p1=19.999442 nash_conv=2.581e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (776.7 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 3c 5d 8d wall_s=1.6 it=150 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=218.6 MiB (f32) / 110.1 MiB (i16) / 164.3 MiB (i16-f32avg)
+memory estimate: 754.9 MiB (f32) / 700.7 MiB (i16) / 754.9 MiB (i16-f32avg)
+iter=      25 expl_p0=4.308e0 expl_p1=2.178e0 nash_conv=6.486e0
+iter=      50 expl_p0=1.248e0 expl_p1=6.319e-1 nash_conv=1.880e0
+iter=     100 expl_p0=2.023e-1 expl_p1=1.558e-1 nash_conv=3.581e-1
+iter=     111 expl_p0=1.631e-1 expl_p1=1.196e-1 nash_conv=2.826e-1
+iter=     114 expl_p0=1.514e-1 expl_p1=1.139e-1 nash_conv=2.653e-1
+done: iterations=114 wall=1.20s ev_p0=20.744446 ev_p1=20.586548 nash_conv=2.653e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (816.1 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 3c 8c Qd wall_s=1.2 it=114 cap=0
+tree: nodes=139145 terminals=87635 rank_tables=422 storage=107.7 MiB (f32) / 54.2 MiB (i16) / 81.0 MiB (i16-f32avg)
+memory estimate: 669.4 MiB (f32) / 642.7 MiB (i16) / 669.4 MiB (i16-f32avg)
+iter=      25 expl_p0=2.696e0 expl_p1=1.712e0 nash_conv=4.408e0
+iter=      50 expl_p0=7.812e-1 expl_p1=4.214e-1 nash_conv=1.203e0
+iter=     100 expl_p0=2.425e-1 expl_p1=1.038e-1 nash_conv=3.463e-1
+iter=     113 expl_p0=1.885e-1 expl_p1=8.178e-2 nash_conv=2.703e-1
+iter=     116 expl_p0=1.794e-1 expl_p1=7.894e-2 nash_conv=2.583e-1
+done: iterations=116 wall=0.66s ev_p0=12.497590 ev_p1=28.854746 nash_conv=2.583e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (466.1 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.10s (139145 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.10s (139145 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 5c 9c Tc wall_s=0.7 it=116 cap=0
+tree: nodes=139145 terminals=87635 rank_tables=422 storage=102.8 MiB (f32) / 51.8 MiB (i16) / 77.3 MiB (i16-f32avg)
+memory estimate: 665.9 MiB (f32) / 640.4 MiB (i16) / 665.9 MiB (i16-f32avg)
+iter=      25 expl_p0=1.979e0 expl_p1=1.653e0 nash_conv=3.632e0
+iter=      50 expl_p0=7.134e-1 expl_p1=6.711e-1 nash_conv=1.385e0
+iter=     100 expl_p0=1.956e-1 expl_p1=1.598e-1 nash_conv=3.555e-1
+iter=     113 expl_p0=1.668e-1 expl_p1=1.329e-1 nash_conv=2.997e-1
+iter=     121 expl_p0=1.390e-1 expl_p1=1.096e-1 nash_conv=2.486e-1
+done: iterations=121 wall=0.66s ev_p0=9.829054 ev_p1=31.774206 nash_conv=2.486e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (447.1 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (139145 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.10s (139145 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 2c 7c Kc wall_s=0.7 it=121 cap=0
+tree: nodes=139145 terminals=87635 rank_tables=422 storage=93.0 MiB (f32) / 46.9 MiB (i16) / 70.0 MiB (i16-f32avg)
+memory estimate: 658.9 MiB (f32) / 635.8 MiB (i16) / 658.9 MiB (i16-f32avg)
+iter=      25 expl_p0=1.634e0 expl_p1=4.594e0 nash_conv=6.228e0
+iter=      50 expl_p0=6.010e-1 expl_p1=1.601e0 nash_conv=2.202e0
+iter=     100 expl_p0=2.470e-1 expl_p1=3.570e-1 nash_conv=6.040e-1
+iter=     144 expl_p0=1.364e-1 expl_p1=1.686e-1 nash_conv=3.050e-1
+iter=     153 expl_p0=1.205e-1 expl_p1=1.508e-1 nash_conv=2.713e-1
+iter=     156 expl_p0=1.198e-1 expl_p1=1.458e-1 nash_conv=2.656e-1
+done: iterations=156 wall=0.81s ev_p0=14.185856 ev_p1=27.368424 nash_conv=2.656e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (451.9 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.10s (139145 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.10s (139145 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 4c Qc Ac wall_s=0.8 it=156 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=227.0 MiB (f32) / 114.3 MiB (i16) / 170.7 MiB (i16-f32avg)
+memory estimate: 760.5 MiB (f32) / 704.1 MiB (i16) / 760.5 MiB (i16-f32avg)
+iter=      25 expl_p0=4.174e0 expl_p1=1.260e0 nash_conv=5.435e0
+iter=      50 expl_p0=1.325e0 expl_p1=5.074e-1 nash_conv=1.832e0
+iter=     100 expl_p0=3.365e-1 expl_p1=1.293e-1 nash_conv=4.657e-1
+iter=     127 expl_p0=1.995e-1 expl_p1=8.522e-2 nash_conv=2.848e-1
+iter=     131 expl_p0=1.863e-1 expl_p1=8.112e-2 nash_conv=2.674e-1
+iter=     134 expl_p0=1.783e-1 expl_p1=7.878e-2 nash_conv=2.571e-1
+done: iterations=134 wall=1.44s ev_p0=20.533562 ev_p1=20.892163 nash_conv=2.571e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (826.7 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 2c 6c Td wall_s=1.4 it=134 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=223.3 MiB (f32) / 112.4 MiB (i16) / 167.9 MiB (i16-f32avg)
+memory estimate: 757.9 MiB (f32) / 702.5 MiB (i16) / 757.9 MiB (i16-f32avg)
+iter=      25 expl_p0=4.787e0 expl_p1=1.492e0 nash_conv=6.279e0
+iter=      50 expl_p0=1.529e0 expl_p1=3.873e-1 nash_conv=1.916e0
+iter=     100 expl_p0=2.320e-1 expl_p1=9.839e-2 nash_conv=3.304e-1
+iter=     108 expl_p0=1.918e-1 expl_p1=8.532e-2 nash_conv=2.771e-1
+iter=     111 expl_p0=1.812e-1 expl_p1=7.819e-2 nash_conv=2.594e-1
+done: iterations=111 wall=1.18s ev_p0=15.629215 ev_p1=25.650997 nash_conv=2.594e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (783.8 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 2c 7d Qd wall_s=1.2 it=111 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=228.9 MiB (f32) / 115.3 MiB (i16) / 172.1 MiB (i16-f32avg)
+memory estimate: 761.8 MiB (f32) / 705.0 MiB (i16) / 761.8 MiB (i16-f32avg)
+iter=      25 expl_p0=5.140e0 expl_p1=1.182e0 nash_conv=6.322e0
+iter=      50 expl_p0=1.826e0 expl_p1=3.077e-1 nash_conv=2.134e0
+iter=     100 expl_p0=4.927e-1 expl_p1=1.260e-1 nash_conv=6.187e-1
+iter=     149 expl_p0=2.471e-1 expl_p1=8.028e-2 nash_conv=3.274e-1
+iter=     166 expl_p0=2.131e-1 expl_p1=7.044e-2 nash_conv=2.836e-1
+iter=     173 expl_p0=1.966e-1 expl_p1=5.988e-2 nash_conv=2.565e-1
+done: iterations=173 wall=1.86s ev_p0=18.401350 ev_p1=23.053523 nash_conv=2.565e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (764.8 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 2c 7d 9d wall_s=1.9 it=173 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=212.9 MiB (f32) / 107.3 MiB (i16) / 160.1 MiB (i16-f32avg)
+memory estimate: 750.1 MiB (f32) / 697.2 MiB (i16) / 750.1 MiB (i16-f32avg)
+iter=      25 expl_p0=5.739e-1 expl_p1=1.422e0 nash_conv=1.996e0
+iter=      50 expl_p0=1.769e-1 expl_p1=3.589e-1 nash_conv=5.358e-1
+iter=      68 expl_p0=1.113e-1 expl_p1=1.624e-1 nash_conv=2.738e-1
+iter=      71 expl_p0=1.011e-1 expl_p1=1.557e-1 nash_conv=2.569e-1
+done: iterations=71 wall=0.72s ev_p0=6.312777 ev_p1=35.690131 nash_conv=2.569e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (809.9 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 4c 9d Kd wall_s=0.7 it=71 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=351.3 MiB (f32) / 177.0 MiB (i16) / 264.1 MiB (i16-f32avg)
+memory estimate: 871.3 MiB (f32) / 765.2 MiB (i16) / 852.3 MiB (i16-f32avg)
+iter=      25 expl_p0=3.872e-1 expl_p1=4.271e-1 nash_conv=8.143e-1
+iter=      50 expl_p0=9.224e-2 expl_p1=2.655e-1 nash_conv=3.577e-1
+iter=      62 expl_p0=4.840e-2 expl_p1=1.549e-1 nash_conv=2.033e-1
+done: iterations=62 wall=0.88s ev_p0=0.750866 ev_p1=41.502243 nash_conv=2.033e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (1.17 MB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 5c 9d Kh wall_s=0.9 it=62 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=369.8 MiB (f32) / 186.2 MiB (i16) / 278.0 MiB (i16-f32avg)
+memory estimate: 889.8 MiB (f32) / 773.8 MiB (i16) / 865.6 MiB (i16-f32avg)
+iter=      25 expl_p0=2.365e0 expl_p1=1.363e0 nash_conv=3.728e0
+iter=      50 expl_p0=6.498e-1 expl_p1=3.796e-1 nash_conv=1.029e0
+iter=      93 expl_p0=1.598e-1 expl_p1=9.208e-2 nash_conv=2.519e-1
+done: iterations=93 wall=1.40s ev_p0=9.135006 ev_p1=32.170007 nash_conv=2.519e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (1.15 MB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.36s (481942 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 5c 9d Jh wall_s=1.4 it=93 cap=0
+tree: nodes=303022 terminals=191300 rank_tables=810 storage=241.2 MiB (f32) / 121.5 MiB (i16) / 181.4 MiB (i16-f32avg)
+memory estimate: 770.7 MiB (f32) / 710.8 MiB (i16) / 770.7 MiB (i16-f32avg)
+iter=      25 expl_p0=4.519e0 expl_p1=1.618e0 nash_conv=6.137e0
+iter=      50 expl_p0=1.850e0 expl_p1=5.320e-1 nash_conv=2.382e0
+iter=     100 expl_p0=4.669e-1 expl_p1=1.752e-1 nash_conv=6.421e-1
+iter=     148 expl_p0=2.640e-1 expl_p1=1.127e-1 nash_conv=3.767e-1
+iter=     183 expl_p0=1.841e-1 expl_p1=9.064e-2 nash_conv=2.748e-1
+iter=     186 expl_p0=1.813e-1 expl_p1=8.892e-2 nash_conv=2.702e-1
+iter=     189 expl_p0=1.778e-1 expl_p1=8.580e-2 nash_conv=2.636e-1
+done: iterations=189 wall=2.11s ev_p0=11.403080 ev_p1=30.009081 nash_conv=2.636e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (832.3 KB, 1268 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.23s (303022 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (303022 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 3c 3d 7h wall_s=2.1 it=189 cap=0
+tree: nodes=303022 terminals=191300 rank_tables=810 storage=224.8 MiB (f32) / 113.2 MiB (i16) / 169.0 MiB (i16-f32avg)
+memory estimate: 758.5 MiB (f32) / 702.7 MiB (i16) / 758.5 MiB (i16-f32avg)
+iter=      25 expl_p0=3.961e0 expl_p1=1.867e0 nash_conv=5.828e0
+iter=      50 expl_p0=1.749e0 expl_p1=5.817e-1 nash_conv=2.331e0
+iter=     100 expl_p0=5.718e-1 expl_p1=1.930e-1 nash_conv=7.648e-1
+iter=     150 expl_p0=2.326e-1 expl_p1=7.738e-2 nash_conv=3.100e-1
+iter=     159 expl_p0=2.039e-1 expl_p1=6.794e-2 nash_conv=2.718e-1
+iter=     162 expl_p0=1.943e-1 expl_p1=6.642e-2 nash_conv=2.607e-1
+done: iterations=162 wall=1.71s ev_p0=15.749536 ev_p1=25.628247 nash_conv=2.607e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (903.9 KB, 1268 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.23s (303022 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.23s (303022 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 8c Jd Jh wall_s=1.7 it=162 cap=0
+tree: nodes=139145 terminals=87635 rank_tables=422 storage=105.5 MiB (f32) / 53.1 MiB (i16) / 79.3 MiB (i16-f32avg)
+memory estimate: 667.8 MiB (f32) / 641.7 MiB (i16) / 667.8 MiB (i16-f32avg)
+iter=      25 expl_p0=3.068e0 expl_p1=1.722e0 nash_conv=4.790e0
+iter=      50 expl_p0=9.201e-1 expl_p1=6.416e-1 nash_conv=1.562e0
+iter=     100 expl_p0=2.100e-1 expl_p1=1.589e-1 nash_conv=3.689e-1
+iter=     114 expl_p0=1.582e-1 expl_p1=1.210e-1 nash_conv=2.792e-1
+iter=     117 expl_p0=1.505e-1 expl_p1=1.137e-1 nash_conv=2.641e-1
+done: iterations=117 wall=0.68s ev_p0=21.628721 ev_p1=19.804743 nash_conv=2.641e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (453.9 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.10s (139145 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.10s (139145 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 6c 8c 9c wall_s=0.7 it=117 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=226.1 MiB (f32) / 113.9 MiB (i16) / 170.0 MiB (i16-f32avg)
+memory estimate: 759.8 MiB (f32) / 703.7 MiB (i16) / 759.8 MiB (i16-f32avg)
+iter=      25 expl_p0=3.272e0 expl_p1=1.819e0 nash_conv=5.092e0
+iter=      50 expl_p0=1.307e0 expl_p1=5.614e-1 nash_conv=1.869e0
+iter=     100 expl_p0=3.489e-1 expl_p1=1.560e-1 nash_conv=5.050e-1
+iter=     133 expl_p0=2.383e-1 expl_p1=1.057e-1 nash_conv=3.439e-1
+iter=     156 expl_p0=1.746e-1 expl_p1=9.193e-2 nash_conv=2.665e-1
+done: iterations=156 wall=1.69s ev_p0=13.491970 ev_p1=27.927993 nash_conv=2.665e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (820.1 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 4c 9c 9d wall_s=1.7 it=156 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=210.1 MiB (f32) / 105.9 MiB (i16) / 158.0 MiB (i16-f32avg)
+memory estimate: 747.9 MiB (f32) / 695.8 MiB (i16) / 747.9 MiB (i16-f32avg)
+iter=      25 expl_p0=3.277e-1 expl_p1=9.441e-1 nash_conv=1.272e0
+iter=      50 expl_p0=4.113e-2 expl_p1=2.452e-1 nash_conv=2.863e-1
+iter=      53 expl_p0=3.538e-2 expl_p1=2.154e-1 nash_conv=2.508e-1
+done: iterations=53 wall=0.53s ev_p0=0.678786 ev_p1=41.526295 nash_conv=2.508e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (728.7 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 9c 9d Kc wall_s=0.5 it=53 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=227.0 MiB (f32) / 114.3 MiB (i16) / 170.7 MiB (i16-f32avg)
+memory estimate: 759.9 MiB (f32) / 703.6 MiB (i16) / 759.9 MiB (i16-f32avg)
+iter=      25 expl_p0=3.962e0 expl_p1=1.825e0 nash_conv=5.786e0
+iter=      50 expl_p0=1.815e0 expl_p1=4.793e-1 nash_conv=2.294e0
+iter=     100 expl_p0=4.936e-1 expl_p1=1.283e-1 nash_conv=6.219e-1
+iter=     146 expl_p0=2.808e-1 expl_p1=1.982e-1 nash_conv=4.791e-1
+iter=     196 expl_p0=2.064e-1 expl_p1=8.645e-2 nash_conv=2.928e-1
+iter=     205 expl_p0=1.840e-1 expl_p1=7.587e-2 nash_conv=2.598e-1
+done: iterations=205 wall=2.19s ev_p0=15.293507 ev_p1=26.082910 nash_conv=2.598e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/solution.sol (845.8 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L34-raise/tmp/summary.csv
+FLOP L34-raise 7c 7d Jc wall_s=2.2 it=205 cap=0
+TASK L34-raise flops=64
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=79.0 MiB (f32) / 39.8 MiB (i16) / 59.4 MiB (i16-f32avg)
+memory estimate: 647.4 MiB (f32) / 627.7 MiB (i16) / 647.4 MiB (i16-f32avg)
+iter=      25 expl_p0=2.708e-1 expl_p1=6.344e-1 nash_conv=9.052e-1
+iter=      50 expl_p0=5.064e-2 expl_p1=9.152e-2 nash_conv=1.422e-1
+done: iterations=50 wall=0.28s ev_p0=11.426366 ev_p1=41.822261 nash_conv=1.422e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (426.9 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 5c Td Jd wall_s=0.3 it=50 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=78.2 MiB (f32) / 39.4 MiB (i16) / 58.8 MiB (i16-f32avg)
+memory estimate: 646.7 MiB (f32) / 627.3 MiB (i16) / 646.7 MiB (i16-f32avg)
+iter=      25 expl_p0=3.331e0 expl_p1=5.633e-1 nash_conv=3.894e0
+iter=      50 expl_p0=8.591e-1 expl_p1=1.499e-1 nash_conv=1.009e0
+iter=      81 expl_p0=2.680e-1 expl_p1=5.047e-2 nash_conv=3.185e-1
+done: iterations=81 wall=0.46s ev_p0=27.072877 ev_p1=26.012422 nash_conv=3.185e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (454.1 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 5c 9d Qc wall_s=0.5 it=81 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=76.4 MiB (f32) / 38.5 MiB (i16) / 57.5 MiB (i16-f32avg)
+memory estimate: 645.5 MiB (f32) / 626.5 MiB (i16) / 645.5 MiB (i16-f32avg)
+iter=      25 expl_p0=1.042e0 expl_p1=7.255e-1 nash_conv=1.767e0
+iter=      50 expl_p0=2.864e-1 expl_p1=1.856e-1 nash_conv=4.721e-1
+iter=      58 expl_p0=2.227e-1 expl_p1=1.232e-1 nash_conv=3.460e-1
+iter=      61 expl_p0=2.098e-1 expl_p1=1.135e-1 nash_conv=3.233e-1
+done: iterations=61 wall=0.35s ev_p0=23.299151 ev_p1=29.704474 nash_conv=3.233e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (441.9 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 8c Td Qc wall_s=0.3 it=61 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=76.2 MiB (f32) / 38.3 MiB (i16) / 57.3 MiB (i16-f32avg)
+memory estimate: 645.3 MiB (f32) / 626.4 MiB (i16) / 645.3 MiB (i16-f32avg)
+iter=      25 expl_p0=1.150e0 expl_p1=7.314e-1 nash_conv=1.882e0
+iter=      50 expl_p0=2.951e-1 expl_p1=1.497e-1 nash_conv=4.448e-1
+iter=      56 expl_p0=2.276e-1 expl_p1=1.225e-1 nash_conv=3.501e-1
+iter=      59 expl_p0=2.033e-1 expl_p1=1.112e-1 nash_conv=3.145e-1
+done: iterations=59 wall=0.34s ev_p0=15.929072 ev_p1=37.087530 nash_conv=3.145e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (445.6 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 8c Jd Qc wall_s=0.3 it=59 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=76.2 MiB (f32) / 38.3 MiB (i16) / 57.3 MiB (i16-f32avg)
+memory estimate: 645.3 MiB (f32) / 626.4 MiB (i16) / 645.3 MiB (i16-f32avg)
+iter=      25 expl_p0=1.375e-1 expl_p1=5.454e-1 nash_conv=6.829e-1
+iter=      50 expl_p0=7.280e-3 expl_p1=1.377e-1 nash_conv=1.450e-1
+done: iterations=50 wall=0.27s ev_p0=8.826104 ev_p1=44.548409 nash_conv=1.450e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (441.2 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 5c Jc Kd wall_s=0.3 it=50 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=75.9 MiB (f32) / 38.2 MiB (i16) / 57.0 MiB (i16-f32avg)
+memory estimate: 645.1 MiB (f32) / 626.2 MiB (i16) / 645.1 MiB (i16-f32avg)
+iter=      25 expl_p0=1.892e0 expl_p1=8.904e-1 nash_conv=2.783e0
+iter=      50 expl_p0=5.170e-1 expl_p1=1.998e-1 nash_conv=7.168e-1
+iter=      69 expl_p0=4.492e-1 expl_p1=1.133e-1 nash_conv=5.624e-1
+iter=     119 expl_p0=1.437e-1 expl_p1=3.557e-2 nash_conv=1.793e-1
+done: iterations=119 wall=0.60s ev_p0=6.736707 ev_p1=46.492749 nash_conv=1.793e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (444.0 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 4c Qc Kd wall_s=0.6 it=119 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=140.1 MiB (f32) / 70.5 MiB (i16) / 105.3 MiB (i16-f32avg)
+memory estimate: 695.6 MiB (f32) / 660.8 MiB (i16) / 695.6 MiB (i16-f32avg)
+iter=      25 expl_p0=1.796e0 expl_p1=7.026e-1 nash_conv=2.498e0
+iter=      50 expl_p0=4.369e-1 expl_p1=2.021e-1 nash_conv=6.390e-1
+iter=      66 expl_p0=2.359e-1 expl_p1=1.081e-1 nash_conv=3.440e-1
+iter=      69 expl_p0=2.099e-1 expl_p1=9.873e-2 nash_conv=3.086e-1
+done: iterations=69 wall=0.55s ev_p0=21.456790 ev_p1=31.580750 nash_conv=3.086e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (649.7 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.13s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 3c 4d 5h wall_s=0.6 it=69 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=136.8 MiB (f32) / 68.8 MiB (i16) / 102.8 MiB (i16-f32avg)
+memory estimate: 693.2 MiB (f32) / 659.2 MiB (i16) / 693.2 MiB (i16-f32avg)
+iter=      25 expl_p0=7.255e-1 expl_p1=7.136e-1 nash_conv=1.439e0
+iter=      50 expl_p0=4.586e-1 expl_p1=1.909e-1 nash_conv=6.496e-1
+iter=      81 expl_p0=5.916e-2 expl_p1=4.499e-2 nash_conv=1.041e-1
+done: iterations=81 wall=0.61s ev_p0=12.127482 ev_p1=40.976091 nash_conv=1.041e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (695.2 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.13s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 3c 5d 9h wall_s=0.6 it=81 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=133.5 MiB (f32) / 67.2 MiB (i16) / 100.3 MiB (i16-f32avg)
+memory estimate: 690.8 MiB (f32) / 657.6 MiB (i16) / 690.8 MiB (i16-f32avg)
+iter=      25 expl_p0=2.646e0 expl_p1=1.098e0 nash_conv=3.744e0
+iter=      50 expl_p0=1.293e0 expl_p1=3.057e-1 nash_conv=1.599e0
+iter=     100 expl_p0=1.614e-1 expl_p1=6.090e-2 nash_conv=2.223e-1
+done: iterations=100 wall=0.75s ev_p0=27.539361 ev_p1=25.486729 nash_conv=2.223e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (708.6 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 2c 4d Qh wall_s=0.7 it=100 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=85.4 MiB (f32) / 43.0 MiB (i16) / 64.2 MiB (i16-f32avg)
+memory estimate: 652.0 MiB (f32) / 630.8 MiB (i16) / 652.0 MiB (i16-f32avg)
+iter=      25 expl_p0=1.123e0 expl_p1=8.247e-1 nash_conv=1.947e0
+iter=      50 expl_p0=3.606e-1 expl_p1=1.988e-1 nash_conv=5.594e-1
+iter=      63 expl_p0=1.743e-1 expl_p1=1.163e-1 nash_conv=2.906e-1
+done: iterations=63 wall=0.39s ev_p0=25.780756 ev_p1=27.321441 nash_conv=2.906e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (473.3 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 3c 4d 5c wall_s=0.4 it=63 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=81.6 MiB (f32) / 41.1 MiB (i16) / 61.4 MiB (i16-f32avg)
+memory estimate: 649.3 MiB (f32) / 629.0 MiB (i16) / 649.3 MiB (i16-f32avg)
+iter=      25 expl_p0=3.293e0 expl_p1=6.237e-1 nash_conv=3.916e0
+iter=      50 expl_p0=1.006e0 expl_p1=2.025e-1 nash_conv=1.208e0
+iter=      95 expl_p0=2.185e-1 expl_p1=6.069e-2 nash_conv=2.792e-1
+done: iterations=95 wall=0.56s ev_p0=26.988201 ev_p1=26.064482 nash_conv=2.792e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (475.0 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 3c 4d Qd wall_s=0.6 it=95 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=79.3 MiB (f32) / 39.9 MiB (i16) / 59.6 MiB (i16-f32avg)
+memory estimate: 647.6 MiB (f32) / 627.9 MiB (i16) / 647.6 MiB (i16-f32avg)
+iter=      25 expl_p0=3.104e-1 expl_p1=1.419e0 nash_conv=1.729e0
+iter=      50 expl_p0=6.055e-2 expl_p1=3.089e-1 nash_conv=3.694e-1
+iter=      53 expl_p0=5.095e-2 expl_p1=2.681e-1 nash_conv=3.191e-1
+done: iterations=53 wall=0.30s ev_p0=10.263744 ev_p1=43.106231 nash_conv=3.191e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (449.9 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 3c 5d Kc wall_s=0.3 it=53 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=72.4 MiB (f32) / 36.5 MiB (i16) / 54.4 MiB (i16-f32avg)
+memory estimate: 642.5 MiB (f32) / 624.6 MiB (i16) / 642.5 MiB (i16-f32avg)
+iter=      25 expl_p0=2.426e0 expl_p1=9.199e-1 nash_conv=3.346e0
+iter=      50 expl_p0=8.091e-1 expl_p1=1.555e-1 nash_conv=9.646e-1
+iter=      82 expl_p0=3.175e-1 expl_p1=5.426e-2 nash_conv=3.718e-1
+iter=      86 expl_p0=2.791e-1 expl_p1=5.093e-2 nash_conv=3.300e-1
+done: iterations=86 wall=0.46s ev_p0=26.440695 ev_p1=26.673572 nash_conv=3.300e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (425.4 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 4c 8c Ad wall_s=0.5 it=86 cap=0
+tree: nodes=103456 terminals=66796 rank_tables=810 storage=87.6 MiB (f32) / 44.1 MiB (i16) / 65.8 MiB (i16-f32avg)
+memory estimate: 653.8 MiB (f32) / 632.0 MiB (i16) / 653.8 MiB (i16-f32avg)
+iter=      25 expl_p0=1.623e0 expl_p1=8.761e-1 nash_conv=2.500e0
+iter=      50 expl_p0=3.268e-1 expl_p1=1.951e-1 nash_conv=5.219e-1
+iter=      59 expl_p0=1.573e-1 expl_p1=1.532e-1 nash_conv=3.105e-1
+done: iterations=59 wall=0.35s ev_p0=11.247431 ev_p1=41.935432 nash_conv=3.105e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (476.8 KB, 600 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 2c 2d 5h wall_s=0.4 it=59 cap=0
+tree: nodes=103456 terminals=66796 rank_tables=810 storage=84.3 MiB (f32) / 42.4 MiB (i16) / 63.4 MiB (i16-f32avg)
+memory estimate: 651.4 MiB (f32) / 630.5 MiB (i16) / 651.4 MiB (i16-f32avg)
+iter=      25 expl_p0=9.535e-1 expl_p1=9.791e-1 nash_conv=1.933e0
+iter=      50 expl_p0=3.888e-1 expl_p1=1.888e-1 nash_conv=5.776e-1
+iter=      65 expl_p0=1.450e-1 expl_p1=1.207e-1 nash_conv=2.657e-1
+done: iterations=65 wall=0.39s ev_p0=10.412531 ev_p1=42.741631 nash_conv=2.657e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (514.3 KB, 600 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 5c 9d 9h wall_s=0.4 it=65 cap=0
+tree: nodes=103456 terminals=66796 rank_tables=810 storage=81.0 MiB (f32) / 40.8 MiB (i16) / 60.9 MiB (i16-f32avg)
+memory estimate: 649.0 MiB (f32) / 628.9 MiB (i16) / 649.0 MiB (i16-f32avg)
+iter=      25 expl_p0=1.663e0 expl_p1=1.223e0 nash_conv=2.886e0
+iter=      50 expl_p0=5.277e-1 expl_p1=4.399e-1 nash_conv=9.676e-1
+iter=      88 expl_p0=1.241e-1 expl_p1=1.219e-1 nash_conv=2.460e-1
+done: iterations=88 wall=0.47s ev_p0=13.205444 ev_p1=40.102054 nash_conv=2.460e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (485.2 KB, 600 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 6c Jd Jh wall_s=0.5 it=88 cap=0
+tree: nodes=103456 terminals=66796 rank_tables=810 storage=78.4 MiB (f32) / 39.5 MiB (i16) / 58.9 MiB (i16-f32avg)
+memory estimate: 647.1 MiB (f32) / 627.6 MiB (i16) / 647.1 MiB (i16-f32avg)
+iter=      25 expl_p0=4.194e-1 expl_p1=1.907e0 nash_conv=2.326e0
+iter=      50 expl_p0=5.733e-2 expl_p1=4.977e-1 nash_conv=5.551e-1
+iter=      61 expl_p0=2.549e-2 expl_p1=3.091e-1 nash_conv=3.345e-1
+done: iterations=61 wall=0.33s ev_p0=4.606251 ev_p1=48.971891 nash_conv=3.345e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (489.8 KB, 600 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise Tc Td Kh wall_s=0.3 it=61 cap=0
+tree: nodes=103456 terminals=66796 rank_tables=810 storage=59.0 MiB (f32) / 29.8 MiB (i16) / 44.4 MiB (i16-f32avg)
+memory estimate: 627.9 MiB (f32) / 613.3 MiB (i16) / 627.9 MiB (i16-f32avg)
+iter=      25 expl_p0=2.326e0 expl_p1=2.430e0 nash_conv=4.756e0
+iter=      50 expl_p0=8.888e-1 expl_p1=3.374e-1 nash_conv=1.226e0
+iter=      88 expl_p0=3.037e-1 expl_p1=9.409e-2 nash_conv=3.978e-1
+iter=      94 expl_p0=2.568e-1 expl_p1=8.195e-2 nash_conv=3.387e-1
+done: iterations=94 wall=0.43s ev_p0=13.484896 ev_p1=39.806582 nash_conv=3.387e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (326.7 KB, 600 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise Kc Ad Ah wall_s=0.4 it=94 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=132.5 MiB (f32) / 66.7 MiB (i16) / 99.6 MiB (i16-f32avg)
+memory estimate: 690.1 MiB (f32) / 657.1 MiB (i16) / 690.1 MiB (i16-f32avg)
+iter=      25 expl_p0=1.491e0 expl_p1=2.035e0 nash_conv=3.525e0
+iter=      50 expl_p0=5.484e-1 expl_p1=5.436e-1 nash_conv=1.092e0
+iter=      90 expl_p0=1.932e-1 expl_p1=2.076e-1 nash_conv=4.008e-1
+iter=      98 expl_p0=1.669e-1 expl_p1=1.743e-1 nash_conv=3.413e-1
+iter=     101 expl_p0=1.527e-1 expl_p1=1.682e-1 nash_conv=3.210e-1
+done: iterations=101 wall=0.77s ev_p0=24.828543 ev_p1=28.326580 nash_conv=3.210e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (661.9 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.13s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 5c 7d 8h wall_s=0.8 it=101 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=130.6 MiB (f32) / 65.8 MiB (i16) / 98.2 MiB (i16-f32avg)
+memory estimate: 688.7 MiB (f32) / 656.2 MiB (i16) / 688.7 MiB (i16-f32avg)
+iter=      25 expl_p0=1.368e0 expl_p1=3.177e0 nash_conv=4.545e0
+iter=      50 expl_p0=5.883e-1 expl_p1=7.900e-1 nash_conv=1.378e0
+iter=     100 expl_p0=2.177e-1 expl_p1=1.697e-1 nash_conv=3.874e-1
+iter=     107 expl_p0=1.926e-1 expl_p1=1.452e-1 nash_conv=3.378e-1
+done: iterations=107 wall=0.78s ev_p0=16.504007 ev_p1=36.706235 nash_conv=3.378e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (674.0 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 5c 7d Jh wall_s=0.8 it=107 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=116.0 MiB (f32) / 58.4 MiB (i16) / 87.2 MiB (i16-f32avg)
+memory estimate: 678.0 MiB (f32) / 649.2 MiB (i16) / 678.0 MiB (i16-f32avg)
+iter=      25 expl_p0=4.655e0 expl_p1=4.499e-1 nash_conv=5.104e0
+iter=      50 expl_p0=1.546e0 expl_p1=1.162e-1 nash_conv=1.662e0
+iter=     100 expl_p0=6.441e-1 expl_p1=3.687e-2 nash_conv=6.810e-1
+iter=     150 expl_p0=2.640e-1 expl_p1=1.602e-2 nash_conv=2.800e-1
+done: iterations=150 wall=1.06s ev_p0=33.902604 ev_p1=19.358379 nash_conv=2.800e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (503.4 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 6c 7d Ah wall_s=1.1 it=150 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=84.5 MiB (f32) / 42.5 MiB (i16) / 63.5 MiB (i16-f32avg)
+memory estimate: 651.4 MiB (f32) / 630.4 MiB (i16) / 651.4 MiB (i16-f32avg)
+iter=      25 expl_p0=1.950e0 expl_p1=1.516e0 nash_conv=3.465e0
+iter=      50 expl_p0=6.004e-1 expl_p1=4.378e-1 nash_conv=1.038e0
+iter=      87 expl_p0=2.228e-1 expl_p1=1.486e-1 nash_conv=3.714e-1
+iter=      91 expl_p0=2.021e-1 expl_p1=1.370e-1 nash_conv=3.390e-1
+iter=      94 expl_p0=1.896e-1 expl_p1=1.269e-1 nash_conv=3.165e-1
+done: iterations=94 wall=0.56s ev_p0=24.580195 ev_p1=28.550094 nash_conv=3.165e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (464.3 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 3c 4c 7d wall_s=0.6 it=94 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=82.5 MiB (f32) / 41.5 MiB (i16) / 62.0 MiB (i16-f32avg)
+memory estimate: 649.9 MiB (f32) / 629.4 MiB (i16) / 649.9 MiB (i16-f32avg)
+iter=      25 expl_p0=1.875e0 expl_p1=1.614e0 nash_conv=3.489e0
+iter=      50 expl_p0=6.142e-1 expl_p1=3.801e-1 nash_conv=9.943e-1
+iter=      83 expl_p0=2.239e-1 expl_p1=1.253e-1 nash_conv=3.491e-1
+iter=      86 expl_p0=2.117e-1 expl_p1=1.170e-1 nash_conv=3.288e-1
+done: iterations=86 wall=0.50s ev_p0=29.010488 ev_p1=24.120649 nash_conv=3.288e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (464.5 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 4c 7d 8d wall_s=0.5 it=86 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=77.9 MiB (f32) / 39.2 MiB (i16) / 58.6 MiB (i16-f32avg)
+memory estimate: 646.5 MiB (f32) / 627.2 MiB (i16) / 646.5 MiB (i16-f32avg)
+iter=      25 expl_p0=5.762e0 expl_p1=3.163e-1 nash_conv=6.078e0
+iter=      50 expl_p0=2.250e0 expl_p1=9.856e-2 nash_conv=2.348e0
+iter=     100 expl_p0=7.570e-1 expl_p1=2.017e-2 nash_conv=7.771e-1
+iter=     150 expl_p0=8.266e-1 expl_p1=4.241e-2 nash_conv=8.690e-1
+iter=     175 expl_p0=6.379e-1 expl_p1=2.301e-2 nash_conv=6.609e-1
+iter=     225 expl_p0=3.088e-1 expl_p1=8.058e-3 nash_conv=3.169e-1
+done: iterations=225 wall=1.15s ev_p0=30.327864 ev_p1=22.903617 nash_conv=3.169e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (443.7 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 5c 7d Qd wall_s=1.2 it=225 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=77.0 MiB (f32) / 38.8 MiB (i16) / 57.9 MiB (i16-f32avg)
+memory estimate: 645.9 MiB (f32) / 626.8 MiB (i16) / 645.9 MiB (i16-f32avg)
+iter=      25 expl_p0=7.729e-1 expl_p1=1.687e0 nash_conv=2.460e0
+iter=      50 expl_p0=2.785e-1 expl_p1=3.226e-1 nash_conv=6.011e-1
+iter=      64 expl_p0=2.025e-1 expl_p1=1.987e-1 nash_conv=4.013e-1
+iter=      70 expl_p0=1.871e-1 expl_p1=1.636e-1 nash_conv=3.507e-1
+iter=      73 expl_p0=1.406e-1 expl_p1=1.493e-1 nash_conv=2.899e-1
+done: iterations=73 wall=0.42s ev_p0=13.581248 ev_p1=39.687138 nash_conv=2.899e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (440.1 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 5c 7c Kd wall_s=0.4 it=73 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=131.1 MiB (f32) / 66.0 MiB (i16) / 98.6 MiB (i16-f32avg)
+memory estimate: 689.0 MiB (f32) / 656.5 MiB (i16) / 689.0 MiB (i16-f32avg)
+iter=      25 expl_p0=1.371e0 expl_p1=2.204e0 nash_conv=3.574e0
+iter=      50 expl_p0=4.490e-1 expl_p1=5.538e-1 nash_conv=1.003e0
+iter=      83 expl_p0=3.049e-1 expl_p1=3.893e-1 nash_conv=6.942e-1
+iter=     133 expl_p0=1.413e-1 expl_p1=1.687e-1 nash_conv=3.101e-1
+done: iterations=133 wall=0.95s ev_p0=20.516846 ev_p1=32.636978 nash_conv=3.101e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (656.4 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 6c 8d Th wall_s=1.0 it=133 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=133.5 MiB (f32) / 67.2 MiB (i16) / 100.3 MiB (i16-f32avg)
+memory estimate: 690.8 MiB (f32) / 657.6 MiB (i16) / 690.8 MiB (i16-f32avg)
+iter=      25 expl_p0=6.125e-1 expl_p1=1.238e0 nash_conv=1.850e0
+iter=      50 expl_p0=5.005e-2 expl_p1=2.879e-1 nash_conv=3.379e-1
+done: iterations=50 wall=0.37s ev_p0=8.165278 ev_p1=45.257659 nash_conv=3.379e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (707.3 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.13s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 4c 9d Jh wall_s=0.4 it=50 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=125.0 MiB (f32) / 62.9 MiB (i16) / 93.9 MiB (i16-f32avg)
+memory estimate: 684.5 MiB (f32) / 653.5 MiB (i16) / 684.5 MiB (i16-f32avg)
+iter=      25 expl_p0=1.250e0 expl_p1=7.314e-1 nash_conv=1.981e0
+iter=      50 expl_p0=2.785e-1 expl_p1=1.543e-1 nash_conv=4.328e-1
+iter=      55 expl_p0=2.151e-1 expl_p1=1.222e-1 nash_conv=3.373e-1
+done: iterations=55 wall=0.45s ev_p0=18.155024 ev_p1=34.867961 nash_conv=3.373e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (639.6 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 8c Jd Qh wall_s=0.4 it=55 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=76.4 MiB (f32) / 38.5 MiB (i16) / 57.5 MiB (i16-f32avg)
+memory estimate: 645.5 MiB (f32) / 626.5 MiB (i16) / 645.5 MiB (i16-f32avg)
+iter=      25 expl_p0=2.483e-1 expl_p1=9.942e-1 nash_conv=1.243e0
+iter=      50 expl_p0=1.625e-2 expl_p1=1.773e-1 nash_conv=1.935e-1
+done: iterations=50 wall=0.29s ev_p0=15.318066 ev_p1=38.004249 nash_conv=1.935e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (429.1 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 6c Tc Kd wall_s=0.3 it=50 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=69.2 MiB (f32) / 34.9 MiB (i16) / 52.1 MiB (i16-f32avg)
+memory estimate: 640.2 MiB (f32) / 623.0 MiB (i16) / 640.2 MiB (i16-f32avg)
+iter=      25 expl_p0=3.186e0 expl_p1=8.746e-1 nash_conv=4.060e0
+iter=      50 expl_p0=9.385e-1 expl_p1=3.419e-1 nash_conv=1.280e0
+iter=      99 expl_p0=2.190e-1 expl_p1=6.142e-2 nash_conv=2.804e-1
+done: iterations=99 wall=0.49s ev_p0=20.056475 ev_p1=33.083296 nash_conv=2.804e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (408.6 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 7c Jc Ad wall_s=0.5 it=99 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=66.6 MiB (f32) / 33.6 MiB (i16) / 50.1 MiB (i16-f32avg)
+memory estimate: 638.3 MiB (f32) / 621.8 MiB (i16) / 638.3 MiB (i16-f32avg)
+iter=      25 expl_p0=3.195e0 expl_p1=8.050e-1 nash_conv=4.000e0
+iter=      50 expl_p0=9.590e-1 expl_p1=2.089e-1 nash_conv=1.168e0
+iter=      91 expl_p0=3.596e-1 expl_p1=7.270e-2 nash_conv=4.323e-1
+iter=     103 expl_p0=2.820e-1 expl_p1=5.920e-2 nash_conv=3.412e-1
+iter=     106 expl_p0=2.664e-1 expl_p1=5.663e-2 nash_conv=3.230e-1
+done: iterations=106 wall=0.54s ev_p0=19.876136 ev_p1=33.220484 nash_conv=3.230e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (383.8 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 7c Kc Ad wall_s=0.5 it=106 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=82.5 MiB (f32) / 41.5 MiB (i16) / 62.0 MiB (i16-f32avg)
+memory estimate: 649.9 MiB (f32) / 629.4 MiB (i16) / 649.9 MiB (i16-f32avg)
+iter=      25 expl_p0=1.228e0 expl_p1=1.508e0 nash_conv=2.736e0
+iter=      50 expl_p0=3.938e-1 expl_p1=4.119e-1 nash_conv=8.057e-1
+iter=      76 expl_p0=1.839e-1 expl_p1=2.087e-1 nash_conv=3.926e-1
+iter=      82 expl_p0=1.610e-1 expl_p1=1.685e-1 nash_conv=3.294e-1
+done: iterations=82 wall=0.48s ev_p0=20.325683 ev_p1=32.819329 nash_conv=3.294e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (488.2 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 3c 8d 9c wall_s=0.5 it=82 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=81.6 MiB (f32) / 41.1 MiB (i16) / 61.4 MiB (i16-f32avg)
+memory estimate: 649.3 MiB (f32) / 629.0 MiB (i16) / 649.3 MiB (i16-f32avg)
+iter=      25 expl_p0=1.100e0 expl_p1=1.341e0 nash_conv=2.441e0
+iter=      50 expl_p0=3.358e-1 expl_p1=3.393e-1 nash_conv=6.751e-1
+iter=      68 expl_p0=1.734e-1 expl_p1=1.955e-1 nash_conv=3.689e-1
+iter=      71 expl_p0=1.638e-1 expl_p1=1.776e-1 nash_conv=3.414e-1
+iter=      74 expl_p0=1.434e-1 expl_p1=1.647e-1 nash_conv=3.081e-1
+done: iterations=74 wall=0.43s ev_p0=19.229716 ev_p1=33.931447 nash_conv=3.081e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (463.8 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 4c 8d Tc wall_s=0.4 it=74 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=78.2 MiB (f32) / 39.4 MiB (i16) / 58.8 MiB (i16-f32avg)
+memory estimate: 646.7 MiB (f32) / 627.3 MiB (i16) / 646.7 MiB (i16-f32avg)
+iter=      25 expl_p0=1.120e0 expl_p1=5.316e-1 nash_conv=1.652e0
+iter=      50 expl_p0=2.876e-1 expl_p1=1.086e-1 nash_conv=3.962e-1
+iter=      54 expl_p0=2.511e-1 expl_p1=9.001e-2 nash_conv=3.411e-1
+iter=      57 expl_p0=2.227e-1 expl_p1=8.192e-2 nash_conv=3.047e-1
+done: iterations=57 wall=0.36s ev_p0=15.298672 ev_p1=37.531971 nash_conv=3.047e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (460.9 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 8c Td Jc wall_s=0.4 it=57 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=132.1 MiB (f32) / 66.5 MiB (i16) / 99.3 MiB (i16-f32avg)
+memory estimate: 689.7 MiB (f32) / 656.9 MiB (i16) / 689.7 MiB (i16-f32avg)
+iter=      25 expl_p0=8.583e-1 expl_p1=4.821e-1 nash_conv=1.340e0
+iter=      50 expl_p0=2.192e-1 expl_p1=1.099e-1 nash_conv=3.291e-1
+done: iterations=50 wall=0.36s ev_p0=5.215150 ev_p1=47.986851 nash_conv=3.291e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (627.9 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 4c Td Jh wall_s=0.4 it=50 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=123.5 MiB (f32) / 62.2 MiB (i16) / 92.9 MiB (i16-f32avg)
+memory estimate: 683.5 MiB (f32) / 652.8 MiB (i16) / 683.5 MiB (i16-f32avg)
+iter=      25 expl_p0=8.602e-1 expl_p1=9.151e-1 nash_conv=1.775e0
+iter=      50 expl_p0=3.729e-1 expl_p1=1.272e-1 nash_conv=5.001e-1
+iter=      60 expl_p0=7.632e-2 expl_p1=1.083e-1 nash_conv=1.846e-1
+done: iterations=60 wall=0.44s ev_p0=7.440697 ev_p1=46.073854 nash_conv=1.846e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (621.3 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 7c Jd Kh wall_s=0.4 it=60 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=110.3 MiB (f32) / 55.6 MiB (i16) / 82.9 MiB (i16-f32avg)
+memory estimate: 673.8 MiB (f32) / 646.5 MiB (i16) / 673.8 MiB (i16-f32avg)
+iter=      25 expl_p0=1.015e0 expl_p1=2.422e0 nash_conv=3.437e0
+iter=      50 expl_p0=3.239e-1 expl_p1=3.370e-1 nash_conv=6.609e-1
+iter=      63 expl_p0=1.861e-1 expl_p1=1.877e-1 nash_conv=3.738e-1
+iter=      66 expl_p0=1.796e-1 expl_p1=1.626e-1 nash_conv=3.423e-1
+iter=      69 expl_p0=1.669e-1 expl_p1=1.470e-1 nash_conv=3.139e-1
+done: iterations=69 wall=0.51s ev_p0=24.827549 ev_p1=28.393570 nash_conv=3.139e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (604.4 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise Tc Qd Ah wall_s=0.5 it=69 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=85.1 MiB (f32) / 42.8 MiB (i16) / 64.0 MiB (i16-f32avg)
+memory estimate: 651.8 MiB (f32) / 630.7 MiB (i16) / 651.8 MiB (i16-f32avg)
+iter=      25 expl_p0=1.054e0 expl_p1=1.283e0 nash_conv=2.337e0
+iter=      50 expl_p0=4.694e-1 expl_p1=4.312e-1 nash_conv=9.006e-1
+iter=      92 expl_p0=1.001e-1 expl_p1=1.199e-1 nash_conv=2.199e-1
+done: iterations=92 wall=0.53s ev_p0=21.345432 ev_p1=31.815545 nash_conv=2.199e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (487.4 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 4c 4d 6c wall_s=0.5 it=92 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=81.6 MiB (f32) / 41.1 MiB (i16) / 61.4 MiB (i16-f32avg)
+memory estimate: 649.3 MiB (f32) / 629.0 MiB (i16) / 649.3 MiB (i16-f32avg)
+iter=      25 expl_p0=2.550e0 expl_p1=1.010e0 nash_conv=3.560e0
+iter=      50 expl_p0=1.011e0 expl_p1=2.208e-1 nash_conv=1.232e0
+iter=     100 expl_p0=3.282e-1 expl_p1=5.617e-2 nash_conv=3.844e-1
+iter=     107 expl_p0=1.741e-1 expl_p1=5.554e-2 nash_conv=2.296e-1
+done: iterations=107 wall=0.60s ev_p0=25.569906 ev_p1=27.414204 nash_conv=2.296e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (493.1 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 3c 3d Qc wall_s=0.6 it=107 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=73.6 MiB (f32) / 37.0 MiB (i16) / 55.3 MiB (i16-f32avg)
+memory estimate: 643.4 MiB (f32) / 625.1 MiB (i16) / 643.4 MiB (i16-f32avg)
+iter=      25 expl_p0=5.704e-1 expl_p1=1.393e0 nash_conv=1.963e0
+iter=      50 expl_p0=3.016e-1 expl_p1=4.323e-1 nash_conv=7.339e-1
+iter=      79 expl_p0=1.498e-1 expl_p1=1.474e-1 nash_conv=2.971e-1
+done: iterations=79 wall=0.42s ev_p0=11.426484 ev_p1=41.878769 nash_conv=2.971e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (425.7 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 6c Kc Kd wall_s=0.4 it=79 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=127.3 MiB (f32) / 64.1 MiB (i16) / 95.7 MiB (i16-f32avg)
+memory estimate: 686.3 MiB (f32) / 654.6 MiB (i16) / 686.3 MiB (i16-f32avg)
+iter=      25 expl_p0=4.933e-1 expl_p1=8.164e-1 nash_conv=1.310e0
+iter=      50 expl_p0=1.394e-1 expl_p1=3.249e-1 nash_conv=4.643e-1
+iter=      60 expl_p0=4.849e-2 expl_p1=2.360e-1 nash_conv=2.845e-1
+done: iterations=60 wall=0.46s ev_p0=3.846271 ev_p1=49.709409 nash_conv=2.845e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (648.0 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 3c Jd Kh wall_s=0.5 it=60 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=116.9 MiB (f32) / 58.9 MiB (i16) / 87.9 MiB (i16-f32avg)
+memory estimate: 678.6 MiB (f32) / 649.6 MiB (i16) / 678.6 MiB (i16-f32avg)
+iter=      25 expl_p0=2.672e0 expl_p1=1.148e0 nash_conv=3.820e0
+iter=      50 expl_p0=7.169e-1 expl_p1=2.227e-1 nash_conv=9.396e-1
+iter=      77 expl_p0=3.376e-1 expl_p1=8.496e-2 nash_conv=4.226e-1
+iter=      85 expl_p0=2.891e-1 expl_p1=7.359e-2 nash_conv=3.627e-1
+iter=      89 expl_p0=2.615e-1 expl_p1=6.830e-2 nash_conv=3.298e-1
+done: iterations=89 wall=0.68s ev_p0=12.526610 ev_p1=40.654681 nash_conv=3.298e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (604.0 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 4c Jd Ah wall_s=0.7 it=89 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=79.3 MiB (f32) / 39.9 MiB (i16) / 59.6 MiB (i16-f32avg)
+memory estimate: 647.6 MiB (f32) / 627.9 MiB (i16) / 647.6 MiB (i16-f32avg)
+iter=      25 expl_p0=1.495e0 expl_p1=1.997e0 nash_conv=3.492e0
+iter=      50 expl_p0=5.546e-1 expl_p1=5.414e-1 nash_conv=1.096e0
+iter=      91 expl_p0=2.259e-1 expl_p1=1.808e-1 nash_conv=4.067e-1
+iter=     100 expl_p0=2.022e-1 expl_p1=1.551e-1 nash_conv=3.573e-1
+iter=     104 expl_p0=1.854e-1 expl_p1=1.468e-1 nash_conv=3.322e-1
+done: iterations=104 wall=0.59s ev_p0=23.019729 ev_p1=30.178238 nash_conv=3.322e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (476.4 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 6c 7d Jd wall_s=0.6 it=104 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=79.6 MiB (f32) / 40.1 MiB (i16) / 59.8 MiB (i16-f32avg)
+memory estimate: 647.8 MiB (f32) / 628.0 MiB (i16) / 647.8 MiB (i16-f32avg)
+iter=      25 expl_p0=6.062e-1 expl_p1=1.695e0 nash_conv=2.302e0
+iter=      50 expl_p0=1.840e-1 expl_p1=3.422e-1 nash_conv=5.262e-1
+iter=      60 expl_p0=1.434e-1 expl_p1=2.202e-1 nash_conv=3.636e-1
+iter=      63 expl_p0=1.234e-1 expl_p1=1.877e-1 nash_conv=3.111e-1
+done: iterations=63 wall=0.37s ev_p0=19.255397 ev_p1=33.882537 nash_conv=3.111e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (459.1 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 6c 9d Jc wall_s=0.4 it=63 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=69.2 MiB (f32) / 34.9 MiB (i16) / 52.1 MiB (i16-f32avg)
+memory estimate: 640.2 MiB (f32) / 623.0 MiB (i16) / 640.2 MiB (i16-f32avg)
+iter=      25 expl_p0=3.022e0 expl_p1=1.332e0 nash_conv=4.355e0
+iter=      50 expl_p0=8.080e-1 expl_p1=2.672e-1 nash_conv=1.075e0
+iter=      81 expl_p0=2.995e-1 expl_p1=9.205e-2 nash_conv=3.916e-1
+iter=      86 expl_p0=2.577e-1 expl_p1=8.038e-2 nash_conv=3.380e-1
+done: iterations=86 wall=0.45s ev_p0=13.031845 ev_p1=40.124048 nash_conv=3.380e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (421.2 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 8c Jd Ac wall_s=0.4 it=86 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=79.0 MiB (f32) / 39.8 MiB (i16) / 59.4 MiB (i16-f32avg)
+memory estimate: 647.4 MiB (f32) / 627.7 MiB (i16) / 647.4 MiB (i16-f32avg)
+iter=      25 expl_p0=5.278e-1 expl_p1=1.871e0 nash_conv=2.399e0
+iter=      50 expl_p0=2.024e-1 expl_p1=4.961e-1 nash_conv=6.985e-1
+iter=      71 expl_p0=1.519e-1 expl_p1=1.973e-1 nash_conv=3.492e-1
+iter=      74 expl_p0=1.368e-1 expl_p1=1.786e-1 nash_conv=3.154e-1
+done: iterations=74 wall=0.45s ev_p0=13.717719 ev_p1=39.575730 nash_conv=3.154e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (465.3 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 3c 6c Kd wall_s=0.5 it=74 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=71.5 MiB (f32) / 36.0 MiB (i16) / 53.8 MiB (i16-f32avg)
+memory estimate: 641.9 MiB (f32) / 624.1 MiB (i16) / 641.9 MiB (i16-f32avg)
+iter=      25 expl_p0=2.711e0 expl_p1=1.052e0 nash_conv=3.763e0
+iter=      50 expl_p0=7.342e-1 expl_p1=2.289e-1 nash_conv=9.630e-1
+iter=      79 expl_p0=3.170e-1 expl_p1=8.537e-2 nash_conv=4.023e-1
+iter=      85 expl_p0=2.797e-1 expl_p1=6.739e-2 nash_conv=3.471e-1
+iter=      88 expl_p0=2.676e-1 expl_p1=6.880e-2 nash_conv=3.364e-1
+done: iterations=88 wall=0.50s ev_p0=12.839126 ev_p1=40.323139 nash_conv=3.364e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (440.3 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 3c Jd Ac wall_s=0.5 it=88 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=83.1 MiB (f32) / 41.8 MiB (i16) / 62.4 MiB (i16-f32avg)
+memory estimate: 650.3 MiB (f32) / 629.7 MiB (i16) / 650.3 MiB (i16-f32avg)
+iter=      25 expl_p0=1.354e0 expl_p1=1.470e0 nash_conv=2.824e0
+iter=      50 expl_p0=4.635e-1 expl_p1=4.950e-1 nash_conv=9.585e-1
+iter=      88 expl_p0=1.708e-1 expl_p1=1.981e-1 nash_conv=3.689e-1
+iter=      92 expl_p0=1.647e-1 expl_p1=1.698e-1 nash_conv=3.345e-1
+done: iterations=92 wall=0.54s ev_p0=19.876658 ev_p1=33.265257 nash_conv=3.345e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (488.9 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 3c 5d 8d wall_s=0.5 it=92 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=79.3 MiB (f32) / 39.9 MiB (i16) / 59.6 MiB (i16-f32avg)
+memory estimate: 647.6 MiB (f32) / 627.9 MiB (i16) / 647.6 MiB (i16-f32avg)
+iter=      25 expl_p0=2.561e0 expl_p1=7.128e-1 nash_conv=3.274e0
+iter=      50 expl_p0=7.774e-1 expl_p1=2.389e-1 nash_conv=1.016e0
+iter=      87 expl_p0=5.580e-1 expl_p1=8.107e-2 nash_conv=6.391e-1
+iter=     137 expl_p0=1.748e-1 expl_p1=3.195e-2 nash_conv=2.068e-1
+done: iterations=137 wall=0.77s ev_p0=30.020511 ev_p1=23.097320 nash_conv=2.068e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (484.7 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 3c 8c Qd wall_s=0.8 it=137 cap=0
+tree: nodes=47585 terminals=30611 rank_tables=422 storage=38.3 MiB (f32) / 19.3 MiB (i16) / 28.8 MiB (i16-f32avg)
+memory estimate: 556.9 MiB (f32) / 547.4 MiB (i16) / 556.9 MiB (i16-f32avg)
+iter=      25 expl_p0=1.593e0 expl_p1=1.625e0 nash_conv=3.219e0
+iter=      50 expl_p0=5.918e-1 expl_p1=6.965e-1 nash_conv=1.288e0
+iter=     100 expl_p0=1.486e-1 expl_p1=1.660e-1 nash_conv=3.146e-1
+done: iterations=100 wall=0.34s ev_p0=24.267094 ev_p1=29.005061 nash_conv=3.146e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (297.0 KB, 376 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.04s (47585 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.04s (47585 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 5c 9c Tc wall_s=0.3 it=100 cap=0
+tree: nodes=47585 terminals=30611 rank_tables=422 storage=37.3 MiB (f32) / 18.8 MiB (i16) / 28.0 MiB (i16-f32avg)
+memory estimate: 539.2 MiB (f32) / 530.0 MiB (i16) / 539.2 MiB (i16-f32avg)
+iter=      25 expl_p0=1.766e0 expl_p1=2.395e0 nash_conv=4.162e0
+iter=      50 expl_p0=5.624e-1 expl_p1=6.725e-1 nash_conv=1.235e0
+iter=      94 expl_p0=2.238e-1 expl_p1=3.799e-1 nash_conv=6.037e-1
+iter=     144 expl_p0=1.094e-1 expl_p1=1.318e-1 nash_conv=2.412e-1
+done: iterations=144 wall=0.45s ev_p0=20.304418 ev_p1=33.006475 nash_conv=2.412e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (282.1 KB, 376 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.04s (47585 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.04s (47585 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 2c 7c Kc wall_s=0.4 it=144 cap=0
+tree: nodes=47585 terminals=30611 rank_tables=422 storage=33.3 MiB (f32) / 16.8 MiB (i16) / 25.1 MiB (i16-f32avg)
+memory estimate: 500.3 MiB (f32) / 492.1 MiB (i16) / 500.3 MiB (i16-f32avg)
+iter=      25 expl_p0=2.671e0 expl_p1=1.018e0 nash_conv=3.689e0
+iter=      50 expl_p0=9.343e-1 expl_p1=2.589e-1 nash_conv=1.193e0
+iter=      97 expl_p0=3.107e-1 expl_p1=1.235e-1 nash_conv=4.342e-1
+iter=     111 expl_p0=4.534e-1 expl_p1=7.754e-2 nash_conv=5.309e-1
+iter=     136 expl_p0=2.841e-1 expl_p1=8.011e-2 nash_conv=3.642e-1
+iter=     141 expl_p0=1.675e-1 expl_p1=6.607e-2 nash_conv=2.335e-1
+done: iterations=141 wall=0.41s ev_p0=32.280877 ev_p1=20.691040 nash_conv=2.335e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (274.8 KB, 376 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.04s (47585 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.04s (47585 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 4c Qc Ac wall_s=0.4 it=141 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=81.9 MiB (f32) / 41.2 MiB (i16) / 61.6 MiB (i16-f32avg)
+memory estimate: 649.5 MiB (f32) / 629.1 MiB (i16) / 649.5 MiB (i16-f32avg)
+iter=      25 expl_p0=7.331e-1 expl_p1=1.303e0 nash_conv=2.036e0
+iter=      50 expl_p0=1.775e-1 expl_p1=3.280e-1 nash_conv=5.055e-1
+iter=      59 expl_p0=1.494e-1 expl_p1=2.380e-1 nash_conv=3.874e-1
+iter=      64 expl_p0=1.159e-1 expl_p1=2.112e-1 nash_conv=3.271e-1
+done: iterations=64 wall=0.38s ev_p0=20.299389 ev_p1=32.886995 nash_conv=3.271e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (495.0 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 2c 6c Td wall_s=0.4 it=64 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=79.0 MiB (f32) / 39.8 MiB (i16) / 59.4 MiB (i16-f32avg)
+memory estimate: 647.4 MiB (f32) / 627.7 MiB (i16) / 647.4 MiB (i16-f32avg)
+iter=      25 expl_p0=6.154e0 expl_p1=8.829e-1 nash_conv=7.037e0
+iter=      50 expl_p0=1.623e0 expl_p1=1.444e-1 nash_conv=1.767e0
+iter=     100 expl_p0=8.327e-1 expl_p1=5.538e-2 nash_conv=8.881e-1
+iter=     150 expl_p0=3.345e-1 expl_p1=2.159e-2 nash_conv=3.561e-1
+iter=     153 expl_p0=2.718e-1 expl_p1=2.534e-2 nash_conv=2.971e-1
+done: iterations=153 wall=0.82s ev_p0=30.346609 ev_p1=22.857080 nash_conv=2.971e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (476.6 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 2c 7d Qd wall_s=0.8 it=153 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=82.2 MiB (f32) / 41.4 MiB (i16) / 61.8 MiB (i16-f32avg)
+memory estimate: 649.7 MiB (f32) / 629.3 MiB (i16) / 649.7 MiB (i16-f32avg)
+iter=      25 expl_p0=1.521e0 expl_p1=1.607e0 nash_conv=3.128e0
+iter=      50 expl_p0=5.721e-1 expl_p1=5.305e-1 nash_conv=1.103e0
+iter=      98 expl_p0=1.504e-1 expl_p1=1.222e-1 nash_conv=2.726e-1
+done: iterations=98 wall=0.55s ev_p0=21.742141 ev_p1=31.419051 nash_conv=2.726e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (470.0 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 2c 7d 9d wall_s=0.6 it=98 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=79.0 MiB (f32) / 39.8 MiB (i16) / 59.4 MiB (i16-f32avg)
+memory estimate: 647.4 MiB (f32) / 627.7 MiB (i16) / 647.4 MiB (i16-f32avg)
+iter=      25 expl_p0=4.478e-1 expl_p1=1.614e0 nash_conv=2.061e0
+iter=      50 expl_p0=1.085e-1 expl_p1=4.770e-1 nash_conv=5.855e-1
+iter=      65 expl_p0=5.632e-2 expl_p1=2.937e-1 nash_conv=3.500e-1
+iter=      68 expl_p0=5.557e-2 expl_p1=2.679e-1 nash_conv=3.234e-1
+done: iterations=68 wall=0.41s ev_p0=9.770790 ev_p1=43.606489 nash_conv=3.234e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (468.5 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 4c 9d Kd wall_s=0.4 it=68 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=126.9 MiB (f32) / 63.9 MiB (i16) / 95.4 MiB (i16-f32avg)
+memory estimate: 685.9 MiB (f32) / 654.4 MiB (i16) / 685.9 MiB (i16-f32avg)
+iter=      25 expl_p0=1.650e-1 expl_p1=1.167e0 nash_conv=1.332e0
+iter=      50 expl_p0=2.398e-2 expl_p1=2.588e-1 nash_conv=2.828e-1
+done: iterations=50 wall=0.38s ev_p0=5.114131 ev_p1=48.471832 nash_conv=2.828e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (642.1 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 5c 9d Kh wall_s=0.4 it=50 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=131.1 MiB (f32) / 66.0 MiB (i16) / 98.6 MiB (i16-f32avg)
+memory estimate: 689.0 MiB (f32) / 656.5 MiB (i16) / 689.0 MiB (i16-f32avg)
+iter=      25 expl_p0=1.814e-1 expl_p1=1.120e0 nash_conv=1.302e0
+iter=      50 expl_p0=8.839e-3 expl_p1=2.232e-1 nash_conv=2.321e-1
+done: iterations=50 wall=0.36s ev_p0=10.084129 ev_p1=43.140157 nash_conv=2.321e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (656.4 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.13s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 5c 9d Jh wall_s=0.4 it=50 cap=0
+tree: nodes=103456 terminals=66796 rank_tables=810 storage=87.3 MiB (f32) / 43.9 MiB (i16) / 65.6 MiB (i16-f32avg)
+memory estimate: 653.6 MiB (f32) / 631.9 MiB (i16) / 653.6 MiB (i16-f32avg)
+iter=      25 expl_p0=1.972e0 expl_p1=1.774e0 nash_conv=3.746e0
+iter=      50 expl_p0=7.427e-1 expl_p1=5.692e-1 nash_conv=1.312e0
+iter=     100 expl_p0=1.728e-1 expl_p1=1.649e-1 nash_conv=3.377e-1
+done: iterations=100 wall=0.57s ev_p0=18.435067 ev_p1=34.683866 nash_conv=3.377e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (480.3 KB, 600 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 3c 3d 7h wall_s=0.6 it=100 cap=0
+tree: nodes=103456 terminals=66796 rank_tables=810 storage=80.4 MiB (f32) / 40.5 MiB (i16) / 60.5 MiB (i16-f32avg)
+memory estimate: 648.6 MiB (f32) / 628.6 MiB (i16) / 648.6 MiB (i16-f32avg)
+iter=      25 expl_p0=9.854e-1 expl_p1=1.443e0 nash_conv=2.428e0
+iter=      50 expl_p0=2.543e-1 expl_p1=3.617e-1 nash_conv=6.160e-1
+iter=      65 expl_p0=1.066e-1 expl_p1=1.780e-1 nash_conv=2.845e-1
+done: iterations=65 wall=0.36s ev_p0=11.816897 ev_p1=41.294203 nash_conv=2.845e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (463.9 KB, 600 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 8c Jd Jh wall_s=0.4 it=65 cap=0
+tree: nodes=47585 terminals=30611 rank_tables=422 storage=38.4 MiB (f32) / 19.3 MiB (i16) / 28.9 MiB (i16-f32avg)
+memory estimate: 557.1 MiB (f32) / 547.6 MiB (i16) / 557.1 MiB (i16-f32avg)
+iter=      25 expl_p0=1.689e0 expl_p1=1.521e0 nash_conv=3.210e0
+iter=      50 expl_p0=5.005e-1 expl_p1=3.782e-1 nash_conv=8.787e-1
+iter=      77 expl_p0=2.249e-1 expl_p1=1.553e-1 nash_conv=3.802e-1
+iter=      81 expl_p0=2.064e-1 expl_p1=1.411e-1 nash_conv=3.475e-1
+iter=      84 expl_p0=1.925e-1 expl_p1=1.304e-1 nash_conv=3.229e-1
+done: iterations=84 wall=0.29s ev_p0=27.352127 ev_p1=25.894446 nash_conv=3.229e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (294.3 KB, 376 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.04s (47585 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.04s (47585 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 6c 8c 9c wall_s=0.3 it=84 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=83.1 MiB (f32) / 41.8 MiB (i16) / 62.4 MiB (i16-f32avg)
+memory estimate: 650.3 MiB (f32) / 629.7 MiB (i16) / 650.3 MiB (i16-f32avg)
+iter=      25 expl_p0=7.993e-1 expl_p1=1.296e0 nash_conv=2.096e0
+iter=      50 expl_p0=2.304e-1 expl_p1=3.403e-1 nash_conv=5.707e-1
+iter=      63 expl_p0=1.213e-1 expl_p1=2.166e-1 nash_conv=3.378e-1
+done: iterations=63 wall=0.37s ev_p0=15.794719 ev_p1=37.408315 nash_conv=3.378e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (506.3 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 4c 9c 9d wall_s=0.4 it=63 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=77.3 MiB (f32) / 38.9 MiB (i16) / 58.1 MiB (i16-f32avg)
+memory estimate: 646.1 MiB (f32) / 626.9 MiB (i16) / 646.1 MiB (i16-f32avg)
+iter=      25 expl_p0=3.420e-1 expl_p1=2.036e0 nash_conv=2.378e0
+iter=      50 expl_p0=8.953e-2 expl_p1=5.094e-1 nash_conv=5.990e-1
+iter=      64 expl_p0=6.325e-2 expl_p1=3.174e-1 nash_conv=3.806e-1
+iter=      68 expl_p0=5.244e-2 expl_p1=2.802e-1 nash_conv=3.326e-1
+done: iterations=68 wall=0.37s ev_p0=8.117639 ev_p1=45.264996 nash_conv=3.326e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (423.1 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 9c 9d Kc wall_s=0.4 it=68 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=79.0 MiB (f32) / 39.8 MiB (i16) / 59.4 MiB (i16-f32avg)
+memory estimate: 647.4 MiB (f32) / 627.7 MiB (i16) / 647.4 MiB (i16-f32avg)
+iter=      25 expl_p0=1.627e0 expl_p1=2.341e0 nash_conv=3.969e0
+iter=      50 expl_p0=5.517e-1 expl_p1=7.125e-1 nash_conv=1.264e0
+iter=      99 expl_p0=1.559e-1 expl_p1=1.614e-1 nash_conv=3.173e-1
+done: iterations=99 wall=0.58s ev_p0=23.044009 ev_p1=30.149029 nash_conv=3.173e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/solution.sol (465.9 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.08s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L35-raise/tmp/summary.csv
+FLOP L35-raise 7c 7d Jc wall_s=0.6 it=99 cap=0
+TASK L35-raise flops=64
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=36.6 MiB (f32) / 18.6 MiB (i16) / 27.6 MiB (i16-f32avg)
+memory estimate: 557.0 MiB (f32) / 548.0 MiB (i16) / 557.0 MiB (i16-f32avg)
+iter=      25 expl_p0=1.153e0 expl_p1=1.347e0 nash_conv=2.500e0
+iter=      50 expl_p0=1.517e-1 expl_p1=4.129e-1 nash_conv=5.645e-1
+iter=      57 expl_p0=1.042e-1 expl_p1=3.454e-1 nash_conv=4.496e-1
+iter=      60 expl_p0=8.813e-2 expl_p1=3.247e-1 nash_conv=4.128e-1
+done: iterations=60 wall=0.22s ev_p0=20.661012 ev_p1=45.161990 nash_conv=4.128e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (223.5 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 5c Td Jd wall_s=0.2 it=60 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=37.8 MiB (f32) / 19.2 MiB (i16) / 28.5 MiB (i16-f32avg)
+memory estimate: 575.0 MiB (f32) / 565.7 MiB (i16) / 575.0 MiB (i16-f32avg)
+iter=      25 expl_p0=1.368e0 expl_p1=1.253e0 nash_conv=2.620e0
+iter=      50 expl_p0=2.658e-1 expl_p1=3.353e-1 nash_conv=6.010e-1
+iter=      58 expl_p0=1.917e-1 expl_p1=2.687e-1 nash_conv=4.604e-1
+iter=      61 expl_p0=2.480e-1 expl_p1=2.265e-1 nash_conv=4.745e-1
+iter=      86 expl_p0=1.055e-1 expl_p1=1.043e-1 nash_conv=2.098e-1
+done: iterations=86 wall=0.31s ev_p0=19.781196 ev_p1=45.982115 nash_conv=2.098e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (223.5 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 5c 9d Qc wall_s=0.3 it=86 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=37.2 MiB (f32) / 18.9 MiB (i16) / 28.0 MiB (i16-f32avg)
+memory estimate: 574.0 MiB (f32) / 564.9 MiB (i16) / 574.0 MiB (i16-f32avg)
+iter=      25 expl_p0=1.820e-1 expl_p1=2.528e0 nash_conv=2.710e0
+iter=      50 expl_p0=3.913e-2 expl_p1=6.413e-1 nash_conv=6.805e-1
+iter=      62 expl_p0=2.818e-2 expl_p1=4.190e-1 nash_conv=4.472e-1
+iter=      65 expl_p0=2.681e-2 expl_p1=3.878e-1 nash_conv=4.146e-1
+done: iterations=65 wall=0.23s ev_p0=15.456223 ev_p1=50.381696 nash_conv=4.146e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (215.5 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 8c Td Qc wall_s=0.2 it=65 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=33.8 MiB (f32) / 17.1 MiB (i16) / 25.4 MiB (i16-f32avg)
+memory estimate: 520.0 MiB (f32) / 511.7 MiB (i16) / 520.0 MiB (i16-f32avg)
+iter=      25 expl_p0=1.179e-1 expl_p1=1.874e0 nash_conv=1.992e0
+iter=      50 expl_p0=3.187e-2 expl_p1=3.060e-1 nash_conv=3.378e-1
+done: iterations=50 wall=0.17s ev_p0=10.942774 ev_p1=54.896978 nash_conv=3.378e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (208.4 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 8c Jd Qc wall_s=0.2 it=50 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=33.2 MiB (f32) / 16.9 MiB (i16) / 25.0 MiB (i16-f32avg)
+memory estimate: 519.0 MiB (f32) / 510.9 MiB (i16) / 519.0 MiB (i16-f32avg)
+iter=      25 expl_p0=2.804e-1 expl_p1=1.622e0 nash_conv=1.903e0
+iter=      50 expl_p0=7.706e-2 expl_p1=7.072e-1 nash_conv=7.843e-1
+iter=      76 expl_p0=3.664e-2 expl_p1=2.936e-1 nash_conv=3.303e-1
+done: iterations=76 wall=0.26s ev_p0=7.384361 ev_p1=58.545366 nash_conv=3.303e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (185.0 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 5c Jc Kd wall_s=0.3 it=76 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=34.0 MiB (f32) / 17.3 MiB (i16) / 25.7 MiB (i16-f32avg)
+memory estimate: 536.5 MiB (f32) / 528.2 MiB (i16) / 536.5 MiB (i16-f32avg)
+iter=      25 expl_p0=1.729e-1 expl_p1=2.294e0 nash_conv=2.467e0
+iter=      50 expl_p0=4.471e-2 expl_p1=5.340e-1 nash_conv=5.787e-1
+iter=      57 expl_p0=3.720e-2 expl_p1=3.855e-1 nash_conv=4.226e-1
+iter=      60 expl_p0=3.206e-2 expl_p1=3.636e-1 nash_conv=3.956e-1
+done: iterations=60 wall=0.22s ev_p0=13.476809 ev_p1=52.380005 nash_conv=3.956e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (198.5 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 4c Qc Kd wall_s=0.2 it=60 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=64.9 MiB (f32) / 32.9 MiB (i16) / 48.9 MiB (i16-f32avg)
+memory estimate: 640.6 MiB (f32) / 624.6 MiB (i16) / 640.6 MiB (i16-f32avg)
+iter=      25 expl_p0=1.363e0 expl_p1=2.521e-1 nash_conv=1.615e0
+iter=      50 expl_p0=8.783e-1 expl_p1=7.550e-2 nash_conv=9.538e-1
+iter=     100 expl_p0=3.997e-1 expl_p1=4.550e-2 nash_conv=4.452e-1
+iter=     105 expl_p0=2.176e-1 expl_p1=7.218e-2 nash_conv=2.898e-1
+done: iterations=105 wall=0.49s ev_p0=38.624042 ev_p1=27.131428 nash_conv=2.898e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (317.1 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 3c 4d 5h wall_s=0.5 it=105 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=65.3 MiB (f32) / 33.1 MiB (i16) / 49.2 MiB (i16-f32avg)
+memory estimate: 641.0 MiB (f32) / 624.8 MiB (i16) / 641.0 MiB (i16-f32avg)
+iter=      25 expl_p0=4.647e0 expl_p1=7.054e-1 nash_conv=5.353e0
+iter=      50 expl_p0=9.809e-1 expl_p1=3.325e-1 nash_conv=1.313e0
+iter=      81 expl_p0=3.090e-1 expl_p1=1.238e-1 nash_conv=4.328e-1
+iter=      84 expl_p0=2.869e-1 expl_p1=1.155e-1 nash_conv=4.024e-1
+done: iterations=84 wall=0.43s ev_p0=29.445566 ev_p1=36.317565 nash_conv=4.024e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (345.1 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 3c 5d 9h wall_s=0.4 it=84 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=61.5 MiB (f32) / 31.2 MiB (i16) / 46.4 MiB (i16-f32avg)
+memory estimate: 635.7 MiB (f32) / 620.6 MiB (i16) / 635.7 MiB (i16-f32avg)
+iter=      25 expl_p0=7.534e-1 expl_p1=1.257e0 nash_conv=2.011e0
+iter=      50 expl_p0=1.931e-1 expl_p1=3.490e-1 nash_conv=5.422e-1
+iter=      56 expl_p0=1.659e-1 expl_p1=3.200e-1 nash_conv=4.859e-1
+iter=      64 expl_p0=1.224e-1 expl_p1=2.138e-1 nash_conv=3.362e-1
+done: iterations=64 wall=0.32s ev_p0=17.787663 ev_p1=47.930814 nash_conv=3.362e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (315.4 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 2c 4d Qh wall_s=0.3 it=64 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=39.5 MiB (f32) / 20.0 MiB (i16) / 29.8 MiB (i16-f32avg)
+memory estimate: 594.0 MiB (f32) / 584.3 MiB (i16) / 594.0 MiB (i16-f32avg)
+iter=      25 expl_p0=2.203e0 expl_p1=1.858e-1 nash_conv=2.389e0
+iter=      50 expl_p0=1.185e0 expl_p1=1.800e-1 nash_conv=1.365e0
+iter=     100 expl_p0=4.776e-1 expl_p1=3.365e-2 nash_conv=5.112e-1
+iter=     113 expl_p0=4.176e-1 expl_p1=2.742e-2 nash_conv=4.450e-1
+iter=     119 expl_p0=2.307e-1 expl_p1=2.748e-2 nash_conv=2.582e-1
+done: iterations=119 wall=0.40s ev_p0=35.510865 ev_p1=30.205939 nash_conv=2.582e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (235.6 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 3c 4d 5c wall_s=0.4 it=119 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=37.5 MiB (f32) / 19.0 MiB (i16) / 28.3 MiB (i16-f32avg)
+memory estimate: 574.5 MiB (f32) / 565.3 MiB (i16) / 574.5 MiB (i16-f32avg)
+iter=      25 expl_p0=4.165e-1 expl_p1=1.240e0 nash_conv=1.657e0
+iter=      50 expl_p0=9.109e-2 expl_p1=3.442e-1 nash_conv=4.353e-1
+iter=      53 expl_p0=9.642e-2 expl_p1=3.112e-1 nash_conv=4.077e-1
+done: iterations=53 wall=0.19s ev_p0=22.775888 ev_p1=42.957348 nash_conv=4.077e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (219.4 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 3c 4d Qd wall_s=0.2 it=53 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=36.1 MiB (f32) / 18.3 MiB (i16) / 27.2 MiB (i16-f32avg)
+memory estimate: 556.0 MiB (f32) / 547.1 MiB (i16) / 556.0 MiB (i16-f32avg)
+iter=      25 expl_p0=4.742e-1 expl_p1=2.778e0 nash_conv=3.253e0
+iter=      50 expl_p0=1.771e-1 expl_p1=7.165e-1 nash_conv=8.936e-1
+iter=      71 expl_p0=8.707e-2 expl_p1=3.358e-1 nash_conv=4.229e-1
+iter=      74 expl_p0=8.116e-2 expl_p1=3.056e-1 nash_conv=3.867e-1
+done: iterations=74 wall=0.25s ev_p0=21.863699 ev_p1=43.956922 nash_conv=3.867e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (208.2 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 3c 5d Kc wall_s=0.2 it=74 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=32.6 MiB (f32) / 16.6 MiB (i16) / 24.6 MiB (i16-f32avg)
+memory estimate: 502.0 MiB (f32) / 494.0 MiB (i16) / 502.0 MiB (i16-f32avg)
+iter=      25 expl_p0=2.876e0 expl_p1=1.035e0 nash_conv=3.911e0
+iter=      50 expl_p0=9.565e-1 expl_p1=2.343e-1 nash_conv=1.191e0
+iter=      84 expl_p0=3.584e-1 expl_p1=1.006e-1 nash_conv=4.590e-1
+iter=      88 expl_p0=3.224e-1 expl_p1=9.393e-2 nash_conv=4.163e-1
+done: iterations=88 wall=0.41s ev_p0=34.082524 ev_p1=31.711712 nash_conv=4.163e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (198.5 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 4c 8c Ad wall_s=0.4 it=88 cap=0
+tree: nodes=103456 terminals=66796 rank_tables=810 storage=40.8 MiB (f32) / 20.7 MiB (i16) / 30.8 MiB (i16-f32avg)
+memory estimate: 596.4 MiB (f32) / 586.4 MiB (i16) / 596.4 MiB (i16-f32avg)
+iter=      25 expl_p0=3.903e0 expl_p1=1.141e0 nash_conv=5.044e0
+iter=      50 expl_p0=7.908e-1 expl_p1=3.264e-1 nash_conv=1.117e0
+iter=      73 expl_p0=3.077e-1 expl_p1=1.326e-1 nash_conv=4.403e-1
+iter=      76 expl_p0=3.092e-1 expl_p1=1.196e-1 nash_conv=4.288e-1
+iter=      79 expl_p0=2.846e-1 expl_p1=1.100e-1 nash_conv=3.946e-1
+done: iterations=79 wall=0.29s ev_p0=29.377926 ev_p1=36.386795 nash_conv=3.946e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (251.4 KB, 600 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 2c 2d 5h wall_s=0.3 it=79 cap=0
+tree: nodes=103456 terminals=66796 rank_tables=810 storage=41.4 MiB (f32) / 21.0 MiB (i16) / 31.2 MiB (i16-f32avg)
+memory estimate: 597.5 MiB (f32) / 587.3 MiB (i16) / 597.5 MiB (i16-f32avg)
+iter=      25 expl_p0=4.316e0 expl_p1=7.700e-1 nash_conv=5.086e0
+iter=      50 expl_p0=1.336e0 expl_p1=5.118e-1 nash_conv=1.848e0
+iter=     100 expl_p0=2.700e-1 expl_p1=1.135e-1 nash_conv=3.835e-1
+done: iterations=100 wall=0.35s ev_p0=27.408081 ev_p1=38.360353 nash_conv=3.835e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (256.8 KB, 600 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 5c 9d 9h wall_s=0.4 it=100 cap=0
+tree: nodes=103456 terminals=66796 rank_tables=810 storage=34.0 MiB (f32) / 17.3 MiB (i16) / 25.6 MiB (i16-f32avg)
+memory estimate: 536.6 MiB (f32) / 528.2 MiB (i16) / 536.6 MiB (i16-f32avg)
+iter=      25 expl_p0=8.678e-1 expl_p1=3.444e0 nash_conv=4.312e0
+iter=      50 expl_p0=3.021e-1 expl_p1=1.285e0 nash_conv=1.587e0
+iter=     100 expl_p0=1.170e-1 expl_p1=4.786e-1 nash_conv=5.955e-1
+iter=     123 expl_p0=8.551e-2 expl_p1=3.280e-1 nash_conv=4.135e-1
+done: iterations=123 wall=0.39s ev_p0=17.891024 ev_p1=47.986375 nash_conv=4.135e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (211.7 KB, 600 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 6c Jd Jh wall_s=0.4 it=123 cap=0
+tree: nodes=103456 terminals=66796 rank_tables=810 storage=37.8 MiB (f32) / 19.2 MiB (i16) / 28.5 MiB (i16-f32avg)
+memory estimate: 575.3 MiB (f32) / 566.0 MiB (i16) / 575.3 MiB (i16-f32avg)
+iter=      25 expl_p0=3.202e-1 expl_p1=3.301e0 nash_conv=3.621e0
+iter=      50 expl_p0=1.356e-1 expl_p1=1.143e0 nash_conv=1.279e0
+iter=      95 expl_p0=6.700e-2 expl_p1=3.158e-1 nash_conv=3.828e-1
+done: iterations=95 wall=0.31s ev_p0=12.103354 ev_p1=53.813603 nash_conv=3.828e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (208.7 KB, 600 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise Tc Td Kh wall_s=0.3 it=95 cap=0
+tree: nodes=103456 terminals=66796 rank_tables=810 storage=25.3 MiB (f32) / 12.9 MiB (i16) / 19.1 MiB (i16-f32avg)
+memory estimate: 409.6 MiB (f32) / 403.4 MiB (i16) / 409.6 MiB (i16-f32avg)
+iter=      25 expl_p0=4.280e0 expl_p1=2.162e0 nash_conv=6.442e0
+iter=      50 expl_p0=1.276e0 expl_p1=7.851e-1 nash_conv=2.061e0
+iter=     100 expl_p0=3.667e-1 expl_p1=1.448e-1 nash_conv=5.115e-1
+iter=     109 expl_p0=2.861e-1 expl_p1=1.700e-1 nash_conv=4.561e-1
+iter=     116 expl_p0=3.051e-1 expl_p1=1.626e-1 nash_conv=4.678e-1
+iter=     141 expl_p0=2.278e-1 expl_p1=1.117e-1 nash_conv=3.395e-1
+done: iterations=141 wall=0.60s ev_p0=28.650309 ev_p1=37.094291 nash_conv=3.395e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (149.2 KB, 600 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise Kc Ad Ah wall_s=0.6 it=141 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=62.5 MiB (f32) / 31.7 MiB (i16) / 47.1 MiB (i16-f32avg)
+memory estimate: 637.4 MiB (f32) / 622.0 MiB (i16) / 637.4 MiB (i16-f32avg)
+iter=      25 expl_p0=3.902e0 expl_p1=3.893e-1 nash_conv=4.291e0
+iter=      50 expl_p0=1.399e0 expl_p1=1.773e-1 nash_conv=1.576e0
+iter=     100 expl_p0=2.981e-1 expl_p1=6.034e-2 nash_conv=3.585e-1
+done: iterations=100 wall=0.47s ev_p0=35.918373 ev_p1=29.849051 nash_conv=3.585e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (311.7 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 5c 7d 8h wall_s=0.5 it=100 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=58.2 MiB (f32) / 29.5 MiB (i16) / 43.9 MiB (i16-f32avg)
+memory estimate: 630.0 MiB (f32) / 615.6 MiB (i16) / 630.0 MiB (i16-f32avg)
+iter=      25 expl_p0=2.173e0 expl_p1=1.465e0 nash_conv=3.638e0
+iter=      50 expl_p0=5.485e-1 expl_p1=4.158e-1 nash_conv=9.642e-1
+iter=      72 expl_p0=2.484e-1 expl_p1=1.761e-1 nash_conv=4.244e-1
+iter=      75 expl_p0=2.069e-1 expl_p1=1.617e-1 nash_conv=3.686e-1
+done: iterations=75 wall=0.36s ev_p0=21.871729 ev_p1=43.882581 nash_conv=3.686e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (318.7 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 5c 7d Jh wall_s=0.4 it=75 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=52.1 MiB (f32) / 26.5 MiB (i16) / 39.3 MiB (i16-f32avg)
+memory estimate: 619.3 MiB (f32) / 606.5 MiB (i16) / 619.3 MiB (i16-f32avg)
+iter=      25 expl_p0=5.234e0 expl_p1=4.644e-1 nash_conv=5.699e0
+iter=      50 expl_p0=2.207e0 expl_p1=3.246e-1 nash_conv=2.532e0
+iter=     100 expl_p0=4.416e-1 expl_p1=1.128e-1 nash_conv=5.545e-1
+iter=     112 expl_p0=3.426e-1 expl_p1=7.873e-2 nash_conv=4.214e-1
+iter=     115 expl_p0=3.249e-1 expl_p1=8.004e-2 nash_conv=4.050e-1
+done: iterations=115 wall=0.50s ev_p0=42.217324 ev_p1=23.620034 nash_conv=4.050e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (251.6 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 6c 7d Ah wall_s=0.5 it=115 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=38.7 MiB (f32) / 19.6 MiB (i16) / 29.1 MiB (i16-f32avg)
+memory estimate: 592.5 MiB (f32) / 583.0 MiB (i16) / 592.5 MiB (i16-f32avg)
+iter=      25 expl_p0=6.005e-1 expl_p1=3.487e-1 nash_conv=9.492e-1
+iter=      50 expl_p0=1.593e-1 expl_p1=8.652e-2 nash_conv=2.458e-1
+done: iterations=50 wall=0.18s ev_p0=38.384422 ev_p1=27.214165 nash_conv=2.458e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (223.3 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 3c 4c 7d wall_s=0.2 it=50 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=38.1 MiB (f32) / 19.3 MiB (i16) / 28.7 MiB (i16-f32avg)
+memory estimate: 575.5 MiB (f32) / 566.1 MiB (i16) / 575.5 MiB (i16-f32avg)
+iter=      25 expl_p0=4.916e-1 expl_p1=1.340e0 nash_conv=1.832e0
+iter=      50 expl_p0=1.219e-1 expl_p1=3.061e-1 nash_conv=4.280e-1
+iter=      53 expl_p0=1.025e-1 expl_p1=2.858e-1 nash_conv=3.883e-1
+done: iterations=53 wall=0.19s ev_p0=30.305456 ev_p1=35.419447 nash_conv=3.883e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (214.0 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 4c 7d 8d wall_s=0.2 it=53 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=36.6 MiB (f32) / 18.6 MiB (i16) / 27.6 MiB (i16-f32avg)
+memory estimate: 557.0 MiB (f32) / 548.0 MiB (i16) / 557.0 MiB (i16-f32avg)
+iter=      25 expl_p0=1.802e0 expl_p1=1.483e0 nash_conv=3.284e0
+iter=      50 expl_p0=5.025e-1 expl_p1=4.674e-1 nash_conv=9.699e-1
+iter=      75 expl_p0=4.701e-1 expl_p1=3.472e-1 nash_conv=8.172e-1
+iter=     125 expl_p0=9.887e-2 expl_p1=1.150e-1 nash_conv=2.139e-1
+done: iterations=125 wall=0.42s ev_p0=31.420590 ev_p1=34.375648 nash_conv=2.139e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (223.5 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 5c 7d Qd wall_s=0.4 it=125 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=35.2 MiB (f32) / 17.9 MiB (i16) / 26.5 MiB (i16-f32avg)
+memory estimate: 538.5 MiB (f32) / 529.9 MiB (i16) / 538.5 MiB (i16-f32avg)
+iter=      25 expl_p0=7.589e-1 expl_p1=3.060e0 nash_conv=3.819e0
+iter=      50 expl_p0=1.865e-1 expl_p1=8.112e-1 nash_conv=9.978e-1
+iter=      73 expl_p0=7.959e-2 expl_p1=3.291e-1 nash_conv=4.087e-1
+done: iterations=73 wall=0.26s ev_p0=19.758180 ev_p1=46.102629 nash_conv=4.087e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (203.6 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 5c 7c Kd wall_s=0.3 it=73 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=63.4 MiB (f32) / 32.2 MiB (i16) / 47.8 MiB (i16-f32avg)
+memory estimate: 639.0 MiB (f32) / 623.4 MiB (i16) / 639.0 MiB (i16-f32avg)
+iter=      25 expl_p0=4.435e-1 expl_p1=4.143e0 nash_conv=4.587e0
+iter=      50 expl_p0=1.177e-1 expl_p1=1.211e0 nash_conv=1.329e0
+iter=      87 expl_p0=4.320e-2 expl_p1=5.174e-1 nash_conv=5.606e-1
+iter=     102 expl_p0=3.089e-2 expl_p1=4.072e-1 nash_conv=4.381e-1
+iter=     105 expl_p0=2.894e-2 expl_p1=3.906e-1 nash_conv=4.195e-1
+iter=     108 expl_p0=2.803e-2 expl_p1=3.732e-1 nash_conv=4.013e-1
+done: iterations=108 wall=0.50s ev_p0=24.472111 ev_p1=41.398278 nash_conv=4.013e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (330.1 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 6c 8d Th wall_s=0.5 it=108 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=60.1 MiB (f32) / 30.5 MiB (i16) / 45.3 MiB (i16-f32avg)
+memory estimate: 633.3 MiB (f32) / 618.5 MiB (i16) / 633.3 MiB (i16-f32avg)
+iter=      25 expl_p0=7.043e-1 expl_p1=2.302e0 nash_conv=3.006e0
+iter=      50 expl_p0=8.986e-2 expl_p1=4.393e-1 nash_conv=5.291e-1
+iter=      54 expl_p0=6.794e-2 expl_p1=4.277e-1 nash_conv=4.957e-1
+iter=      64 expl_p0=4.884e-2 expl_p1=3.135e-1 nash_conv=3.623e-1
+done: iterations=64 wall=0.30s ev_p0=11.139068 ev_p1=54.788651 nash_conv=3.623e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (307.3 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 4c 9d Jh wall_s=0.3 it=64 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=55.4 MiB (f32) / 28.1 MiB (i16) / 41.8 MiB (i16-f32avg)
+memory estimate: 625.1 MiB (f32) / 611.4 MiB (i16) / 625.1 MiB (i16-f32avg)
+iter=      25 expl_p0=1.950e-1 expl_p1=2.347e0 nash_conv=2.542e0
+iter=      50 expl_p0=1.033e-1 expl_p1=7.466e-1 nash_conv=8.498e-1
+iter=      73 expl_p0=5.994e-2 expl_p1=3.331e-1 nash_conv=3.930e-1
+done: iterations=73 wall=0.32s ev_p0=9.475716 ev_p1=56.444728 nash_conv=3.930e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (273.4 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 8c Jd Qh wall_s=0.3 it=73 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=35.8 MiB (f32) / 18.2 MiB (i16) / 27.0 MiB (i16-f32avg)
+memory estimate: 555.5 MiB (f32) / 546.7 MiB (i16) / 555.5 MiB (i16-f32avg)
+iter=      25 expl_p0=4.778e-1 expl_p1=2.771e0 nash_conv=3.249e0
+iter=      50 expl_p0=1.956e-1 expl_p1=6.149e-1 nash_conv=8.105e-1
+iter=      66 expl_p0=1.479e-1 expl_p1=3.194e-1 nash_conv=4.672e-1
+iter=      70 expl_p0=1.502e-1 expl_p1=2.777e-1 nash_conv=4.279e-1
+iter=      73 expl_p0=1.298e-1 expl_p1=2.559e-1 nash_conv=3.857e-1
+done: iterations=73 wall=0.25s ev_p0=22.053069 ev_p1=43.776488 nash_conv=3.857e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (212.3 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 6c Tc Kd wall_s=0.2 it=73 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=29.4 MiB (f32) / 15.0 MiB (i16) / 22.2 MiB (i16-f32avg)
+memory estimate: 464.5 MiB (f32) / 457.3 MiB (i16) / 464.5 MiB (i16-f32avg)
+iter=      25 expl_p0=3.774e0 expl_p1=1.456e0 nash_conv=5.230e0
+iter=      50 expl_p0=8.542e-1 expl_p1=4.639e-1 nash_conv=1.318e0
+iter=      82 expl_p0=3.036e-1 expl_p1=1.795e-1 nash_conv=4.831e-1
+iter=      87 expl_p0=2.848e-1 expl_p1=1.704e-1 nash_conv=4.552e-1
+iter=      94 expl_p0=2.421e-1 expl_p1=1.555e-1 nash_conv=3.976e-1
+done: iterations=94 wall=0.40s ev_p0=28.009267 ev_p1=37.789897 nash_conv=3.976e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (182.1 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 7c Jc Ad wall_s=0.4 it=94 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=29.1 MiB (f32) / 14.8 MiB (i16) / 22.0 MiB (i16-f32avg)
+memory estimate: 464.0 MiB (f32) / 456.9 MiB (i16) / 464.0 MiB (i16-f32avg)
+iter=      25 expl_p0=3.707e0 expl_p1=1.349e0 nash_conv=5.056e0
+iter=      50 expl_p0=7.998e-1 expl_p1=4.281e-1 nash_conv=1.228e0
+iter=      78 expl_p0=3.197e-1 expl_p1=1.459e-1 nash_conv=4.656e-1
+iter=      82 expl_p0=2.779e-1 expl_p1=1.273e-1 nash_conv=4.052e-1
+done: iterations=82 wall=0.35s ev_p0=27.811580 ev_p1=37.982235 nash_conv=4.052e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (181.3 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 7c Kc Ad wall_s=0.4 it=82 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=39.2 MiB (f32) / 19.9 MiB (i16) / 29.6 MiB (i16-f32avg)
+memory estimate: 593.5 MiB (f32) / 583.8 MiB (i16) / 593.5 MiB (i16-f32avg)
+iter=      25 expl_p0=4.855e-1 expl_p1=2.705e0 nash_conv=3.191e0
+iter=      50 expl_p0=1.719e-1 expl_p1=6.994e-1 nash_conv=8.714e-1
+iter=      70 expl_p0=9.704e-2 expl_p1=3.380e-1 nash_conv=4.351e-1
+iter=      73 expl_p0=8.988e-2 expl_p1=3.035e-1 nash_conv=3.934e-1
+done: iterations=73 wall=0.25s ev_p0=21.616496 ev_p1=44.179797 nash_conv=3.934e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (223.7 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 3c 8d 9c wall_s=0.2 it=73 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=39.2 MiB (f32) / 19.9 MiB (i16) / 29.6 MiB (i16-f32avg)
+memory estimate: 593.5 MiB (f32) / 583.8 MiB (i16) / 593.5 MiB (i16-f32avg)
+iter=      25 expl_p0=4.505e-1 expl_p1=2.708e0 nash_conv=3.159e0
+iter=      50 expl_p0=1.641e-1 expl_p1=6.842e-1 nash_conv=8.483e-1
+iter=      69 expl_p0=9.549e-2 expl_p1=3.517e-1 nash_conv=4.472e-1
+iter=      72 expl_p0=9.729e-2 expl_p1=3.179e-1 nash_conv=4.152e-1
+done: iterations=72 wall=0.25s ev_p0=21.410057 ev_p1=44.383233 nash_conv=4.152e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (222.8 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 4c 8d Tc wall_s=0.3 it=72 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=36.1 MiB (f32) / 18.3 MiB (i16) / 27.2 MiB (i16-f32avg)
+memory estimate: 556.0 MiB (f32) / 547.1 MiB (i16) / 556.0 MiB (i16-f32avg)
+iter=      25 expl_p0=9.617e-2 expl_p1=1.538e0 nash_conv=1.634e0
+iter=      50 expl_p0=1.789e-2 expl_p1=3.741e-1 nash_conv=3.920e-1
+done: iterations=50 wall=0.18s ev_p0=12.953623 ev_p1=52.894871 nash_conv=3.920e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (218.6 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 8c Td Jc wall_s=0.2 it=50 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=60.1 MiB (f32) / 30.5 MiB (i16) / 45.3 MiB (i16-f32avg)
+memory estimate: 633.3 MiB (f32) / 618.5 MiB (i16) / 633.3 MiB (i16-f32avg)
+iter=      25 expl_p0=6.568e-2 expl_p1=1.839e0 nash_conv=1.905e0
+iter=      50 expl_p0=2.914e-2 expl_p1=5.068e-1 nash_conv=5.360e-1
+iter=      56 expl_p0=1.695e-2 expl_p1=5.930e-1 nash_conv=6.100e-1
+iter=      81 expl_p0=1.686e-2 expl_p1=5.007e-1 nash_conv=5.176e-1
+iter=     122 expl_p0=4.248e-3 expl_p1=9.181e-2 nash_conv=9.606e-2
+done: iterations=122 wall=0.53s ev_p0=10.294154 ev_p1=55.657822 nash_conv=9.606e-2
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (299.4 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 4c Td Jh wall_s=0.5 it=122 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=53.0 MiB (f32) / 26.9 MiB (i16) / 40.0 MiB (i16-f32avg)
+memory estimate: 621.0 MiB (f32) / 607.9 MiB (i16) / 621.0 MiB (i16-f32avg)
+iter=      25 expl_p0=2.933e-1 expl_p1=2.263e0 nash_conv=2.556e0
+iter=      50 expl_p0=1.089e-1 expl_p1=7.925e-1 nash_conv=9.014e-1
+iter=      77 expl_p0=6.749e-2 expl_p1=3.636e-1 nash_conv=4.311e-1
+iter=      80 expl_p0=6.371e-2 expl_p1=3.420e-1 nash_conv=4.057e-1
+done: iterations=80 wall=0.33s ev_p0=8.129956 ev_p1=57.795728 nash_conv=4.057e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (261.2 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 7c Jd Kh wall_s=0.3 it=80 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=52.1 MiB (f32) / 26.5 MiB (i16) / 39.3 MiB (i16-f32avg)
+memory estimate: 619.3 MiB (f32) / 606.5 MiB (i16) / 619.3 MiB (i16-f32avg)
+iter=      25 expl_p0=1.171e0 expl_p1=2.109e0 nash_conv=3.280e0
+iter=      50 expl_p0=2.026e-1 expl_p1=5.513e-1 nash_conv=7.539e-1
+iter=      63 expl_p0=9.731e-2 expl_p1=3.423e-1 nash_conv=4.396e-1
+iter=      66 expl_p0=8.501e-2 expl_p1=3.141e-1 nash_conv=3.991e-1
+done: iterations=66 wall=0.28s ev_p0=10.264326 ev_p1=55.509321 nash_conv=3.991e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (229.7 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise Tc Qd Ah wall_s=0.3 it=66 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=38.9 MiB (f32) / 19.7 MiB (i16) / 29.3 MiB (i16-f32avg)
+memory estimate: 593.0 MiB (f32) / 583.4 MiB (i16) / 593.0 MiB (i16-f32avg)
+iter=      25 expl_p0=7.531e-1 expl_p1=2.869e0 nash_conv=3.622e0
+iter=      50 expl_p0=2.458e-1 expl_p1=6.408e-1 nash_conv=8.866e-1
+iter=      68 expl_p0=1.309e-1 expl_p1=3.338e-1 nash_conv=4.647e-1
+iter=      71 expl_p0=1.214e-1 expl_p1=2.985e-1 nash_conv=4.198e-1
+iter=      74 expl_p0=1.170e-1 expl_p1=2.746e-1 nash_conv=3.916e-1
+done: iterations=74 wall=0.28s ev_p0=29.739739 ev_p1=36.064770 nash_conv=3.916e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (242.4 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 4c 4d 6c wall_s=0.3 it=74 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=37.5 MiB (f32) / 19.0 MiB (i16) / 28.3 MiB (i16-f32avg)
+memory estimate: 574.5 MiB (f32) / 565.3 MiB (i16) / 574.5 MiB (i16-f32avg)
+iter=      25 expl_p0=5.870e-1 expl_p1=2.703e0 nash_conv=3.290e0
+iter=      50 expl_p0=1.773e-1 expl_p1=6.941e-1 nash_conv=8.714e-1
+iter=      69 expl_p0=9.834e-2 expl_p1=3.630e-1 nash_conv=4.614e-1
+iter=      72 expl_p0=9.973e-2 expl_p1=3.299e-1 nash_conv=4.296e-1
+iter=      75 expl_p0=8.916e-2 expl_p1=3.110e-1 nash_conv=4.002e-1
+done: iterations=75 wall=0.26s ev_p0=18.916786 ev_p1=46.894202 nash_conv=4.002e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (212.0 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 3c 3d Qc wall_s=0.3 it=75 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=32.3 MiB (f32) / 16.4 MiB (i16) / 24.4 MiB (i16-f32avg)
+memory estimate: 501.5 MiB (f32) / 493.6 MiB (i16) / 501.5 MiB (i16-f32avg)
+iter=      25 expl_p0=6.531e-1 expl_p1=2.733e0 nash_conv=3.386e0
+iter=      50 expl_p0=2.993e-1 expl_p1=7.903e-1 nash_conv=1.090e0
+iter=      82 expl_p0=2.544e-1 expl_p1=4.814e-1 nash_conv=7.358e-1
+iter=     132 expl_p0=9.865e-2 expl_p1=2.013e-1 nash_conv=2.999e-1
+done: iterations=132 wall=0.58s ev_p0=20.100781 ev_p1=45.744982 nash_conv=2.999e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (198.6 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 6c Kc Kd wall_s=0.6 it=132 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=54.4 MiB (f32) / 27.7 MiB (i16) / 41.0 MiB (i16-f32avg)
+memory estimate: 623.4 MiB (f32) / 610.0 MiB (i16) / 623.4 MiB (i16-f32avg)
+iter=      25 expl_p0=2.175e-1 expl_p1=1.544e0 nash_conv=1.762e0
+iter=      50 expl_p0=4.861e-2 expl_p1=4.911e-1 nash_conv=5.397e-1
+iter=      57 expl_p0=3.771e-2 expl_p1=3.861e-1 nash_conv=4.238e-1
+iter=      60 expl_p0=3.649e-2 expl_p1=3.645e-1 nash_conv=4.010e-1
+done: iterations=60 wall=0.26s ev_p0=5.488868 ev_p1=60.446171 nash_conv=4.010e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (255.0 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 3c Jd Kh wall_s=0.3 it=60 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=49.7 MiB (f32) / 25.3 MiB (i16) / 37.5 MiB (i16-f32avg)
+memory estimate: 615.2 MiB (f32) / 603.0 MiB (i16) / 615.2 MiB (i16-f32avg)
+iter=      25 expl_p0=3.392e0 expl_p1=1.664e0 nash_conv=5.056e0
+iter=      50 expl_p0=7.447e-1 expl_p1=4.467e-1 nash_conv=1.191e0
+iter=      77 expl_p0=3.251e-1 expl_p1=1.749e-1 nash_conv=4.999e-1
+iter=      83 expl_p0=2.884e-1 expl_p1=1.561e-1 nash_conv=4.445e-1
+iter=      86 expl_p0=2.694e-1 expl_p1=1.442e-1 nash_conv=4.136e-1
+done: iterations=86 wall=0.37s ev_p0=20.901334 ev_p1=44.893072 nash_conv=4.136e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (247.4 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 4c Jd Ah wall_s=0.4 it=86 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=34.9 MiB (f32) / 17.7 MiB (i16) / 26.3 MiB (i16-f32avg)
+memory estimate: 538.0 MiB (f32) / 529.4 MiB (i16) / 538.0 MiB (i16-f32avg)
+iter=      25 expl_p0=5.881e-1 expl_p1=3.421e0 nash_conv=4.010e0
+iter=      50 expl_p0=2.391e-1 expl_p1=8.438e-1 nash_conv=1.083e0
+iter=      77 expl_p0=1.256e-1 expl_p1=3.446e-1 nash_conv=4.702e-1
+iter=      81 expl_p0=1.172e-1 expl_p1=3.214e-1 nash_conv=4.386e-1
+iter=      84 expl_p0=1.090e-1 expl_p1=2.908e-1 nash_conv=3.997e-1
+done: iterations=84 wall=0.28s ev_p0=27.196915 ev_p1=38.613932 nash_conv=3.997e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (222.7 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 6c 7d Jd wall_s=0.3 it=84 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=36.1 MiB (f32) / 18.3 MiB (i16) / 27.2 MiB (i16-f32avg)
+memory estimate: 556.0 MiB (f32) / 547.1 MiB (i16) / 556.0 MiB (i16-f32avg)
+iter=      25 expl_p0=3.306e-1 expl_p1=2.757e0 nash_conv=3.087e0
+iter=      50 expl_p0=5.530e-2 expl_p1=6.316e-1 nash_conv=6.869e-1
+iter=      61 expl_p0=3.089e-2 expl_p1=3.926e-1 nash_conv=4.235e-1
+iter=      64 expl_p0=2.669e-2 expl_p1=3.557e-1 nash_conv=3.824e-1
+done: iterations=64 wall=0.23s ev_p0=22.926904 ev_p1=42.874067 nash_conv=3.824e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (225.1 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 6c 9d Jc wall_s=0.2 it=64 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=29.7 MiB (f32) / 15.1 MiB (i16) / 22.4 MiB (i16-f32avg)
+memory estimate: 465.0 MiB (f32) / 457.7 MiB (i16) / 465.0 MiB (i16-f32avg)
+iter=      25 expl_p0=3.140e0 expl_p1=1.656e0 nash_conv=4.796e0
+iter=      50 expl_p0=9.349e-1 expl_p1=4.415e-1 nash_conv=1.376e0
+iter=      88 expl_p0=3.228e-1 expl_p1=1.464e-1 nash_conv=4.693e-1
+iter=      93 expl_p0=2.982e-1 expl_p1=1.344e-1 nash_conv=4.326e-1
+iter=      96 expl_p0=2.734e-1 expl_p1=1.228e-1 nash_conv=3.961e-1
+done: iterations=96 wall=0.41s ev_p0=18.772784 ev_p1=47.019431 nash_conv=3.961e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (180.5 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 8c Jd Ac wall_s=0.4 it=96 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=35.5 MiB (f32) / 18.0 MiB (i16) / 26.7 MiB (i16-f32avg)
+memory estimate: 555.0 MiB (f32) / 546.3 MiB (i16) / 555.0 MiB (i16-f32avg)
+iter=      25 expl_p0=6.443e-1 expl_p1=3.007e0 nash_conv=3.651e0
+iter=      50 expl_p0=2.832e-1 expl_p1=7.258e-1 nash_conv=1.009e0
+iter=      75 expl_p0=1.632e-1 expl_p1=3.048e-1 nash_conv=4.681e-1
+iter=      79 expl_p0=1.486e-1 expl_p1=2.898e-1 nash_conv=4.384e-1
+iter=      82 expl_p0=1.368e-1 expl_p1=2.731e-1 nash_conv=4.099e-1
+done: iterations=82 wall=0.28s ev_p0=23.487067 ev_p1=42.343899 nash_conv=4.099e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (227.2 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 3c 6c Kd wall_s=0.3 it=82 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=30.6 MiB (f32) / 15.6 MiB (i16) / 23.1 MiB (i16-f32avg)
+memory estimate: 482.5 MiB (f32) / 475.0 MiB (i16) / 482.5 MiB (i16-f32avg)
+iter=      25 expl_p0=3.241e0 expl_p1=1.811e0 nash_conv=5.052e0
+iter=      50 expl_p0=7.871e-1 expl_p1=4.474e-1 nash_conv=1.235e0
+iter=      79 expl_p0=3.488e-1 expl_p1=1.853e-1 nash_conv=5.341e-1
+iter=      89 expl_p0=2.880e-1 expl_p1=1.456e-1 nash_conv=4.336e-1
+iter=      92 expl_p0=2.814e-1 expl_p1=1.359e-1 nash_conv=4.173e-1
+iter=      95 expl_p0=2.590e-1 expl_p1=1.287e-1 nash_conv=3.878e-1
+done: iterations=95 wall=0.43s ev_p0=19.525503 ev_p1=46.267841 nash_conv=3.878e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (179.0 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 3c Jd Ac wall_s=0.4 it=95 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=38.9 MiB (f32) / 19.7 MiB (i16) / 29.3 MiB (i16-f32avg)
+memory estimate: 593.0 MiB (f32) / 583.4 MiB (i16) / 593.0 MiB (i16-f32avg)
+iter=      25 expl_p0=3.292e0 expl_p1=1.093e0 nash_conv=4.384e0
+iter=      50 expl_p0=6.648e-1 expl_p1=2.979e-1 nash_conv=9.627e-1
+iter=      69 expl_p0=3.371e-1 expl_p1=1.399e-1 nash_conv=4.770e-1
+iter=      73 expl_p0=2.830e-1 expl_p1=1.255e-1 nash_conv=4.085e-1
+done: iterations=73 wall=0.27s ev_p0=27.428976 ev_p1=38.328439 nash_conv=4.085e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (231.2 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 3c 5d 8d wall_s=0.3 it=73 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=36.9 MiB (f32) / 18.7 MiB (i16) / 27.8 MiB (i16-f32avg)
+memory estimate: 573.5 MiB (f32) / 564.4 MiB (i16) / 573.5 MiB (i16-f32avg)
+iter=      25 expl_p0=5.045e-1 expl_p1=2.485e0 nash_conv=2.990e0
+iter=      50 expl_p0=1.622e-1 expl_p1=6.216e-1 nash_conv=7.838e-1
+iter=      66 expl_p0=1.107e-1 expl_p1=3.813e-1 nash_conv=4.920e-1
+iter=      72 expl_p0=9.753e-2 expl_p1=3.296e-1 nash_conv=4.271e-1
+iter=      75 expl_p0=8.897e-2 expl_p1=3.001e-1 nash_conv=3.891e-1
+done: iterations=75 wall=0.26s ev_p0=19.993947 ev_p1=45.819516 nash_conv=3.891e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (218.0 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 3c 8c Qd wall_s=0.3 it=75 cap=0
+tree: nodes=47585 terminals=30611 rank_tables=422 storage=19.1 MiB (f32) / 9.7 MiB (i16) / 14.4 MiB (i16-f32avg)
+memory estimate: 299.7 MiB (f32) / 295.0 MiB (i16) / 299.7 MiB (i16-f32avg)
+iter=      25 expl_p0=1.847e0 expl_p1=2.071e0 nash_conv=3.918e0
+iter=      50 expl_p0=5.847e-1 expl_p1=4.641e-1 nash_conv=1.049e0
+iter=      75 expl_p0=1.788e-1 expl_p1=2.292e-1 nash_conv=4.079e-1
+done: iterations=75 wall=0.21s ev_p0=19.798907 ev_p1=45.946883 nash_conv=4.079e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (142.3 KB, 376 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.04s (47585 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.03s (47585 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 5c 9c Tc wall_s=0.2 it=75 cap=0
+tree: nodes=47585 terminals=30611 rank_tables=422 storage=16.7 MiB (f32) / 8.5 MiB (i16) / 12.6 MiB (i16-f32avg)
+memory estimate: 263.6 MiB (f32) / 259.5 MiB (i16) / 263.6 MiB (i16-f32avg)
+iter=      25 expl_p0=1.660e0 expl_p1=2.430e0 nash_conv=4.090e0
+iter=      50 expl_p0=4.361e-1 expl_p1=6.363e-1 nash_conv=1.072e0
+iter=      76 expl_p0=2.048e-1 expl_p1=2.641e-1 nash_conv=4.689e-1
+iter=      80 expl_p0=1.849e-1 expl_p1=2.374e-1 nash_conv=4.223e-1
+iter=      83 expl_p0=1.853e-1 expl_p1=2.223e-1 nash_conv=4.076e-1
+done: iterations=83 wall=0.23s ev_p0=28.636362 ev_p1=37.187677 nash_conv=4.076e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (145.4 KB, 376 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.03s (47585 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.03s (47585 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 2c 7c Kc wall_s=0.2 it=83 cap=0
+tree: nodes=47585 terminals=30611 rank_tables=422 storage=14.9 MiB (f32) / 7.6 MiB (i16) / 11.3 MiB (i16-f32avg)
+memory estimate: 244.5 MiB (f32) / 240.9 MiB (i16) / 244.5 MiB (i16-f32avg)
+iter=      25 expl_p0=2.283e0 expl_p1=1.056e0 nash_conv=3.340e0
+iter=      50 expl_p0=6.001e-1 expl_p1=3.608e-1 nash_conv=9.609e-1
+iter=      74 expl_p0=3.354e-1 expl_p1=2.368e-1 nash_conv=5.721e-1
+iter=      90 expl_p0=2.140e-1 expl_p1=1.613e-1 nash_conv=3.752e-1
+done: iterations=90 wall=0.29s ev_p0=16.844078 ev_p1=48.933599 nash_conv=3.752e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (119.4 KB, 376 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.04s (47585 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.03s (47585 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 4c Qc Ac wall_s=0.3 it=90 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=39.2 MiB (f32) / 19.9 MiB (i16) / 29.6 MiB (i16-f32avg)
+memory estimate: 593.5 MiB (f32) / 583.8 MiB (i16) / 593.5 MiB (i16-f32avg)
+iter=      25 expl_p0=5.975e-1 expl_p1=3.337e0 nash_conv=3.934e0
+iter=      50 expl_p0=2.153e-1 expl_p1=7.037e-1 nash_conv=9.190e-1
+iter=      69 expl_p0=1.123e-1 expl_p1=3.267e-1 nash_conv=4.390e-1
+iter=      72 expl_p0=1.048e-1 expl_p1=2.958e-1 nash_conv=4.007e-1
+done: iterations=72 wall=0.26s ev_p0=27.906145 ev_p1=37.905697 nash_conv=4.007e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (242.5 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 2c 6c Td wall_s=0.3 it=72 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=36.6 MiB (f32) / 18.6 MiB (i16) / 27.6 MiB (i16-f32avg)
+memory estimate: 557.0 MiB (f32) / 548.0 MiB (i16) / 557.0 MiB (i16-f32avg)
+iter=      25 expl_p0=5.776e-1 expl_p1=2.836e0 nash_conv=3.413e0
+iter=      50 expl_p0=2.347e-1 expl_p1=5.872e-1 nash_conv=8.220e-1
+iter=      66 expl_p0=1.462e-1 expl_p1=3.330e-1 nash_conv=4.792e-1
+iter=      70 expl_p0=1.301e-1 expl_p1=2.965e-1 nash_conv=4.266e-1
+iter=      73 expl_p0=1.208e-1 expl_p1=2.703e-1 nash_conv=3.911e-1
+done: iterations=73 wall=0.27s ev_p0=22.785894 ev_p1=43.028281 nash_conv=3.911e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (215.0 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 2c 7d Qd wall_s=0.3 it=73 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=38.9 MiB (f32) / 19.7 MiB (i16) / 29.3 MiB (i16-f32avg)
+memory estimate: 593.0 MiB (f32) / 583.4 MiB (i16) / 593.0 MiB (i16-f32avg)
+iter=      25 expl_p0=5.741e-1 expl_p1=3.033e0 nash_conv=3.607e0
+iter=      50 expl_p0=1.840e-1 expl_p1=8.105e-1 nash_conv=9.946e-1
+iter=      74 expl_p0=9.598e-2 expl_p1=3.162e-1 nash_conv=4.122e-1
+done: iterations=74 wall=0.28s ev_p0=24.814097 ev_p1=40.990459 nash_conv=4.122e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (229.5 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 2c 7d 9d wall_s=0.3 it=74 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=36.3 MiB (f32) / 18.4 MiB (i16) / 27.4 MiB (i16-f32avg)
+memory estimate: 556.5 MiB (f32) / 547.6 MiB (i16) / 556.5 MiB (i16-f32avg)
+iter=      25 expl_p0=2.237e-1 expl_p1=2.184e0 nash_conv=2.408e0
+iter=      50 expl_p0=5.322e-2 expl_p1=5.477e-1 nash_conv=6.009e-1
+iter=      59 expl_p0=4.546e-2 expl_p1=4.106e-1 nash_conv=4.561e-1
+iter=      62 expl_p0=7.778e-2 expl_p1=3.861e-1 nash_conv=4.639e-1
+iter=      87 expl_p0=2.718e-2 expl_p1=2.361e-1 nash_conv=2.632e-1
+done: iterations=87 wall=0.29s ev_p0=16.065033 ev_p1=49.780955 nash_conv=2.632e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (208.3 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 4c 9d Kd wall_s=0.3 it=87 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=59.6 MiB (f32) / 30.3 MiB (i16) / 45.0 MiB (i16-f32avg)
+memory estimate: 632.4 MiB (f32) / 617.8 MiB (i16) / 632.4 MiB (i16-f32avg)
+iter=      25 expl_p0=3.545e-1 expl_p1=2.726e0 nash_conv=3.081e0
+iter=      50 expl_p0=8.078e-2 expl_p1=6.616e-1 nash_conv=7.424e-1
+iter=      63 expl_p0=5.220e-2 expl_p1=4.086e-1 nash_conv=4.608e-1
+iter=      66 expl_p0=4.793e-2 expl_p1=3.742e-1 nash_conv=4.222e-1
+iter=      69 expl_p0=4.609e-2 expl_p1=3.373e-1 nash_conv=3.833e-1
+done: iterations=69 wall=0.31s ev_p0=15.664258 ev_p1=50.228333 nash_conv=3.833e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (266.6 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.12s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 5c 9d Kh wall_s=0.3 it=69 cap=0
+tree: nodes=164416 terminals=106336 rank_tables=1176 storage=60.1 MiB (f32) / 30.5 MiB (i16) / 45.3 MiB (i16-f32avg)
+memory estimate: 633.3 MiB (f32) / 618.5 MiB (i16) / 633.3 MiB (i16-f32avg)
+iter=      25 expl_p0=1.804e0 expl_p1=1.669e0 nash_conv=3.473e0
+iter=      50 expl_p0=2.820e-1 expl_p1=4.205e-1 nash_conv=7.025e-1
+iter=      61 expl_p0=1.699e-1 expl_p1=2.452e-1 nash_conv=4.151e-1
+done: iterations=61 wall=0.28s ev_p0=17.749274 ev_p1=48.007099 nash_conv=4.151e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (308.7 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.11s (164416 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 5c 9d Jh wall_s=0.3 it=61 cap=0
+tree: nodes=103456 terminals=66796 rank_tables=810 storage=39.9 MiB (f32) / 20.2 MiB (i16) / 30.1 MiB (i16-f32avg)
+memory estimate: 594.9 MiB (f32) / 585.1 MiB (i16) / 594.9 MiB (i16-f32avg)
+iter=      25 expl_p0=2.841e-1 expl_p1=3.078e0 nash_conv=3.362e0
+iter=      50 expl_p0=5.889e-2 expl_p1=6.819e-1 nash_conv=7.408e-1
+iter=      63 expl_p0=1.462e-1 expl_p1=7.586e-1 nash_conv=9.048e-1
+iter=      88 expl_p0=3.599e-2 expl_p1=4.199e-1 nash_conv=4.559e-1
+iter=      92 expl_p0=4.435e-2 expl_p1=3.951e-1 nash_conv=4.394e-1
+iter=      97 expl_p0=2.717e-2 expl_p1=3.002e-1 nash_conv=3.274e-1
+done: iterations=97 wall=0.36s ev_p0=20.998197 ev_p1=44.862472 nash_conv=3.274e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (240.0 KB, 600 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 3c 3d 7h wall_s=0.4 it=97 cap=0
+tree: nodes=103456 terminals=66796 rank_tables=810 storage=34.0 MiB (f32) / 17.3 MiB (i16) / 25.6 MiB (i16-f32avg)
+memory estimate: 536.6 MiB (f32) / 528.2 MiB (i16) / 536.6 MiB (i16-f32avg)
+iter=      25 expl_p0=2.656e-1 expl_p1=2.873e0 nash_conv=3.139e0
+iter=      50 expl_p0=1.705e-1 expl_p1=1.720e0 nash_conv=1.891e0
+iter=     100 expl_p0=1.619e-2 expl_p1=3.148e-1 nash_conv=3.309e-1
+done: iterations=100 wall=0.32s ev_p0=10.669484 ev_p1=55.254183 nash_conv=3.309e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (198.6 KB, 600 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (103456 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 8c Jd Jh wall_s=0.3 it=100 cap=0
+tree: nodes=47585 terminals=30611 rank_tables=422 storage=18.4 MiB (f32) / 9.3 MiB (i16) / 13.8 MiB (i16-f32avg)
+memory estimate: 282.5 MiB (f32) / 277.9 MiB (i16) / 282.5 MiB (i16-f32avg)
+iter=      25 expl_p0=1.611e0 expl_p1=2.430e0 nash_conv=4.040e0
+iter=      50 expl_p0=6.929e-1 expl_p1=6.199e-1 nash_conv=1.313e0
+iter=      92 expl_p0=2.394e-1 expl_p1=2.101e-1 nash_conv=4.495e-1
+iter=      96 expl_p0=2.068e-1 expl_p1=1.970e-1 nash_conv=4.038e-1
+done: iterations=96 wall=0.27s ev_p0=36.861237 ev_p1=28.967637 nash_conv=4.038e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (158.9 KB, 376 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.04s (47585 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.03s (47585 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 6c 8c 9c wall_s=0.3 it=96 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=40.1 MiB (f32) / 20.3 MiB (i16) / 30.2 MiB (i16-f32avg)
+memory estimate: 595.0 MiB (f32) / 585.1 MiB (i16) / 595.0 MiB (i16-f32avg)
+iter=      25 expl_p0=4.482e-1 expl_p1=2.779e0 nash_conv=3.227e0
+iter=      50 expl_p0=1.555e-1 expl_p1=8.020e-1 nash_conv=9.574e-1
+iter=      75 expl_p0=7.437e-2 expl_p1=3.770e-1 nash_conv=4.513e-1
+iter=      78 expl_p0=6.963e-2 expl_p1=3.432e-1 nash_conv=4.129e-1
+done: iterations=78 wall=0.27s ev_p0=20.788887 ev_p1=45.001487 nash_conv=4.129e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (231.1 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 4c 9c 9d wall_s=0.3 it=78 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=36.6 MiB (f32) / 18.6 MiB (i16) / 27.6 MiB (i16-f32avg)
+memory estimate: 557.0 MiB (f32) / 548.0 MiB (i16) / 557.0 MiB (i16-f32avg)
+iter=      25 expl_p0=2.216e-1 expl_p1=2.504e0 nash_conv=2.726e0
+iter=      50 expl_p0=7.842e-2 expl_p1=7.523e-1 nash_conv=8.307e-1
+iter=      70 expl_p0=5.575e-2 expl_p1=4.427e-1 nash_conv=4.985e-1
+iter=      77 expl_p0=4.960e-2 expl_p1=3.974e-1 nash_conv=4.470e-1
+iter=      81 expl_p0=5.533e-2 expl_p1=3.721e-1 nash_conv=4.274e-1
+iter=      84 expl_p0=5.459e-2 expl_p1=3.415e-1 nash_conv=3.961e-1
+done: iterations=84 wall=0.30s ev_p0=14.655788 ev_p1=51.195510 nash_conv=3.961e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (205.4 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 9c 9d Kc wall_s=0.3 it=84 cap=0
+tree: nodes=100170 terminals=64671 rank_tables=799 storage=34.9 MiB (f32) / 17.7 MiB (i16) / 26.3 MiB (i16-f32avg)
+memory estimate: 538.0 MiB (f32) / 529.4 MiB (i16) / 538.0 MiB (i16-f32avg)
+iter=      25 expl_p0=2.320e-1 expl_p1=2.742e0 nash_conv=2.974e0
+iter=      50 expl_p0=4.227e-2 expl_p1=7.228e-1 nash_conv=7.651e-1
+iter=      65 expl_p0=2.789e-2 expl_p1=4.461e-1 nash_conv=4.740e-1
+iter=      69 expl_p0=2.287e-2 expl_p1=4.068e-1 nash_conv=4.297e-1
+iter=      72 expl_p0=2.354e-2 expl_p1=3.624e-1 nash_conv=3.860e-1
+done: iterations=72 wall=0.25s ev_p0=15.861037 ev_p1=49.990901 nash_conv=3.860e-1
+sol: wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/solution.sol (203.1 KB, 584 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.07s (100170 nodes)
+wrote /home/ubuntu/out/p1/p1-e2/out/L36-raise/tmp/summary.csv
+FLOP L36-raise 7c 7d Jc wall_s=0.2 it=72 cap=0
+TASK L36-raise flops=64
+	Command being timed: "bash -c python3 $X/p1_classes.py ~/e2.profile.json ~/tasks-raise.txt ~ ~/out/p1/p1-e2/out --solvers $S --min-weight 0.0001"
+	User time (seconds): 3570.30
+	System time (seconds): 189.50
+	Percent of CPU this job got: 1737%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 3:36.43
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 673816
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 82
+	Minor (reclaiming a frame) page faults: 19219603
+	Voluntary context switches: 233709
+	Involuntary context switches: 1860514
+	Swaps: 0
+	File system inputs: 59536
+	File system outputs: 189544
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

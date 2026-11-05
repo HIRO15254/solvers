@@ -1,0 +1,71 @@
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-gqcfn9rh",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-gaffpr2j",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-52wfq78j",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-829qnfak",
+            "State": "cancelled"
+        }
+    ]
+}
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the CancelSpotInstanceRequests operation: The spot instance request ID 'sir-gqcfn9rh' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the DescribeSpotInstanceRequests operation: The spot instance request ID 'sir-gqcfn9rh' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the CancelSpotInstanceRequests operation: The spot instance request ID 'sir-gaffpr2j' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the DescribeSpotInstanceRequests operation: The spot instance request ID 'sir-gaffpr2j' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the CancelSpotInstanceRequests operation: The spot instance request ID 'sir-52wfq78j' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the DescribeSpotInstanceRequests operation: The spot instance request ID 'sir-52wfq78j' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the CancelSpotInstanceRequests operation: The spot instance request ID 'sir-829qnfak' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the DescribeSpotInstanceRequests operation: The spot instance request ID 'sir-829qnfak' does not exist
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-4hezmhqg",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "TerminatingInstances": [
+        {
+            "InstanceId": "i-0e10c4c1d01dde091",
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "PreviousState": {
+                "Code": 16,
+                "Name": "running"
+            }
+        }
+    ]
+}

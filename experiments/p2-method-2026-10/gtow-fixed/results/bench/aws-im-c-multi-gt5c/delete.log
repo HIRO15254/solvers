@@ -1,0 +1,87 @@
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-dq2qp8ek",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-v357pyck",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-936fnxgj",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-gv7qnqzg",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-dq2qp8ek",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-v357pyck",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-936fnxgj",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-gv7qnqzg",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-6fd7pvsg",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "TerminatingInstances": [
+        {
+            "InstanceId": "i-0670b4527597a3e8e",
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "PreviousState": {
+                "Code": 16,
+                "Name": "running"
+            }
+        }
+    ]
+}

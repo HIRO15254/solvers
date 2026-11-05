@@ -1,0 +1,28 @@
+{
+    "TerminatingInstances": [
+        {
+            "InstanceId": "i-0f996928e53961bcf",
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "PreviousState": {
+                "Code": 16,
+                "Name": "running"
+            }
+        }
+    ]
+}
+{
+    "LaunchTemplate": {
+        "LaunchTemplateId": "lt-0fb47b57cc844cb6a",
+        "LaunchTemplateName": "p2-1793837052-34686-19199",
+        "CreateTime": "2026-11-05T00:05:37+00:00",
+        "CreatedBy": "arn:aws:iam::975049889077:user/solvers-spot",
+        "DefaultVersionNumber": 1,
+        "LatestVersionNumber": 1,
+        "Operator": {
+            "Managed": false
+        }
+    }
+}

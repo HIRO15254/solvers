@@ -1,0 +1,10 @@
+Tree: 6845 decisions, 7801 terminals (1.425s)
+Tables: 0.299s; model: 0.003s
+L1: 304 leaves; 20748 postflop decisions; 1500800 slots; 24012800 storage bytes
+Iteration 1: wall 2.859426s; reaches 0.395375; t2 0.049385; t3 0.747842; k4 0.448240; update 0.004950; board preparation 0.022943; postflop 1.077462; evaluation 0.000000
+Iteration 2: wall 1.858297s; reaches 0.077572; t2 0.022154; t3 0.337440; k4 0.353201; update 0.004763; board preparation 0.000251; postflop 1.050331; evaluation 0.000000
+Iteration 3: wall 1.852224s; reaches 0.079009; t2 0.022283; t3 0.282021; k4 0.349541; update 0.004865; board preparation 0.000389; postflop 1.101587; evaluation 0.000000
+Iteration 4: wall 1.772000s; reaches 0.078751; t2 0.021803; t3 0.213835; k4 0.318939; update 0.004927; board preparation 0.000414; postflop 1.121011; evaluation 0.000000
+Iteration 5: wall 1.801434s; reaches 0.078257; t2 0.021468; t3 0.224018; k4 0.323545; update 0.004968; board preparation 0.000412; postflop 1.136341; evaluation 0.000000
+Iteration 6: wall 1.824947s; reaches 0.079496; t2 0.021403; t3 0.227952; k4 0.331937; update 0.004783; board preparation 0.000431; postflop 1.126932; evaluation 0.000000
+Iterations: 6; reached target: false; solve phases Timings { trunk: SolveTimings { reaches: 0.788459407, t2: 0.158495444, t3: 2.0331081190000004, k4: 2.125403693, update: 0.029257633, evaluation: 0.0 }, board_preparation: 0.024840682, postflop: 6.613664130999999, evaluation_board_preparation: 1.7e-7 }

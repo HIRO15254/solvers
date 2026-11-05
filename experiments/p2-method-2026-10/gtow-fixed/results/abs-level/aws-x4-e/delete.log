@@ -1,0 +1,84 @@
+{
+    "TerminatingInstances": [
+        {
+            "InstanceId": "i-0592f7ecaace9da9d",
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "PreviousState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            }
+        }
+    ]
+}
+{
+    "TerminatingInstances": [
+        {
+            "InstanceId": "i-0bdcbfaa768b36871",
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "PreviousState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            }
+        }
+    ]
+}
+{
+    "LaunchTemplate": {
+        "LaunchTemplateId": "lt-0cfa1c22018be778d",
+        "LaunchTemplateName": "p2-1793634236-46536-2185",
+        "CreateTime": "2026-11-02T15:44:42+00:00",
+        "CreatedBy": "arn:aws:iam::975049889077:user/solvers-spot",
+        "DefaultVersionNumber": 1,
+        "LatestVersionNumber": 1,
+        "Operator": {
+            "Managed": false
+        }
+    }
+}
+{
+    "LaunchTemplate": {
+        "LaunchTemplateId": "lt-09d55382bed2e2293",
+        "LaunchTemplateName": "p2-1793634236-46536-2185",
+        "CreateTime": "2026-11-02T15:49:52+00:00",
+        "CreatedBy": "arn:aws:iam::975049889077:user/solvers-spot",
+        "DefaultVersionNumber": 1,
+        "LatestVersionNumber": 1,
+        "Operator": {
+            "Managed": false
+        }
+    }
+}
+{
+    "TerminatingInstances": [
+        {
+            "InstanceId": "i-02846788f7ce7d324",
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "PreviousState": {
+                "Code": 16,
+                "Name": "running"
+            }
+        }
+    ]
+}
+{
+    "LaunchTemplate": {
+        "LaunchTemplateId": "lt-0ee3d7f4072c3c1d7",
+        "LaunchTemplateName": "p2-1793634236-46536-2185",
+        "CreateTime": "2026-11-02T16:04:51+00:00",
+        "CreatedBy": "arn:aws:iam::975049889077:user/solvers-spot",
+        "DefaultVersionNumber": 1,
+        "LatestVersionNumber": 1,
+        "Operator": {
+            "Managed": false
+        }
+    }
+}

@@ -1,0 +1,109 @@
+{
+  "checkpoints": [],
+  "ehs2": {
+    "blake3": "55df69080ecc8a308eaecffb00c227a231c93923f0ff015ad6eed30ef8e40f87",
+    "bucket_counts": {
+      "flop_buckets": 32,
+      "river_buckets": 32,
+      "turn_buckets": 32
+    },
+    "bytes": 357378844,
+    "low_spr": null,
+    "path": "C:\\Users\\PC_User\\AppData\\Local\\solvers\\ehs2\\v2-f32-t32-r32.postcard",
+    "refinement": {
+      "recall": 1,
+      "texture": 0
+    },
+    "relative": {
+      "buckets": 8,
+      "flop_groups": "experiments/p2-method-2026-10/gtow-fixed/subsets/k25-groups.txt",
+      "hand": "HandSplit { made: 1, draws: true, potential: 1, category: 0 }",
+      "levels": 2,
+      "prior": 10.0,
+      "reach": "current",
+      "runout": "Runout { kinds: 0 }",
+      "strength_table": "C:\\Users\\PC_User\\AppData\\Local\\solvers\\ehs2\\v2-f128-t128-r128.postcard"
+    }
+  },
+  "format": "p2-trunk-solve",
+  "game_fingerprint": "ee8eae1a9a9a73198baff92ff6e3c4c057ede4093c3f9a6df75488fb17ce1848",
+  "iterations": 20,
+  "k4": {
+    "samples": 2048,
+    "seed": 0
+  },
+  "l1": {
+    "leaves": 181,
+    "postflop_nodes": 16100,
+    "slots": 32638400,
+    "storage_bytes": 522214400
+  },
+  "leaf_model": "l1",
+  "options": {
+    "alpha": 1.5,
+    "beta": 1.0,
+    "eval_every": 0,
+    "gamma": 2.0,
+    "iterations": 20,
+    "k4_min_samples": 16,
+    "k4_samples": 256,
+    "l1_boards": 32,
+    "l1_eval_boards": 1024,
+    "l1_eval_control": true,
+    "l1_eval_regression": true,
+    "l1_eval_sampling": "random",
+    "l1_eval_seed": 0,
+    "l1_postflop_beta": 0.0,
+    "l1_sampling": "stratified",
+    "l1_seed": 0,
+    "l1_train_control": true,
+    "l1_train_regression": true,
+    "max_seconds": null,
+    "qre": {
+      "floor": 0.1,
+      "lambda": 0.5
+    },
+    "target_nash_conv": null
+  },
+  "reached_target": false,
+  "source": "experiments/p2-method-2026-10/b4s-8h/b4s-gtow-raise5.toml",
+  "stopped_by_stop_file": false,
+  "tables": {
+    "t2": {
+      "payload_blake3": "885e99f5307de34fb311d4075ed9fc9d9ecb72ec15db36ee896704239b70da87"
+    },
+    "t3": {
+      "payload_blake3": "bdafa5c526d0b7207abe93b6281bd8e7cb9316fe2fb32e917f6c433ef7a044b8"
+    }
+  },
+  "terminals": {
+    "counts_by_k": [
+      0,
+      463,
+      904,
+      673,
+      293,
+      69,
+      7
+    ]
+  },
+  "timings": {
+    "model": 0.0039246,
+    "solve": {
+      "board_preparation": 0.10482910000000004,
+      "evaluation": 0.0,
+      "evaluation_board_preparation": 2e-7,
+      "k4": 7.1905498,
+      "postflop": 130.69792639999994,
+      "reaches": 1.2053144999999998,
+      "t2": 0.33926459999999997,
+      "t3": 9.4813628,
+      "update": 0.8717428999999995
+    },
+    "tables": 0.1649016,
+    "total": 167.5294231,
+    "tree": 14.1569921
+  },
+  "version": 2,
+  "warnings": []
+}

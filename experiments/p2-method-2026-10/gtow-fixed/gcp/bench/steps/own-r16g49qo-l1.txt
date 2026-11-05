@@ -1,0 +1,2 @@
+STATE_DIR=~/state NODIAG=1 LINES=~/all36-lines.txt bash $X/buckets.sh ~/r16g49qo.profile.json ~/out/train/r16g49qo 2000 rel16x2@raise5+g49+hdq+own+sd1
+DIAG_RIVERS=4 DIAG_JOBS=1 bash $X/bench_diag.sh ~/r16g49qo.profile.json ~/out/train/r16g49qo/rel16x2@raise5+g49+hdq+own+sd1/postflop.bin ~/out/l1/r16g49qo rel16x2@raise5+g49+hdq+own+sd1 ~/bands.txt

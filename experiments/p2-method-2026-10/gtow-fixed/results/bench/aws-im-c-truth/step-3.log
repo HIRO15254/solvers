@@ -1,0 +1,23 @@
+	Command being timed: "bash -c bash ~/trunk_eval.sh ~/out/ruler-eval/e2 e2 ~/e2.profile.json ~/e2.postflop.bin 0 ~/truth-p1.json ~/truth-multi.json"
+	User time (seconds): 2421.80
+	System time (seconds): 6.76
+	Percent of CPU this job got: 2052%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:58.29
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 2377852
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 2571193
+	Voluntary context switches: 16681
+	Involuntary context switches: 9963
+	Swaps: 0
+	File system inputs: 557784
+	File system outputs: 72
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

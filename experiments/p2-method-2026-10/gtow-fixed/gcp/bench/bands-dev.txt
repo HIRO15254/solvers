@@ -1,0 +1,4 @@
+srp lines-srp.txt flops16-dev.txt
+3bet lines-3bet.txt flops32-dev.txt
+4bet lines-4bet.txt flops64-dev.txt
+5bet lines-5bet.txt flops64-dev.txt

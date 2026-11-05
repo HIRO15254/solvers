@@ -1,0 +1,72 @@
+2026-10-30T09:26:49Z skipping region=sa-east-1 until 2026-10-30T17:05:09Z: consecutive quick Spot reclaims (/c/Users/PC_User/.cache/p2-aws/spot-reclaims.log)
+2026-10-30T09:26:53Z ranked regions: placement-score cheapest-USD/hour region
+2026-10-30T09:26:53Z 9 0.299400 us-east-2
+2026-10-30T09:26:53Z 9 0.528700 us-east-1
+2026-10-30T09:27:11Z created launch template=p2-1793352403-43563-3759 region=us-east-2 ami=ami-0fc53b217ec1ad816
+2026-10-30T09:27:11Z requesting instant fleet region=us-east-2 placement-score=9 types=c6a.8xlarge c6i.8xlarge c7a.8xlarge c7i.8xlarge subnets=3
+2026-10-30T09:27:19Z using region=us-east-2 instance=i-04df83abd2544be02 az=us-east-2c type=c6a.8xlarge spot-price-usd-per-hour=0.299400 placement-score=9
+2026-10-30T09:27:21Z instance=i-04df83abd2544be02 status=running ip=3.144.174.46
+2026-10-30T09:28:19Z uploaded source, job and flat extra files
+2026-10-30T09:28:22Z launched instance=i-04df83abd2544be02
+2026-10-30T09:28:24Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-2c price=0.299400	2026-10-30T04:00:00+00:00
+2026-10-30T09:28:26Z downloaded results
+2026-10-30T09:33:36Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-2c price=0.299400	2026-10-30T04:00:00+00:00
+2026-10-30T09:33:39Z downloaded results
+2026-10-30T09:38:49Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-2c price=0.299400	2026-10-30T04:00:00+00:00
+2026-10-30T09:38:52Z downloaded results
+2026-10-30T09:44:02Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-2c price=0.299400	2026-10-30T04:00:00+00:00
+2026-10-30T09:44:05Z downloaded results
+2026-10-30T09:49:15Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-2c price=0.299400	2026-10-30T04:00:00+00:00
+2026-10-30T09:49:19Z downloaded results
+2026-10-30T09:54:30Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-2c price=0.299400	2026-10-30T04:00:00+00:00
+2026-10-30T09:54:33Z downloaded results
+2026-10-30T09:57:24Z spot reclaim log: kind=ok region=us-east-2 ran_s=1803
+2026-10-30T09:59:44Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-2c price=0.299400	2026-10-30T04:00:00+00:00
+2026-10-30T09:59:47Z downloaded results
+2026-10-30T10:04:58Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-2c price=0.299400	2026-10-30T04:00:00+00:00
+2026-10-30T10:05:02Z downloaded results
+2026-10-30T10:09:53Z instance=i-04df83abd2544be02 status=shutting-down ip=3.144.174.46
+2026-10-30T10:09:53Z instance=i-04df83abd2544be02 interrupted (state=shutting-down); relaunching
+2026-10-30T10:09:58Z skipping region=sa-east-1 until 2026-10-30T17:05:09Z: consecutive quick Spot reclaims (/c/Users/PC_User/.cache/p2-aws/spot-reclaims.log)
+2026-10-30T10:10:02Z ranked regions: placement-score cheapest-USD/hour region
+2026-10-30T10:10:03Z 9 0.299400 us-east-2
+2026-10-30T10:10:03Z 9 0.528700 us-east-1
+2026-10-30T10:10:19Z requesting instant fleet region=us-east-2 placement-score=9 types=c6a.8xlarge c6i.8xlarge c7a.8xlarge c7i.8xlarge subnets=3
+2026-10-30T10:10:27Z using region=us-east-2 instance=i-04bd6a8bfeffaac1f az=us-east-2c type=c7a.8xlarge spot-price-usd-per-hour=0.364500 placement-score=9
+2026-10-30T10:10:29Z instance=i-04bd6a8bfeffaac1f status=running ip=18.188.220.67
+2026-10-30T10:11:35Z uploaded source, job and flat extra files
+2026-10-30T10:11:38Z launched instance=i-04bd6a8bfeffaac1f
+2026-10-30T10:11:40Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.364500	2026-10-30T09:00:00+00:00
+2026-10-30T10:11:42Z downloaded results
+2026-10-30T10:16:45Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.364500	2026-10-30T09:00:00+00:00
+2026-10-30T10:16:47Z downloaded results
+2026-10-30T10:21:59Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.364500	2026-10-30T09:00:00+00:00
+2026-10-30T10:22:02Z downloaded results
+2026-10-30T10:27:12Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.364500	2026-10-30T09:00:00+00:00
+2026-10-30T10:27:15Z downloaded results
+2026-10-30T10:32:26Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.364500	2026-10-30T09:00:00+00:00
+2026-10-30T10:32:29Z downloaded results
+2026-10-30T10:37:40Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.364500	2026-10-30T09:00:00+00:00
+2026-10-30T10:37:43Z downloaded results
+2026-10-30T10:40:35Z spot reclaim log: kind=ok region=us-east-2 ran_s=1805
+2026-10-30T10:42:54Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.364500	2026-10-30T09:00:00+00:00
+2026-10-30T10:42:57Z downloaded results
+2026-10-30T10:48:09Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.364500	2026-10-30T09:00:00+00:00
+2026-10-30T10:48:12Z downloaded results
+2026-10-30T10:53:25Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.364500	2026-10-30T09:00:00+00:00
+2026-10-30T10:53:28Z downloaded results
+2026-10-30T10:58:41Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.364500	2026-10-30T09:00:00+00:00
+2026-10-30T10:58:44Z downloaded results
+2026-10-30T11:03:55Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.364500	2026-10-30T09:00:00+00:00
+2026-10-30T11:03:58Z downloaded results
+2026-10-30T11:09:09Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.364500	2026-10-30T09:00:00+00:00
+2026-10-30T11:09:13Z downloaded results
+2026-10-30T11:14:25Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.364500	2026-10-30T09:00:00+00:00
+2026-10-30T11:14:29Z downloaded results
+2026-10-30T11:19:40Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.364500	2026-10-30T09:00:00+00:00
+2026-10-30T11:19:44Z downloaded results
+2026-10-30T11:24:40Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.364500	2026-10-30T09:00:00+00:00
+2026-10-30T11:24:43Z downloaded results
+2026-10-30T11:24:49Z ALL_DONE final downloaded
+2026-10-30T11:25:29Z deleted instance=i-04bd6a8bfeffaac1f
+2026-10-30T11:25:31Z deleted launch template=p2-1793352403-43563-3759 region=us-east-2

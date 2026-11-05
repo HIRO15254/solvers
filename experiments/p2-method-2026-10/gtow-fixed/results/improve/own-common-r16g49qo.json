@@ -1,0 +1,49 @@
+{
+ "format": "p2-bench-class-error",
+ "version": 1,
+ "half": null,
+ "baseline": "r16g49qo",
+ "variants": {},
+ "multi": {
+  "3bet": {
+   "rows": 10,
+   "flops": 32,
+   "size": null,
+   "variants": {
+    "r16g49qo": {
+     "card": null,
+     "card_se": null,
+     "total": 0.8751665531384631,
+     "total_se": 0.04522211079984073
+    }
+   }
+  },
+  "4bet": {
+   "rows": 30,
+   "flops": 32,
+   "size": null,
+   "variants": {
+    "r16g49qo": {
+     "card": null,
+     "card_se": null,
+     "total": 1.5800505360127437,
+     "total_se": 0.0674973626452807
+    }
+   }
+  },
+  "5bet": {
+   "rows": 2,
+   "flops": 32,
+   "size": null,
+   "variants": {
+    "r16g49qo": {
+     "card": null,
+     "card_se": null,
+     "total": 0.7914579138702628,
+     "total_se": 0.3095460638288126
+    }
+   }
+  }
+ },
+ "classes": null
+}

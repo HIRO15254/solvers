@@ -1,0 +1,4 @@
+NODIAG=1 SNAPSHOTS=1000 LINES=~/all36-lines.txt bash $X/buckets.sh ~/gtow.profile.json ~/out/train/gtow 2000 rel8x2@raise5+g25+hd+sd1+ow
+DIAG_RIVERS=4 DIAG_JOBS=1 bash $X/bench_diag.sh ~/gtow.profile.json ~/out/train/gtow/rel8x2@raise5+g25+hd+sd1+ow/postflop.bin ~/out/l1/gtow rel8x2@raise5+g25+hd+sd1+ow ~/bands.txt
+DIAG_RIVERS=4 DIAG_JOBS=1 bash $X/bench_diag.sh ~/gtow.profile.json ~/out/train/gtow/rel8x2@raise5+g25+hd+sd1+ow/postflop.bin.it1000 ~/out/l1/gtow rel8x2@raise5+g25+hd+sd1+ow+it1000 ~/bands.txt
+DIAG_RIVERS=4 DIAG_JOBS=1 bash $X/bench_diag.sh ~/gtow.profile.json ~/e2l1-it1000.bin ~/out/l1/gtow rel8x2@raise5+g25+hd+sd1+it1000 ~/bands.txt

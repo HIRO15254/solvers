@@ -1,0 +1,18 @@
+AWS prerequisite check before any launch:
+aws sts get-caller-identity --output json
+Exit 255: Your session has expired. Please reauthenticate using 'aws login'.
+No AWS instance or Spot request was created by this experiment. AWS cost: $0.
+
+GCP substitution was authorized by Main.
+VM qre-reach-l05, europe-west4-b, c2d-highcpu-32:
+using 2026-10-12T03:28:19+09:00
+final downloaded 2026-10-12T04:55:16+09:00, exit 0
+deleted 2026-10-12T04:56:10+09:00
+
+Post-run command:
+gcloud compute instances list --project solvers-abstraction-20260723 --format=json
+Exit 0, result [] (CLI wrapper additionally emitted 'Python').
+No GCP instance remained. VM p1eff-1 was never targeted.
+
+Estimated GCP runtime: 1.4642 h, about $1.46 at the parent-provided approximate $1/h.
+This is an estimate, not verified invoice/Spot pricing. Disk/network excluded.

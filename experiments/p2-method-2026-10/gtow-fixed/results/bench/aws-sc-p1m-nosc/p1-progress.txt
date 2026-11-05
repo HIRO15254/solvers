@@ -1,0 +1,17 @@
+FLOP L04-gtsrp 5c Td Jd wall_s=393.3 it=327 cap=0
+FLOP L04-gtsrp 5c Jc Kd wall_s=429.8 it=348 cap=0
+FLOP L04-gtsrp 2c 4d Qh wall_s=698.8 it=350 cap=0
+FLOP L04-gtsrp 4c 8c Ad wall_s=428.6 it=347 cap=0
+FLOP L04-gtsrp Tc Td Kh wall_s=406.5 it=350 cap=0
+FLOP L04-gtsrp 6c 7d Ah wall_s=683.0 it=353 cap=0
+FLOP L04-gtsrp 5c 7c Kd wall_s=442.4 it=350 cap=0
+FLOP L04-gtsrp 6c Tc Kd wall_s=401.5 it=324 cap=0
+FLOP L04-gtsrp 4c 8d Tc wall_s=458.1 it=358 cap=0
+FLOP L04-gtsrp Tc Qd Ah wall_s=638.9 it=350 cap=0
+FLOP L04-gtsrp 3c Jd Kh wall_s=751.1 it=378 cap=0
+FLOP L04-gtsrp 8c Jd Ac wall_s=423.6 it=348 cap=0
+FLOP L04-gtsrp 3c 8c Qd wall_s=440.2 it=350 cap=0
+FLOP L04-gtsrp 2c 6c Td wall_s=426.1 it=340 cap=0
+FLOP L04-gtsrp 5c 9d Kh wall_s=730.9 it=373 cap=0
+FLOP L04-gtsrp 6c 8c 9c wall_s=203.7 it=322 cap=0
+TASK L04-gtsrp flops=16

@@ -1,0 +1,8 @@
+48a8085e475a408b34563d94b80324c469ab84d872269f0c4bc5f6dc064d33f5  crates/mw-preflop/src/trunk/l1/qre.rs
+37ad0a9c54f3698e3718661a3206905b7bbdb072d951c96215df7fe1ddf38ecb  crates/mw-preflop/src/trunk/l1/solve.rs
+72e5f1bfa50cd6cf17c59c7daa996ee429e36dfe4d4ce2cc598198726d51f83e  crates/mw-preflop/src/trunk/l1/state.rs
+ea1bf29464846e4a08797b666e83e4cecde5977ed43a1ad65a19a81c79880c9e  crates/mw-preflop/src/trunk/l1/tests.rs
+5b8f9764f8618c3c5f1782b84e0654b8323c68a51c269a7a4ca83071742ca350  crates/mw-preflop/src/trunk/l1/mod.rs
+b47f0df7c9c258ee7b9eab8ef12e122b5d535c750f3230e8f1fc6d0fb53230bb  crates/mw-preflop/examples/trunk_solve.rs
+405b63e694e904085ad20c6d7cc1ee28feab78d69c95e8b2d6dfd8feb9522b2b  experiments/p2-method-2026-10/relative-reach/gcp/job.sh
+95f3bf148072a52c3bfa093b1a9e7a8c2f49cd46ebf58722faf20eb65a4b239e  experiments/p2-method-2026-10/gtow-fixed/qre_local.py

@@ -1,0 +1,46 @@
+2026-11-05T00:04:51Z ranked regions: placement-score cheapest-USD/hour region
+2026-11-05T00:04:52Z 9 0.209600 sa-east-1
+2026-11-05T00:04:52Z 9 0.263900 us-east-2
+2026-11-05T00:04:52Z 9 0.403600 us-east-1
+2026-11-05T00:05:39Z created launch template=p2-1793837052-34686-19199 region=sa-east-1 ami=ami-06ae896a166ca24f2
+2026-11-05T00:05:40Z requesting instant fleet region=sa-east-1 placement-score=9 types=c7a.8xlarge c6a.8xlarge c7i.8xlarge c6i.8xlarge m7a.8xlarge m7i.8xlarge m6a.8xlarge subnets=3
+2026-11-05T00:05:58Z using region=sa-east-1 instance=i-0f996928e53961bcf az=sa-east-1a type=c6a.8xlarge spot-price-usd-per-hour=0.229100 placement-score=9
+2026-11-05T00:06:03Z instance=i-0f996928e53961bcf status=running ip=54.20.204.74
+2026-11-05T00:07:49Z uploaded source, job and flat extra files
+2026-11-05T00:07:53Z launched instance=i-0f996928e53961bcf
+2026-11-05T00:07:58Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:08:02Z downloaded results
+2026-11-05T00:13:08Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:13:13Z downloaded results
+2026-11-05T00:18:21Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:18:25Z downloaded results
+2026-11-05T00:23:34Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:23:41Z downloaded results
+2026-11-05T00:28:34Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:28:40Z downloaded results
+2026-11-05T00:33:37Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:33:43Z downloaded results
+2026-11-05T00:36:13Z spot reclaim log: kind=ok region=sa-east-1 ran_s=1810
+2026-11-05T00:38:40Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:38:47Z downloaded results
+2026-11-05T00:43:53Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:43:59Z downloaded results
+2026-11-05T00:49:05Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:49:13Z downloaded results
+2026-11-05T00:54:18Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:54:26Z downloaded results
+2026-11-05T00:59:31Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:59:39Z downloaded results
+2026-11-05T01:04:45Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T01:04:52Z downloaded results
+2026-11-05T01:09:58Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T01:10:05Z downloaded results
+2026-11-05T01:15:12Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T01:15:19Z downloaded results
+2026-11-05T01:20:28Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T01:20:36Z downloaded results
+2026-11-05T01:25:44Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T01:25:52Z downloaded results
+2026-11-05T01:26:03Z ALL_DONE final downloaded
+2026-11-05T01:26:42Z deleted instance=i-0f996928e53961bcf
+2026-11-05T01:26:45Z deleted launch template=p2-1793837052-34686-19199 region=sa-east-1

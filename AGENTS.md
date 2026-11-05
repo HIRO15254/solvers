@@ -127,6 +127,7 @@ wiki change.
 
 Measure acceptance timing on the acceptance machine and launch AWS machines
 as `docs/development.md` §5.4-§5.5 specify (user decisions, 2026-10-28 and
-2026-10-29): choose the region by Spot placement score right before launching,
-launch with `create-fleet` over several instance types and every AZ subnet,
-and fix the instance type only for measurements that need it.
+2026-10-29): use Spot instances only (never On-demand), choose the region by
+Spot placement score right before launching, launch with `create-fleet` over
+several instance types and every AZ subnet, and fix the instance type only for
+measurements that need it.

@@ -99,6 +99,7 @@ PF11のauto選択自体は利用者決定であり、実測による見積りの
 
 | 機能・判断 | 実験 | 確立したこと |
 |---|---|---|
+| S4の判断材料、L1の抽象化の選択 | [P2方式の再設計の実験索引](p2-method-2026-10/README.md) | 2026-10-06〜。索引のREADMEの「現在地」に、実装の既定、実験の基準、KPIの候補をまとめ、実験を「現行の根拠」と「アーカイブ」に分けた。数値は[物差しの一覧](p2-method-2026-10/metrics.md)のIDで読む（KPIは`m-kpi`、計画のP2D10）。大きいfileの置き場所と、2026-10-29に消したfileは[artifacts.md](p2-method-2026-10/artifacts.md) |
 | D5 暫定方式の比較基準 | [暫定方式のseed間の差](p2-method-2026-10/legacy-seed-noise/README.md) | 10倍の計算で深さ0〜4のseed差は概ね縮むが、深さ7は0.83倍にとどまる。再現状態partial |
 | P2D1・P2D2 L0表 | [L0 hand-class tables](p2-method-2026-10/trunk-tables/README.md) | T2の全entryの整合性と一部の総当たり、T3の標本値を検査 |
 | P2D1 モデル内評価 | [L0評価器の検査と暫定方式の測定](p2-method-2026-10/l0-evaluator-check/README.md) | 独立計算との一致を検査。B3の暫定解は10倍の計算でNashConvが約1/6.5 |

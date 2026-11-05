@@ -1,6 +1,7 @@
 //! Alternating, full-width DCFR in the hero-conditioned L0 game.
 use anyhow::{Result, ensure};
-use serde::Serialize;
+use rayon::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::time::Instant;
 
 use super::{Model, Profile, Tree, evaluate};
@@ -63,7 +64,7 @@ pub struct Checkpoint {
     pub seconds: f64,
 }
 
-#[derive(Debug, Clone, Default, Serialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct SolveTimings {
     pub reaches: f64,
     pub t2: f64,
@@ -173,24 +174,131 @@ pub(crate) fn backward_values(
     seat: usize,
     values: &mut [[f64; 169]],
 ) {
-    for z in (0..tree.nodes.len()).rev() {
+    backward_subtree(tree, profile, support, seat, 0, values);
+}
+
+/// DFS subtrees occupy disjoint contiguous ranges. Children finish before
+/// their parent; each class still sums children in the original action order.
+fn backward_subtree(
+    tree: &Tree,
+    profile: &Profile,
+    support: &[usize],
+    seat: usize,
+    root: usize,
+    values: &mut [[f64; 169]],
+) {
+    // Small subtrees retain the cache-friendly reverse arena traversal.
+    if values.len() >= 128 {
+        let node = &tree.nodes[root];
+        let (row, descendants) = values.split_first_mut().unwrap();
+        backward_children(tree, profile, support, seat, &node.children, descendants);
+        for &c in support {
+            row[c] = if node.actor == Some(seat) {
+                let probabilities = profile.row(tree, root, c);
+                let mut value = 0.0;
+                for (a, &child) in node.children.iter().enumerate() {
+                    value += probabilities[a] * descendants[child - root - 1][c];
+                }
+                value
+            } else {
+                node.children
+                    .iter()
+                    .map(|&child| descendants[child - root - 1][c])
+                    .sum()
+            };
+        }
+        return;
+    }
+    for z in (root..root + values.len()).rev() {
         let node = &tree.nodes[z];
         if node.terminal.is_some() {
             continue;
         }
         for &c in support {
-            values[z][c] = if node.actor == Some(seat) {
+            values[z - root][c] = if node.actor == Some(seat) {
                 let row = profile.row(tree, z, c);
                 let mut value = 0.0;
                 for (a, &child) in node.children.iter().enumerate() {
-                    value += row[a] * values[child][c];
+                    value += row[a] * values[child - root][c];
                 }
                 value
             } else {
-                node.children.iter().map(|&child| values[child][c]).sum()
+                node.children
+                    .iter()
+                    .map(|&child| values[child - root][c])
+                    .sum()
             };
         }
     }
+}
+
+fn backward_children(
+    tree: &Tree,
+    profile: &Profile,
+    support: &[usize],
+    seat: usize,
+    children: &[usize],
+    values: &mut [[f64; 169]],
+) {
+    let Some((&first, rest)) = children.split_first() else {
+        return;
+    };
+    if values.len() < 128 {
+        // A small forest is also a valid reverse-arena range; avoid spawning
+        // a job for every tiny sibling once there is enough parallel work.
+        backward_subtree(tree, profile, support, seat, first, values);
+        return;
+    }
+    if let Some(&next) = rest.first() {
+        let (subtree, siblings) = values.split_at_mut(next - first);
+        rayon::join(
+            || backward_subtree(tree, profile, support, seat, first, subtree),
+            || backward_children(tree, profile, support, seat, rest, siblings),
+        );
+    } else {
+        backward_subtree(tree, profile, support, seat, first, values);
+    }
+}
+
+/// Node rows have no cross-node dependencies after the backward pass.
+pub(crate) fn update_rows(
+    tree: &Tree,
+    model: &Model<'_>,
+    seat: usize,
+    strategies: (&mut Profile, &mut Profile, &mut Profile),
+    values: &[[f64; 169]],
+    reach: &[super::eval::Reach],
+    discount: &Discounts,
+) {
+    let (profile, regrets, sums) = strategies;
+    profile
+        .rows
+        .par_iter_mut()
+        .zip(regrets.rows.par_iter_mut())
+        .zip(sums.rows.par_iter_mut())
+        .enumerate()
+        .for_each(|(z, ((rows, regrets), sums))| {
+            let node = &tree.nodes[z];
+            if node.actor != Some(seat) {
+                return;
+            }
+            let actions = node.children.len();
+            for &c in &model.support[seat] {
+                let range = c * actions..(c + 1) * actions;
+                let row = &mut rows[range.clone()];
+                let r = &mut regrets[range.clone()];
+                update_row(
+                    r,
+                    &mut sums[range],
+                    row,
+                    node.children.iter().map(|&child| values[child][c]),
+                    values[z][c],
+                    reach[z].pi(seat, c),
+                    discount,
+                );
+                regret_matching(r, row);
+            }
+        });
 }
 
 pub(crate) fn average_profile(tree: &Tree, sums: &Profile, model: &Model<'_>) -> Profile {
@@ -323,24 +431,15 @@ pub fn solve(
             let phase = Instant::now();
             let values = &mut leaves.values[p];
             backward_values(tree, &profile, &model.support[p], p, values);
-            for (z, node) in tree.nodes.iter().enumerate() {
-                if node.actor != Some(p) {
-                    continue;
-                }
-                for &c in &model.support[p] {
-                    let regrets = regrets.row_mut(tree, z, c);
-                    update_row(
-                        regrets,
-                        sums.row_mut(tree, z, c),
-                        profile.row(tree, z, c),
-                        node.children.iter().map(|&child| values[child][c]),
-                        values[z][c],
-                        reach[z].pi(p, c),
-                        &discount,
-                    );
-                    regret_matching(regrets, profile.row_mut(tree, z, c));
-                }
-            }
+            update_rows(
+                tree,
+                model,
+                p,
+                (&mut profile, &mut regrets, &mut sums),
+                values,
+                &reach,
+                &discount,
+            );
             timings.update += phase.elapsed().as_secs_f64();
             let phase = Instant::now();
             update_reach(tree, &profile, model, &mut reach, p);

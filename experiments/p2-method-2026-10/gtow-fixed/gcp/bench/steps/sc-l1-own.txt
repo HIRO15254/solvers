@@ -1,0 +1,2 @@
+bash ~/sc_l1.sh own base
+bash ~/sc_l1.sh own nosc

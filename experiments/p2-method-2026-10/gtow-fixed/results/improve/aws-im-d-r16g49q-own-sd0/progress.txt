@@ -1,0 +1,5 @@
+06:51:05 JOB_START
+06:53:32 SETUP_DONE
+06:53:32 START traise5+p10+g49+hdq+rel16x2+own
+08:24:45 END traise5+p10+g49+hdq+rel16x2+own 0
+08:46:09 ALL_DONE

@@ -1,0 +1,54 @@
+2026-10-15T03:23:29Z skipping region=us-east-2 until 2026-10-15T07:50:26Z: consecutive quick Spot reclaims (/c/Users/PC_User/.cache/p2-aws/spot-reclaims.log)
+2026-10-15T03:23:33Z ranked candidates: score=USD/hour/relative-speed region AZ type USD/hour speed
+2026-10-15T03:23:33Z 0.209600000 sa-east-1 sa-east-1c c6a.8xlarge 0.209600 1.0
+2026-10-15T03:23:33Z 0.209800000 sa-east-1 sa-east-1a c6a.8xlarge 0.209800 1.0
+2026-10-15T03:23:33Z 0.424200000 sa-east-1 sa-east-1b c6a.8xlarge 0.424200 1.0
+2026-10-15T03:23:33Z 0.524500000 us-east-1 us-east-1d c6a.8xlarge 0.524500 1.0
+2026-10-15T03:23:33Z 0.528200000 us-east-1 us-east-1b c6a.8xlarge 0.528200 1.0
+2026-10-15T03:23:33Z 0.544600000 us-east-1 us-east-1f c6a.8xlarge 0.544600 1.0
+2026-10-15T03:23:34Z 0.634700000 us-east-1 us-east-1c c6a.8xlarge 0.634700 1.0
+2026-10-15T03:23:34Z 0.651200000 us-east-1 us-east-1a c6a.8xlarge 0.651200 1.0
+2026-10-15T03:24:04Z requesting region=sa-east-1 az=sa-east-1c type=c6a.8xlarge ami=ami-01b4d0596a944c035
+2026-10-15T03:24:12Z request=sir-vvcfmsnj status=fulfilled state=active
+2026-10-15T03:24:16Z using region=sa-east-1 instance=i-03176d6c585379dea request=sir-vvcfmsnj az=sa-east-1c type=c6a.8xlarge spot-price-usd-per-hour=0.209600 speed=1.0 score=0.209600000
+2026-10-15T03:24:19Z instance=i-03176d6c585379dea status=running ip=15.228.16.17
+2026-10-15T03:25:12Z uploaded source, job and flat extra files
+2026-10-15T03:25:16Z launched instance=i-03176d6c585379dea
+2026-10-15T03:25:20Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1c price=0.209600	2026-10-14T23:00:00+00:00
+2026-10-15T03:25:24Z downloaded results
+2026-10-15T03:30:22Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1c price=0.209600	2026-10-14T23:00:00+00:00
+2026-10-15T03:30:26Z downloaded results
+2026-10-15T03:35:25Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1c price=0.209600	2026-10-14T23:00:00+00:00
+2026-10-15T03:35:30Z downloaded results
+2026-10-15T03:40:32Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1c price=0.209600	2026-10-14T23:00:00+00:00
+2026-10-15T03:40:36Z downloaded results
+2026-10-15T03:45:46Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1c price=0.209600	2026-10-14T23:00:00+00:00
+2026-10-15T03:45:51Z downloaded results
+2026-10-15T03:51:02Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1c price=0.209600	2026-10-14T23:00:00+00:00
+2026-10-15T03:51:06Z downloaded results
+2026-10-15T03:54:35Z spot reclaim log: kind=ok region=sa-east-1 ran_s=1816
+2026-10-15T03:56:15Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1c price=0.209600	2026-10-14T23:00:00+00:00
+2026-10-15T03:56:19Z downloaded results
+2026-10-15T04:01:28Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1c price=0.209600	2026-10-14T23:00:00+00:00
+2026-10-15T04:01:32Z downloaded results
+2026-10-15T04:06:43Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1c price=0.209600	2026-10-14T23:00:00+00:00
+2026-10-15T04:06:48Z downloaded results
+2026-10-15T04:07:07Z instance=i-03176d6c585379dea status=stopping ip=15.228.16.17
+2026-10-15T04:07:27Z instance=i-03176d6c585379dea status=stopped ip=None
+2026-10-15T04:08:24Z instance=i-03176d6c585379dea status=pending ip=None
+2026-10-15T04:08:43Z instance=i-03176d6c585379dea status=running ip=56.125.34.217
+2026-10-15T04:08:51Z launched instance=i-03176d6c585379dea
+2026-10-15T04:08:56Z downloaded results
+2026-10-15T04:11:57Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1c price=0.209600	2026-10-14T23:00:00+00:00
+2026-10-15T04:13:57Z downloaded results
+2026-10-15T04:17:04Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1c price=0.209600	2026-10-14T23:00:00+00:00
+2026-10-15T04:19:04Z downloaded results
+2026-10-15T04:22:08Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1c price=0.209600	2026-10-14T23:00:00+00:00
+2026-10-15T04:24:08Z downloaded results
+2026-10-15T04:27:09Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1c price=0.209600	2026-10-14T23:00:00+00:00
+2026-10-15T04:29:09Z downloaded results
+2026-10-15T04:32:12Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1c price=0.209600	2026-10-14T23:00:00+00:00
+2026-10-15T04:34:17Z downloaded results
+2026-10-15T04:38:56Z ALL_DONE final downloaded
+2026-10-15T04:39:14Z canceled request=sir-vvcfmsnj
+2026-10-15T04:39:58Z deleted instance=i-03176d6c585379dea request=sir-vvcfmsnj

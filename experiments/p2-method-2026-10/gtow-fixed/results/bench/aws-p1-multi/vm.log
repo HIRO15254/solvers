@@ -1,0 +1,268 @@
+2026-10-16T16:18:02Z skipping region=sa-east-1 until 2026-10-16T20:49:37Z: consecutive quick Spot reclaims (/c/Users/PC_User/.cache/p2-aws/spot-reclaims.log)
+2026-10-16T16:18:02Z skipping region=us-east-2 until 2026-10-16T22:55:44Z: consecutive quick Spot reclaims (/c/Users/PC_User/.cache/p2-aws/spot-reclaims.log)
+2026-10-16T16:18:07Z ranked candidates: score=USD/hour/relative-speed region AZ type USD/hour speed
+2026-10-16T16:18:07Z 0.380400000 us-east-1 us-east-1a c7a.8xlarge 0.570600 1.5
+2026-10-16T16:18:07Z 0.396800000 us-east-1 us-east-1d c7a.8xlarge 0.595200 1.5
+2026-10-16T16:18:07Z 0.397800000 us-east-1 us-east-1b c7a.8xlarge 0.596700 1.5
+2026-10-16T16:18:07Z 0.405800000 us-east-1 us-east-1c c7a.8xlarge 0.608700 1.5
+2026-10-16T16:18:08Z 0.441733333 us-east-1 us-east-1f c7a.8xlarge 0.662600 1.5
+2026-10-16T16:18:08Z 0.524100000 us-east-1 us-east-1b c6a.8xlarge 0.524100 1.0
+2026-10-16T16:18:08Z 0.531800000 us-east-1 us-east-1d c6a.8xlarge 0.531800 1.0
+2026-10-16T16:18:08Z 0.533000000 us-east-1 us-east-1f c6a.8xlarge 0.533000 1.0
+2026-10-16T16:18:08Z 0.632200000 us-east-1 us-east-1a c6a.8xlarge 0.632200 1.0
+2026-10-16T16:18:08Z 0.636200000 us-east-1 us-east-1f c6i.8xlarge 0.636200 1.0
+2026-10-16T16:18:08Z 0.647600000 us-east-1 us-east-1c c6a.8xlarge 0.647600 1.0
+2026-10-16T16:18:09Z 0.696600000 us-east-1 us-east-1f c7i.8xlarge 0.696600 1.0
+2026-10-16T16:18:09Z 0.736800000 us-east-1 us-east-1a c7i.8xlarge 0.736800 1.0
+2026-10-16T16:18:09Z 0.793500000 us-east-1 us-east-1b c7i.8xlarge 0.793500 1.0
+2026-10-16T16:18:09Z 0.800400000 us-east-1 us-east-1d c7i.8xlarge 0.800400 1.0
+2026-10-16T16:18:09Z 0.806800000 us-east-1 us-east-1b c6i.8xlarge 0.806800 1.0
+2026-10-16T16:18:09Z 0.845200000 us-east-1 us-east-1c c7i.8xlarge 0.845200 1.0
+2026-10-16T16:18:09Z 1.039300000 us-east-1 us-east-1a c6i.8xlarge 1.039300 1.0
+2026-10-16T16:18:09Z 1.174500000 us-east-1 us-east-1c c6i.8xlarge 1.174500 1.0
+2026-10-16T16:18:09Z 1.181300000 us-east-1 us-east-1d c6i.8xlarge 1.181300 1.0
+2026-10-16T16:18:29Z requesting region=us-east-1 az=us-east-1a type=c7a.8xlarge ami=ami-0fa5967347d08d2df
+2026-10-16T16:18:35Z request=sir-b31fn6zh status=pending-fulfillment state=open
+2026-10-16T16:18:52Z request=sir-b31fn6zh status=fulfilled state=active
+2026-10-16T16:18:54Z using region=us-east-1 instance=i-0847ea73b7509486d request=sir-b31fn6zh az=us-east-1a type=c7a.8xlarge spot-price-usd-per-hour=0.570600 speed=1.5 score=0.380400000
+2026-10-16T16:18:57Z instance=i-0847ea73b7509486d status=running ip=3.237.204.115
+2026-10-16T16:19:25Z uploaded source, job and flat extra files
+2026-10-16T16:19:27Z launched instance=i-0847ea73b7509486d
+2026-10-16T16:19:30Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T16:19:32Z downloaded results
+2026-10-16T16:24:31Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T16:24:33Z downloaded results
+2026-10-16T16:29:32Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T16:29:35Z downloaded results
+2026-10-16T16:34:33Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T16:34:36Z downloaded results
+2026-10-16T16:39:33Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T16:39:36Z downloaded results
+2026-10-16T16:44:50Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T16:44:53Z downloaded results
+2026-10-16T16:48:57Z spot reclaim log: kind=ok region=us-east-1 ran_s=1800
+2026-10-16T16:49:51Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T16:49:54Z downloaded results
+2026-10-16T16:54:51Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T16:54:54Z downloaded results
+2026-10-16T16:59:52Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T16:59:56Z downloaded results
+2026-10-16T17:04:52Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T17:04:55Z downloaded results
+2026-10-16T17:09:54Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T17:09:58Z downloaded results
+2026-10-16T17:14:55Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T17:14:59Z downloaded results
+2026-10-16T17:19:58Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T17:20:02Z downloaded results
+2026-10-16T17:24:59Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T17:25:03Z downloaded results
+2026-10-16T17:30:01Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T17:30:04Z downloaded results
+2026-10-16T17:35:02Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T17:35:05Z downloaded results
+2026-10-16T17:40:03Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T17:40:06Z downloaded results
+2026-10-16T17:45:17Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T17:45:21Z downloaded results
+2026-10-16T17:50:32Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T17:50:36Z downloaded results
+2026-10-16T17:55:47Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T17:55:51Z downloaded results
+2026-10-16T18:01:01Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T18:01:05Z downloaded results
+2026-10-16T18:06:03Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T18:06:07Z downloaded results
+2026-10-16T18:11:19Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T18:11:23Z downloaded results
+2026-10-16T18:16:19Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T18:16:23Z downloaded results
+2026-10-16T18:21:34Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T18:21:38Z downloaded results
+2026-10-16T18:26:49Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T18:26:53Z downloaded results
+2026-10-16T18:32:04Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T18:32:08Z downloaded results
+2026-10-16T18:37:20Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T18:37:23Z downloaded results
+2026-10-16T18:42:28Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T18:42:32Z downloaded results
+2026-10-16T18:47:43Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T18:47:48Z downloaded results
+2026-10-16T18:53:00Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T18:53:03Z downloaded results
+2026-10-16T18:58:14Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.570600	2026-10-16T16:00:00+00:00
+2026-10-16T18:58:18Z downloaded results
+2026-10-16T19:03:29Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T19:03:33Z downloaded results
+2026-10-16T19:08:45Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T19:08:49Z downloaded results
+2026-10-16T19:14:00Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T19:14:04Z downloaded results
+2026-10-16T19:19:16Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T19:19:20Z downloaded results
+2026-10-16T19:24:32Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T19:24:36Z downloaded results
+2026-10-16T19:29:48Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T19:29:52Z downloaded results
+2026-10-16T19:35:05Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T19:35:09Z downloaded results
+2026-10-16T19:40:04Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T19:40:08Z downloaded results
+2026-10-16T19:45:19Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T19:45:23Z downloaded results
+2026-10-16T19:50:34Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T19:50:38Z downloaded results
+2026-10-16T19:55:48Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T19:55:53Z downloaded results
+2026-10-16T20:01:03Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T20:01:07Z downloaded results
+2026-10-16T20:06:17Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T20:06:22Z downloaded results
+2026-10-16T20:11:32Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T20:11:37Z downloaded results
+2026-10-16T20:16:47Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T20:16:51Z downloaded results
+2026-10-16T20:22:02Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T20:22:06Z downloaded results
+2026-10-16T20:27:17Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T20:27:21Z downloaded results
+2026-10-16T20:32:32Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T20:32:37Z downloaded results
+2026-10-16T20:37:47Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T20:37:52Z downloaded results
+2026-10-16T20:43:03Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T20:43:07Z results download unavailable (see ssh.log); retrying at next interval
+2026-10-16T20:48:17Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T20:48:21Z downloaded results
+2026-10-16T20:53:32Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T20:53:36Z downloaded results
+2026-10-16T20:58:47Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T20:58:51Z downloaded results
+2026-10-16T21:04:03Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T21:04:09Z downloaded results
+2026-10-16T21:09:19Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T21:09:24Z downloaded results
+2026-10-16T21:14:19Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T21:14:23Z downloaded results
+2026-10-16T21:19:34Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T21:19:39Z downloaded results
+2026-10-16T21:24:51Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T21:24:55Z downloaded results
+2026-10-16T21:30:05Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T21:30:10Z downloaded results
+2026-10-16T21:35:21Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T21:35:26Z downloaded results
+2026-10-16T21:40:37Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T21:40:41Z downloaded results
+2026-10-16T21:45:53Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T21:45:58Z downloaded results
+2026-10-16T21:51:08Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T21:51:13Z downloaded results
+2026-10-16T21:56:24Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T21:56:30Z downloaded results
+2026-10-16T22:01:40Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T22:01:45Z downloaded results
+2026-10-16T22:06:56Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T22:07:01Z downloaded results
+2026-10-16T22:12:12Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T22:12:17Z downloaded results
+2026-10-16T22:17:27Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T22:17:32Z downloaded results
+2026-10-16T22:19:15Z instance=i-0847ea73b7509486d status=stopping ip=3.237.204.115
+2026-10-16T22:19:32Z instance=i-0847ea73b7509486d status=stopped ip=None
+2026-10-16T22:20:41Z instance=i-0847ea73b7509486d status=running ip=3.237.183.253
+2026-10-16T22:20:46Z launched instance=i-0847ea73b7509486d
+2026-10-16T22:20:51Z downloaded results
+2026-10-16T22:22:37Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T22:25:51Z downloaded results
+2026-10-16T22:27:53Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T22:31:06Z downloaded results
+2026-10-16T22:33:09Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T22:36:06Z downloaded results
+2026-10-16T22:38:25Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T22:41:22Z downloaded results
+2026-10-16T22:43:25Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.576000	2026-10-16T19:00:00+00:00
+2026-10-16T22:46:16Z instance=i-0847ea73b7509486d status=stopping ip=3.237.183.253
+2026-10-16T22:46:17Z spot reclaim log: kind=quick region=us-east-1 ran_s=1536
+2026-10-16T22:46:34Z instance=i-0847ea73b7509486d status=stopped ip=None
+2026-10-16T22:47:25Z instance=i-0847ea73b7509486d status=running ip=100.52.184.85
+2026-10-16T22:47:38Z launched instance=i-0847ea73b7509486d
+2026-10-16T22:47:43Z downloaded results
+2026-10-16T22:48:34Z describe-instances failed (1/20); retrying
+2026-10-16T22:49:06Z describe-instances failed (2/20); retrying
+2026-10-16T22:49:38Z describe-instances failed (3/20); retrying
+2026-10-16T22:50:11Z describe-instances failed (4/20); retrying
+2026-10-16T22:50:43Z describe-instances failed (5/20); retrying
+2026-10-16T22:51:15Z describe-instances failed (6/20); retrying
+2026-10-16T22:51:47Z describe-instances failed (7/20); retrying
+2026-10-16T22:52:19Z describe-instances failed (8/20); retrying
+2026-10-16T22:52:51Z describe-instances failed (9/20); retrying
+2026-10-16T22:53:23Z describe-instances failed (10/20); retrying
+2026-10-16T22:53:55Z describe-instances failed (11/20); retrying
+2026-10-16T22:54:27Z describe-instances failed (12/20); retrying
+2026-10-16T22:54:58Z describe-instances failed (13/20); retrying
+2026-10-16T22:55:30Z describe-instances failed (14/20); retrying
+2026-10-16T22:56:02Z describe-instances failed (15/20); retrying
+2026-10-16T22:56:34Z describe-instances failed (16/20); retrying
+2026-10-16T22:57:06Z describe-instances failed (17/20); retrying
+2026-10-16T22:57:38Z describe-instances failed (18/20); retrying
+2026-10-16T22:58:10Z describe-instances failed (19/20); retrying
+2026-10-16T22:58:42Z describe-instances failed (20/20); retrying
+2026-10-16T22:59:14Z describe-instances kept failing
+2026-10-16T22:59:17Z ERROR line=54 exit=255
+2026-10-16T22:59:17Z ERROR line=56 exit=255
+2026-10-16T22:59:17Z ERROR line=79 exit=255
+2026-10-16T22:59:17Z ERROR line=79 exit=255
+2026-10-16T22:59:17Z ERROR discovering requests region=sa-east-1 by RunId
+2026-10-16T22:59:19Z ERROR line=54 exit=255
+2026-10-16T22:59:19Z ERROR line=56 exit=255
+2026-10-16T22:59:19Z ERROR line=79 exit=255
+2026-10-16T22:59:19Z ERROR line=79 exit=255
+2026-10-16T22:59:19Z ERROR discovering requests region=us-east-2 by RunId
+2026-10-16T22:59:21Z ERROR line=54 exit=255
+2026-10-16T22:59:21Z ERROR line=56 exit=255
+2026-10-16T22:59:22Z ERROR line=79 exit=255
+2026-10-16T22:59:22Z ERROR line=79 exit=255
+2026-10-16T22:59:22Z ERROR discovering requests region=us-east-1 by RunId
+2026-10-16T22:59:24Z ERROR cancel request=sir-b31fn6zh (see delete.log)
+2026-10-16T22:59:26Z ERROR line=54 exit=255
+2026-10-16T22:59:26Z ERROR line=56 exit=255
+2026-10-16T22:59:26Z ERROR line=94 exit=255
+2026-10-16T22:59:26Z ERROR line=94 exit=255
+2026-10-16T22:59:26Z ERROR discovering instance for request=sir-b31fn6zh
+2026-10-16T22:59:28Z ERROR terminating instance=i-0847ea73b7509486d
+2026-10-16T23:00:36Z reattached watcher instance=i-0847ea73b7509486d
+2026-10-16T23:00:38Z instance=i-0847ea73b7509486d status=running ip=100.52.184.85
+2026-10-16T23:00:43Z downloaded results
+2026-10-16T23:05:45Z instance=i-0847ea73b7509486d status=running ip=100.52.184.85
+2026-10-16T23:05:51Z downloaded results
+2026-10-16T23:10:54Z instance=i-0847ea73b7509486d status=running ip=100.52.184.85
+2026-10-16T23:11:01Z downloaded results
+2026-10-16T23:16:03Z instance=i-0847ea73b7509486d status=running ip=100.52.184.85
+2026-10-16T23:16:09Z downloaded results
+2026-10-16T23:21:12Z instance=i-0847ea73b7509486d status=running ip=100.52.184.85
+2026-10-16T23:21:17Z downloaded results
+2026-10-16T23:26:19Z instance=i-0847ea73b7509486d status=running ip=100.52.184.85
+2026-10-16T23:26:24Z downloaded results
+2026-10-16T23:31:27Z instance=i-0847ea73b7509486d status=running ip=100.52.184.85
+2026-10-16T23:31:32Z downloaded results
+2026-10-16T23:36:34Z instance=i-0847ea73b7509486d status=running ip=100.52.184.85
+2026-10-16T23:36:39Z downloaded results
+2026-10-16T23:41:42Z instance=i-0847ea73b7509486d status=running ip=100.52.184.85
+2026-10-16T23:41:48Z downloaded results
+2026-10-16T23:46:51Z instance=i-0847ea73b7509486d status=running ip=100.52.184.85
+2026-10-16T23:46:55Z downloaded results
+2026-10-16T23:51:59Z instance=i-0847ea73b7509486d status=running ip=100.52.184.85
+2026-10-16T23:52:04Z downloaded results
+2026-10-16T23:57:06Z instance=i-0847ea73b7509486d status=running ip=100.52.184.85
+2026-10-16T23:57:13Z downloaded results
+2026-10-17T00:02:16Z instance=i-0847ea73b7509486d status=running ip=100.52.184.85
+2026-10-17T00:02:21Z downloaded results
+2026-10-17T00:07:23Z instance=i-0847ea73b7509486d status=running ip=100.52.184.85
+2026-10-17T00:07:29Z downloaded results
+2026-10-17T00:12:33Z instance=i-0847ea73b7509486d status=running ip=100.52.184.85
+2026-10-17T00:12:39Z downloaded results
+2026-10-17T00:12:46Z ALL_DONE final downloaded
+2026-10-17T00:12:48Z canceled request=sir-b31fn6zh
+2026-10-17T00:12:51Z deleted instance=i-0847ea73b7509486d request=sir-b31fn6zh

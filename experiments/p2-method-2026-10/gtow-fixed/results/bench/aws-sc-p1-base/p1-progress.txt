@@ -1,0 +1,34 @@
+FLOP L04-raise 5c Td Jd wall_s=73.0 it=230 cap=0
+FLOP L04-raise 5c Jc Kd wall_s=66.8 it=206 cap=0
+FLOP L04-raise 2c 4d Qh wall_s=140.0 it=262 cap=0
+FLOP L04-raise 4c 8c Ad wall_s=81.9 it=247 cap=0
+FLOP L04-raise Tc Td Kh wall_s=75.4 it=244 cap=0
+FLOP L04-raise 6c 7d Ah wall_s=121.6 it=234 cap=0
+FLOP L04-raise 5c 7c Kd wall_s=74.1 it=223 cap=0
+FLOP L04-raise 6c Tc Kd wall_s=78.2 it=247 cap=0
+FLOP L04-raise 4c 8d Tc wall_s=76.0 it=232 cap=0
+FLOP L04-raise Tc Qd Ah wall_s=115.9 it=246 cap=0
+FLOP L04-raise 3c Jd Kh wall_s=174.9 it=338 cap=0
+FLOP L04-raise 8c Jd Ac wall_s=80.7 it=252 cap=0
+FLOP L04-raise 3c 8c Qd wall_s=77.7 it=231 cap=0
+FLOP L04-raise 2c 6c Td wall_s=81.6 it=245 cap=0
+FLOP L04-raise 5c 9d Kh wall_s=118.5 it=229 cap=0
+FLOP L04-raise 6c 8c 9c wall_s=47.7 it=289 cap=0
+TASK L04-raise flops=16
+FLOP L02-raise 5c Td Jd wall_s=73.5 it=229 cap=0
+FLOP L02-raise 5c Jc Kd wall_s=70.0 it=220 cap=0
+FLOP L02-raise 2c 4d Qh wall_s=132.9 it=251 cap=0
+FLOP L02-raise 4c 8c Ad wall_s=78.7 it=250 cap=0
+FLOP L02-raise Tc Td Kh wall_s=91.6 it=291 cap=0
+FLOP L02-raise 6c 7d Ah wall_s=123.7 it=251 cap=0
+FLOP L02-raise 5c 7c Kd wall_s=74.3 it=231 cap=0
+FLOP L02-raise 6c Tc Kd wall_s=78.1 it=247 cap=0
+FLOP L02-raise 4c 8d Tc wall_s=74.7 it=231 cap=0
+FLOP L02-raise Tc Qd Ah wall_s=113.2 it=232 cap=0
+FLOP L02-raise 3c Jd Kh wall_s=136.0 it=268 cap=0
+FLOP L02-raise 8c Jd Ac wall_s=68.2 it=223 cap=0
+FLOP L02-raise 3c 8c Qd wall_s=71.7 it=221 cap=0
+FLOP L02-raise 2c 6c Td wall_s=97.3 it=298 cap=0
+FLOP L02-raise 5c 9d Kh wall_s=110.7 it=225 cap=0
+FLOP L02-raise 6c 8c 9c wall_s=43.5 it=283 cap=0
+TASK L02-raise flops=16

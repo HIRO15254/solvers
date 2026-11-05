@@ -1,0 +1,5 @@
+L01-gtsrp gtsrp 15m flops8.txt fold/raise-to:2000/fold/fold/fold/call:1000
+L02-gtsrp gtsrp 15m flops8.txt fold/fold/fold/fold/raise-to:3000/call:2000
+L03-gtsrp gtsrp 15m flops8.txt raise-to:2000/fold/fold/fold/fold/call:1000
+L04-gtsrp gtsrp 15m flops8.txt fold/fold/fold/raise-to:2500/fold/call:1500
+L05-gtsrp gtsrp 15m flops8.txt fold/fold/raise-to:2300/fold/fold/call:1300

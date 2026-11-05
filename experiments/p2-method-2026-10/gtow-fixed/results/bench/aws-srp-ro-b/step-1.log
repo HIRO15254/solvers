@@ -1,0 +1,26 @@
+own-ro srp 3 train 2036s diag 37s L1: 181 leaves; 16100 postflop decisions; 40752000 slots; 652032000 storage bytes
+own-ro srp 4 train 1916s diag 39s L1: 181 leaves; 16100 postflop decisions; 40752000 slots; 652032000 storage bytes
+own-ro srp 5 train 2029s diag 38s L1: 181 leaves; 16100 postflop decisions; 40752000 slots; 652032000 storage bytes
+	Command being timed: "bash -c bash ~/run_own_cloud.sh own-ro ~/plan-ro.tsv"
+	User time (seconds): 8990.85
+	System time (seconds): 5533.97
+	Percent of CPU this job got: 238%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:41:34
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 29415556
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 2974073762
+	Voluntary context switches: 2279278
+	Involuntary context switches: 1528925
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 1912344
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

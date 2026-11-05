@@ -1,0 +1,1 @@
+python3 $X/p1_classes.py ~/gtow.profile.json ~/tasks-raise.txt ~ ~/out/p1/p1-gtow/out --solvers $S

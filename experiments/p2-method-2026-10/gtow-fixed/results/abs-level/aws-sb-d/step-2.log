@@ -1,0 +1,24 @@
+bl1k 3bet 4 train 636s diag 34s L1: 181 leaves; 16100 postflop decisions; 437873408 slots; 7005974528 storage bytes
+	Command being timed: "bash -c TRAIN_ARGS='--l1-boards-late 128:1001' bash ~/run_own_cloud.sh bl1k <(awk -F'\t' '$1=="3bet" && $2==4' ~/plan-sb.tsv)"
+	User time (seconds): 3917.12
+	System time (seconds): 116.84
+	Percent of CPU this job got: 601%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 11:10.82
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 9748632
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 36974294
+	Voluntary context switches: 954452
+	Involuntary context switches: 105835
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 64864
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

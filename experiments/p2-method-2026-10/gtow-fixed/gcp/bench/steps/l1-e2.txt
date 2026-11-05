@@ -1,0 +1,5 @@
+NODIAG=1 LINES=~/all36-lines.txt bash $X/buckets.sh ~/e2.profile.json ~/out/train/e2 2000 rel8x2@raise5+g25+hd+sd1 rel8x2@raise5+hd+sd1
+DIAG_RIVERS=4 DIAG_JOBS=1 bash $X/bench_diag.sh ~/e2.profile.json ~/out/train/e2/rel8x2@raise5+g25+hd+sd1/postflop.bin ~/out/l1/e2 rel8x2@raise5+g25+hd+sd1 ~/bands.txt
+DIAG_RIVERS=4 DIAG_JOBS=1 bash $X/bench_diag.sh ~/e2.profile.json ~/out/train/e2/rel8x2@raise5+hd+sd1/postflop.bin ~/out/l1/e2 rel8x2@raise5+hd+sd1 ~/bands.txt
+DIAG_RIVERS=4 DIAG_JOBS=1 bash $X/bench_diag.sh ~/e2.profile.json ~/e2.postflop.bin ~/out/l1/e2 rel8x2@raise5+g25+hd ~/bands.txt
+DIAG_RIVERS=4 DIAG_JOBS=1 bash $X/bench_diag.sh ~/e2sd1.profile.json ~/e2sd1.postflop.bin ~/out/l1/e2sd1 rel8x2@raise5+g25+hd ~/bands-dev.txt

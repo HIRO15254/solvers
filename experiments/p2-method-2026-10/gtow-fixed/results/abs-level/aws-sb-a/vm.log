@@ -1,0 +1,52 @@
+2026-11-05T00:03:46Z ranked regions: placement-score cheapest-USD/hour region
+2026-11-05T00:03:46Z 9 0.209600 sa-east-1
+2026-11-05T00:03:46Z 9 0.263900 us-east-2
+2026-11-05T00:03:46Z 9 0.403600 us-east-1
+2026-11-05T00:04:32Z created launch template=p2-1793836986-33953-25428 region=sa-east-1 ami=ami-06ae896a166ca24f2
+2026-11-05T00:04:33Z requesting instant fleet region=sa-east-1 placement-score=9 types=c7a.8xlarge c6a.8xlarge c7i.8xlarge c6i.8xlarge m7a.8xlarge m7i.8xlarge m6a.8xlarge subnets=3
+2026-11-05T00:04:53Z using region=sa-east-1 instance=i-09f53cda7a18d3afa az=sa-east-1a type=c6a.8xlarge spot-price-usd-per-hour=0.229100 placement-score=9
+2026-11-05T00:04:59Z instance=i-09f53cda7a18d3afa status=running ip=18.228.151.8
+2026-11-05T00:06:46Z uploaded source, job and flat extra files
+2026-11-05T00:06:51Z launched instance=i-09f53cda7a18d3afa
+2026-11-05T00:06:56Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:07:00Z downloaded results
+2026-11-05T00:12:04Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:12:09Z downloaded results
+2026-11-05T00:17:17Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:17:22Z downloaded results
+2026-11-05T00:22:17Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:22:26Z downloaded results
+2026-11-05T00:27:29Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:27:36Z downloaded results
+2026-11-05T00:32:29Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:32:38Z downloaded results
+2026-11-05T00:35:02Z spot reclaim log: kind=ok region=sa-east-1 ran_s=1803
+2026-11-05T00:37:29Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:37:38Z downloaded results
+2026-11-05T00:42:45Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:42:53Z downloaded results
+2026-11-05T00:48:00Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:48:07Z downloaded results
+2026-11-05T00:53:14Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:53:23Z downloaded results
+2026-11-05T00:58:30Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:58:39Z downloaded results
+2026-11-05T01:03:46Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T01:03:54Z downloaded results
+2026-11-05T01:09:03Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T01:09:15Z downloaded results
+2026-11-05T01:14:04Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T01:14:11Z downloaded results
+2026-11-05T01:19:17Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T01:19:26Z downloaded results
+2026-11-05T01:24:17Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T01:24:25Z downloaded results
+2026-11-05T01:29:32Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T01:29:40Z downloaded results
+2026-11-05T01:34:43Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T01:34:57Z downloaded results
+2026-11-05T01:39:48Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T01:39:56Z downloaded results
+2026-11-05T01:40:10Z ALL_DONE final downloaded
+2026-11-05T01:40:49Z deleted instance=i-09f53cda7a18d3afa
+2026-11-05T01:40:52Z deleted launch template=p2-1793836986-33953-25428 region=sa-east-1

@@ -1,0 +1,14 @@
+Initial full-run command: qre_local.py full, 16 threads, eval-every 1000, l1-eval-boards 1024, state-every 1200 seconds.
+Retained command/log: .cache/p2-trunk/gtow-fixed/qre-genuine/lambda-0.5/{command.json,solve.log}
+Initial checkpoint evaluation: 87.911952 seconds.
+Last printed progress: Iteration 100, wall 3.784048 seconds/iteration.
+Fatal error: memory allocation of 3456000 bytes failed.
+Process failed after 785.19 seconds; no training state had yet been saved and no 1000-iteration profile exists.
+After abort, Win32_OperatingSystem reported 33471776 KiB total / 7847580 KiB free physical memory, 41860384 KiB total / 5008016 KiB free virtual commit.
+Unrelated user's solvers PID 34004: 5573607424 bytes working set, 5838348288 bytes private memory. Never touched.
+Resolution: retain 16 threads, disable NashConv evaluation, run finished-state segments to each 1000-iteration profile, state-every 120 seconds. Compare.py is the plateau metric. Finished-state resume preserves training/seeds; no cloud APIs/resources.
+Second attempt: 16 threads, eval-every 0, state-every 120 seconds, 1000-iteration finished-state segment.
+Failed after 135.25 seconds, before iteration 100 or a saved state, with memory allocation of 6758400 bytes failed.
+Retained command/log: .cache/p2-trunk/gtow-fixed/qre-genuine/lambda-0.5-profile-only/{command-1000.json,solve.log}
+After this abort, free virtual commit was 700052 KiB; free physical memory 5282116 KiB.
+At that observation, unrelated sol14_probe PID 7232 held 8378277888 bytes private / 8254636032 bytes working set. Never touched.

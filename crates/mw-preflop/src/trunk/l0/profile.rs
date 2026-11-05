@@ -9,7 +9,7 @@ use crate::{HistoryKey, mwsol::MultiwayStrategyBlock};
 /// unvisited-infoset uniform strategy and is separately marked as defaulted.
 #[derive(Clone)]
 pub struct Profile {
-    rows: Vec<Vec<f64>>,
+    pub(crate) rows: Vec<Vec<f64>>,
     defaulted: Vec<[bool; 169]>,
     fingerprint: [u8; 32],
 }

@@ -1,0 +1,27 @@
+rel16x2@raise5+g25+hd+sd1 94s 
+rel16x2@raise5+g25+hd+sd1 312s 
+rel16x2@raise5+g25+hd+sd1 370s 
+rel16x2@raise5+g25+hd+sd1 24s 
+	Command being timed: "bash -c DIAG_RIVERS=4 DIAG_JOBS=1 bash $X/bench_diag.sh ~/e2.profile.json ~/out/train/e2/rel16x2@raise5+g25+hd+sd1/postflop.bin ~/out/l1/e2 rel16x2@raise5+g25+hd+sd1 ~/bands.txt"
+	User time (seconds): 4366.80
+	System time (seconds): 76.60
+	Percent of CPU this job got: 555%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 13:20.47
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 2678880
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 30772929
+	Voluntary context switches: 747223
+	Involuntary context switches: 225618
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 65872
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

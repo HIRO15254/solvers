@@ -1,0 +1,23 @@
+	Command being timed: "target/release/examples/trunk_solve --config examples/bench/6max_100bb_nl50_partial_simple_reference.toml --leaf-model l1 --ehs2-cache /home/PC_User/ehs2/v2-f32-t32-r32.postcard --solver-k4-samples 256 --solver-k4-min-samples 16 --iterations 2000 --eval-every 1000 --l1-eval-boards 1024 --print-every 50 --output /home/PC_User/results/b4s-rel8x2.json --output-profile /home/PC_User/results/b4s-rel8x2.profile.json --output-postflop /home/PC_User/results/b4s-rel8x2.postflop.bin --l1-relative 8x2:/home/PC_User/ehs2/v2-f128-t128-r128.postcard"
+	User time (seconds): 107541.63
+	System time (seconds): 349.80
+	Percent of CPU this job got: 2797%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:04:16
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 2847096
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 1862994
+	Voluntary context switches: 15586437
+	Involuntary context switches: 247012
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 174160
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

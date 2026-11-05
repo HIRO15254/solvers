@@ -1,0 +1,14 @@
+python3 $X/p1_classes.py ~/gtow.profile.json ~/basis-raise.txt ~ ~/out/pilot/basis/out --solvers $S
+python3 $X/p1_classes.py ~/gtow.profile.json ~/basis-multi.txt ~ ~/out/pilot/basis/out --solvers $S
+python3 $X/p1_classes.py ~/gtow.profile.json ~/tasks24.txt ~ ~/out/pilot/p1-gtow-24 --solvers $S
+python3 $X/p1_classes.py ~/e2.profile.json ~/tasks24.txt ~ ~/out/pilot/p1-e2-24 --solvers $S --min-weight 0.0001
+python3 $X/p1_classes.py ~/gtow.profile.json ~/tasks8.txt ~ ~/out/pilot/p1-gtow-target01 --solvers $S --target 0.1%pot
+python3 $X/p1_classes.py ~/gtow.profile.json ~/tasks8.txt ~ ~/out/pilot/p1-gtow-extra --solvers $S --extra ~/extras.txt
+python3 $X/p1_classes.py ~/e2.profile.json ~/tasks8.txt ~ ~/out/pilot/p1-e2-minweight6 --solvers $S --min-weight 0.000001
+DIAG_RIVERS=1 DIAG_JOBS=1 bash $X/bench_diag.sh ~/gtow.profile.json ~/e2l1-it2000.bin ~/out/pilot/l1-gtow-rivers1-jobs1 rel8x2@raise5+g25+hd+sd1 ~/bands-pilot.txt
+DIAG_RIVERS=1 DIAG_JOBS=4 bash $X/bench_diag.sh ~/gtow.profile.json ~/e2l1-it2000.bin ~/out/pilot/l1-gtow-rivers1-jobs4 rel8x2@raise5+g25+hd+sd1 ~/bands-pilot.txt
+DIAG_RIVERS=1 DIAG_JOBS=8 bash $X/bench_diag.sh ~/gtow.profile.json ~/e2l1-it2000.bin ~/out/pilot/l1-gtow-rivers1-jobs8 rel8x2@raise5+g25+hd+sd1 ~/bands-pilot.txt
+DIAG_RIVERS=4 DIAG_JOBS=8 bash $X/bench_diag.sh ~/gtow.profile.json ~/e2l1-it2000.bin ~/out/pilot/l1-gtow-rivers4 rel8x2@raise5+g25+hd+sd1 ~/bands-pilot.txt
+DIAG_RIVERS=1 DIAG_JOBS=8 bash $X/bench_diag.sh ~/gtow.profile.json ~/e2l1-it4000.bin ~/out/pilot/l1-gtow-it4000 rel8x2@raise5+g25+hd+sd1 ~/bands-pilot.txt
+DIAG_RIVERS=1 DIAG_JOBS=8 bash $X/bench_diag.sh ~/e2.profile.json ~/e2.postflop.bin ~/out/pilot/l1-e2-rivers1 rel8x2@raise5+g25+hd ~/bands-pilot.txt
+NODIAG=1 LINES=~/all36-lines.txt bash $X/buckets.sh ~/gtow.profile.json ~/out/train/gtow 2000 rel8x2@raise5+hd+sd1

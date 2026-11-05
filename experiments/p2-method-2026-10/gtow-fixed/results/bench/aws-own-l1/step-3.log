@@ -1,0 +1,24 @@
+rel16x2@raise5+g49+hdq+sd1 4391s L1: 181 leaves; 16100 postflop decisions; 218936704 slots; 3502987264 storage bytes
+	Command being timed: "bash -c STATE_DIR=~/state NODIAG=1 LINES=~/all36-lines.txt bash $X/buckets.sh ~/r16g49q.profile.json ~/out/train/r16g49q 2000 rel16x2@raise5+g49+hdq+sd1"
+	User time (seconds): 55723.06
+	System time (seconds): 1776.60
+	Percent of CPU this job got: 1309%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:13:10
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 13665796
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 608819518
+	Voluntary context switches: 3145846
+	Involuntary context switches: 719055
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 92364024
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

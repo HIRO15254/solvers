@@ -1,0 +1,23 @@
+	Command being timed: "bash -c bash ~/override_solve.sh ~/out/ruler ov-e2-sd0 0 ~/x-e2.json ~/truth-p1.json"
+	User time (seconds): 53379.88
+	System time (seconds): 279.13
+	Percent of CPU this job got: 1967%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 45:27.39
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 4475160
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 52
+	Minor (reclaiming a frame) page faults: 21630372
+	Voluntary context switches: 9237183
+	Involuntary context switches: 722698
+	Swaps: 0
+	File system inputs: 1651352
+	File system outputs: 11415128
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

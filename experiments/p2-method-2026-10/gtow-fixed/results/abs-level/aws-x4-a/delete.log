@@ -1,0 +1,56 @@
+{
+    "TerminatingInstances": [
+        {
+            "InstanceId": "i-09095259b967d3fa8",
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "PreviousState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            }
+        }
+    ]
+}
+{
+    "LaunchTemplate": {
+        "LaunchTemplateId": "lt-0814481d0b32774f9",
+        "LaunchTemplateName": "p2-1793634155-45576-22130",
+        "CreateTime": "2026-11-02T15:43:27+00:00",
+        "CreatedBy": "arn:aws:iam::975049889077:user/solvers-spot",
+        "DefaultVersionNumber": 1,
+        "LatestVersionNumber": 1,
+        "Operator": {
+            "Managed": false
+        }
+    }
+}
+{
+    "TerminatingInstances": [
+        {
+            "InstanceId": "i-0adef17c1d0af08d3",
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "PreviousState": {
+                "Code": 16,
+                "Name": "running"
+            }
+        }
+    ]
+}
+{
+    "LaunchTemplate": {
+        "LaunchTemplateId": "lt-0ce39ca3f71d35cdf",
+        "LaunchTemplateName": "p2-1793634155-45576-22130",
+        "CreateTime": "2026-11-02T16:02:30+00:00",
+        "CreatedBy": "arn:aws:iam::975049889077:user/solvers-spot",
+        "DefaultVersionNumber": 1,
+        "LatestVersionNumber": 1,
+        "Operator": {
+            "Managed": false
+        }
+    }
+}

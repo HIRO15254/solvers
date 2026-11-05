@@ -1,0 +1,24 @@
+flop1 base train 701s diag 54s L1: 181 leaves; 16100 postflop decisions; 75957632 slots; 1215322112 storage bytes
+	Command being timed: "bash -c bash ~/sc_l1.sh flop1 base"
+	User time (seconds): 3429.21
+	System time (seconds): 46.22
+	Percent of CPU this job got: 459%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 12:35.59
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 4829620
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 11528510
+	Voluntary context switches: 1342101
+	Involuntary context switches: 268850
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 1188192
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

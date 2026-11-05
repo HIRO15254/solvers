@@ -1,0 +1,13 @@
+FLOP L01-gtsrp 5c Td Jd wall_s=408.8 it=366 cap=0
+FLOP L01-gtsrp 2c 4d Qh wall_s=805.5 it=441 cap=0
+FLOP L01-gtsrp Tc Td Kh wall_s=384.6 it=370 cap=0
+FLOP L01-gtsrp 5c 7c Kd wall_s=371.5 it=356 cap=0
+FLOP L01-gtsrp 4c 8d Tc wall_s=396.4 it=386 cap=0
+FLOP L01-gtsrp 3c Jd Kh wall_s=558.6 it=350 cap=0
+FLOP L01-gtsrp 3c 8c Qd wall_s=359.9 it=350 cap=0
+FLOP L01-gtsrp 5c 9d Kh wall_s=556.3 it=350 cap=0
+TASK L01-gtsrp flops=8
+FLOP L02-gtsrp 5c Td Jd wall_s=500.9 it=333 cap=0
+FLOP L02-gtsrp 2c 4d Qh wall_s=882.8 it=353 cap=0
+FLOP L02-gtsrp Tc Td Kh wall_s=538.2 it=359 cap=0
+FLOP L02-gtsrp 5c 7c Kd wall_s=531.2 it=350 cap=0

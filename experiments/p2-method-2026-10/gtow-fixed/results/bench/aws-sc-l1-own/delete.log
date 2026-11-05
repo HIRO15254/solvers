@@ -1,0 +1,43 @@
+{
+    "TerminatingInstances": [
+        {
+            "InstanceId": "i-04db48e59e8a713b0",
+            "CurrentState": {
+                "Code": 48,
+                "Name": "terminated"
+            },
+            "PreviousState": {
+                "Code": 48,
+                "Name": "terminated"
+            }
+        }
+    ]
+}
+{
+    "TerminatingInstances": [
+        {
+            "InstanceId": "i-0c1549e86db27b0ac",
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "PreviousState": {
+                "Code": 16,
+                "Name": "running"
+            }
+        }
+    ]
+}
+{
+    "LaunchTemplate": {
+        "LaunchTemplateId": "lt-0a034cdca5a0c32be",
+        "LaunchTemplateName": "p2-1793368417-63299-8822",
+        "CreateTime": "2026-10-30T13:54:07+00:00",
+        "CreatedBy": "arn:aws:iam::975049889077:user/solvers-spot",
+        "DefaultVersionNumber": 1,
+        "LatestVersionNumber": 1,
+        "Operator": {
+            "Managed": false
+        }
+    }
+}

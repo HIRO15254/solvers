@@ -1,0 +1,15 @@
+srp	4	fold/fold/fold/raise-to:2500/fold/call:1500	--l1-flop-groups none --l1-leaf-flop-groups ../sbl-own-L04.txt --l1-relative-opponent-levels flop,turn,river --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	9	fold/fold/raise-to:2300/raise-to:7500/fold/fold/call:5200	--l1-flop-groups ../L22.txt --l1-relative-opponent-levels flop,turn,river --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	11	fold/raise-to:2000/raise-to:6500/fold/fold/fold/call:4500	--l1-flop-groups ../L26.txt --l1-relative-opponent-levels flop,turn,river --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	14	raise-to:2000/fold/fold/raise-to:7500/fold/fold/call:5500	--l1-flop-groups ../L30.txt --l1-relative-opponent-levels flop,turn,river --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	4	fold/fold/raise-to:2300/fold/fold/raise-to:13500/call:11200	--l1-flop-groups ../L12.txt --l1-relative-opponent-levels flop,turn,river --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+4bet	15	fold/fold/raise-to:2300/fold/fold/raise-to:13500/raise-to:28000/call:14500	--l1-flop-groups ../L35.txt --l1-relative-opponent-levels flop,turn,river
+4bet	4	fold/fold/fold/raise-to:2500/raise-to:12000/fold/raise-to:26000/call:14000	--l1-flop-groups ../L14.txt --l1-relative-opponent-levels flop,turn,river
+4bet	11	fold/raise-to:2000/fold/fold/raise-to:11000/fold/raise-to:22000/call:11000	--l1-flop-groups ../L29.txt --l1-relative-opponent-levels flop,turn,river
+4bet	6	raise-to:2000/fold/fold/raise-to:7500/fold/fold/raise-to:20000/call:12500	--l1-flop-groups ../L16.txt --l1-relative-opponent-levels flop,turn,river
+4bet	2	raise-to:2000/fold/raise-to:6500/fold/fold/fold/raise-to:18000/call:11500	--l1-flop-groups ../L10.txt --l1-relative-opponent-levels flop,turn,river
+5bet	1	fold/raise-to:2000/raise-to:6500/fold/fold/fold/raise-to:19000/raise-to:34000/call:15000	--l1-flop-groups ../L36.txt --l1-relative-opponent-levels flop,turn,river
+srp	3	raise-to:2000/fold/fold/fold/fold/call:1000	--l1-flop-groups none --l1-leaf-flop-groups ../sbl-own-L03.txt --l1-relative-opponent-levels flop,turn,river --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+srp	5	fold/fold/raise-to:2300/fold/fold/call:1300	--l1-flop-groups none --l1-leaf-flop-groups ../sbl-own-L05.txt --l1-relative-opponent-levels flop,turn,river --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+srp	1	fold/raise-to:2000/fold/fold/fold/call:1000	--l1-flop-groups none --l1-leaf-flop-groups ../sbl-own-L01.txt --l1-relative-opponent-levels flop,turn,river --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+srp	2	fold/fold/fold/fold/raise-to:3000/call:2000	--l1-flop-groups none --l1-leaf-flop-groups ../sbl-own-L02.txt --l1-relative-opponent-levels flop,turn,river --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard

@@ -1,0 +1,2 @@
+bash ~/run_own_cloud.sh own-pr0 <(awk -F'\t' '$1=="srp" && $2==4' ~/plan-p0.tsv)
+bash ~/run_own_cloud.sh own-pr0 <(awk -F'\t' '$1=="srp" && $2==1' ~/plan-p0.tsv)

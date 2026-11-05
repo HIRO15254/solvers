@@ -1,0 +1,547 @@
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7356.9 MiB (f32) / 3683.1 MiB (i16) / 5520.0 MiB (i16-f32avg)
+memory estimate: 7541.0 MiB (f32) / 3867.2 MiB (i16) / 5704.1 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 7907283312 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.348e0 expl_p1=9.370e-1 nash_conv=2.285e0
+iter=      50 expl_p0=3.875e-1 expl_p1=3.750e-1 nash_conv=7.626e-1
+iter=     100 expl_p0=8.325e-2 expl_p1=9.990e-2 nash_conv=1.831e-1
+iter=     150 expl_p0=4.651e-2 expl_p1=4.693e-2 nash_conv=9.343e-2
+iter=     200 expl_p0=2.344e-2 expl_p1=2.176e-2 nash_conv=4.520e-2
+iter=     222 expl_p0=1.827e-2 expl_p1=1.671e-2 nash_conv=3.499e-2
+iter=     227 expl_p0=1.726e-2 expl_p1=1.586e-2 nash_conv=3.312e-2
+iter=     230 expl_p0=1.672e-2 expl_p1=1.535e-2 nash_conv=3.207e-2
+done: iterations=230 wall=73.04s ev_p0=1.964474 ev_p1=2.919794 nash_conv=3.207e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/solution.sol (10.16 MB, 3036 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/summary.csv
+FLOP L04-raise 5c Td Jd wall_s=73.0 it=230 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7362.8 MiB (f32) / 3686.1 MiB (i16) / 5524.5 MiB (i16-f32avg)
+memory estimate: 7546.9 MiB (f32) / 3870.2 MiB (i16) / 5708.6 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 7913536000 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.319e0 expl_p1=8.733e-1 nash_conv=2.192e0
+iter=      50 expl_p0=3.814e-1 expl_p1=3.747e-1 nash_conv=7.561e-1
+iter=     100 expl_p0=8.263e-2 expl_p1=9.736e-2 nash_conv=1.800e-1
+iter=     150 expl_p0=3.373e-2 expl_p1=3.356e-2 nash_conv=6.729e-2
+iter=     191 expl_p0=2.030e-2 expl_p1=1.837e-2 nash_conv=3.866e-2
+iter=     202 expl_p0=1.816e-2 expl_p1=1.618e-2 nash_conv=3.433e-2
+iter=     206 expl_p0=1.748e-2 expl_p1=1.545e-2 nash_conv=3.293e-2
+done: iterations=206 wall=66.80s ev_p0=1.949835 ev_p1=2.944808 nash_conv=3.293e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/solution.sol (9.98 MB, 3036 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/summary.csv
+FLOP L04-raise 5c Jc Kd wall_s=66.8 it=206 cap=0
+tree: nodes=2761036 terminals=1746272 rank_tables=1176 storage=12578.2 MiB (f32) / 6296.8 MiB (i16) / 9437.5 MiB (i16-f32avg)
+memory estimate: 12764.8 MiB (f32) / 6483.4 MiB (i16) / 9624.1 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 13384829912 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.740e0 expl_p1=1.036e0 nash_conv=2.776e0
+iter=      50 expl_p0=5.473e-1 expl_p1=4.077e-1 nash_conv=9.549e-1
+iter=     100 expl_p0=1.335e-1 expl_p1=1.419e-1 nash_conv=2.754e-1
+iter=     150 expl_p0=5.468e-2 expl_p1=6.106e-2 nash_conv=1.157e-1
+iter=     200 expl_p0=2.857e-2 expl_p1=2.918e-2 nash_conv=5.775e-2
+iter=     242 expl_p0=1.910e-2 expl_p1=1.897e-2 nash_conv=3.807e-2
+iter=     256 expl_p0=1.706e-2 expl_p1=1.690e-2 nash_conv=3.396e-2
+iter=     259 expl_p0=1.670e-2 expl_p1=1.650e-2 nash_conv=3.320e-2
+iter=     262 expl_p0=1.633e-2 expl_p1=1.608e-2 nash_conv=3.241e-2
+done: iterations=262 wall=140.05s ev_p0=2.255401 ev_p1=2.604249 nash_conv=3.241e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/solution.sol (15.01 MB, 4128 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/summary.csv
+FLOP L04-raise 2c 4d Qh wall_s=140.0 it=262 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7494.0 MiB (f32) / 3751.7 MiB (i16) / 5622.8 MiB (i16-f32avg)
+memory estimate: 7678.1 MiB (f32) / 3935.8 MiB (i16) / 5807.0 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 8051099392 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.277e0 expl_p1=1.013e0 nash_conv=2.290e0
+iter=      50 expl_p0=4.021e-1 expl_p1=3.689e-1 nash_conv=7.710e-1
+iter=     100 expl_p0=8.761e-2 expl_p1=8.687e-2 nash_conv=1.745e-1
+iter=     150 expl_p0=3.922e-2 expl_p1=3.702e-2 nash_conv=7.624e-2
+iter=     200 expl_p0=2.153e-2 expl_p1=1.893e-2 nash_conv=4.045e-2
+iter=     216 expl_p0=1.831e-2 expl_p1=1.588e-2 nash_conv=3.419e-2
+iter=     219 expl_p0=1.781e-2 expl_p1=1.544e-2 nash_conv=3.325e-2
+iter=     222 expl_p0=1.871e-2 expl_p1=1.633e-2 nash_conv=3.504e-2
+iter=     247 expl_p0=1.768e-2 expl_p1=1.388e-2 nash_conv=3.156e-2
+done: iterations=247 wall=81.86s ev_p0=2.054080 ev_p1=2.868792 nash_conv=3.156e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/solution.sol (9.78 MB, 3036 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/summary.csv
+FLOP L04-raise 4c 8c Ad wall_s=81.9 it=247 cap=0
+tree: nodes=1734172 terminals=1096316 rank_tables=810 storage=7401.6 MiB (f32) / 3705.6 MiB (i16) / 5553.6 MiB (i16-f32avg)
+memory estimate: 7585.8 MiB (f32) / 3889.8 MiB (i16) / 5737.8 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 7954251488 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.354e0 expl_p1=9.178e-1 nash_conv=2.272e0
+iter=      50 expl_p0=4.157e-1 expl_p1=3.979e-1 nash_conv=8.136e-1
+iter=     100 expl_p0=1.062e-1 expl_p1=1.246e-1 nash_conv=2.308e-1
+iter=     150 expl_p0=4.656e-2 expl_p1=4.990e-2 nash_conv=9.646e-2
+iter=     200 expl_p0=2.505e-2 expl_p1=2.483e-2 nash_conv=4.989e-2
+iter=     232 expl_p0=1.854e-2 expl_p1=1.768e-2 nash_conv=3.622e-2
+iter=     241 expl_p0=1.711e-2 expl_p1=1.624e-2 nash_conv=3.336e-2
+iter=     244 expl_p0=1.669e-2 expl_p1=1.583e-2 nash_conv=3.252e-2
+done: iterations=244 wall=75.42s ev_p0=1.718340 ev_p1=3.210098 nash_conv=3.252e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/solution.sol (9.67 MB, 3120 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/summary.csv
+FLOP L04-raise Tc Td Kh wall_s=75.4 it=244 cap=0
+tree: nodes=2761036 terminals=1746272 rank_tables=1176 storage=12205.6 MiB (f32) / 6110.5 MiB (i16) / 9158.1 MiB (i16-f32avg)
+memory estimate: 12392.1 MiB (f32) / 6297.0 MiB (i16) / 9344.6 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 12994108760 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.396e0 expl_p1=9.996e-1 nash_conv=2.395e0
+iter=      50 expl_p0=4.169e-1 expl_p1=3.827e-1 nash_conv=7.995e-1
+iter=     100 expl_p0=9.323e-2 expl_p1=1.040e-1 nash_conv=1.973e-1
+iter=     150 expl_p0=4.630e-2 expl_p1=3.813e-2 nash_conv=8.442e-2
+iter=     200 expl_p0=2.518e-2 expl_p1=2.025e-2 nash_conv=4.543e-2
+iter=     226 expl_p0=1.909e-2 expl_p1=1.562e-2 nash_conv=3.471e-2
+iter=     231 expl_p0=1.813e-2 expl_p1=1.497e-2 nash_conv=3.310e-2
+iter=     234 expl_p0=1.770e-2 expl_p1=1.455e-2 nash_conv=3.225e-2
+done: iterations=234 wall=121.63s ev_p0=1.989204 ev_p1=2.942132 nash_conv=3.225e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/solution.sol (14.37 MB, 4128 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/summary.csv
+FLOP L04-raise 6c 7d Ah wall_s=121.6 it=234 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7482.0 MiB (f32) / 3745.7 MiB (i16) / 5613.9 MiB (i16-f32avg)
+memory estimate: 7666.2 MiB (f32) / 3929.9 MiB (i16) / 5798.0 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 8038592976 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.381e0 expl_p1=1.033e0 nash_conv=2.415e0
+iter=      50 expl_p0=4.310e-1 expl_p1=3.748e-1 nash_conv=8.058e-1
+iter=     100 expl_p0=9.113e-2 expl_p1=9.502e-2 nash_conv=1.861e-1
+iter=     150 expl_p0=3.827e-2 expl_p1=3.650e-2 nash_conv=7.476e-2
+iter=     200 expl_p0=2.147e-2 expl_p1=1.874e-2 nash_conv=4.021e-2
+iter=     216 expl_p0=1.839e-2 expl_p1=1.592e-2 nash_conv=3.431e-2
+iter=     220 expl_p0=1.775e-2 expl_p1=1.527e-2 nash_conv=3.302e-2
+iter=     223 expl_p0=1.728e-2 expl_p1=1.483e-2 nash_conv=3.211e-2
+done: iterations=223 wall=74.08s ev_p0=2.109835 ev_p1=2.770913 nash_conv=3.211e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/solution.sol (10.21 MB, 3036 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/summary.csv
+FLOP L04-raise 5c 7c Kd wall_s=74.1 it=223 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7321.1 MiB (f32) / 3665.2 MiB (i16) / 5493.2 MiB (i16-f32avg)
+memory estimate: 7505.2 MiB (f32) / 3849.3 MiB (i16) / 5677.3 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 7869761808 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.315e0 expl_p1=8.023e-1 nash_conv=2.117e0
+iter=      50 expl_p0=3.996e-1 expl_p1=4.306e-1 nash_conv=8.302e-1
+iter=     100 expl_p0=8.718e-2 expl_p1=1.109e-1 nash_conv=1.981e-1
+iter=     150 expl_p0=3.541e-2 expl_p1=3.770e-2 nash_conv=7.311e-2
+iter=     196 expl_p0=2.020e-2 expl_p1=1.905e-2 nash_conv=3.925e-2
+iter=     209 expl_p0=2.208e-2 expl_p1=2.244e-2 nash_conv=4.452e-2
+iter=     234 expl_p0=2.017e-2 expl_p1=1.667e-2 nash_conv=3.684e-2
+iter=     247 expl_p0=1.809e-2 expl_p1=1.437e-2 nash_conv=3.246e-2
+done: iterations=247 wall=78.16s ev_p0=1.829619 ev_p1=3.048211 nash_conv=3.246e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/solution.sol (9.98 MB, 3036 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/summary.csv
+FLOP L04-raise 6c Tc Kd wall_s=78.2 it=247 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7523.8 MiB (f32) / 3766.6 MiB (i16) / 5645.2 MiB (i16-f32avg)
+memory estimate: 7707.9 MiB (f32) / 3950.7 MiB (i16) / 5829.3 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 8082361968 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.388e0 expl_p1=1.006e0 nash_conv=2.394e0
+iter=      50 expl_p0=4.054e-1 expl_p1=4.251e-1 nash_conv=8.305e-1
+iter=     100 expl_p0=1.049e-1 expl_p1=1.361e-1 nash_conv=2.411e-1
+iter=     150 expl_p0=4.225e-2 expl_p1=4.493e-2 nash_conv=8.718e-2
+iter=     200 expl_p0=2.278e-2 expl_p1=2.183e-2 nash_conv=4.462e-2
+iter=     223 expl_p0=1.813e-2 expl_p1=1.707e-2 nash_conv=3.520e-2
+iter=     229 expl_p0=1.725e-2 expl_p1=1.607e-2 nash_conv=3.332e-2
+iter=     232 expl_p0=1.679e-2 expl_p1=1.559e-2 nash_conv=3.239e-2
+done: iterations=232 wall=76.00s ev_p0=1.976797 ev_p1=2.871518 nash_conv=3.239e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/solution.sol (10.54 MB, 3036 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/summary.csv
+FLOP L04-raise 4c 8d Tc wall_s=76.0 it=232 cap=0
+tree: nodes=2761036 terminals=1746272 rank_tables=1176 storage=11725.2 MiB (f32) / 5870.3 MiB (i16) / 8797.8 MiB (i16-f32avg)
+memory estimate: 11911.7 MiB (f32) / 6056.8 MiB (i16) / 8984.2 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 12490281248 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.324e0 expl_p1=8.037e-1 nash_conv=2.128e0
+iter=      50 expl_p0=4.733e-1 expl_p1=5.064e-1 nash_conv=9.797e-1
+iter=     100 expl_p0=1.078e-1 expl_p1=1.464e-1 nash_conv=2.542e-1
+iter=     150 expl_p0=4.132e-2 expl_p1=5.574e-2 nash_conv=9.707e-2
+iter=     200 expl_p0=2.516e-2 expl_p1=2.843e-2 nash_conv=5.359e-2
+iter=     243 expl_p0=1.651e-2 expl_p1=1.750e-2 nash_conv=3.401e-2
+iter=     246 expl_p0=1.602e-2 expl_p1=1.695e-2 nash_conv=3.296e-2
+done: iterations=246 wall=115.91s ev_p0=1.784797 ev_p1=3.133865 nash_conv=3.296e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/solution.sol (13.39 MB, 4128 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/summary.csv
+FLOP L04-raise Tc Qd Ah wall_s=115.9 it=246 cap=0
+tree: nodes=2761036 terminals=1746272 rank_tables=1176 storage=12225.2 MiB (f32) / 6120.3 MiB (i16) / 9172.8 MiB (i16-f32avg)
+memory estimate: 12411.8 MiB (f32) / 6306.9 MiB (i16) / 9359.3 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 13014673040 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.404e0 expl_p1=8.358e-1 nash_conv=2.240e0
+iter=      50 expl_p0=3.858e-1 expl_p1=3.828e-1 nash_conv=7.686e-1
+iter=     100 expl_p0=8.678e-2 expl_p1=1.090e-1 nash_conv=1.958e-1
+iter=     150 expl_p0=3.772e-2 expl_p1=3.891e-2 nash_conv=7.662e-2
+iter=     200 expl_p0=2.023e-2 expl_p1=1.903e-2 nash_conv=3.926e-2
+iter=     213 expl_p0=1.770e-2 expl_p1=1.639e-2 nash_conv=3.409e-2
+iter=     216 expl_p0=1.795e-2 expl_p1=1.586e-2 nash_conv=3.382e-2
+iter=     224 expl_p0=5.185e-2 expl_p1=4.975e-2 nash_conv=1.016e-1
+iter=     249 expl_p0=5.688e-2 expl_p1=4.645e-2 nash_conv=1.033e-1
+iter=     274 expl_p0=4.134e-2 expl_p1=2.935e-2 nash_conv=7.069e-2
+iter=     321 expl_p0=2.374e-2 expl_p1=1.475e-2 nash_conv=3.850e-2
+iter=     332 expl_p0=2.118e-2 expl_p1=1.290e-2 nash_conv=3.408e-2
+iter=     335 expl_p0=2.057e-2 expl_p1=1.245e-2 nash_conv=3.303e-2
+iter=     338 expl_p0=1.997e-2 expl_p1=1.204e-2 nash_conv=3.201e-2
+done: iterations=338 wall=174.87s ev_p0=1.838417 ev_p1=3.069830 nash_conv=3.201e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/solution.sol (15.01 MB, 4128 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/summary.csv
+FLOP L04-raise 3c Jd Kh wall_s=174.9 it=338 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7279.3 MiB (f32) / 3644.4 MiB (i16) / 5461.9 MiB (i16-f32avg)
+memory estimate: 7463.5 MiB (f32) / 3828.5 MiB (i16) / 5646.0 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 7825995848 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.369e0 expl_p1=9.931e-1 nash_conv=2.363e0
+iter=      50 expl_p0=4.564e-1 expl_p1=5.039e-1 nash_conv=9.602e-1
+iter=     100 expl_p0=1.196e-1 expl_p1=1.544e-1 nash_conv=2.740e-1
+iter=     150 expl_p0=4.843e-2 expl_p1=5.527e-2 nash_conv=1.037e-1
+iter=     200 expl_p0=2.554e-2 expl_p1=2.621e-2 nash_conv=5.175e-2
+iter=     233 expl_p0=1.914e-2 expl_p1=1.938e-2 nash_conv=3.852e-2
+iter=     249 expl_p0=1.704e-2 expl_p1=1.666e-2 nash_conv=3.370e-2
+iter=     252 expl_p0=1.669e-2 expl_p1=1.618e-2 nash_conv=3.287e-2
+done: iterations=252 wall=80.68s ev_p0=1.818707 ev_p1=3.082375 nash_conv=3.287e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/solution.sol (9.70 MB, 3036 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/summary.csv
+FLOP L04-raise 8c Jd Ac wall_s=80.7 it=252 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7541.7 MiB (f32) / 3775.5 MiB (i16) / 5658.6 MiB (i16-f32avg)
+memory estimate: 7725.8 MiB (f32) / 3959.7 MiB (i16) / 5842.8 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 8101120120 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.442e0 expl_p1=9.787e-1 nash_conv=2.421e0
+iter=      50 expl_p0=4.518e-1 expl_p1=4.197e-1 nash_conv=8.715e-1
+iter=     100 expl_p0=9.617e-2 expl_p1=1.071e-1 nash_conv=2.032e-1
+iter=     150 expl_p0=4.053e-2 expl_p1=4.181e-2 nash_conv=8.234e-2
+iter=     200 expl_p0=2.242e-2 expl_p1=2.179e-2 nash_conv=4.421e-2
+iter=     224 expl_p0=1.779e-2 expl_p1=1.680e-2 nash_conv=3.459e-2
+iter=     228 expl_p0=1.719e-2 expl_p1=1.626e-2 nash_conv=3.345e-2
+iter=     231 expl_p0=1.682e-2 expl_p1=1.577e-2 nash_conv=3.260e-2
+done: iterations=231 wall=77.71s ev_p0=1.971439 ev_p1=2.906489 nash_conv=3.260e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/solution.sol (10.38 MB, 3036 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/summary.csv
+FLOP L04-raise 3c 8c Qd wall_s=77.7 it=231 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7565.5 MiB (f32) / 3787.4 MiB (i16) / 5676.5 MiB (i16-f32avg)
+memory estimate: 7749.7 MiB (f32) / 3971.6 MiB (i16) / 5860.6 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 8126130440 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.460e0 expl_p1=1.018e0 nash_conv=2.477e0
+iter=      50 expl_p0=4.794e-1 expl_p1=4.420e-1 nash_conv=9.214e-1
+iter=     100 expl_p0=9.633e-2 expl_p1=1.121e-1 nash_conv=2.084e-1
+iter=     150 expl_p0=4.654e-2 expl_p1=4.816e-2 nash_conv=9.470e-2
+iter=     200 expl_p0=2.637e-2 expl_p1=2.462e-2 nash_conv=5.099e-2
+iter=     236 expl_p0=1.842e-2 expl_p1=1.674e-2 nash_conv=3.516e-2
+iter=     242 expl_p0=1.741e-2 expl_p1=1.584e-2 nash_conv=3.325e-2
+iter=     245 expl_p0=1.697e-2 expl_p1=1.538e-2 nash_conv=3.235e-2
+done: iterations=245 wall=81.57s ev_p0=2.143394 ev_p1=2.694962 nash_conv=3.235e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/solution.sol (10.42 MB, 3036 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/summary.csv
+FLOP L04-raise 2c 6c Td wall_s=81.6 it=245 cap=0
+tree: nodes=2761036 terminals=1746272 rank_tables=1176 storage=12186.0 MiB (f32) / 6100.7 MiB (i16) / 9143.4 MiB (i16-f32avg)
+memory estimate: 12372.5 MiB (f32) / 6287.2 MiB (i16) / 9329.9 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 12973546040 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.514e0 expl_p1=9.173e-1 nash_conv=2.432e0
+iter=      50 expl_p0=4.297e-1 expl_p1=3.972e-1 nash_conv=8.270e-1
+iter=     100 expl_p0=9.714e-2 expl_p1=9.533e-2 nash_conv=1.925e-1
+iter=     150 expl_p0=4.338e-2 expl_p1=3.466e-2 nash_conv=7.804e-2
+iter=     200 expl_p0=2.505e-2 expl_p1=1.728e-2 nash_conv=4.233e-2
+iter=     220 expl_p0=2.106e-2 expl_p1=1.403e-2 nash_conv=3.509e-2
+iter=     226 expl_p0=1.991e-2 expl_p1=1.319e-2 nash_conv=3.309e-2
+iter=     229 expl_p0=1.935e-2 expl_p1=1.283e-2 nash_conv=3.217e-2
+done: iterations=229 wall=118.53s ev_p0=1.732616 ev_p1=3.090443 nash_conv=3.217e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/solution.sol (14.48 MB, 4128 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/summary.csv
+FLOP L04-raise 5c 9d Kh wall_s=118.5 it=229 cap=0
+tree: nodes=794513 terminals=501795 rank_tables=422 storage=3568.9 MiB (f32) / 1786.7 MiB (i16) / 2677.8 MiB (i16-f32avg)
+memory estimate: 3751.1 MiB (f32) / 1968.9 MiB (i16) / 2860.0 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 3933343304 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.474e0 expl_p1=1.227e0 nash_conv=2.701e0
+iter=      50 expl_p0=4.908e-1 expl_p1=4.249e-1 nash_conv=9.157e-1
+iter=     100 expl_p0=1.230e-1 expl_p1=1.120e-1 nash_conv=2.350e-1
+iter=     150 expl_p0=7.859e-2 expl_p1=5.710e-2 nash_conv=1.357e-1
+iter=     200 expl_p0=4.862e-2 expl_p1=2.917e-2 nash_conv=7.779e-2
+iter=     250 expl_p0=2.772e-2 expl_p1=1.666e-2 nash_conv=4.438e-2
+iter=     276 expl_p0=2.212e-2 expl_p1=1.461e-2 nash_conv=3.674e-2
+iter=     289 expl_p0=1.964e-2 expl_p1=1.295e-2 nash_conv=3.259e-2
+done: iterations=289 wall=47.71s ev_p0=2.180180 ev_p1=2.708196 nash_conv=3.259e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/solution.sol (5.79 MB, 1944 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L04-raise/tmp/summary.csv
+FLOP L04-raise 6c 8c 9c wall_s=47.7 it=289 cap=0
+TASK L04-raise flops=16
+tree: nodes=1592822 terminals=1009831 rank_tables=799 storage=7294.8 MiB (f32) / 3651.8 MiB (i16) / 5473.3 MiB (i16-f32avg)
+memory estimate: 7478.7 MiB (f32) / 3835.8 MiB (i16) / 5657.3 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 7842022310 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.474e0 expl_p1=1.054e0 nash_conv=2.528e0
+iter=      50 expl_p0=3.927e-1 expl_p1=3.607e-1 nash_conv=7.534e-1
+iter=     100 expl_p0=9.224e-2 expl_p1=9.355e-2 nash_conv=1.858e-1
+iter=     150 expl_p0=5.006e-2 expl_p1=3.953e-2 nash_conv=8.959e-2
+iter=     200 expl_p0=2.874e-2 expl_p1=2.016e-2 nash_conv=4.890e-2
+iter=     226 expl_p0=2.141e-2 expl_p1=1.552e-2 nash_conv=3.692e-2
+iter=     229 expl_p0=2.076e-2 expl_p1=1.509e-2 nash_conv=3.585e-2
+done: iterations=229 wall=73.49s ev_p0=2.719232 ev_p1=2.555493 nash_conv=3.585e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/solution.sol (9.88 MB, 2892 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/summary.csv
+FLOP L02-raise 5c Td Jd wall_s=73.5 it=229 cap=0
+tree: nodes=1592822 terminals=1009831 rank_tables=799 storage=7255.2 MiB (f32) / 3632.0 MiB (i16) / 5443.6 MiB (i16-f32avg)
+memory estimate: 7439.1 MiB (f32) / 3816.0 MiB (i16) / 5627.6 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 7800502358 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.588e0 expl_p1=1.026e0 nash_conv=2.614e0
+iter=      50 expl_p0=4.160e-1 expl_p1=3.484e-1 nash_conv=7.644e-1
+iter=     100 expl_p0=1.020e-1 expl_p1=9.857e-2 nash_conv=2.006e-1
+iter=     150 expl_p0=4.328e-2 expl_p1=3.728e-2 nash_conv=8.057e-2
+iter=     200 expl_p0=2.306e-2 expl_p1=1.974e-2 nash_conv=4.280e-2
+iter=     214 expl_p0=1.991e-2 expl_p1=1.725e-2 nash_conv=3.716e-2
+iter=     217 expl_p0=1.939e-2 expl_p1=1.677e-2 nash_conv=3.616e-2
+iter=     220 expl_p0=1.911e-2 expl_p1=1.634e-2 nash_conv=3.544e-2
+done: iterations=220 wall=70.05s ev_p0=2.725008 ev_p1=2.583647 nash_conv=3.544e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/solution.sol (9.60 MB, 2892 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/summary.csv
+FLOP L02-raise 5c Jc Kd wall_s=70.0 it=220 cap=0
+tree: nodes=2619328 terminals=1661404 rank_tables=1176 storage=12470.0 MiB (f32) / 6242.3 MiB (i16) / 9356.1 MiB (i16-f32avg)
+memory estimate: 12656.3 MiB (f32) / 6428.6 MiB (i16) / 9542.5 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 13271122006 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.601e0 expl_p1=1.240e0 nash_conv=2.841e0
+iter=      50 expl_p0=5.364e-1 expl_p1=4.135e-1 nash_conv=9.499e-1
+iter=     100 expl_p0=1.374e-1 expl_p1=1.052e-1 nash_conv=2.426e-1
+iter=     150 expl_p0=5.616e-2 expl_p1=4.673e-2 nash_conv=1.029e-1
+iter=     200 expl_p0=3.072e-2 expl_p1=2.567e-2 nash_conv=5.639e-2
+iter=     239 expl_p0=2.151e-2 expl_p1=1.769e-2 nash_conv=3.921e-2
+iter=     248 expl_p0=2.003e-2 expl_p1=1.646e-2 nash_conv=3.649e-2
+iter=     251 expl_p0=1.962e-2 expl_p1=1.604e-2 nash_conv=3.566e-2
+done: iterations=251 wall=132.90s ev_p0=2.740406 ev_p1=2.502196 nash_conv=3.566e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/solution.sol (14.53 MB, 3932 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/summary.csv
+FLOP L02-raise 2c 4d Qh wall_s=132.9 it=251 cap=0
+tree: nodes=1592822 terminals=1009831 rank_tables=799 storage=7215.6 MiB (f32) / 3612.2 MiB (i16) / 5413.9 MiB (i16-f32avg)
+memory estimate: 7399.5 MiB (f32) / 3796.2 MiB (i16) / 5597.9 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 7758986998 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.569e0 expl_p1=1.077e0 nash_conv=2.646e0
+iter=      50 expl_p0=4.560e-1 expl_p1=3.783e-1 nash_conv=8.343e-1
+iter=     100 expl_p0=1.445e-1 expl_p1=1.177e-1 nash_conv=2.622e-1
+iter=     150 expl_p0=6.541e-2 expl_p1=5.186e-2 nash_conv=1.173e-1
+iter=     200 expl_p0=3.464e-2 expl_p1=2.531e-2 nash_conv=5.995e-2
+iter=     240 expl_p0=2.222e-2 expl_p1=1.689e-2 nash_conv=3.911e-2
+iter=     247 expl_p0=2.077e-2 expl_p1=1.582e-2 nash_conv=3.659e-2
+iter=     250 expl_p0=2.017e-2 expl_p1=1.544e-2 nash_conv=3.561e-2
+done: iterations=250 wall=78.74s ev_p0=2.961973 ev_p1=2.353327 nash_conv=3.561e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/solution.sol (9.66 MB, 2892 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/summary.csv
+FLOP L02-raise 4c 8c Ad wall_s=78.7 it=250 cap=0
+tree: nodes=1645168 terminals=1043032 rank_tables=810 storage=7458.6 MiB (f32) / 3733.9 MiB (i16) / 5596.2 MiB (i16-f32avg)
+memory estimate: 7642.6 MiB (f32) / 3917.9 MiB (i16) / 5780.3 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 8013881342 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.743e0 expl_p1=1.368e0 nash_conv=3.111e0
+iter=      50 expl_p0=5.934e-1 expl_p1=4.182e-1 nash_conv=1.012e0
+iter=     100 expl_p0=1.440e-1 expl_p1=1.277e-1 nash_conv=2.718e-1
+iter=     150 expl_p0=7.117e-2 expl_p1=5.606e-2 nash_conv=1.272e-1
+iter=     200 expl_p0=3.809e-2 expl_p1=3.199e-2 nash_conv=7.008e-2
+iter=     250 expl_p0=2.591e-2 expl_p1=2.156e-2 nash_conv=4.747e-2
+iter=     285 expl_p0=1.980e-2 expl_p1=1.704e-2 nash_conv=3.684e-2
+iter=     288 expl_p0=1.937e-2 expl_p1=1.673e-2 nash_conv=3.610e-2
+iter=     291 expl_p0=1.892e-2 expl_p1=1.644e-2 nash_conv=3.536e-2
+done: iterations=291 wall=91.56s ev_p0=2.892126 ev_p1=2.449105 nash_conv=3.536e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/solution.sol (9.77 MB, 2972 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/summary.csv
+FLOP L02-raise Tc Td Kh wall_s=91.6 it=291 cap=0
+tree: nodes=2619328 terminals=1661404 rank_tables=1176 storage=11688.9 MiB (f32) / 5851.7 MiB (i16) / 8770.3 MiB (i16-f32avg)
+memory estimate: 11875.0 MiB (f32) / 6037.9 MiB (i16) / 8956.5 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 12451880726 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.682e0 expl_p1=1.274e0 nash_conv=2.956e0
+iter=      50 expl_p0=4.974e-1 expl_p1=4.526e-1 nash_conv=9.500e-1
+iter=     100 expl_p0=1.385e-1 expl_p1=1.414e-1 nash_conv=2.799e-1
+iter=     150 expl_p0=5.535e-2 expl_p1=5.585e-2 nash_conv=1.112e-1
+iter=     200 expl_p0=2.907e-2 expl_p1=2.891e-2 nash_conv=5.798e-2
+iter=     238 expl_p0=1.999e-2 expl_p1=2.001e-2 nash_conv=4.000e-2
+iter=     248 expl_p0=1.836e-2 expl_p1=1.834e-2 nash_conv=3.670e-2
+iter=     251 expl_p0=1.788e-2 expl_p1=1.789e-2 nash_conv=3.577e-2
+done: iterations=251 wall=123.69s ev_p0=2.728747 ev_p1=2.586731 nash_conv=3.577e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/solution.sol (13.98 MB, 3932 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/summary.csv
+FLOP L02-raise 6c 7d Ah wall_s=123.7 it=251 cap=0
+tree: nodes=1592822 terminals=1009831 rank_tables=799 storage=7243.9 MiB (f32) / 3626.4 MiB (i16) / 5435.1 MiB (i16-f32avg)
+memory estimate: 7427.8 MiB (f32) / 3810.3 MiB (i16) / 5619.1 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 7788638462 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.518e0 expl_p1=1.080e0 nash_conv=2.598e0
+iter=      50 expl_p0=4.663e-1 expl_p1=3.699e-1 nash_conv=8.362e-1
+iter=     100 expl_p0=1.059e-1 expl_p1=9.921e-2 nash_conv=2.052e-1
+iter=     150 expl_p0=4.733e-2 expl_p1=4.554e-2 nash_conv=9.288e-2
+iter=     200 expl_p0=2.491e-2 expl_p1=2.313e-2 nash_conv=4.803e-2
+iter=     222 expl_p0=2.001e-2 expl_p1=1.834e-2 nash_conv=3.834e-2
+iter=     228 expl_p0=1.894e-2 expl_p1=1.727e-2 nash_conv=3.621e-2
+iter=     231 expl_p0=1.845e-2 expl_p1=1.677e-2 nash_conv=3.522e-2
+done: iterations=231 wall=74.35s ev_p0=2.544670 ev_p1=2.753533 nash_conv=3.522e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/solution.sol (9.88 MB, 2892 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/summary.csv
+FLOP L02-raise 5c 7c Kd wall_s=74.3 it=231 cap=0
+tree: nodes=1592822 terminals=1009831 rank_tables=799 storage=7215.6 MiB (f32) / 3612.2 MiB (i16) / 5413.9 MiB (i16-f32avg)
+memory estimate: 7399.5 MiB (f32) / 3796.2 MiB (i16) / 5597.9 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 7758984918 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.617e0 expl_p1=1.059e0 nash_conv=2.676e0
+iter=      50 expl_p0=4.256e-1 expl_p1=3.666e-1 nash_conv=7.922e-1
+iter=     100 expl_p0=1.038e-1 expl_p1=9.924e-2 nash_conv=2.031e-1
+iter=     150 expl_p0=6.543e-2 expl_p1=4.732e-2 nash_conv=1.127e-1
+iter=     200 expl_p0=3.335e-2 expl_p1=2.446e-2 nash_conv=5.781e-2
+iter=     237 expl_p0=2.182e-2 expl_p1=1.704e-2 nash_conv=3.885e-2
+iter=     244 expl_p0=2.033e-2 expl_p1=1.593e-2 nash_conv=3.626e-2
+iter=     247 expl_p0=1.974e-2 expl_p1=1.549e-2 nash_conv=3.523e-2
+done: iterations=247 wall=78.13s ev_p0=2.758492 ev_p1=2.533101 nash_conv=3.523e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/solution.sol (9.72 MB, 2892 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/summary.csv
+FLOP L02-raise 6c Tc Kd wall_s=78.1 it=247 cap=0
+tree: nodes=1592822 terminals=1009831 rank_tables=799 storage=7357.0 MiB (f32) / 3682.9 MiB (i16) / 5520.0 MiB (i16-f32avg)
+memory estimate: 7541.0 MiB (f32) / 3866.9 MiB (i16) / 5703.9 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 7907261734 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.557e0 expl_p1=1.069e0 nash_conv=2.627e0
+iter=      50 expl_p0=4.777e-1 expl_p1=4.191e-1 nash_conv=8.968e-1
+iter=     100 expl_p0=1.276e-1 expl_p1=1.109e-1 nash_conv=2.385e-1
+iter=     150 expl_p0=5.163e-2 expl_p1=4.319e-2 nash_conv=9.481e-2
+iter=     200 expl_p0=2.635e-2 expl_p1=2.230e-2 nash_conv=4.865e-2
+iter=     223 expl_p0=2.049e-2 expl_p1=1.765e-2 nash_conv=3.815e-2
+iter=     228 expl_p0=1.951e-2 expl_p1=1.685e-2 nash_conv=3.636e-2
+iter=     231 expl_p0=1.891e-2 expl_p1=1.639e-2 nash_conv=3.530e-2
+done: iterations=231 wall=74.68s ev_p0=2.640133 ev_p1=2.623467 nash_conv=3.530e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/solution.sol (10.17 MB, 2892 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/summary.csv
+FLOP L02-raise 4c 8d Tc wall_s=74.7 it=231 cap=0
+tree: nodes=2619328 terminals=1661404 rank_tables=1176 storage=11707.5 MiB (f32) / 5861.0 MiB (i16) / 8784.2 MiB (i16-f32avg)
+memory estimate: 11893.6 MiB (f32) / 6047.2 MiB (i16) / 8970.4 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 12471389726 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.782e0 expl_p1=1.069e0 nash_conv=2.851e0
+iter=      50 expl_p0=5.100e-1 expl_p1=3.709e-1 nash_conv=8.809e-1
+iter=     100 expl_p0=1.121e-1 expl_p1=9.321e-2 nash_conv=2.053e-1
+iter=     150 expl_p0=4.640e-2 expl_p1=3.750e-2 nash_conv=8.390e-2
+iter=     200 expl_p0=2.609e-2 expl_p1=2.094e-2 nash_conv=4.703e-2
+iter=     223 expl_p0=2.107e-2 expl_p1=1.707e-2 nash_conv=3.814e-2
+iter=     229 expl_p0=1.989e-2 expl_p1=1.626e-2 nash_conv=3.615e-2
+iter=     232 expl_p0=1.943e-2 expl_p1=1.599e-2 nash_conv=3.542e-2
+done: iterations=232 wall=113.15s ev_p0=3.094555 ev_p1=2.208824 nash_conv=3.542e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/solution.sol (13.28 MB, 3932 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/summary.csv
+FLOP L02-raise Tc Qd Ah wall_s=113.2 it=232 cap=0
+tree: nodes=2619328 terminals=1661404 rank_tables=1176 storage=12144.5 MiB (f32) / 6079.5 MiB (i16) / 9112.0 MiB (i16-f32avg)
+memory estimate: 12330.8 MiB (f32) / 6265.8 MiB (i16) / 9298.3 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 12929772166 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.553e0 expl_p1=1.154e0 nash_conv=2.707e0
+iter=      50 expl_p0=4.848e-1 expl_p1=4.135e-1 nash_conv=8.983e-1
+iter=     100 expl_p0=1.101e-1 expl_p1=1.015e-1 nash_conv=2.116e-1
+iter=     150 expl_p0=4.740e-2 expl_p1=4.057e-2 nash_conv=8.796e-2
+iter=     200 expl_p0=5.200e-2 expl_p1=2.853e-2 nash_conv=8.054e-2
+iter=     250 expl_p0=2.708e-2 expl_p1=1.629e-2 nash_conv=4.337e-2
+iter=     264 expl_p0=2.309e-2 expl_p1=1.437e-2 nash_conv=3.746e-2
+iter=     268 expl_p0=2.203e-2 expl_p1=1.386e-2 nash_conv=3.589e-2
+done: iterations=268 wall=135.99s ev_p0=2.864974 ev_p1=2.442935 nash_conv=3.589e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/solution.sol (13.98 MB, 3932 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/summary.csv
+FLOP L02-raise 3c Jd Kh wall_s=136.0 it=268 cap=0
+tree: nodes=1592822 terminals=1009831 rank_tables=799 storage=7091.2 MiB (f32) / 3550.0 MiB (i16) / 5320.6 MiB (i16-f32avg)
+memory estimate: 7275.1 MiB (f32) / 3733.9 MiB (i16) / 5504.5 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 7628504510 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.770e0 expl_p1=1.045e0 nash_conv=2.815e0
+iter=      50 expl_p0=4.308e-1 expl_p1=3.620e-1 nash_conv=7.928e-1
+iter=     100 expl_p0=1.033e-1 expl_p1=9.181e-2 nash_conv=1.951e-1
+iter=     150 expl_p0=4.676e-2 expl_p1=3.723e-2 nash_conv=8.399e-2
+iter=     200 expl_p0=2.454e-2 expl_p1=1.978e-2 nash_conv=4.433e-2
+iter=     216 expl_p0=2.076e-2 expl_p1=1.672e-2 nash_conv=3.748e-2
+iter=     220 expl_p0=1.980e-2 expl_p1=1.629e-2 nash_conv=3.610e-2
+iter=     223 expl_p0=1.922e-2 expl_p1=1.574e-2 nash_conv=3.497e-2
+done: iterations=223 wall=68.24s ev_p0=3.039197 ev_p1=2.255808 nash_conv=3.497e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/solution.sol (9.31 MB, 2892 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/summary.csv
+FLOP L02-raise 8c Jd Ac wall_s=68.2 it=223 cap=0
+tree: nodes=1592822 terminals=1009831 rank_tables=799 storage=7419.2 MiB (f32) / 3714.0 MiB (i16) / 5566.6 MiB (i16-f32avg)
+memory estimate: 7603.2 MiB (f32) / 3898.0 MiB (i16) / 5750.6 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 7972499686 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.455e0 expl_p1=1.134e0 nash_conv=2.588e0
+iter=      50 expl_p0=4.268e-1 expl_p1=3.792e-1 nash_conv=8.060e-1
+iter=     100 expl_p0=1.050e-1 expl_p1=8.964e-2 nash_conv=1.946e-1
+iter=     150 expl_p0=4.439e-2 expl_p1=3.570e-2 nash_conv=8.009e-2
+iter=     200 expl_p0=2.339e-2 expl_p1=1.979e-2 nash_conv=4.319e-2
+iter=     215 expl_p0=1.984e-2 expl_p1=1.724e-2 nash_conv=3.708e-2
+iter=     218 expl_p0=1.921e-2 expl_p1=1.684e-2 nash_conv=3.606e-2
+iter=     221 expl_p0=1.867e-2 expl_p1=1.634e-2 nash_conv=3.501e-2
+done: iterations=221 wall=71.70s ev_p0=3.030651 ev_p1=2.221742 nash_conv=3.501e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/solution.sol (9.95 MB, 2892 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/summary.csv
+FLOP L02-raise 3c 8c Qd wall_s=71.7 it=221 cap=0
+tree: nodes=1592822 terminals=1009831 rank_tables=799 storage=7470.1 MiB (f32) / 3739.5 MiB (i16) / 5604.8 MiB (i16-f32avg)
+memory estimate: 7654.1 MiB (f32) / 3923.5 MiB (i16) / 5788.8 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 8025880414 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.503e0 expl_p1=1.082e0 nash_conv=2.585e0
+iter=      50 expl_p0=4.616e-1 expl_p1=3.942e-1 nash_conv=8.558e-1
+iter=     100 expl_p0=1.024e-1 expl_p1=1.035e-1 nash_conv=2.058e-1
+iter=     150 expl_p0=4.253e-2 expl_p1=4.003e-2 nash_conv=8.256e-2
+iter=     200 expl_p0=2.319e-2 expl_p1=2.105e-2 nash_conv=4.424e-2
+iter=     216 expl_p0=1.980e-2 expl_p1=1.795e-2 nash_conv=3.775e-2
+iter=     221 expl_p0=2.859e-2 expl_p1=1.770e-2 nash_conv=4.629e-2
+iter=     246 expl_p0=3.689e-2 expl_p1=2.505e-2 nash_conv=6.193e-2
+iter=     271 expl_p0=2.859e-2 expl_p1=1.818e-2 nash_conv=4.677e-2
+iter=     292 expl_p0=2.284e-2 expl_p1=1.439e-2 nash_conv=3.723e-2
+iter=     295 expl_p0=2.216e-2 expl_p1=1.391e-2 nash_conv=3.607e-2
+iter=     298 expl_p0=2.144e-2 expl_p1=1.346e-2 nash_conv=3.491e-2
+done: iterations=298 wall=97.29s ev_p0=2.507042 ev_p1=2.758935 nash_conv=3.491e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/solution.sol (10.37 MB, 2892 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/summary.csv
+FLOP L02-raise 2c 6c Td wall_s=97.3 it=298 cap=0
+tree: nodes=2619328 terminals=1661404 rank_tables=1176 storage=11884.2 MiB (f32) / 5949.4 MiB (i16) / 8916.8 MiB (i16-f32avg)
+memory estimate: 12070.4 MiB (f32) / 6135.6 MiB (i16) / 9103.0 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 12656692606 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.577e0 expl_p1=1.243e0 nash_conv=2.820e0
+iter=      50 expl_p0=4.543e-1 expl_p1=3.860e-1 nash_conv=8.403e-1
+iter=     100 expl_p0=1.043e-1 expl_p1=9.985e-2 nash_conv=2.041e-1
+iter=     150 expl_p0=4.423e-2 expl_p1=3.941e-2 nash_conv=8.364e-2
+iter=     200 expl_p0=2.380e-2 expl_p1=2.116e-2 nash_conv=4.496e-2
+iter=     218 expl_p0=1.971e-2 expl_p1=1.765e-2 nash_conv=3.736e-2
+iter=     222 expl_p0=1.907e-2 expl_p1=1.697e-2 nash_conv=3.605e-2
+iter=     225 expl_p0=1.845e-2 expl_p1=1.662e-2 nash_conv=3.507e-2
+done: iterations=225 wall=110.71s ev_p0=2.706943 ev_p1=2.559461 nash_conv=3.507e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/solution.sol (14.22 MB, 3932 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/summary.csv
+FLOP L02-raise 5c 9d Kh wall_s=110.7 it=225 cap=0
+tree: nodes=753737 terminals=477403 rank_tables=422 storage=3420.0 MiB (f32) / 1712.1 MiB (i16) / 2566.0 MiB (i16-f32avg)
+memory estimate: 3602.0 MiB (f32) / 1894.1 MiB (i16) / 2748.1 MiB (i16-f32avg)
+storage: f32 (auto: f32 needs 3777011478 bytes <= limit 53056264601 bytes)
+iter=      25 expl_p0=1.771e0 expl_p1=1.021e0 nash_conv=2.793e0
+iter=      50 expl_p0=5.804e-1 expl_p1=4.442e-1 nash_conv=1.025e0
+iter=     100 expl_p0=1.196e-1 expl_p1=1.390e-1 nash_conv=2.585e-1
+iter=     150 expl_p0=5.467e-2 expl_p1=5.496e-2 nash_conv=1.096e-1
+iter=     200 expl_p0=4.061e-2 expl_p1=3.284e-2 nash_conv=7.345e-2
+iter=     250 expl_p0=2.645e-2 expl_p1=2.068e-2 nash_conv=4.714e-2
+iter=     280 expl_p0=2.006e-2 expl_p1=1.611e-2 nash_conv=3.617e-2
+iter=     283 expl_p0=1.962e-2 expl_p1=1.568e-2 nash_conv=3.530e-2
+done: iterations=283 wall=43.49s ev_p0=2.539952 ev_p1=2.800480 nash_conv=3.530e-2
+sol: wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/solution.sol (5.62 MB, 1852 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1/base/L02-raise/tmp/summary.csv
+FLOP L02-raise 6c 8c 9c wall_s=43.5 it=283 cap=0
+TASK L02-raise flops=16
+	Command being timed: "bash -c python3 $X/p1_classes.py ~/base.profile.json ~/tasks-sc.txt ~ ~/out/sc/p1/base --solvers $S --min-weight 0.0001"
+	User time (seconds): 94132.20
+	System time (seconds): 340.22
+	Percent of CPU this job got: 3156%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 49:52.48
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 13964120
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 80506636
+	Voluntary context switches: 1375648
+	Involuntary context switches: 154633
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 730056
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

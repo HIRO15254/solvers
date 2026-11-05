@@ -1,0 +1,1 @@
+L04-gtsrp gtsrp 15m flops-p1m-b.txt fold/fold/fold/raise-to:2500/fold/call:1500

@@ -415,6 +415,31 @@ no-riversの未保存Riverをviewerで開くと再solveする。`export`も`--re
 再計算値を保存時の値と同一視しない。
 reportはlineに合うboardを指定し、board別root集計をCSVにする。
 
+### 保存した解を見る
+
+P2の保存解は`solvers browse`で対話的に見る。stdinのpipeも使える。
+
+```text
+$ solvers browse runs/my-spot/solution.mwsol --color never
+browse> show
+browse> strat
+browse> go 1
+browse> path
+selector: 1
+browse> range
+browse> up
+browse> quit
+```
+
+`grid 0`はaction 0の確率、`combos AKs`はclass単位のmix、`range 0`はseat 0の到達rangeを表示する。
+`--node 1`で同じnodeから開始できる。13×13はA〜2、suitedが対角の上である。
+実験用trunkの`p2-class-profile` version 1 JSONも内容判別で開ける。
+`solvers browse profile.json --config examples/bench/hu_pushfold_10bb.toml --color never`のように
+対応する設定を指定するとtrunk treeとのdecision数・path・actor・actionを検証し、設定のposition・開始rangeと各nodeのpot・残stack（BB）を表示する。
+位置が分かる場合は`range BTN`のように指定できる。`strat`はpathとactorの1行headerに続けてgridを表示する。
+設定なしでは開始rangeをfullと仮定し、position・pot・stack・EVはnot availableである。
+設定ありでもEVはnot availableで、構造の一致だけでは生成元configの同一性は保証しない。`.mwsol`に`--config`を指定すると入力errorになる。詳細は[CLI reference](cli-reference.jp.md#solvers-browse)を参照する。
+
 ### P2の照会・再評価・比較
 
 ```sh

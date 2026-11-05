@@ -1,0 +1,241 @@
+{
+  "checkpoints": [
+    {
+      "auxiliary_held_nash_conv": 6.118263497964922,
+      "auxiliary_nash_conv": 6.118263497964923,
+      "evaluation_seconds": 5.3887071,
+      "held_nash_conv": 2.4093420497049776,
+      "iteration": 0,
+      "nash_conv": 2.409343795790175,
+      "seats": [
+        {
+          "auxiliary_best_response": 3.025441391115025,
+          "auxiliary_gain": 3.244752173200176,
+          "auxiliary_held_a_to_b": 3.2472456442860045,
+          "auxiliary_held_b_to_a": 3.2422587021143454,
+          "auxiliary_held_gain": 3.244752173200175,
+          "auxiliary_telescoping_residual": -8.881784197001252e-16,
+          "best_response": 1.1880705666765212,
+          "gain": 1.407381348761672,
+          "held_a_to_b": 1.4073846108361834,
+          "held_b_to_a": 1.4073780866871608,
+          "held_gain": 1.407381348761672,
+          "l1_reach_share": 0.19444444444444423,
+          "seat": 0,
+          "telescoping_residual": -2.220446049250313e-16,
+          "value": -0.21931078208515078,
+          "value_a": -0.21932489398296257,
+          "value_b": -0.21929667018733923
+        },
+        {
+          "auxiliary_best_response": 3.0928221068498805,
+          "auxiliary_gain": 2.8735113247647477,
+          "auxiliary_held_a_to_b": 2.8746923906533466,
+          "auxiliary_held_b_to_a": 2.8723302588761483,
+          "auxiliary_held_gain": 2.8735113247647472,
+          "auxiliary_telescoping_residual": 1.3322676295501878e-15,
+          "best_response": 1.221273229113636,
+          "gain": 1.0019624470285031,
+          "held_a_to_b": 1.0019551465880348,
+          "held_b_to_a": 1.0019662552985769,
+          "held_gain": 1.0019607009433058,
+          "l1_reach_share": 0.19444444444444423,
+          "seat": 1,
+          "telescoping_residual": 1.1102230246251565e-15,
+          "value": 0.2193107820851328,
+          "value_a": 0.21932489398294538,
+          "value_b": 0.21929667018732135
+        }
+      ],
+      "seconds": 5.52536
+    },
+    {
+      "auxiliary_held_nash_conv": 1.254865718636356,
+      "auxiliary_nash_conv": 1.2551360336029704,
+      "evaluation_seconds": 5.6250926,
+      "held_nash_conv": -0.0007123912811123692,
+      "iteration": 1000,
+      "nash_conv": 0.002262669389680269,
+      "seats": [
+        {
+          "auxiliary_best_response": 0.5480797365441165,
+          "auxiliary_gain": 0.5134320865544875,
+          "auxiliary_held_a_to_b": 0.510599749691936,
+          "auxiliary_held_b_to_a": 0.5157237934838111,
+          "auxiliary_held_gain": 0.5131617715878736,
+          "auxiliary_telescoping_residual": 7.771561172376096e-16,
+          "best_response": 0.03575779901043853,
+          "gain": 0.001110149020809588,
+          "held_a_to_b": 0.000036561323403738744,
+          "held_b_to_a": -0.0001052613247473494,
+          "held_gain": -0.000034350000671805325,
+          "l1_reach_share": 0.6160013263632892,
+          "seat": 0,
+          "telescoping_residual": -2.45029690981724e-17,
+          "value": 0.034647649989628944,
+          "value_a": 0.034206984514292556,
+          "value_b": 0.03508831546496516
+        },
+        {
+          "auxiliary_best_response": 0.7057423520049054,
+          "auxiliary_gain": 0.7417039470484829,
+          "auxiliary_held_a_to_b": 0.7343968097667869,
+          "auxiliary_held_b_to_a": 0.7490110843301782,
+          "auxiliary_held_gain": 0.7417039470484825,
+          "auxiliary_telescoping_residual": -1.4432899320127035e-15,
+          "best_response": -0.034809074674706765,
+          "gain": 0.0011525203688706812,
+          "held_a_to_b": -0.0007660405694789874,
+          "held_b_to_a": -0.0005900419914021404,
+          "held_gain": -0.0006780412804405639,
+          "l1_reach_share": 0.6160013263632896,
+          "seat": 1,
+          "telescoping_residual": 4.0766001685454967e-17,
+          "value": -0.035961595043577446,
+          "value_a": -0.037345841949356424,
+          "value_b": -0.03457734813779844
+        }
+      ],
+      "seconds": 66.4607001
+    },
+    {
+      "auxiliary_held_nash_conv": 1.2787624422454116,
+      "auxiliary_nash_conv": 1.2790232340242547,
+      "evaluation_seconds": 5.6350812999999995,
+      "held_nash_conv": -0.0013243245976603917,
+      "iteration": 2000,
+      "nash_conv": 0.002163417239277869,
+      "seats": [
+        {
+          "auxiliary_best_response": 0.5608244585633222,
+          "auxiliary_gain": 0.5264098750373498,
+          "auxiliary_held_a_to_b": 0.5234441201622319,
+          "auxiliary_held_b_to_a": 0.5288546166595517,
+          "auxiliary_held_gain": 0.5261493684108918,
+          "auxiliary_telescoping_residual": 5.551115123125783e-16,
+          "best_response": 0.03581259408921428,
+          "gain": 0.0013980105632418818,
+          "held_a_to_b": -0.00008524771770528072,
+          "held_b_to_a": -0.000032489688394615746,
+          "held_gain": -0.000058868703049948234,
+          "l1_reach_share": 0.6194937211091819,
+          "seat": 0,
+          "telescoping_residual": -1.441988889405721e-16,
+          "value": 0.034414583525972396,
+          "value_a": 0.03407354459194251,
+          "value_b": 0.03475562246000244
+        },
+        {
+          "auxiliary_best_response": 0.7168810812951402,
+          "auxiliary_gain": 0.752613358986905,
+          "auxiliary_held_a_to_b": 0.7449753383545868,
+          "auxiliary_held_b_to_a": 0.7602508093144527,
+          "auxiliary_held_gain": 0.7526130738345198,
+          "auxiliary_telescoping_residual": -1.1102230246251565e-16,
+          "best_response": -0.03496687101572876,
+          "gain": 0.0007654066760359873,
+          "held_a_to_b": -0.0012412117572939696,
+          "held_b_to_a": -0.0012897000319269172,
+          "held_gain": -0.0012654558946104434,
+          "l1_reach_share": 0.6194937211091807,
+          "seat": 1,
+          "telescoping_residual": 1.1763593571467723e-16,
+          "value": -0.03573227769176475,
+          "value_a": -0.03719915713174706,
+          "value_b": -0.034265398251782424
+        }
+      ],
+      "seconds": 124.075555
+    }
+  ],
+  "ehs2": {
+    "blake3": "55df69080ecc8a308eaecffb00c227a231c93923f0ff015ad6eed30ef8e40f87",
+    "bucket_counts": {
+      "flop_buckets": 32,
+      "river_buckets": 32,
+      "turn_buckets": 32
+    },
+    "bytes": 357378844,
+    "path": "C:\\Users\\PC_User\\AppData\\Local/solvers/ehs2/v2-f32-t32-r32.postcard",
+    "refinement": {
+      "recall": 1,
+      "texture": 0
+    },
+    "relative": {
+      "buckets": 8,
+      "levels": 3,
+      "strength_table": "C:\\Users\\PC_User\\AppData\\Local/solvers/ehs2/v2-f128-t128-r128.postcard"
+    }
+  },
+  "format": "p2-trunk-solve",
+  "game_fingerprint": "a7e9ad90f312f1760d0ab75d3d625f7e48ab58352785240207d3517b41df080f",
+  "iterations": 2000,
+  "k4": {
+    "samples": 2048,
+    "seed": 0
+  },
+  "l1": {
+    "leaves": 5,
+    "postflop_nodes": 302,
+    "slots": 16272,
+    "storage_bytes": 260352
+  },
+  "leaf_model": "l1",
+  "options": {
+    "alpha": 1.5,
+    "beta": 1.0,
+    "eval_every": 1000,
+    "gamma": 2.0,
+    "iterations": 2000,
+    "k4_min_samples": null,
+    "k4_samples": null,
+    "l1_boards": 32,
+    "l1_eval_boards": 4096,
+    "l1_eval_control": true,
+    "l1_eval_regression": true,
+    "l1_eval_sampling": "stratified",
+    "l1_eval_seed": 0,
+    "l1_postflop_beta": 0.0,
+    "l1_sampling": "stratified",
+    "l1_seed": 0,
+    "l1_train_control": true,
+    "l1_train_regression": true,
+    "target_nash_conv": null
+  },
+  "reached_target": false,
+  "source": "examples/bench/hu_20bb_postflop.toml",
+  "tables": {
+    "t2": {
+      "payload_blake3": "885e99f5307de34fb311d4075ed9fc9d9ecb72ec15db36ee896704239b70da87"
+    },
+    "t3": {
+      "payload_blake3": "bdafa5c526d0b7207abe93b6281bd8e7cb9316fe2fb32e917f6c433ef7a044b8"
+    }
+  },
+  "terminals": {
+    "counts_by_k": [
+      0,
+      11,
+      11
+    ]
+  },
+  "timings": {
+    "model": 0.0033718,
+    "solve": {
+      "board_preparation": 1.6970326000000036,
+      "evaluation": 16.648881,
+      "evaluation_board_preparation": 0.1364696,
+      "k4": 0.00927390000000007,
+      "postflop": 103.15896140000024,
+      "reaches": 0.4761123000000004,
+      "t2": 1.6439048999999961,
+      "t3": 0.0006206999999999832,
+      "update": 0.2769553999999988
+    },
+    "tables": 0.1504507,
+    "total": 125.86618,
+    "tree": 0.0013979
+  },
+  "version": 2,
+  "warnings": []
+}

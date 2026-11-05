@@ -1,0 +1,12 @@
+L07-gt3bet gt3bet 5m 8 fold/fold/fold/raise-to:2500/raise-to:12000/fold/call:9500
+L13-gt3bet gt3bet 5m 8 fold/raise-to:2000/fold/fold/fold/raise-to:12300/call:10300
+L11-gt4bet gt4bet 4m 8 fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/call:11000
+L01-raise raise 3m 8 fold/raise-to:2000/fold/fold/fold/call:1000
+L04-raise raise 3m 8 fold/fold/fold/raise-to:2500/fold/call:1500
+L13-raise raise 90s 8 fold/raise-to:2000/fold/fold/fold/raise-to:12300/call:10300
+L22-raise raise 90s 8 fold/fold/raise-to:2300/raise-to:7500/fold/fold/call:5200
+L28-raise raise 90s 8 fold/raise-to:2000/fold/fold/raise-to:11000/fold/call:9000
+L10-raise raise 45s 8 raise-to:2000/fold/raise-to:6500/fold/fold/fold/raise-to:18000/call:11500
+L15-raise raise 45s 8 fold/raise-to:2000/raise-to:6500/fold/fold/fold/raise-to:19000/call:12500
+L23-raise raise 45s 8 raise-to:2000/fold/fold/fold/raise-to:10000/fold/raise-to:19000/call:9000
+L33-raise raise 45s 8 fold/raise-to:2000/fold/fold/fold/raise-to:12300/raise-to:24900/call:12600

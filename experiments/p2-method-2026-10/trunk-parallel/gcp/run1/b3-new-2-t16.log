@@ -1,0 +1,17 @@
+Postflop menus solved in L0 Checkdown mode.
+Tree: 5466 decisions, 6131 terminals (0.054s)
+Tables: 0.297s; model: 0.003s
+Iteration 1: wall 1.510173s; reaches 0.476283; t2 0.026217; t3 0.485736; k4 0.434563; update 0.003993; evaluation 0.000000
+Iteration 2: wall 0.706197s; reaches 0.111710; t2 0.019489; t3 0.269319; k4 0.290830; update 0.003957; evaluation 0.000000
+Iteration 3: wall 0.870281s; reaches 0.109200; t2 0.019419; t3 0.318744; k4 0.407934; update 0.004002; evaluation 0.000000
+Iteration 4: wall 0.905969s; reaches 0.105578; t2 0.018547; t3 0.301022; k4 0.466134; update 0.004024; evaluation 0.000000
+Iteration 5: wall 0.858632s; reaches 0.101511; t2 0.017988; t3 0.276217; k4 0.448108; update 0.004036; evaluation 0.000000
+Iteration 6: wall 0.865457s; reaches 0.100571; t2 0.017935; t3 0.264154; k4 0.468061; update 0.004006; evaluation 0.000000
+Iteration 7: wall 0.878311s; reaches 0.101145; t2 0.017778; t3 0.254312; k4 0.490218; update 0.003975; evaluation 0.000000
+Iteration 8: wall 0.915267s; reaches 0.101587; t2 0.017782; t3 0.260239; k4 0.520970; update 0.003960; evaluation 0.000000
+Iteration 9: wall 0.924096s; reaches 0.101639; t2 0.017405; t3 0.260361; k4 0.529979; update 0.003978; evaluation 0.000000
+Iteration 10: wall 0.928285s; reaches 0.101699; t2 0.017288; t3 0.263776; k4 0.530917; update 0.003957; evaluation 0.000000
+Iteration 11: wall 0.937776s; reaches 0.101864; t2 0.016911; t3 0.265289; k4 0.538698; update 0.004195; evaluation 0.000000
+Iteration 12: wall 40.093438s; reaches 0.101624; t2 0.017117; t3 0.260839; k4 0.543896; update 0.021152; evaluation 39.138031
+Checkpoint 12: NashConv 0.254859760706; gains [0.04989915725997893, 0.063400630829126, 0.06391375061414314, 0.014585888256892665, 0.02979200493187481, 0.03326832881410807]; 50.394002s
+Iterations: 12; reached target: false; solve phases SolveTimings { reaches: 1.6144104889999997, t2: 0.22387558000000002, t3: 3.48000999, k4: 5.6703093959999995, update: 0.065235805, evaluation: 39.138030782 }

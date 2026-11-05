@@ -1,0 +1,258 @@
+tree: nodes=10085822 terminals=6472341 rank_tables=799 storage=33356.1 MiB (f32) / 16705.5 MiB (i16) / 25030.8 MiB (i16-f32avg)
+memory estimate: 33876.1 MiB (f32) / 17225.5 MiB (i16) / 25550.8 MiB (i16-f32avg)
+iter=      25 expl_p0=1.693e0 expl_p1=1.259e0 nash_conv=2.952e0
+iter=      50 expl_p0=5.228e-1 expl_p1=5.164e-1 nash_conv=1.039e0
+iter=     100 expl_p0=1.494e-1 expl_p1=1.953e-1 nash_conv=3.446e-1
+iter=     150 expl_p0=6.696e-2 expl_p1=7.737e-2 nash_conv=1.443e-1
+iter=     200 expl_p0=3.693e-2 expl_p1=4.211e-2 nash_conv=7.904e-2
+iter=     250 expl_p0=2.502e-2 expl_p1=3.396e-2 nash_conv=5.899e-2
+iter=     300 expl_p0=2.291e-2 expl_p1=2.541e-2 nash_conv=4.832e-2
+iter=     350 expl_p0=1.369e-2 expl_p1=1.619e-2 nash_conv=2.988e-2
+iter=     360 expl_p0=1.301e-2 expl_p1=1.506e-2 nash_conv=2.807e-2
+iter=     366 expl_p0=1.253e-2 expl_p1=1.437e-2 nash_conv=2.690e-2
+done: iterations=366 wall=408.77s ev_p0=1.190236 ev_p1=2.746356 nash_conv=2.690e-2
+sol: wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/solution.sol (22.09 MB, 20491 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 8.46s (10085822 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 8.42s (10085822 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/summary.csv
+FLOP L01-gtsrp 5c Td Jd wall_s=408.8 it=366 cap=0
+tree: nodes=16583196 terminals=10647447 rank_tables=1176 storage=57167.2 MiB (f32) / 28628.7 MiB (i16) / 42897.9 MiB (i16-f32avg)
+memory estimate: 57687.2 MiB (f32) / 29148.7 MiB (i16) / 43417.9 MiB (i16-f32avg)
+iter=      25 expl_p0=2.563e0 expl_p1=1.594e0 nash_conv=4.156e0
+iter=      50 expl_p0=7.593e-1 expl_p1=5.373e-1 nash_conv=1.297e0
+iter=     100 expl_p0=1.693e-1 expl_p1=2.409e-1 nash_conv=4.102e-1
+iter=     150 expl_p0=6.968e-2 expl_p1=9.932e-2 nash_conv=1.690e-1
+iter=     200 expl_p0=3.986e-2 expl_p1=5.351e-2 nash_conv=9.336e-2
+iter=     250 expl_p0=2.794e-2 expl_p1=3.643e-2 nash_conv=6.436e-2
+iter=     300 expl_p0=2.206e-2 expl_p1=2.428e-2 nash_conv=4.634e-2
+iter=     350 expl_p0=1.969e-2 expl_p1=1.510e-2 nash_conv=3.479e-2
+iter=     391 expl_p0=2.182e-2 expl_p1=1.173e-2 nash_conv=3.355e-2
+iter=     441 expl_p0=1.659e-2 expl_p1=1.020e-2 nash_conv=2.680e-2
+done: iterations=441 wall=805.49s ev_p0=1.315458 ev_p1=2.652237 nash_conv=2.680e-2
+sol: wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/solution.sol (30.50 MB, 27875 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 13.73s (16583196 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 13.85s (16583196 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/summary.csv
+FLOP L01-gtsrp 2c 4d Qh wall_s=805.5 it=441 cap=0
+tree: nodes=10417236 terminals=6685119 rank_tables=810 storage=34050.2 MiB (f32) / 17053.4 MiB (i16) / 25551.8 MiB (i16-f32avg)
+memory estimate: 34570.2 MiB (f32) / 17573.4 MiB (i16) / 26071.8 MiB (i16-f32avg)
+iter=      25 expl_p0=2.262e0 expl_p1=1.364e0 nash_conv=3.626e0
+iter=      50 expl_p0=6.225e-1 expl_p1=4.943e-1 nash_conv=1.117e0
+iter=     100 expl_p0=1.810e-1 expl_p1=1.589e-1 nash_conv=3.399e-1
+iter=     150 expl_p0=6.922e-2 expl_p1=6.213e-2 nash_conv=1.314e-1
+iter=     200 expl_p0=3.916e-2 expl_p1=4.081e-2 nash_conv=7.996e-2
+iter=     250 expl_p0=2.796e-2 expl_p1=2.939e-2 nash_conv=5.735e-2
+iter=     300 expl_p0=3.691e-2 expl_p1=3.198e-2 nash_conv=6.889e-2
+iter=     325 expl_p0=2.195e-2 expl_p1=1.919e-2 nash_conv=4.113e-2
+iter=     343 expl_p0=1.747e-2 expl_p1=1.629e-2 nash_conv=3.375e-2
+iter=     361 expl_p0=1.476e-2 expl_p1=1.386e-2 nash_conv=2.863e-2
+iter=     367 expl_p0=1.403e-2 expl_p1=1.341e-2 nash_conv=2.744e-2
+iter=     370 expl_p0=1.372e-2 expl_p1=1.321e-2 nash_conv=2.693e-2
+done: iterations=370 wall=384.60s ev_p0=1.010936 ev_p1=3.045358 nash_conv=2.693e-2
+sol: wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/solution.sol (19.93 MB, 21059 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 8.72s (10417236 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 8.64s (10417236 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/summary.csv
+FLOP L01-gtsrp Tc Td Kh wall_s=384.6 it=370 cap=0
+tree: nodes=10085822 terminals=6472341 rank_tables=799 storage=33532.9 MiB (f32) / 16793.9 MiB (i16) / 25163.4 MiB (i16-f32avg)
+memory estimate: 34053.0 MiB (f32) / 17313.9 MiB (i16) / 25683.4 MiB (i16-f32avg)
+iter=      25 expl_p0=2.058e0 expl_p1=1.529e0 nash_conv=3.587e0
+iter=      50 expl_p0=5.854e-1 expl_p1=5.225e-1 nash_conv=1.108e0
+iter=     100 expl_p0=1.490e-1 expl_p1=2.213e-1 nash_conv=3.703e-1
+iter=     150 expl_p0=6.120e-2 expl_p1=9.411e-2 nash_conv=1.553e-1
+iter=     200 expl_p0=3.505e-2 expl_p1=5.408e-2 nash_conv=8.913e-2
+iter=     250 expl_p0=2.433e-2 expl_p1=3.861e-2 nash_conv=6.293e-2
+iter=     300 expl_p0=2.010e-2 expl_p1=2.692e-2 nash_conv=4.701e-2
+iter=     350 expl_p0=1.231e-2 expl_p1=1.551e-2 nash_conv=2.783e-2
+iter=     353 expl_p0=1.204e-2 expl_p1=1.522e-2 nash_conv=2.726e-2
+iter=     356 expl_p0=1.186e-2 expl_p1=1.495e-2 nash_conv=2.680e-2
+done: iterations=356 wall=371.46s ev_p0=1.260570 ev_p1=2.667698 nash_conv=2.680e-2
+sol: wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/solution.sol (18.92 MB, 20491 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 8.25s (10085822 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 8.25s (10085822 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/summary.csv
+FLOP L01-gtsrp 5c 7c Kd wall_s=371.5 it=356 cap=0
+tree: nodes=10085822 terminals=6472341 rank_tables=799 storage=33992.8 MiB (f32) / 17023.8 MiB (i16) / 25508.3 MiB (i16-f32avg)
+memory estimate: 34512.8 MiB (f32) / 17543.8 MiB (i16) / 26028.3 MiB (i16-f32avg)
+iter=      25 expl_p0=2.067e0 expl_p1=1.177e0 nash_conv=3.244e0
+iter=      50 expl_p0=6.478e-1 expl_p1=5.197e-1 nash_conv=1.168e0
+iter=     100 expl_p0=1.522e-1 expl_p1=2.429e-1 nash_conv=3.951e-1
+iter=     150 expl_p0=6.507e-2 expl_p1=1.033e-1 nash_conv=1.684e-1
+iter=     200 expl_p0=3.814e-2 expl_p1=5.710e-2 nash_conv=9.524e-2
+iter=     250 expl_p0=2.962e-2 expl_p1=3.834e-2 nash_conv=6.796e-2
+iter=     300 expl_p0=3.266e-2 expl_p1=3.805e-2 nash_conv=7.071e-2
+iter=     325 expl_p0=2.226e-2 expl_p1=2.655e-2 nash_conv=4.880e-2
+iter=     361 expl_p0=1.445e-2 expl_p1=1.771e-2 nash_conv=3.215e-2
+iter=     374 expl_p0=1.291e-2 expl_p1=1.622e-2 nash_conv=2.913e-2
+iter=     383 expl_p0=1.210e-2 expl_p1=1.541e-2 nash_conv=2.751e-2
+iter=     386 expl_p0=1.185e-2 expl_p1=1.509e-2 nash_conv=2.694e-2
+done: iterations=386 wall=396.38s ev_p0=1.379263 ev_p1=2.521142 nash_conv=2.694e-2
+sol: wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/solution.sol (23.14 MB, 20491 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 8.36s (10085822 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 8.43s (10085822 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/summary.csv
+FLOP L01-gtsrp 4c 8d Tc wall_s=396.4 it=386 cap=0
+tree: nodes=16583196 terminals=10647447 rank_tables=1176 storage=55422.5 MiB (f32) / 27756.3 MiB (i16) / 41589.4 MiB (i16-f32avg)
+memory estimate: 55942.5 MiB (f32) / 28276.3 MiB (i16) / 42109.4 MiB (i16-f32avg)
+iter=      25 expl_p0=2.020e0 expl_p1=1.050e0 nash_conv=3.070e0
+iter=      50 expl_p0=4.991e-1 expl_p1=4.371e-1 nash_conv=9.361e-1
+iter=     100 expl_p0=1.451e-1 expl_p1=1.723e-1 nash_conv=3.174e-1
+iter=     150 expl_p0=5.519e-2 expl_p1=6.732e-2 nash_conv=1.225e-1
+iter=     200 expl_p0=4.369e-2 expl_p1=3.802e-2 nash_conv=8.171e-2
+iter=     250 expl_p0=2.676e-2 expl_p1=2.878e-2 nash_conv=5.555e-2
+iter=     300 expl_p0=2.440e-2 expl_p1=2.085e-2 nash_conv=4.526e-2
+iter=     350 expl_p0=1.213e-2 expl_p1=1.320e-2 nash_conv=2.533e-2
+done: iterations=350 wall=558.56s ev_p0=0.994875 ev_p1=2.992127 nash_conv=2.533e-2
+sol: wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/solution.sol (26.24 MB, 27875 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 13.79s (16583196 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 13.82s (16583196 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/summary.csv
+FLOP L01-gtsrp 3c Jd Kh wall_s=558.6 it=350 cap=0
+tree: nodes=10085822 terminals=6472341 rank_tables=799 storage=34134.3 MiB (f32) / 17094.5 MiB (i16) / 25614.4 MiB (i16-f32avg)
+memory estimate: 34654.3 MiB (f32) / 17614.6 MiB (i16) / 26134.4 MiB (i16-f32avg)
+iter=      25 expl_p0=1.881e0 expl_p1=9.846e-1 nash_conv=2.866e0
+iter=      50 expl_p0=6.060e-1 expl_p1=4.216e-1 nash_conv=1.028e0
+iter=     100 expl_p0=1.429e-1 expl_p1=1.929e-1 nash_conv=3.359e-1
+iter=     150 expl_p0=5.909e-2 expl_p1=8.366e-2 nash_conv=1.428e-1
+iter=     200 expl_p0=3.375e-2 expl_p1=4.893e-2 nash_conv=8.269e-2
+iter=     250 expl_p0=2.413e-2 expl_p1=3.679e-2 nash_conv=6.093e-2
+iter=     300 expl_p0=2.083e-2 expl_p1=2.372e-2 nash_conv=4.456e-2
+iter=     350 expl_p0=1.115e-2 expl_p1=1.520e-2 nash_conv=2.634e-2
+done: iterations=350 wall=359.94s ev_p0=1.199267 ev_p1=2.728917 nash_conv=2.634e-2
+sol: wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/solution.sol (19.10 MB, 20491 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 8.40s (10085822 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 8.40s (10085822 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/summary.csv
+FLOP L01-gtsrp 3c 8c Qd wall_s=359.9 it=350 cap=0
+tree: nodes=16583196 terminals=10647447 rank_tables=1176 storage=54666.5 MiB (f32) / 27378.3 MiB (i16) / 41022.4 MiB (i16-f32avg)
+memory estimate: 55186.5 MiB (f32) / 27898.3 MiB (i16) / 41542.4 MiB (i16-f32avg)
+iter=      25 expl_p0=2.626e0 expl_p1=9.781e-1 nash_conv=3.604e0
+iter=      50 expl_p0=7.032e-1 expl_p1=3.754e-1 nash_conv=1.079e0
+iter=     100 expl_p0=1.629e-1 expl_p1=1.517e-1 nash_conv=3.146e-1
+iter=     150 expl_p0=6.588e-2 expl_p1=6.300e-2 nash_conv=1.289e-1
+iter=     200 expl_p0=3.675e-2 expl_p1=3.647e-2 nash_conv=7.322e-2
+iter=     250 expl_p0=2.541e-2 expl_p1=2.860e-2 nash_conv=5.401e-2
+iter=     300 expl_p0=2.388e-2 expl_p1=1.897e-2 nash_conv=4.285e-2
+iter=     350 expl_p0=1.302e-2 expl_p1=1.221e-2 nash_conv=2.524e-2
+done: iterations=350 wall=556.27s ev_p0=1.017573 ev_p1=2.897914 nash_conv=2.524e-2
+sol: wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/solution.sol (26.52 MB, 27875 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 13.50s (16583196 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 13.75s (16583196 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L01-gtsrp/tmp/summary.csv
+FLOP L01-gtsrp 5c 9d Kh wall_s=556.3 it=350 cap=0
+TASK L01-gtsrp flops=8
+tree: nodes=12376190 terminals=7883591 rank_tables=799 storage=47728.3 MiB (f32) / 23898.2 MiB (i16) / 35813.3 MiB (i16-f32avg)
+memory estimate: 48248.3 MiB (f32) / 24418.2 MiB (i16) / 36333.3 MiB (i16-f32avg)
+warning: unmatched Flop tree rule 5
+iter=      25 expl_p0=2.572e0 expl_p1=1.942e0 nash_conv=4.514e0
+iter=      50 expl_p0=8.663e-1 expl_p1=5.152e-1 nash_conv=1.382e0
+iter=     100 expl_p0=2.338e-1 expl_p1=1.277e-1 nash_conv=3.615e-1
+iter=     150 expl_p0=9.512e-2 expl_p1=5.443e-2 nash_conv=1.496e-1
+iter=     200 expl_p0=5.351e-2 expl_p1=3.491e-2 nash_conv=8.842e-2
+iter=     250 expl_p0=3.721e-2 expl_p1=2.726e-2 nash_conv=6.447e-2
+iter=     300 expl_p0=2.579e-2 expl_p1=1.991e-2 nash_conv=4.570e-2
+iter=     333 expl_p0=2.075e-2 expl_p1=1.456e-2 nash_conv=3.532e-2
+done: iterations=333 wall=500.94s ev_p0=2.785815 ev_p1=2.427722 nash_conv=3.532e-2
+sol: wrote /home/ubuntu/out/p1/p1-srp-multi/out/L02-gtsrp/tmp/solution.sol (38.45 MB, 31332 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 10.12s (12376190 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L02-gtsrp/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 10.11s (12376190 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L02-gtsrp/tmp/summary.csv
+FLOP L02-gtsrp 5c Td Jd wall_s=500.9 it=333 cap=0
+tree: nodes=20344020 terminals=12967540 rank_tables=1176 storage=82007.9 MiB (f32) / 41059.9 MiB (i16) / 61533.9 MiB (i16-f32avg)
+memory estimate: 82527.9 MiB (f32) / 41579.9 MiB (i16) / 62053.9 MiB (i16-f32avg)
+warning: unmatched Flop tree rule 5
+iter=      25 expl_p0=2.744e0 expl_p1=2.489e0 nash_conv=5.233e0
+iter=      50 expl_p0=9.472e-1 expl_p1=6.868e-1 nash_conv=1.634e0
+iter=     100 expl_p0=2.861e-1 expl_p1=1.625e-1 nash_conv=4.486e-1
+iter=     150 expl_p0=1.182e-1 expl_p1=7.224e-2 nash_conv=1.905e-1
+iter=     200 expl_p0=6.757e-2 expl_p1=4.536e-2 nash_conv=1.129e-1
+iter=     250 expl_p0=4.796e-2 expl_p1=3.540e-2 nash_conv=8.336e-2
+iter=     300 expl_p0=3.706e-2 expl_p1=2.694e-2 nash_conv=6.400e-2
+iter=     350 expl_p0=2.087e-2 expl_p1=1.525e-2 nash_conv=3.612e-2
+iter=     353 expl_p0=2.049e-2 expl_p1=1.499e-2 nash_conv=3.548e-2
+done: iterations=353 wall=882.79s ev_p0=2.705762 ev_p1=2.491536 nash_conv=3.548e-2
+sol: wrote /home/ubuntu/out/p1/p1-srp-multi/out/L02-gtsrp/tmp/solution.sol (50.84 MB, 42616 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 16.34s (20344020 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L02-gtsrp/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 16.32s (20344020 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L02-gtsrp/tmp/summary.csv
+FLOP L02-gtsrp 2c 4d Qh wall_s=882.8 it=353 cap=0
+tree: nodes=12782772 terminals=8142736 rank_tables=810 storage=48375.1 MiB (f32) / 24222.7 MiB (i16) / 36298.9 MiB (i16-f32avg)
+memory estimate: 48895.2 MiB (f32) / 24742.7 MiB (i16) / 36818.9 MiB (i16-f32avg)
+warning: unmatched Flop tree rule 5
+iter=      25 expl_p0=3.665e0 expl_p1=3.066e0 nash_conv=6.731e0
+iter=      50 expl_p0=1.082e0 expl_p1=7.249e-1 nash_conv=1.807e0
+iter=     100 expl_p0=2.629e-1 expl_p1=2.220e-1 nash_conv=4.849e-1
+iter=     150 expl_p0=1.057e-1 expl_p1=9.190e-2 nash_conv=1.976e-1
+iter=     200 expl_p0=6.022e-2 expl_p1=5.400e-2 nash_conv=1.142e-1
+iter=     250 expl_p0=4.540e-2 expl_p1=4.053e-2 nash_conv=8.593e-2
+iter=     300 expl_p0=3.117e-2 expl_p1=2.783e-2 nash_conv=5.899e-2
+iter=     350 expl_p0=1.911e-2 expl_p1=1.879e-2 nash_conv=3.790e-2
+iter=     356 expl_p0=1.851e-2 expl_p1=1.805e-2 nash_conv=3.656e-2
+iter=     359 expl_p0=1.814e-2 expl_p1=1.781e-2 nash_conv=3.595e-2
+done: iterations=359 wall=538.22s ev_p0=2.931990 ev_p1=2.336853 nash_conv=3.595e-2
+sol: wrote /home/ubuntu/out/p1/p1-srp-multi/out/L02-gtsrp/tmp/solution.sol (29.58 MB, 32200 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 10.45s (12782772 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L02-gtsrp/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 10.53s (12782772 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L02-gtsrp/tmp/summary.csv
+FLOP L02-gtsrp Tc Td Kh wall_s=538.2 it=359 cap=0
+tree: nodes=12376190 terminals=7883591 rank_tables=799 storage=48237.9 MiB (f32) / 24153.0 MiB (i16) / 36195.4 MiB (i16-f32avg)
+memory estimate: 48757.9 MiB (f32) / 24673.0 MiB (i16) / 36715.4 MiB (i16-f32avg)
+warning: unmatched Flop tree rule 5
+iter=      25 expl_p0=2.716e0 expl_p1=2.084e0 nash_conv=4.801e0
+iter=      50 expl_p0=8.714e-1 expl_p1=6.115e-1 nash_conv=1.483e0
+iter=     100 expl_p0=2.402e-1 expl_p1=1.522e-1 nash_conv=3.925e-1
+iter=     150 expl_p0=9.701e-2 expl_p1=6.539e-2 nash_conv=1.624e-1
+iter=     200 expl_p0=5.643e-2 expl_p1=3.993e-2 nash_conv=9.636e-2
+iter=     250 expl_p0=3.929e-2 expl_p1=3.027e-2 nash_conv=6.956e-2
+iter=     300 expl_p0=2.996e-2 expl_p1=2.130e-2 nash_conv=5.126e-2
+iter=     350 expl_p0=1.743e-2 expl_p1=1.309e-2 nash_conv=3.051e-2
+done: iterations=350 wall=531.16s ev_p0=2.634204 ev_p1=2.595783 nash_conv=3.051e-2
+sol: wrote /home/ubuntu/out/p1/p1-srp-multi/out/L02-gtsrp/tmp/solution.sol (35.37 MB, 31332 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 10.00s (12376190 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L02-gtsrp/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 9.98s (12376190 nodes)
+wrote /home/ubuntu/out/p1/p1-srp-multi/out/L02-gtsrp/tmp/summary.csv
+FLOP L02-gtsrp 5c 7c Kd wall_s=531.2 it=350 cap=0
+tree: nodes=12376190 terminals=7883591 rank_tables=799 storage=47855.7 MiB (f32) / 23961.9 MiB (i16) / 35908.8 MiB (i16-f32avg)
+memory estimate: 48375.7 MiB (f32) / 24481.9 MiB (i16) / 36428.8 MiB (i16-f32avg)
+warning: unmatched Flop tree rule 5
+iter=      25 expl_p0=2.563e0 expl_p1=2.054e0 nash_conv=4.617e0
+iter=      50 expl_p0=8.886e-1 expl_p1=5.544e-1 nash_conv=1.443e0
+iter=     100 expl_p0=2.254e-1 expl_p1=1.498e-1 nash_conv=3.753e-1
+iter=     150 expl_p0=9.111e-2 expl_p1=6.393e-2 nash_conv=1.550e-1
+iter=     200 expl_p0=5.207e-2 expl_p1=3.890e-2 nash_conv=9.098e-2

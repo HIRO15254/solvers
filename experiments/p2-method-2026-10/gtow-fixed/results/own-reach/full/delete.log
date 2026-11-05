@@ -1,0 +1,6 @@
+
+aws: [ERROR]: An error occurred (RequestExpired) when calling the CancelSpotInstanceRequests operation: Request has expired.
+
+aws: [ERROR]: An error occurred (RequestExpired) when calling the DescribeSpotInstanceRequests operation: Request has expired.
+
+aws: [ERROR]: An error occurred (RequestExpired) when calling the TerminateInstances operation: Request has expired.

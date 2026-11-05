@@ -1,0 +1,23 @@
+	Command being timed: "bash -c bash ~/override_solve.sh ~/out/ruler ovm-gt5c-sd0 0 ~/xm-gt5c.json ~/truth-multi.json"
+	User time (seconds): 5703.77
+	System time (seconds): 30.50
+	Percent of CPU this job got: 1846%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 5:10.50
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 4209036
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 53
+	Minor (reclaiming a frame) page faults: 6606785
+	Voluntary context switches: 664357
+	Involuntary context switches: 52902
+	Swaps: 0
+	File system inputs: 2857744
+	File system outputs: 1762232
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

@@ -1,0 +1,100 @@
+2026-10-17T10:03:50Z ranked candidates: score=USD/hour/relative-speed region AZ type USD/hour speed
+2026-10-17T10:03:50Z 0.218533333 us-east-2 us-east-2b c7a.8xlarge 0.327800 1.5
+2026-10-17T10:03:50Z 0.223133333 us-east-2 us-east-2c c7a.8xlarge 0.334700 1.5
+2026-10-17T10:03:50Z 0.252866667 us-east-2 us-east-2a c7a.8xlarge 0.379300 1.5
+2026-10-17T10:03:50Z 0.297200000 us-east-2 us-east-2c c6i.8xlarge 0.297200 1.0
+2026-10-17T10:03:50Z 0.298700000 us-east-2 us-east-2a c6i.8xlarge 0.298700 1.0
+2026-10-17T10:03:50Z 0.302500000 us-east-2 us-east-2b c6i.8xlarge 0.302500 1.0
+2026-10-17T10:03:50Z 0.303400000 us-east-2 us-east-2c c6a.8xlarge 0.303400 1.0
+2026-10-17T10:03:50Z 0.319400000 us-east-2 us-east-2a c6a.8xlarge 0.319400 1.0
+2026-10-17T10:03:51Z 0.320600000 us-east-2 us-east-2b c6a.8xlarge 0.320600 1.0
+2026-10-17T10:03:51Z 0.334000000 us-east-2 us-east-2c c7i.8xlarge 0.334000 1.0
+2026-10-17T10:03:51Z 0.359600000 us-east-2 us-east-2a c7i.8xlarge 0.359600 1.0
+2026-10-17T10:03:51Z 0.392800000 us-east-1 us-east-1a c7a.8xlarge 0.589200 1.5
+2026-10-17T10:03:51Z 0.404800000 us-east-1 us-east-1b c7a.8xlarge 0.607200 1.5
+2026-10-17T10:03:51Z 0.409733333 us-east-1 us-east-1d c7a.8xlarge 0.614600 1.5
+2026-10-17T10:03:51Z 0.415300000 us-east-2 us-east-2b c7i.8xlarge 0.415300 1.0
+2026-10-17T10:03:51Z 0.416200000 us-east-1 us-east-1c c7a.8xlarge 0.624300 1.5
+2026-10-17T10:03:51Z 0.441000000 us-east-1 us-east-1f c7a.8xlarge 0.661500 1.5
+2026-10-17T10:03:51Z 0.519800000 us-east-1 us-east-1b c6a.8xlarge 0.519800 1.0
+2026-10-17T10:03:51Z 0.534300000 us-east-1 us-east-1f c6a.8xlarge 0.534300 1.0
+2026-10-17T10:03:51Z 0.542500000 us-east-1 us-east-1d c6a.8xlarge 0.542500 1.0
+2026-10-17T10:03:51Z 0.618500000 us-east-1 us-east-1a c6a.8xlarge 0.618500 1.0
+2026-10-17T10:03:51Z 0.645200000 us-east-1 us-east-1c c6a.8xlarge 0.645200 1.0
+2026-10-17T10:03:52Z 0.653600000 us-east-1 us-east-1f c6i.8xlarge 0.653600 1.0
+2026-10-17T10:03:52Z 0.719300000 us-east-1 us-east-1a c7i.8xlarge 0.719300 1.0
+2026-10-17T10:03:52Z 0.719800000 us-east-1 us-east-1f c7i.8xlarge 0.719800 1.0
+2026-10-17T10:03:52Z 0.785900000 us-east-1 us-east-1d c7i.8xlarge 0.785900 1.0
+2026-10-17T10:03:52Z 0.793600000 us-east-1 us-east-1b c7i.8xlarge 0.793600 1.0
+2026-10-17T10:03:52Z 0.839100000 us-east-1 us-east-1c c7i.8xlarge 0.839100 1.0
+2026-10-17T10:03:52Z 0.861200000 us-east-1 us-east-1b c6i.8xlarge 0.861200 1.0
+2026-10-17T10:03:52Z 1.014300000 us-east-1 us-east-1a c6i.8xlarge 1.014300 1.0
+2026-10-17T10:03:52Z 1.193900000 us-east-1 us-east-1d c6i.8xlarge 1.193900 1.0
+2026-10-17T10:03:52Z 1.205200000 us-east-1 us-east-1c c6i.8xlarge 1.205200 1.0
+2026-10-17T10:04:07Z requesting region=us-east-2 az=us-east-2b type=c7a.8xlarge ami=ami-09519cc56eb20524a
+2026-10-17T10:04:12Z request=sir-4i47mc2h status=fulfilled state=active
+2026-10-17T10:04:14Z using region=us-east-2 instance=i-01a361643dc52fe4b request=sir-4i47mc2h az=us-east-2b type=c7a.8xlarge spot-price-usd-per-hour=0.327800 speed=1.5 score=0.218533333
+2026-10-17T10:04:17Z instance=i-01a361643dc52fe4b status=running ip=3.14.146.187
+2026-10-17T10:06:27Z uploaded source, job and flat extra files
+2026-10-17T10:06:30Z launched instance=i-01a361643dc52fe4b
+2026-10-17T10:06:32Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T10:06:34Z downloaded results
+2026-10-17T10:11:46Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T10:11:49Z downloaded results
+2026-10-17T10:16:58Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T10:17:01Z downloaded results
+2026-10-17T10:22:12Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T10:22:14Z downloaded results
+2026-10-17T10:27:25Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T10:27:28Z downloaded results
+2026-10-17T10:32:26Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T10:32:28Z downloaded results
+2026-10-17T10:34:28Z spot reclaim log: kind=ok region=us-east-2 ran_s=1811
+2026-10-17T10:37:39Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T10:37:42Z downloaded results
+2026-10-17T10:42:55Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T10:43:01Z downloaded results
+2026-10-17T10:48:11Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T10:48:26Z downloaded results
+2026-10-17T10:53:21Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T10:54:11Z downloaded results
+2026-10-17T10:58:31Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T10:59:15Z downloaded results
+2026-10-17T11:00:24Z describe-instances failed (1/20); retrying
+2026-10-17T11:00:56Z describe-instances failed (2/20); retrying
+2026-10-17T11:01:28Z describe-instances failed (3/20); retrying
+2026-10-17T11:02:00Z describe-instances failed (4/20); retrying
+2026-10-17T11:02:32Z describe-instances failed (5/20); retrying
+2026-10-17T11:03:04Z describe-instances failed (6/20); retrying
+2026-10-17T11:03:36Z describe-instances failed (7/20); retrying
+2026-10-17T11:04:08Z describe-instances failed (8/20); retrying
+2026-10-17T11:04:40Z describe-instances failed (9/20); retrying
+2026-10-17T11:05:12Z describe-instances failed (10/20); retrying
+2026-10-17T11:05:43Z describe-instances failed (11/20); retrying
+2026-10-17T11:06:15Z describe-instances failed (12/20); retrying
+2026-10-17T11:06:47Z describe-instances failed (13/20); retrying
+2026-10-17T11:07:19Z describe-instances failed (14/20); retrying
+2026-10-17T11:07:51Z describe-instances failed (15/20); retrying
+2026-10-17T11:08:23Z describe-instances failed (16/20); retrying
+2026-10-17T11:08:55Z describe-instances failed (17/20); retrying
+2026-10-17T11:09:26Z describe-instances failed (18/20); retrying
+2026-10-17T11:09:58Z describe-instances failed (19/20); retrying
+2026-10-17T11:10:30Z describe-instances failed (20/20); retrying
+2026-10-17T11:11:02Z describe-instances kept failing
+2026-10-17T11:11:04Z ERROR line=54 exit=255
+2026-10-17T11:11:04Z ERROR line=56 exit=255
+2026-10-17T11:11:04Z ERROR line=79 exit=255
+2026-10-17T11:11:04Z ERROR line=79 exit=255
+2026-10-17T11:11:04Z ERROR discovering requests region=us-east-2 by RunId
+2026-10-17T11:11:06Z ERROR line=54 exit=255
+2026-10-17T11:11:06Z ERROR line=56 exit=255
+2026-10-17T11:11:06Z ERROR line=79 exit=255
+2026-10-17T11:11:06Z ERROR line=79 exit=255
+2026-10-17T11:11:06Z ERROR discovering requests region=us-east-1 by RunId
+2026-10-17T11:11:08Z ERROR cancel request=sir-4i47mc2h (see delete.log)
+2026-10-17T11:11:11Z ERROR line=54 exit=255
+2026-10-17T11:11:11Z ERROR line=56 exit=255
+2026-10-17T11:11:11Z ERROR line=94 exit=255
+2026-10-17T11:11:11Z ERROR line=94 exit=255
+2026-10-17T11:11:11Z ERROR discovering instance for request=sir-4i47mc2h
+2026-10-17T11:11:13Z ERROR terminating instance=i-01a361643dc52fe4b

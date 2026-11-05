@@ -1,0 +1,4 @@
+TRAIN_ARGS='--l1-boards 128' bash ~/run_own_cloud.sh b128u <(awk -F'\t' '$1=="4bet" && $2==4' ~/plan-sb.tsv)
+TRAIN_ARGS='--l1-boards-late 128:1001' bash ~/run_own_cloud.sh bl1k <(awk -F'\t' '$1=="4bet" && $2==2' ~/plan-sb.tsv)
+TRAIN_ARGS='--l1-boards-late 128:1001' bash ~/run_own_cloud.sh bl1k <(awk -F'\t' '$1=="srp" && $2==1' ~/plan-sb.tsv)
+TRAIN_ARGS='--l1-boards-late 128:1001' bash ~/run_own_cloud.sh bl1k <(awk -F'\t' '$1=="srp" && $2==2' ~/plan-sb.tsv)

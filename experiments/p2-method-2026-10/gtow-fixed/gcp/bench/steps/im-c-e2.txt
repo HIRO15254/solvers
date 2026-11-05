@@ -1,0 +1,2 @@
+bash ~/override_solve.sh ~/out/ruler ov-e2-sd0 0 ~/x-e2.json ~/truth-p1.json
+bash ~/override_solve.sh ~/out/ruler ov-e2-sd1 1 ~/x-e2.json ~/truth-p1.json

@@ -1,0 +1,27 @@
+Tree: 12 decisions, 22 terminals (0.001s)
+Tables: 0.152s; model: 0.003s
+L1: 5 leaves; 302 postflop decisions; 21696 slots; 347136 storage bytes
+Checkpoint 0: NashConv 2.409343795790; held 2.409342049705; auxiliary 6.118263497965; auxiliary held 6.118263497965; gains [1.407381348761672, 1.0019624470285031]; held gains [1.407381348761672, 1.0019607009433058]; auxiliary gains [3.244752173200176, 2.8735113247647477]; auxiliary held gains [3.244752173200175, 2.8735113247647472]; evaluation 6.890540s
+Iteration 100: wall 0.069130s; reaches 0.000235; t2 0.000832; t3 0.000001; k4 0.000006; update 0.000142; board preparation 0.000745; postflop 0.067157; evaluation 0.000000
+Iteration 200: wall 0.070322s; reaches 0.000263; t2 0.000960; t3 0.000000; k4 0.000006; update 0.000130; board preparation 0.001089; postflop 0.067859; evaluation 0.000000
+Iteration 300: wall 0.070101s; reaches 0.000236; t2 0.000974; t3 0.000000; k4 0.000006; update 0.000135; board preparation 0.001059; postflop 0.067676; evaluation 0.000000
+Iteration 400: wall 0.068661s; reaches 0.000253; t2 0.000976; t3 0.000000; k4 0.000006; update 0.000131; board preparation 0.000812; postflop 0.066470; evaluation 0.000000
+Iteration 500: wall 0.075093s; reaches 0.000307; t2 0.000769; t3 0.000000; k4 0.000006; update 0.000130; board preparation 0.000744; postflop 0.073123; evaluation 0.000000
+Iteration 600: wall 0.068819s; reaches 0.000260; t2 0.000800; t3 0.000000; k4 0.000006; update 0.000124; board preparation 0.000772; postflop 0.066843; evaluation 0.000000
+Iteration 700: wall 0.067900s; reaches 0.000237; t2 0.000801; t3 0.000000; k4 0.000006; update 0.000130; board preparation 0.000772; postflop 0.065939; evaluation 0.000000
+Iteration 800: wall 0.069371s; reaches 0.000233; t2 0.000783; t3 0.000000; k4 0.000005; update 0.000140; board preparation 0.000741; postflop 0.067454; evaluation 0.000000
+Iteration 900: wall 0.074035s; reaches 0.000218; t2 0.000793; t3 0.000000; k4 0.000006; update 0.000130; board preparation 0.000747; postflop 0.072128; evaluation 0.000000
+Iteration 1000: wall 7.158008s; reaches 0.000232; t2 0.000788; t3 0.000000; k4 0.000006; update 0.000134; board preparation 0.000738; postflop 0.067865; evaluation 7.088192
+Checkpoint 1000: NashConv 0.005225210721; held 0.001202962572; auxiliary 2.695572894587; auxiliary held 2.694962742379; gains [0.0023286669715246455, 0.0028965437498452012]; held gains [0.0009701778060307552, 0.00023278476644604182]; auxiliary gains [0.8146433802954204, 1.8809295142911662]; auxiliary held gains [0.8140332280882786, 1.8809295142911688]; evaluation 7.088192s
+Iteration 1100: wall 0.083461s; reaches 0.000215; t2 0.000799; t3 0.000000; k4 0.000005; update 0.000149; board preparation 0.001011; postflop 0.081270; evaluation 0.000000
+Iteration 1200: wall 0.068833s; reaches 0.000210; t2 0.000823; t3 0.000000; k4 0.000004; update 0.000126; board preparation 0.000962; postflop 0.066694; evaluation 0.000000
+Iteration 1300: wall 0.070401s; reaches 0.000183; t2 0.000789; t3 0.000000; k4 0.000005; update 0.000132; board preparation 0.001056; postflop 0.068224; evaluation 0.000000
+Iteration 1400: wall 0.073098s; reaches 0.000255; t2 0.000778; t3 0.000000; k4 0.000004; update 0.000129; board preparation 0.000768; postflop 0.071149; evaluation 0.000000
+Iteration 1500: wall 0.069394s; reaches 0.000211; t2 0.000783; t3 0.000000; k4 0.000004; update 0.000266; board preparation 0.000740; postflop 0.067380; evaluation 0.000000
+Iteration 1600: wall 0.075341s; reaches 0.000255; t2 0.000805; t3 0.000000; k4 0.000006; update 0.000131; board preparation 0.000753; postflop 0.073377; evaluation 0.000000
+Iteration 1700: wall 0.068694s; reaches 0.000194; t2 0.000799; t3 0.000000; k4 0.000006; update 0.000130; board preparation 0.000746; postflop 0.066807; evaluation 0.000000
+Iteration 1800: wall 0.075832s; reaches 0.000219; t2 0.000978; t3 0.000000; k4 0.000006; update 0.000135; board preparation 0.001081; postflop 0.073399; evaluation 0.000000
+Iteration 1900: wall 0.067427s; reaches 0.000209; t2 0.000825; t3 0.000000; k4 0.000005; update 0.000218; board preparation 0.000742; postflop 0.065416; evaluation 0.000000
+Iteration 2000: wall 7.160749s; reaches 0.000207; t2 0.000779; t3 0.000000; k4 0.000005; update 0.000121; board preparation 0.000803; postflop 0.065895; evaluation 7.092896
+Checkpoint 2000: NashConv 0.004584941230; held -0.000475162995; auxiliary 2.789346331956; auxiliary held 2.789332922798; gains [0.0020773320493532588, 0.0025076091809465365]; held gains [0.0005864718884465853, -0.0010616348830335583]; auxiliary gains [0.8225652854720287, 1.966781046483837]; auxiliary held gains [0.8225518763137116, 1.966781046483837]; evaluation 7.092896s
+Iterations: 2000; reached target: false; solve phases Timings { trunk: SolveTimings { reaches: 0.4694067999999995, t2: 1.667304400000006, t3: 0.0006136999999999839, k4: 0.011099000000000194, update: 0.27533859999999927, evaluation: 21.0716278 }, board_preparation: 1.7160151999999962, postflop: 138.38786860000008, evaluation_board_preparation: 0.1448569 }

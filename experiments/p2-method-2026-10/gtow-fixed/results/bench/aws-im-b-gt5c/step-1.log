@@ -1,0 +1,24 @@
+rel8x2@gt5c+g25+hd+sd1 1092s L1: 181 leaves; 144632 postflop decisions; 265468800 slots; 4247500800 storage bytes
+	Command being timed: "bash -c STATE_DIR=~/state NODIAG=1 LINES=~/all36-lines.txt bash $X/buckets.sh ~/gtow.profile.json ~/out/train/gtow 2000 rel8x2@gt5c+g25+hd+sd1"
+	User time (seconds): 14219.57
+	System time (seconds): 151.59
+	Percent of CPU this job got: 1315%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 18:12.32
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 15888800
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 58
+	Minor (reclaiming a frame) page faults: 58073516
+	Voluntary context switches: 209378
+	Involuntary context switches: 89178
+	Swaps: 0
+	File system inputs: 9966520
+	File system outputs: 29035712
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

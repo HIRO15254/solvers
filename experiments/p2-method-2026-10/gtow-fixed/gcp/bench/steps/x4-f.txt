@@ -1,0 +1,6 @@
+bash ~/run_own_cloud.sh own-x4 <(awk -F'\t' '$1=="3bet" && $2==10' ~/plan-x4.tsv)
+bash ~/run_own_cloud.sh own-x4 <(awk -F'\t' '$1=="3bet" && $2==11' ~/plan-x4.tsv)
+bash ~/run_own_cloud.sh own-x4 <(awk -F'\t' '$1=="3bet" && $2==12' ~/plan-x4.tsv)
+bash ~/run_own_cloud.sh own-x4 <(awk -F'\t' '$1=="3bet" && $2==13' ~/plan-x4.tsv)
+bash ~/run_own_cloud.sh own-x4 <(awk -F'\t' '$1=="3bet" && $2==14' ~/plan-x4.tsv)
+bash ~/run_own_cloud.sh own-x4 <(awk -F'\t' '$1=="3bet" && $2==15' ~/plan-x4.tsv)

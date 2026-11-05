@@ -1,0 +1,2 @@
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=13825.4 MiB (f32) / 6917.4 MiB (i16) / 10371.4 MiB (i16-f32avg)
+memory estimate: 14345.4 MiB (f32) / 7437.4 MiB (i16) / 10891.4 MiB (i16-f32avg)

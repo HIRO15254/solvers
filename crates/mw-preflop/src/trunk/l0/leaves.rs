@@ -4,11 +4,8 @@ use rand::{Rng, RngCore, SeedableRng};
 use rand_chacha::ChaCha8Rng;
 use rayon::prelude::*;
 use rustc_hash::FxHashMap;
-use std::{
-    cell::{Cell, RefCell},
-    collections::BTreeMap,
-    time::Instant,
-};
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::{cell::RefCell, collections::BTreeMap, time::Instant};
 
 use super::eval::Reach;
 use super::{Model, Terminal, Tree};
@@ -90,6 +87,9 @@ impl ThreeTerms {
 }
 
 type Deferred = Vec<(usize, Option<ThreeItem>)>;
+type ThreeOutput = (usize, usize, f64);
+type ThreeBlock = [ThreeOutput; 16];
+type ThreeOutputs = Vec<Vec<ThreeOutput>>;
 
 thread_local! {
     static VALUES: RefCell<Vec<Vec<[f64; 169]>>> = const { RefCell::new(Vec::new()) };
@@ -101,51 +101,66 @@ thread_local! {
     /// `three_values`'s `[k][d][e]` slab (3.9 MB), kept per thread: allocated
     /// per hero class, it committed fresh zeroed pages for every class, seat
     /// and iteration.
-    static THREE_SLAB: Cell<Vec<f64>> = const { Cell::new(Vec::new()) };
+    static THREE_SLAB: RefCell<Vec<Vec<f64>>> = const { RefCell::new(Vec::new()) };
+    static THREE_SELECTED: RefCell<Vec<Vec<(usize, f64)>>> = const { RefCell::new(Vec::new()) };
+    static THREE_OUTPUTS: RefCell<Vec<ThreeOutputs>> = const { RefCell::new(Vec::new()) };
+    static THREE_BLOCKS: RefCell<Vec<Vec<ThreeBlock>>> = const { RefCell::new(Vec::new()) };
+    static SAMPLE_SCRATCH: RefCell<Vec<SampleScratch>> = const { RefCell::new(Vec::new()) };
 }
 
 /// Fixed-order bilinear forms, batched only with identical correction masks.
 /// Independent item accumulators make grouping and class/thread order irrelevant.
-pub(crate) fn three_values(
+fn three_values_into(
     c: usize,
     items: &[ThreeItem],
     tree: &Tree,
     model: &Model<'_>,
     reach: &[Reach],
-) -> Result<Vec<(usize, usize, f64)>> {
-    let mut selected: Vec<_> = items
-        .iter()
-        .filter_map(|item| {
-            let terminal = tree.nodes[item.node].terminal.as_ref().unwrap();
-            let folded: f64 = (0..tree.seats)
-                .filter(|j| !terminal.active.contains(j))
-                .map(|j| reach[item.node].mass(j, c))
-                .product();
-            (model.weights[item.hero][c] > 0.0
-                && !item.q.is_empty()
-                && !item.r.is_empty()
-                && folded != 0.0)
-                .then_some((item, folded))
-        })
-        .collect();
-    selected.sort_by_key(|(item, _)| (item.terms.mask, item.node, item.hero));
+    output: &mut Vec<(usize, usize, f64)>,
+    unfinished: &AtomicUsize,
+) -> Result<()> {
+    output.clear();
+    let mut selected = Reused::take(&THREE_SELECTED);
+    selected.clear();
+    selected.extend(items.iter().enumerate().filter_map(|(index, item)| {
+        let terminal = tree.nodes[item.node].terminal.as_ref().unwrap();
+        let folded: f64 = (0..tree.seats)
+            .filter(|j| !terminal.active.contains(j))
+            .map(|j| reach[item.node].mass(j, c))
+            .product();
+        (model.weights[item.hero][c] > 0.0
+            && !item.q.is_empty()
+            && !item.r.is_empty()
+            && folded != 0.0)
+            .then_some((index, folded))
+    }));
+    selected.sort_by_key(|&(index, _)| {
+        let item = &items[index];
+        (item.terms.mask, item.node, item.hero)
+    });
     if selected.is_empty() {
-        return Ok(Vec::new());
+        return Ok(());
     }
-    let support: Vec<_> = (0..169)
-        .filter(|&d| model.weights.iter().any(|w| w[d] > 0.0))
-        .collect();
+    let mut support = [0; 169];
+    let mut count = 0;
+    for d in 0..169 {
+        if model.weights.iter().any(|w| w[d] > 0.0) {
+            support[count] = d;
+            count += 1;
+        }
+    }
+    let support = &support[..count];
     let corrections = selected
         .iter()
-        .fold(0, |mask, (item, _)| mask | item.terms.mask);
+        .fold(0, |mask, &(index, _)| mask | items[index].terms.mask);
     let basis = three_basis();
     let catalog = Classes::get();
     // Every entry read below (support × support, the four basis rows and the
     // masked corrections) is written first, so a reused slab is not cleared.
-    let mut slab = THREE_SLAB.take();
+    let mut slab = Reused::take(&THREE_SLAB);
     slab.resize(17 * 169 * 169, 0.0);
-    for &d in &support {
-        for &e in &support {
+    for &d in support {
+        for &e in support {
             let p = model.tables.p3(c, d, e)?;
             let mut sums = [0.0; 4];
             for o in 0..13 {
@@ -162,17 +177,22 @@ pub(crate) fn three_values(
             }
         }
     }
-    let mut output = Vec::with_capacity(selected.len());
+    output.reserve(selected.len());
     let mut remaining = selected.as_slice();
-    while let Some((first, _)) = remaining.first() {
-        let mask = first.terms.mask;
-        let count = remaining.partition_point(|(item, _)| item.terms.mask == mask);
+    while let Some(&(first, _)) = remaining.first() {
+        let mask = items[first].terms.mask;
+        let count = remaining.partition_point(|&(index, _)| items[index].terms.mask == mask);
         let (group, rest) = remaining.split_at(count);
         remaining = rest;
-        for block in group.chunks(16) {
+        // Preserve mask groups and the original blocks of sixteen: changing a
+        // block's union of d/e support could change additions of zero. Only
+        // independent blocks are scheduled in parallel, never their sums.
+        let mut blocks = Reused::take(&THREE_BLOCKS);
+        let contract = |block: &[(usize, f64)]| {
             let mut q = [[0.0; 16]; 169];
             let mut r = [[0.0; 16]; 169];
-            for (i, (item, _)) in block.iter().enumerate() {
+            for (i, &(index, _)) in block.iter().enumerate() {
+                let item = &items[index];
                 for &(d, v) in &item.q {
                     q[d][i] = v;
                 }
@@ -180,22 +200,30 @@ pub(crate) fn three_values(
                     r[e][i] = v;
                 }
             }
-            let ds: Vec<_> = support
-                .iter()
-                .copied()
-                .filter(|&d| q[d].iter().any(|&v| v != 0.0))
-                .collect();
-            let es: Vec<_> = support
-                .iter()
-                .copied()
-                .filter(|&e| r[e].iter().any(|&v| v != 0.0))
-                .collect();
+            let mut ds = [0; 169];
+            let mut count = 0;
+            for &d in support {
+                if q[d].iter().any(|&v| v != 0.0) {
+                    ds[count] = d;
+                    count += 1;
+                }
+            }
+            let ds = &ds[..count];
+            let mut es = [0; 169];
+            let mut count = 0;
+            for &d in support {
+                if r[d].iter().any(|&v| v != 0.0) {
+                    es[count] = d;
+                    count += 1;
+                }
+            }
+            let es = &es[..count];
             let mut total = [0.0; 16];
             for k in (0..4).chain((0..13).filter(|&o| mask & (1 << o) != 0).map(|o| 4 + o)) {
                 let mut outcome = [0.0; 16];
-                for &d in &ds {
+                for &d in ds {
                     let mut inner = [0.0; 16];
-                    for &e in &es {
+                    for &e in es {
                         let value = slab[(k * 169 + d) * 169 + e];
                         for i in 0..16 {
                             inner[i] += value * r[e][i];
@@ -205,7 +233,8 @@ pub(crate) fn three_values(
                         outcome[i] += q[d][i] * inner[i];
                     }
                 }
-                for (i, (item, _)) in block.iter().enumerate() {
+                for (i, &(index, _)) in block.iter().enumerate() {
+                    let item = &items[index];
                     let weight = if k < 4 {
                         item.terms.weights[k]
                     } else {
@@ -214,12 +243,65 @@ pub(crate) fn three_values(
                     total[i] += outcome[i] * weight;
                 }
             }
-            for (i, (item, folded)) in block.iter().enumerate() {
-                output.push((item.node, item.hero, folded * total[i]));
+            let mut results = [(0, 0, 0.0); 16];
+            for (i, &(index, folded)) in block.iter().enumerate() {
+                let item = &items[index];
+                results[i] = (item.node, item.hero, folded * total[i]);
             }
+            results
+        };
+        // Keep slab reuse local while enough hero-class jobs remain. Only the
+        // tail exposes terminal blocks to idle workers. This scheduling choice
+        // never changes block boundaries or any floating-point accumulator.
+        if unfinished.load(Ordering::Relaxed) <= rayon::current_num_threads() {
+            group
+                .par_chunks(16)
+                .map(contract)
+                .collect_into_vec(&mut blocks);
+        } else {
+            blocks.clear();
+            blocks.extend(group.chunks(16).map(contract));
+        }
+        for (block, results) in group.chunks(16).zip(blocks.iter()) {
+            output.extend_from_slice(&results[..block.len()]);
         }
     }
-    THREE_SLAB.set(slab);
+    Ok(())
+}
+
+#[cfg(test)]
+pub(crate) fn three_values(
+    c: usize,
+    items: &[ThreeItem],
+    tree: &Tree,
+    model: &Model<'_>,
+    reach: &[Reach],
+) -> Result<Vec<(usize, usize, f64)>> {
+    let mut output = Vec::new();
+    three_values_into(
+        c,
+        items,
+        tree,
+        model,
+        reach,
+        &mut output,
+        &AtomicUsize::new(0),
+    )?;
+    // Exercise both scheduling branches with the same mask groups/blocks.
+    let mut serial = Vec::new();
+    three_values_into(
+        c,
+        items,
+        tree,
+        model,
+        reach,
+        &mut serial,
+        &AtomicUsize::new(usize::MAX),
+    )?;
+    assert_eq!(output.len(), serial.len());
+    for (&(z, p, v), &(sz, sp, sv)) in output.iter().zip(&serial) {
+        assert_eq!((z, p, v.to_bits()), (sz, sp, sv.to_bits()));
+    }
     Ok(output)
 }
 
@@ -419,6 +501,14 @@ fn shared_random_prefix_replays_chacha_including_tail_and_mixed_draws() {
     }
 }
 
+#[derive(Default)]
+struct SampleScratch {
+    others: Vec<usize>,
+    cdfs: [Vec<(usize, f64)>; 8],
+    cache: FxHashMap<u64, [f64; 9]>,
+    new_entries: Vec<(u64, [f64; 9])>,
+}
+
 fn sample_value(
     t: &Terminal,
     hero: usize,
@@ -437,29 +527,35 @@ fn sample_value(
     }
     let catalog = Classes::get();
     let h = catalog.representative(c);
-    let others: Vec<_> = t.active.iter().copied().filter(|&j| j != hero).collect();
-    let cdfs: Vec<_> = others
-        .iter()
-        .map(|&j| {
-            let mut sum = 0.0;
-            reach
-                .rho(model, j)
-                .into_iter()
-                .filter_map(|(d, r)| {
-                    let w = f64::from(catalog.k(c, d)) * r;
-                    if w == 0.0 {
-                        None
-                    } else {
-                        sum += w;
-                        Some((d, sum))
-                    }
-                })
-                .collect::<Vec<_>>()
-        })
-        .collect();
-    // Memoize only this item's patterns; publish shared misses once sampling ends.
-    let mut cache = FxHashMap::default();
-    let mut new_entries = Vec::new();
+    let mut scratch = Reused::take(&SAMPLE_SCRATCH);
+    let SampleScratch {
+        others,
+        cdfs,
+        cache,
+        new_entries,
+    } = &mut *scratch;
+    others.clear();
+    others.extend(t.active.iter().copied().filter(|&j| j != hero));
+    for (a, &j) in others.iter().enumerate() {
+        let cdf = &mut cdfs[a];
+        cdf.clear();
+        let mut sum = 0.0;
+        // Match rho's filtering and class order without allocating a rho Vec.
+        for &d in &model.support[j] {
+            let r = model.weights[j][d] * reach.pi(j, d);
+            if r > 0.0 {
+                let w = f64::from(catalog.k(c, d)) * r;
+                if w != 0.0 {
+                    sum += w;
+                    cdf.push((d, sum));
+                }
+            }
+        }
+    }
+    // These caches belong to one item: retaining capacity must never retain
+    // terminal-specific payoffs or cumulative probabilities from a prior item.
+    cache.clear();
+    new_entries.clear();
     let mut total = 0.0;
     for (s, words) in random_words.iter().enumerate() {
         let mut rng = SampleRng {
@@ -471,7 +567,7 @@ fn sample_value(
         };
         let mut combos = [h; 9];
         let mut dead = catalog.combo_mask(h);
-        for (a, cdf) in cdfs.iter().enumerate() {
+        for (a, cdf) in cdfs[..others.len()].iter().enumerate() {
             let draw = rng.r#gen::<f64>() * cdf.last().unwrap().1;
             let d = cdf[cdf
                 .partition_point(|&(_, end)| end <= draw)
@@ -542,7 +638,7 @@ fn sample_value(
             .cache
             .write()
             .map_err(|_| anyhow::anyhow!("ordering cache poisoned"))?;
-        for (pattern, payoff) in new_entries {
+        for (pattern, payoff) in new_entries.drain(..) {
             shared.entry(pattern).or_insert(payoff);
         }
     }
@@ -666,15 +762,23 @@ pub(crate) fn leaf_values(
     let t2_seconds = start.elapsed().as_secs_f64();
     let start = Instant::now();
     if !three.is_empty() {
-        let classes: Vec<_> = (0..169)
-            .filter(|&c| model.weights.iter().any(|w| w[c] > 0.0))
-            .collect();
-        let outputs: Vec<_> = classes
+        let classes = &support;
+        let mut outputs = Reused::take(&THREE_OUTPUTS);
+        outputs.resize_with(classes.len(), Vec::new);
+        // Results stay in the caller's pool; workers return their slabs to
+        // their own pools. Count unfinished classes only to schedule the tail.
+        let remaining = AtomicUsize::new(classes.len());
+        classes
             .par_iter()
-            .map(|&c| three_values(c, &three, tree, model, reach))
-            .collect::<Result<_>>()?;
-        for (c, output) in classes.into_iter().zip(outputs) {
-            for (z, p, v) in output {
+            .zip(outputs.par_iter_mut())
+            .with_max_len(1)
+            .try_for_each(|(&c, output)| -> Result<()> {
+                let result = three_values_into(c, &three, tree, model, reach, output, &remaining);
+                remaining.fetch_sub(1, Ordering::Relaxed);
+                result
+            })?;
+        for (&c, output) in classes.iter().zip(outputs.iter_mut()) {
+            for (z, p, v) in output.drain(..) {
                 leaves[p][z][c] = v;
             }
         }
@@ -698,7 +802,22 @@ pub(crate) fn leaf_values(
             }
         }
     }
-    let groups: Vec<_> = groups.into_iter().collect();
+    let mut groups: Vec<_> = groups.into_iter().collect();
+    // Longest estimated sampling work first. Only independent output rows are
+    // reordered; each item's RNG prefix and payoff sum remain unchanged.
+    groups.sort_by_cached_key(|((p, c, _), nodes)| {
+        std::cmp::Reverse(
+            nodes
+                .iter()
+                .map(|&z| {
+                    plan.allocation(
+                        opponent_mass(&reach[z], tree.seats, *p, *c),
+                        reference[*p][*c],
+                    ) * tree.nodes[z].terminal.as_ref().unwrap().active.len() as u64
+                })
+                .sum::<u64>(),
+        )
+    });
     let samples: Vec<_> = groups
         .par_iter()
         .map(|((p, c, mask), nodes)| {

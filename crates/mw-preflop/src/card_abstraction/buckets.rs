@@ -94,6 +94,9 @@ pub struct Ehs2Abstraction {
     flop: Option<StreetTable>,
     turn: Option<StreetTable>,
     river: Option<StreetTable>,
+    /// [`Self::content_hash`], computed on first use; not serialized.
+    #[serde(skip)]
+    content_hash: std::sync::OnceLock<[u8; 32]>,
 }
 
 /// Distinguishes concurrent cache writers within one process; the pid
@@ -678,6 +681,7 @@ impl Ehs2Abstraction {
             flop: None,
             turn: None,
             river: None,
+            content_hash: Default::default(),
         };
         for &street in streets {
             match street {
@@ -730,6 +734,7 @@ impl Ehs2Abstraction {
             flop: None,
             turn: None,
             river: None,
+            content_hash: Default::default(),
         };
         if !flop_boards.is_empty() {
             out.flop = Some(build_table(
@@ -756,6 +761,17 @@ impl Ehs2Abstraction {
             ));
         }
         out
+    }
+
+    /// Blake3 of the table's postcard bytes. Hashing the 128-bucket table
+    /// takes seconds, and per-leaf card mappings ask once per variant, so the
+    /// value is kept after the first call.
+    pub(crate) fn content_hash(&self) -> [u8; 32] {
+        *self.content_hash.get_or_init(|| {
+            let mut hash = blake3::Hasher::new();
+            postcard::to_io(self, &mut hash).expect("hashing EHS2 table");
+            *hash.finalize().as_bytes()
+        })
     }
 
     /// Streets this abstraction was built for.

@@ -182,6 +182,7 @@ Preflop-only exportは未達である。これを完全な全street profileと�
 | `export ev` | 保存している評価結果。cashはBB/hand、ICMは賞金単位。全nodeのper-hand EVではない |
 | `evaluate` | artifactの保存averageを再評価し、baseline utility、候補gain・CI、coverageを報告 |
 | `inspect` | root/historyのnode、summary、169 class matrix、strategy/range。未訪問はunvisited/null |
+| `browse` | 保存P2 Preflopの対話閲覧。class strategy、席自身のactionで条件付けたrangeとcombo加重頻度、保存root評価。実験用class-profile v1 JSONは任意の`--config`でtrunk構造を照合しposition・開始range・pot/stackを補う。設定なしはfull開始rangeを明示して仮定。操作は[CLI reference](cli-reference.jp.md#solvers-browse) |
 | `inspect ev` | rootはformal-average-profileの再評価、後続nodeはnode-conditioned-profileの条件付き再評価 |
 
 cash utilityはhand開始のstackを基準としたBB増減であり、P1のspot開始pot基準とは異なる。

@@ -1,0 +1,74 @@
+2026-10-27T17:30:29Z ranked candidates: score=USD/hour/relative-speed region AZ type USD/hour speed
+2026-10-27T17:30:29Z 0.202700000 sa-east-1 sa-east-1a c6a.8xlarge 0.202700 1.0
+2026-10-27T17:30:29Z 0.209600000 sa-east-1 sa-east-1a c6i.8xlarge 0.209600 1.0
+2026-10-27T17:30:29Z 0.209600000 sa-east-1 sa-east-1c c6i.8xlarge 0.209600 1.0
+2026-10-27T17:30:29Z 0.239600000 sa-east-1 sa-east-1c c6a.8xlarge 0.239600 1.0
+2026-10-27T17:30:29Z 0.268100000 sa-east-1 sa-east-1b c6i.8xlarge 0.268100 1.0
+2026-10-27T17:30:29Z 0.354100000 sa-east-1 sa-east-1a c7i.8xlarge 0.354100 1.0
+2026-10-27T17:30:30Z 0.372800000 sa-east-1 sa-east-1b c6a.8xlarge 0.372800 1.0
+2026-10-27T17:30:30Z 0.494700000 sa-east-1 sa-east-1c c7i.8xlarge 0.494700 1.0
+2026-10-27T17:30:30Z 0.516300000 sa-east-1 sa-east-1b c7i.8xlarge 0.516300 1.0
+2026-10-27T17:30:50Z requesting region=sa-east-1 az=sa-east-1a type=c6a.8xlarge ami=ami-06ae896a166ca24f2
+2026-10-27T17:30:56Z request=sir-ynr7q2vh status=capacity-not-available state=open
+2026-10-27T17:30:59Z capacity fallback canceled request=sir-ynr7q2vh
+2026-10-27T17:31:20Z requesting region=sa-east-1 az=sa-east-1a type=c6i.8xlarge ami=ami-06ae896a166ca24f2
+2026-10-27T17:31:26Z request=sir-iqp7my7j status=capacity-not-available state=open
+2026-10-27T17:31:28Z capacity fallback canceled request=sir-iqp7my7j
+2026-10-27T17:31:50Z requesting region=sa-east-1 az=sa-east-1c type=c6i.8xlarge ami=ami-06ae896a166ca24f2
+2026-10-27T17:31:56Z request=sir-nr7znxyj status=capacity-not-available state=open
+2026-10-27T17:31:58Z capacity fallback canceled request=sir-nr7znxyj
+2026-10-27T17:32:20Z requesting region=sa-east-1 az=sa-east-1c type=c6a.8xlarge ami=ami-06ae896a166ca24f2
+2026-10-27T17:32:25Z request=sir-sj87pz1g status=capacity-not-available state=open
+2026-10-27T17:32:28Z capacity fallback canceled request=sir-sj87pz1g
+2026-10-27T17:32:53Z requesting region=sa-east-1 az=sa-east-1b type=c6i.8xlarge ami=ami-06ae896a166ca24f2
+2026-10-27T17:32:58Z request=sir-n9qqntjk status=capacity-not-available state=open
+2026-10-27T17:33:01Z capacity fallback canceled request=sir-n9qqntjk
+2026-10-27T17:33:23Z requesting region=sa-east-1 az=sa-east-1a type=c7i.8xlarge ami=ami-06ae896a166ca24f2
+2026-10-27T17:33:29Z request=sir-je9qqhzk status=capacity-not-available state=open
+2026-10-27T17:33:32Z capacity fallback canceled request=sir-je9qqhzk
+2026-10-27T17:33:54Z requesting region=sa-east-1 az=sa-east-1b type=c6a.8xlarge ami=ami-06ae896a166ca24f2
+2026-10-27T17:33:59Z request=sir-9bjfqhpj status=capacity-not-available state=open
+2026-10-27T17:34:02Z capacity fallback canceled request=sir-9bjfqhpj
+2026-10-27T17:34:24Z requesting region=sa-east-1 az=sa-east-1c type=c7i.8xlarge ami=ami-06ae896a166ca24f2
+2026-10-27T17:34:30Z request=sir-y5ifnv2g status=fulfilled state=active
+2026-10-27T17:34:32Z using region=sa-east-1 instance=i-024a2205657cf1ea6 request=sir-y5ifnv2g az=sa-east-1c type=c7i.8xlarge spot-price-usd-per-hour=0.494700 speed=1.0 score=0.494700000
+2026-10-27T17:34:35Z instance=i-024a2205657cf1ea6 status=running ip=54.20.203.16
+2026-10-27T17:34:48Z ssh ingress refreshed ip=106.178.125.134
+2026-10-27T17:36:24Z uploaded source, job and flat extra files
+2026-10-27T17:36:27Z launched instance=i-024a2205657cf1ea6
+2026-10-27T17:36:30Z spot-price-usd-per-hour type=c7i.8xlarge az=sa-east-1c price=0.494700	2026-10-27T17:00:00+00:00
+2026-10-27T17:36:34Z downloaded results
+2026-10-27T17:41:36Z spot-price-usd-per-hour type=c7i.8xlarge az=sa-east-1c price=0.494700	2026-10-27T17:00:00+00:00
+2026-10-27T17:41:39Z downloaded results
+2026-10-27T17:46:42Z spot-price-usd-per-hour type=c7i.8xlarge az=sa-east-1c price=0.494700	2026-10-27T17:00:00+00:00
+2026-10-27T17:46:46Z downloaded results
+2026-10-27T17:51:49Z spot-price-usd-per-hour type=c7i.8xlarge az=sa-east-1c price=0.494700	2026-10-27T17:00:00+00:00
+2026-10-27T17:51:53Z downloaded results
+2026-10-27T17:56:56Z spot-price-usd-per-hour type=c7i.8xlarge az=sa-east-1c price=0.494700	2026-10-27T17:00:00+00:00
+2026-10-27T17:57:00Z downloaded results
+2026-10-27T18:05:43Z reattached watcher region=sa-east-1 instance=i-024a2205657cf1ea6 request=sir-y5ifnv2g
+2026-10-27T18:05:49Z instance=i-024a2205657cf1ea6 status=running ip=54.20.203.16
+2026-10-27T18:05:57Z downloaded results
+2026-10-27T18:11:31Z downloaded results
+2026-10-27T18:17:07Z downloaded results
+2026-10-27T18:22:40Z downloaded results
+2026-10-27T18:27:40Z downloaded results
+2026-10-27T18:33:11Z downloaded results
+2026-10-27T18:38:41Z downloaded results
+2026-10-27T18:44:11Z downloaded results
+2026-10-27T18:49:41Z downloaded results
+2026-10-27T18:55:10Z downloaded results
+2026-10-27T19:00:40Z downloaded results
+2026-10-27T19:06:11Z downloaded results
+2026-10-27T19:11:41Z downloaded results
+2026-10-27T19:17:11Z downloaded results
+2026-10-27T19:22:41Z downloaded results
+2026-10-27T19:27:51Z downloaded results
+2026-10-27T19:33:22Z downloaded results
+2026-10-27T19:38:54Z downloaded results
+2026-10-27T19:44:26Z downloaded results
+2026-10-27T19:49:57Z downloaded results
+2026-10-27T19:55:28Z downloaded results
+2026-10-27T19:55:36Z ALL_DONE final downloaded
+2026-10-27T19:55:39Z canceled request=sir-y5ifnv2g
+2026-10-27T19:55:41Z deleted instance=i-024a2205657cf1ea6 request=sir-y5ifnv2g

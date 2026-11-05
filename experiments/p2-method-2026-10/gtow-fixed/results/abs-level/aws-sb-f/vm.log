@@ -1,0 +1,17 @@
+2026-11-05T00:17:48Z ranked regions: placement-score cheapest-USD/hour region
+2026-11-05T00:17:48Z 9 0.209600 sa-east-1
+2026-11-05T00:17:48Z 9 0.263900 us-east-2
+2026-11-05T00:17:49Z 9 0.403600 us-east-1
+2026-11-05T00:18:37Z created launch template=p2-1793837834-37373-23172 region=sa-east-1 ami=ami-06ae896a166ca24f2
+2026-11-05T00:18:37Z requesting instant fleet region=sa-east-1 placement-score=9 types=c7a.8xlarge c6a.8xlarge c7i.8xlarge c6i.8xlarge m7a.8xlarge m7i.8xlarge m6a.8xlarge subnets=3
+2026-11-05T00:18:56Z using region=sa-east-1 instance=i-0b0a6f750d7739a9e az=sa-east-1a type=c6a.8xlarge spot-price-usd-per-hour=0.229100 placement-score=9
+2026-11-05T00:19:01Z instance=i-0b0a6f750d7739a9e status=running ip=54.233.234.116
+2026-11-05T00:20:47Z uploaded source, job and flat extra files
+2026-11-05T00:20:52Z launched instance=i-0b0a6f750d7739a9e
+2026-11-05T00:20:57Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:21:02Z downloaded results
+2026-11-05T00:25:58Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.229100	2026-11-05T00:00:00+00:00
+2026-11-05T00:26:02Z downloaded results
+2026-11-05T00:26:02Z JOB_FAILED downloaded results; deleting instance
+2026-11-05T00:26:41Z deleted instance=i-0b0a6f750d7739a9e
+2026-11-05T00:26:44Z deleted launch template=p2-1793837834-37373-23172 region=sa-east-1

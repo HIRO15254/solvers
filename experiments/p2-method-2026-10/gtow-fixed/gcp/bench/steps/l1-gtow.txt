@@ -1,0 +1,2 @@
+DIAG_RIVERS=4 DIAG_JOBS=1 bash $X/bench_diag.sh ~/gtow.profile.json ~/e2l1-it2000.bin ~/out/l1/gtow rel8x2@raise5+g25+hd+sd1 ~/bands.txt
+DIAG_RIVERS=4 DIAG_JOBS=1 bash $X/bench_diag.sh ~/gtow.profile.json ~/drawsonly-gtow.bin ~/out/l1/gtow rel8x2@raise5+hd+sd1 ~/bands.txt

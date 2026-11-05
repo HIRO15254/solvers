@@ -1,0 +1,6 @@
+Tree: 2013 decisions, 2409 terminals (18.453s)
+Tables: 0.242s; model: 0.003s
+L1 own flop groups: 1.164s
+L1: 181 leaves; 16100 postflop decisions; 218936704 slots; 3502987264 storage bytes
+L1 leaf cards: 181 leaves with their own flop groups, 0 with the runout split
+Fixed-profile postflop: 3194.347s

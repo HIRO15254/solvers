@@ -1,0 +1,24 @@
+own-x4pr0 3bet 4 train 355s diag 33s L1: 181 leaves; 16100 postflop decisions; 437873408 slots; 7005974528 storage bytes
+	Command being timed: "bash -c bash ~/run_own_cloud.sh own-x4pr0 <(awk -F'\t' '$1=="3bet" && $2==4' ~/plan-xp.tsv)"
+	User time (seconds): 1057.45
+	System time (seconds): 47.82
+	Percent of CPU this job got: 285%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 6:27.59
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 9682764
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 13667072
+	Voluntary context switches: 707572
+	Involuntary context switches: 27807
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 64864
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

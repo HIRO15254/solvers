@@ -1,0 +1,2 @@
+bash ~/sc_l1.sh flop1ro base
+bash ~/sc_l1.sh flop1ro nosc
