@@ -34,7 +34,7 @@ pub use checkpoint::{
 };
 pub use config::{
     AbstractionConfig, AbstractionKind, ActiveOpponentBucketConfig, BettingConfig, MultiwayConfig,
-    RecallMode, SeatConfig, StreetBettingConfig,
+    RecallMode, SeatConfig,
 };
 pub use economics::rake_condition::{CompiledRakeCondition, RakeConditionContext};
 pub use economics::{RakeAllocation, UtilityConfig};

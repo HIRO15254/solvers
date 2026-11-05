@@ -15,17 +15,6 @@ impl PotRake for CompiledRake {
             .fold(MwChips::ZERO, |sum, value| sum + value);
         let total = match *self {
             CompiledRake::None => MwChips::ZERO,
-            CompiledRake::PercentCap {
-                rate,
-                cap,
-                no_flop_no_drop,
-            } => {
-                if no_flop_no_drop && !rake_context.flop_dealt {
-                    MwChips::ZERO
-                } else {
-                    percentage(gross, rate).min(cap)
-                }
-            }
             CompiledRake::Generic {
                 rate,
                 cap,
@@ -41,17 +30,6 @@ impl PotRake for CompiledRake {
                     let value =
                         percentage_with_rounding(gross, rate, rounding, rounding_unit).min(gross);
                     cap.map_or(value, |cap| value.min(cap))
-                }
-            }
-            CompiledRake::GgPreflop {
-                rate,
-                cap,
-                exempt_pot,
-            } => {
-                if gross <= exempt_pot {
-                    MwChips::ZERO
-                } else {
-                    percentage(gross, rate).min(cap)
                 }
             }
         };
@@ -105,12 +83,6 @@ impl PotRake for CompiledRake {
     }
 }
 
-fn percentage(amount: MwChips, rate: f64) -> MwChips {
-    MwChips(
-        nlh::decimal::rounded_product(amount.raw(), rate, 1, Rounding::Down).unwrap_or(u64::MAX),
-    )
-}
-
 fn percentage_with_rounding(
     amount: MwChips,
     rate: f64,
@@ -144,7 +116,12 @@ mod tests {
             MwChips(29)
         );
         assert_eq!(
-            percentage(MwChips(9_007_199_254_740_993), 1.0),
+            percentage_with_rounding(
+                MwChips(9_007_199_254_740_993),
+                1.0,
+                Rounding::Down,
+                MwChips(1)
+            ),
             MwChips(9_007_199_254_740_993)
         );
     }
@@ -207,10 +184,13 @@ mod tests {
         let settled = settle_ranked(
             &state,
             ranks,
-            CompiledRake::PercentCap {
+            CompiledRake::Generic {
                 rate: 0.10,
-                cap: MwChips(15),
-                no_flop_no_drop: false,
+                cap: Some(MwChips(15)),
+                when: crate::rake_condition::compile("true").unwrap(),
+                allocation: RakeAllocation::Proportional,
+                rounding: Rounding::Down,
+                rounding_unit: MwChips(1),
             },
         )
         .unwrap();
@@ -254,10 +234,13 @@ mod tests {
         let settled = settle_ranked(
             &state,
             ranks,
-            CompiledRake::PercentCap {
+            CompiledRake::Generic {
                 rate: 0.10,
-                cap: MwChips(100),
-                no_flop_no_drop: true,
+                cap: Some(MwChips(100)),
+                when: crate::rake_condition::compile("flop_dealt").unwrap(),
+                allocation: RakeAllocation::Proportional,
+                rounding: Rounding::Down,
+                rounding_unit: MwChips(1),
             },
         )
         .unwrap();

@@ -60,10 +60,10 @@ fn profile_navigation_grids_ranges_and_errors() {
     for fragment in [
         "experimental",
         "0: fold",
-        "1: raise-to:3000:all-in",
+        "1: raise to 3",
         "AKs (class unit)",
         "unknown action",
-        "selector: 1",
+        "selector: r3",
         "actor: seat 1",
         "range seat 0: 990.000 known combos",
         "range seat 1: 1326.000 known combos",
@@ -89,9 +89,17 @@ fn profile_navigation_grids_ranges_and_errors() {
     assert_eq!(solution.range(node, 1).unwrap()[0], Some(6.0));
     let frequencies = solution.frequencies(solution.root).unwrap().0;
     assert!((frequencies[1] - 990.0 / 1326.0).abs() < 1e-10);
-    for selector in ["1", "raise-to:3000:all-in"] {
+    // Every selector form `inspect --node` accepts reaches the same node.
+    for selector in [
+        "1",
+        "raise to 3",
+        "raise to 3bb",
+        "raise to 3000c",
+        "r3",
+        "r3000c",
+    ] {
         let text = success(browse(&file, selector, "path\ngo 1\npath\nup\nexit\n"));
-        assert!(text.contains("selector: 1/1"));
+        assert!(text.contains("selector: r3c"), "{selector}: {text}");
         assert!(text.contains("actor: seat 1"));
     }
     let output = Command::new(env!("CARGO_BIN_EXE_solvers"))
@@ -212,7 +220,7 @@ probability_encoding = 'f32'
         "seat 0 (BTN)",
         "pot: 1.500 BB",
         "0: fold",
-        "selector: 0",
+        "selector: f",
         "unknown action",
         "saved root summary",
     ] {
@@ -229,7 +237,7 @@ probability_encoding = 'f32'
             .sum::<f64>(),
         18.0
     );
-    for selector in ["0", "fold", "00000000000000000000000000000000"] {
+    for selector in ["0", "fold", "f", "00000000000000000000000000000000"] {
         success(browse(&file, selector, "path\nquit\n"));
     }
     // A missing saved class must remain unknown, including its path reach.
@@ -357,6 +365,25 @@ fn configured_class_profile_context_and_tree_validation() {
     assert_eq!(solution.positions, ["BTN", "BB"]);
     assert_eq!(solution.nodes[0].pot_bb, Some(1.5));
     assert_eq!(solution.nodes[0].stacks_bb, Some(vec![9.5, 9.0]));
+    // Pots, stacks and labels are in BB whatever the table's chips per BB.
+    let config4 = dir.path().join("pushfold4.toml");
+    let raw4 = raw.replacen("[table]\n", "[table]\nbb_chips = 4\n", 1);
+    std::fs::write(&config4, &raw4).unwrap();
+    let tree4 = Tree::build_with(
+        &l0::game_from_config(&raw4, &config4).unwrap(),
+        FlopLeaves::L1,
+    )
+    .unwrap();
+    let file4 = dir.path().join("profile4.json");
+    std::fs::write(
+        &file4,
+        serde_json::to_vec(&Profile::uniform(&tree4).export(&tree4)).unwrap(),
+    )
+    .unwrap();
+    let scaled = mw_preflop::browse::Solution::load_with_config(&file4, Some(&config4)).unwrap();
+    assert_eq!(scaled.nodes[0].pot_bb, Some(1.5));
+    assert_eq!(scaled.nodes[0].stacks_bb, Some(vec![9.5, 9.0]));
+    assert_eq!(scaled.nodes[0].actions, solution.nodes[0].actions);
     assert_eq!(
         solution.range(0, 0).unwrap().iter().flatten().sum::<f64>(),
         7.0
@@ -382,7 +409,7 @@ fn configured_class_profile_context_and_tree_validation() {
     for fragment in [
         "config starting ranges",
         "path: root; actor: seat 0 (BTN)",
-        "path: BTN raise-to:10000:all-in",
+        "path: BTN raise to 10",
         "actor: seat 1 (BB)",
         "range seat 0 (BTN): 3.500",
         "range seat 1 (BB): 6.000",

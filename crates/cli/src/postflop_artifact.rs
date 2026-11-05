@@ -122,6 +122,10 @@ fn lock_toml(path: &Path, nodes: &[String], rivers: Option<RiverResolve>) -> Res
 fn to_json<T: Serialize>(value: &T) -> Result<String> {
     Ok(serde_json::to_string_pretty(value)? + "\n")
 }
+/// Shared fixed-precision formatting for weights, frequencies and values.
+pub(crate) fn csv_six<T: std::fmt::Display>(value: T) -> String {
+    format!("{value:.6}")
+}
 
 fn summary_csv(summary: &Summary) -> String {
     let mut out = String::from(
@@ -176,8 +180,12 @@ fn action_csv(rows: &[ActionRow]) -> String {
     let mut out = String::from("history,street,actor,action,frequency\n");
     for row in rows {
         out.push_str(&format!(
-            "{},{},{},{},{:.6}\n",
-            row.history, row.street, row.actor, row.action, row.frequency
+            "{},{},{},{},{}\n",
+            row.history,
+            row.street,
+            row.actor,
+            row.action,
+            csv_six(row.frequency)
         ));
     }
     out
@@ -186,17 +194,13 @@ fn action_csv(rows: &[ActionRow]) -> String {
 fn strategy_csv(rows: &[StrategyRow]) -> String {
     let mut out = String::from("history,actor,combo,weight,probabilities\n");
     for row in rows {
-        let probs: Vec<String> = row
-            .probabilities
-            .iter()
-            .map(|p| format!("{p:.6}"))
-            .collect();
+        let probs: Vec<String> = row.probabilities.iter().map(csv_six).collect();
         out.push_str(&format!(
-            "{},{},{},{:.6},{}\n",
+            "{},{},{},{},{}\n",
             row.history,
             row.actor,
             row.combo,
-            row.weight,
+            csv_six(row.weight),
             probs.join("|"),
         ));
     }
@@ -207,8 +211,12 @@ fn value_csv(rows: &[ValueRow]) -> String {
     let mut out = String::from("history,seat,combo,weight,ev\n");
     for row in rows {
         out.push_str(&format!(
-            "{},{},{},{:.6},{:.6}\n",
-            row.history, row.seat, row.combo, row.weight, row.ev
+            "{},{},{},{},{}\n",
+            row.history,
+            row.seat,
+            row.combo,
+            csv_six(row.weight),
+            csv_six(row.ev)
         ));
     }
     out
@@ -217,7 +225,12 @@ fn value_csv(rows: &[ValueRow]) -> String {
 fn range_csv(rows: &[RangeRow]) -> String {
     let mut out = String::from("seat,combo,weight\n");
     for row in rows {
-        out.push_str(&format!("{},{},{:.6}\n", row.seat, row.combo, row.weight));
+        out.push_str(&format!(
+            "{},{},{}\n",
+            row.seat,
+            row.combo,
+            csv_six(row.weight)
+        ));
     }
     out
 }

@@ -1,7 +1,7 @@
 //! Experimental saved-profile action EVs at a preflop decision, with fold = 0.
 //! Reuses the trunk terminal evaluator/backward pass and L1 leaf diagnostic.
 //! L1 board estimates are normalized by their sampled compatible-combo mass,
-//! then scaled by exact trunk opponent mass, matching l1_leaf_diag/call_ev.py.
+//! then scaled by exact trunk opponent mass, matching l1_leaf_diag.
 use anyhow::{Context, Result, bail, ensure};
 use mw_preflop::{
     Street,
@@ -219,9 +219,7 @@ fn main() -> Result<()> {
         "node {root}, actor {hero}, boards {}, seed {seed}",
         boards.len()
     );
-    println!(
-        "EV in bb, action minus fold; L1 compatible-board mass normalized as l1_leaf_diag/call_ev.py"
-    );
+    println!("EV in bb, action minus fold; L1 compatible-board mass normalized as l1_leaf_diag");
     println!("range shares use combo count * starting class weight * own trunk reach");
     println!(
         "model: hero-conditioned classes; ignores opponent/opponent overlap and folded cards; T3/K4 sampled as solver"

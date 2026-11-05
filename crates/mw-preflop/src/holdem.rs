@@ -110,9 +110,8 @@ impl<A: MultiwayAbstraction> HoldemGame<A> {
         };
 
         let mut hasher = blake3::Hasher::new();
-        // v2 removes structural aggression limits and size-to-all-in merging
-        // from the serialized betting policy; scripts now define those edits.
-        hasher.update(b"solvers.multiway.holdem.v2");
+        // v3 identifies chip-denominated game configuration.
+        hasher.update(b"solvers.multiway.holdem.v3");
         let mut game_identity = config.clone();
         game_identity.abstraction = AbstractionConfig::default();
         hasher.update(&serde_json::to_vec(&game_identity)?);
@@ -914,12 +913,23 @@ mod tests {
     use crate::types::SeatId;
     use nlh::combo_index;
 
+    fn betting(script: &str) -> BettingConfig {
+        let raw = format!(
+            "schema = 'solvers.nlh/v1'\n[table]\nplayers = 3\nstack = 10\n[tree]\nscript = '''{script}'''\n"
+        );
+        crate::prepare::prepare(&raw, std::path::Path::new("unit.toml"))
+            .unwrap()
+            .lowered
+            .game
+            .betting
+    }
+
     fn config() -> MultiwayConfig {
         MultiwayConfig {
             seats: (0..3)
                 .map(|_| SeatConfig {
                     name: None,
-                    stack_bb: 10.0,
+                    stack_chips: MwChips(10_000),
                     range: String::new(),
                     betting: None,
                 })
@@ -927,7 +937,7 @@ mod tests {
             button: SeatId(0),
             blinds: BlindConfig::default(),
             ante: AnteConfig::None,
-            betting: BettingConfig::default(),
+            betting: betting("preflop { replace raise [2.5bb, a] }"),
             forced_bets: None,
             abstraction: AbstractionConfig::default(),
             bb_chips: 1000,
@@ -972,8 +982,7 @@ mod tests {
     #[test]
     fn actor_specific_betting_profile_overrides_global_sizes() {
         let mut config = config();
-        let mut seat_profile = BettingConfig::default();
-        seat_profile.preflop.bet_sizes = vec![crate::config::SizeSpec::ToBb { value: 7.0 }];
+        let seat_profile = betting("preflop { replace raise [7bb] }");
         config.seats[0].betting = Some(seat_profile);
         let game = HoldemGame::new(
             &config,
@@ -1165,9 +1174,9 @@ mod tests {
     #[test]
     fn vector_terminal_utilities_match_scalar_settlement_for_several_combos() {
         let mut game_config = config();
-        game_config.seats[0].stack_bb = 5.0;
-        game_config.seats[1].stack_bb = 3.0;
-        game_config.seats[2].stack_bb = 1.0;
+        game_config.seats[0].stack_chips = MwChips(5_000);
+        game_config.seats[1].stack_chips = MwChips(3_000);
+        game_config.seats[2].stack_chips = MwChips(1_000);
         let game = HoldemGame::new(
             &game_config,
             &UtilityConfig::ChipEv,
@@ -1317,7 +1326,7 @@ mod tests {
                 .iter()
                 .map(|&stack_bb| SeatConfig {
                     name: None,
-                    stack_bb,
+                    stack_chips: nlh::ChipScale::DEFAULT.from_bb(stack_bb).unwrap(),
                     range: String::new(),
                     betting: None,
                 })
@@ -1436,10 +1445,13 @@ mod tests {
             let traverser = rng.gen_range(0..num_seats);
 
             let rake = if rng.gen_bool(0.5) {
-                RakeConfig::PercentCap {
+                RakeConfig::Generic {
                     rate: 0.05,
-                    cap_bb: 3.0,
-                    no_flop_no_drop: false,
+                    cap_chips: Some(3_000),
+                    when: "true".into(),
+                    allocation: economics::RakeAllocation::MainFirst,
+                    rounding: nlh::Rounding::Down,
+                    rounding_unit: MwChips(1),
                 }
             } else {
                 RakeConfig::None

@@ -1,10 +1,7 @@
 //! Internal typed game configuration and shared validation.
 //!
-//! Common-input lowering constructs `MultiwayConfig`; solver settings, rake,
-//! and utility remain separate typed values.  Conversion to
-//! integral [`MwChips`] happens exactly once during validation/compilation so the betting and
-//! settlement layers never see floating-point chip amounts.
-//! Rake and utility configuration are compatibility exports from `economics`.
+//! Common-input lowering constructs `MultiwayConfig` with integral chip amounts;
+//! solver settings, rake, and utility remain separate typed values.
 
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -13,7 +10,7 @@ use nlh::Range;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::types::{MAX_SEATS, MIN_SEATS, MwChips, SeatId, SeatVec, Street};
+use crate::types::{MAX_SEATS, MIN_SEATS, MwChips, SeatId, SeatVec};
 pub use economics::{CompiledRake, FieldPlayerConfig, RakeAllocation, RakeConfig, UtilityConfig};
 use nlh::{ChipScale, Rounding};
 
@@ -56,7 +53,7 @@ fn is_default_bb_chips(value: &u64) -> bool {
 pub struct SeatConfig {
     #[serde(default)]
     pub name: Option<String>,
-    pub stack_bb: f64,
+    pub stack_chips: MwChips,
     /// Empty means the full 1,326-combo range.  Non-empty strings use the
     /// shared `nlh::Range` grammar.
     #[serde(default = "default_range")]
@@ -75,26 +72,26 @@ fn default_range() -> String {
 #[serde(deny_unknown_fields)]
 pub struct BlindConfig {
     #[serde(default = "default_small_blind")]
-    pub small_bb: f64,
+    pub small_chips: MwChips,
     #[serde(default = "default_big_blind")]
-    pub big_bb: f64,
+    pub big_chips: MwChips,
 }
 
 impl Default for BlindConfig {
     fn default() -> Self {
         Self {
-            small_bb: default_small_blind(),
-            big_bb: default_big_blind(),
+            small_chips: default_small_blind(),
+            big_chips: default_big_blind(),
         }
     }
 }
 
-fn default_small_blind() -> f64 {
-    0.5
+fn default_small_blind() -> MwChips {
+    MwChips(500)
 }
 
-fn default_big_blind() -> f64 {
-    1.0
+fn default_big_blind() -> MwChips {
+    MwChips(1_000)
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -103,10 +100,10 @@ pub enum AnteConfig {
     #[default]
     None,
     Each {
-        amount_bb: f64,
+        amount_chips: MwChips,
     },
     BigBlind {
-        amount_bb: f64,
+        amount_chips: MwChips,
     },
 }
 
@@ -115,56 +112,22 @@ pub enum AnteConfig {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ForcedBetConfig {
-    pub blinds_bb: Vec<f64>,
-    pub antes_bb: Vec<f64>,
+    pub blinds_chips: Vec<MwChips>,
+    pub antes_chips: Vec<MwChips>,
     #[serde(default)]
-    pub common_ante_bb: f64,
-    pub nominal_big_blind_bb: f64,
+    pub common_ante_chips: MwChips,
+    pub nominal_big_blind_chips: MwChips,
     pub first_to_act: SeatId,
-    /// Ordered live posts (seat, total wager in BB). Empty for old families.
+    /// Ordered live posts (seat, total wager in chips).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub straddles: Vec<(SeatId, f64)>,
+    pub straddles: Vec<(SeatId, MwChips)>,
 }
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct BettingConfig {
-    #[serde(default = "default_true")]
-    pub allow_limp: bool,
-    #[serde(default = "default_preflop_betting")]
-    pub preflop: StreetBettingConfig,
-    #[serde(default = "default_postflop_betting")]
-    pub flop: StreetBettingConfig,
-    #[serde(default = "default_postflop_betting")]
-    pub turn: StreetBettingConfig,
-    #[serde(default = "default_postflop_betting")]
-    pub river: StreetBettingConfig,
     /// Common-input rules in source order, evaluated by the P2 dialect.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub nlh_rules: Vec<crate::tree_rules::NlhTreeRule>,
-}
-
-impl Default for BettingConfig {
-    fn default() -> Self {
-        Self {
-            allow_limp: true,
-            preflop: default_preflop_betting(),
-            flop: default_postflop_betting(),
-            turn: default_postflop_betting(),
-            river: default_postflop_betting(),
-            nlh_rules: Vec::new(),
-        }
-    }
-}
-
-impl BettingConfig {
-    pub fn for_street(&self, street: Street) -> &StreetBettingConfig {
-        match street {
-            Street::Preflop => &self.preflop,
-            Street::Flop => &self.flop,
-            Street::Turn => &self.turn,
-            Street::River => &self.river,
-        }
-    }
 }
 
 /// The same five effects a postflop `.tree` script's `add`/`remove`/
@@ -175,64 +138,6 @@ pub type RuleEffect = nlh::script::Effect;
 /// The same five actions a postflop `.tree` script's `bet`/`raise` (and,
 /// here, `fold`/`check`/`call`) statements name -- see [`RuleEffect`].
 pub type RuleAction = nlh::script::ActionKind;
-
-fn default_true() -> bool {
-    true
-}
-
-/// Base size menus and street policy. Aggression limits and all-in
-/// replacement are expressed with ordered tree-script rules, not fields.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct StreetBettingConfig {
-    /// Opening sizes. Preflop these apply before a voluntary limp; postflop
-    /// they are bets into an unopened street.
-    #[serde(default)]
-    pub bet_sizes: Vec<SizeSpec>,
-    /// Preflop raise-to sizes after one or more limps. None preserves the
-    /// historical behavior of reusing bet_sizes; Some(empty) disables sized
-    /// isolations.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub isolate_sizes: Option<Vec<SizeSpec>>,
-    #[serde(default)]
-    pub raise_sizes: Vec<SizeSpec>,
-    /// HRC-style check-down threshold (flop/turn/river only). When the
-    /// non-folded seat count at this street's start (all-in seats included)
-    /// exceeds this value, the street has no betting at all: no decision
-    /// nodes, not even checks; play proceeds straight to the next street (or
-    /// showdown). `None` (default) preserves unlimited betting, so every
-    /// config predating this field serializes identically and keeps its game
-    /// fingerprint. See `docs/nlh-input-v1.jp.md`. Rejected on preflop and
-    /// must be at least `1` when present; also a public-tree property, so a
-    /// per-seat betting override must not disagree with the table's value
-    /// for the same street (see [`MultiwayConfig::validate`]).
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub max_betting_players: Option<u8>,
-}
-
-fn default_preflop_betting() -> StreetBettingConfig {
-    StreetBettingConfig {
-        bet_sizes: vec![
-            SizeSpec::PreviousBetMultiple { factor: 2.5 },
-            SizeSpec::AllIn,
-        ],
-        isolate_sizes: None,
-        raise_sizes: vec![
-            SizeSpec::PreviousBetMultiple { factor: 3.0 },
-            SizeSpec::AllIn,
-        ],
-        max_betting_players: None,
-    }
-}
-
-fn default_postflop_betting() -> StreetBettingConfig {
-    StreetBettingConfig {
-        bet_sizes: vec![SizeSpec::PotAfterCall { fraction: 0.5 }, SizeSpec::AllIn],
-        isolate_sizes: None,
-        raise_sizes: vec![SizeSpec::PotAfterCall { fraction: 0.75 }, SizeSpec::AllIn],
-        max_betting_players: None,
-    }
-}
 
 /// Bet/raise size grammar, shared with every other config family that
 /// lowers a bet or raise tree. Defined in `nlh::sizing`; re-exported here
@@ -458,16 +363,11 @@ impl MultiwayConfig {
                 num_seats,
             });
         }
-        let scale =
-            ChipScale::new(self.bb_chips).ok_or_else(|| ConfigError::Number("bb_chips".into()))?;
+        ChipScale::new(self.bb_chips).ok_or_else(|| ConfigError::Number("bb_chips".into()))?;
 
         for (index, seat) in self.seats.iter().enumerate() {
-            positive_finite(&format!("seats[{index}].stack_bb"), seat.stack_bb)?;
-            let chips = scale
-                .from_bb(seat.stack_bb)
-                .map_err(|_| ConfigError::Number(format!("seats[{index}].stack_bb")))?;
-            if chips == MwChips::ZERO {
-                return Err(ConfigError::Number(format!("seats[{index}].stack_bb")));
+            if seat.stack_chips == MwChips::ZERO {
+                return Err(ConfigError::Number(format!("seats[{index}].stack_chips")));
             }
             if seat
                 .name
@@ -478,46 +378,20 @@ impl MultiwayConfig {
             }
             if let Some(betting) = &seat.betting {
                 validate_betting(betting)?;
-                // Check-down is a public-tree property: it cannot legally
-                // differ by seat, so a per-seat override may only repeat the
-                // table's value for the same street, never diverge from it.
-                for street in [Street::Flop, Street::Turn, Street::River] {
-                    let seat_value = betting.for_street(street).max_betting_players;
-                    let table_value = self.betting.for_street(street).max_betting_players;
-                    if seat_value != table_value {
-                        return Err(ConfigError::SeatMaxBettingPlayersMismatch {
-                            seat: index,
-                            street,
-                        });
-                    }
-                }
             }
         }
 
-        finite("blinds.small_bb", self.blinds.small_bb)?;
-        positive_finite("blinds.big_bb", self.blinds.big_bb)?;
-        let small = scale
-            .from_bb(self.blinds.small_bb)
-            .map_err(|_| ConfigError::Number("blinds.small_bb".into()))?;
-        let big = scale
-            .from_bb(self.blinds.big_bb)
-            .map_err(|_| ConfigError::Number("blinds.big_bb".into()))?;
-        if small > big || big == MwChips::ZERO {
+        if self.blinds.small_chips > self.blinds.big_chips || self.blinds.big_chips == MwChips::ZERO
+        {
             return Err(ConfigError::Blinds);
         }
 
-        match self.ante {
-            AnteConfig::None => {}
-            AnteConfig::Each { amount_bb } => nonnegative_finite("ante.amount_bb", amount_bb)?,
-            AnteConfig::BigBlind { amount_bb } => nonnegative_finite("ante.amount_bb", amount_bb)?,
-        }
-
         if let Some(forced) = &self.forced_bets {
-            if forced.blinds_bb.len() != num_seats || forced.antes_bb.len() != num_seats {
+            if forced.blinds_chips.len() != num_seats || forced.antes_chips.len() != num_seats {
                 return Err(ConfigError::ForcedBetCount {
                     expected: num_seats,
-                    blinds: forced.blinds_bb.len(),
-                    antes: forced.antes_bb.len(),
+                    blinds: forced.blinds_chips.len(),
+                    antes: forced.antes_chips.len(),
                 });
             }
             if forced.first_to_act.index() >= num_seats {
@@ -526,22 +400,16 @@ impl MultiwayConfig {
                     num_seats,
                 });
             }
-            nonnegative_finite(
-                "forced_bets.nominal_big_blind_bb",
-                forced.nominal_big_blind_bb,
-            )?;
-            nonnegative_finite("forced_bets.common_ante_bb", forced.common_ante_bb)?;
-            for (seat, &amount) in forced.blinds_bb.iter().enumerate() {
-                nonnegative_finite(&format!("forced_bets.blinds_bb[{seat}]"), amount)?;
-            }
-            for (seat, &amount) in forced.antes_bb.iter().enumerate() {
-                nonnegative_finite(&format!("forced_bets.antes_bb[{seat}]"), amount)?;
-            }
-            let maximum = forced.blinds_bb.iter().copied().fold(0.0, f64::max);
-            if maximum != forced.nominal_big_blind_bb {
+            let maximum = forced
+                .blinds_chips
+                .iter()
+                .copied()
+                .max()
+                .unwrap_or(MwChips::ZERO);
+            if maximum != forced.nominal_big_blind_chips {
                 return Err(ConfigError::NominalBlind);
             }
-            let mut previous = forced.nominal_big_blind_bb;
+            let mut previous = forced.nominal_big_blind_chips;
             let mut expected = if num_seats == 2 {
                 self.button
             } else {
@@ -551,16 +419,13 @@ impl MultiwayConfig {
                 return Err(ConfigError::Number("forced_bets.straddles count".into()));
             }
             for &(seat, amount) in &forced.straddles {
-                nonnegative_finite("forced_bets.straddles amount", amount)?;
-                let chips = scale
-                    .from_bb(amount)
-                    .map_err(|_| ConfigError::Number("forced_bets.straddles amount".into()))?;
-                if scale.to_bb(chips) != amount {
-                    return Err(ConfigError::Number("forced_bets.straddles grid".into()));
-                }
                 if seat != expected
-                    || amount < 2.0 * previous
-                    || self.seats[seat.index()].stack_bb <= forced.antes_bb[seat.index()] + amount
+                    || previous
+                        .checked_add(previous)
+                        .is_none_or(|minimum| amount < minimum)
+                    || forced.antes_chips[seat.index()]
+                        .checked_add(amount)
+                        .is_none_or(|total| self.seats[seat.index()].stack_chips <= total)
                 {
                     return Err(ConfigError::Number(
                         "forced_bets.straddles order/amount/stack".into(),
@@ -651,25 +516,15 @@ impl MultiwayConfig {
             .zip(ranges)
             .map(|(seat, range)| ValidatedSeat {
                 name: seat.name.clone(),
-                starting_stack: scale
-                    .from_bb(seat.stack_bb)
-                    .expect("validated finite stack must convert"),
+                starting_stack: seat.stack_chips,
                 range,
                 betting: seat.betting.clone(),
             })
             .collect();
         let ante = match self.ante {
             AnteConfig::None => ValidatedAnte::None,
-            AnteConfig::Each { amount_bb } => ValidatedAnte::Each(
-                scale
-                    .from_bb(amount_bb)
-                    .expect("validated ante must convert"),
-            ),
-            AnteConfig::BigBlind { amount_bb } => ValidatedAnte::BigBlind(
-                scale
-                    .from_bb(amount_bb)
-                    .expect("validated ante must convert"),
-            ),
+            AnteConfig::Each { amount_chips } => ValidatedAnte::Each(amount_chips),
+            AnteConfig::BigBlind { amount_chips } => ValidatedAnte::BigBlind(amount_chips),
         };
         let num_seats = self.seats.len();
         let small_blind_seat = if num_seats == 2 {
@@ -679,12 +534,8 @@ impl MultiwayConfig {
         };
         let big_blind_seat = small_blind_seat.next(num_seats);
         let mut forced_blinds = vec![MwChips::ZERO; num_seats];
-        forced_blinds[small_blind_seat.index()] = scale
-            .from_bb(self.blinds.small_bb)
-            .expect("validated blind must convert");
-        forced_blinds[big_blind_seat.index()] = scale
-            .from_bb(self.blinds.big_bb)
-            .expect("validated blind must convert");
+        forced_blinds[small_blind_seat.index()] = self.blinds.small_chips;
+        forced_blinds[big_blind_seat.index()] = self.blinds.big_chips;
         let mut forced_antes = vec![MwChips::ZERO; num_seats];
         let mut common_ante = MwChips::ZERO;
         match ante {
@@ -692,34 +543,21 @@ impl MultiwayConfig {
             ValidatedAnte::Each(amount) => forced_antes.fill(amount),
             ValidatedAnte::BigBlind(amount) => common_ante = amount,
         }
-        let nominal_big_blind = scale.bb();
+        let mut nominal_big_blind = scale.bb();
         let mut preflop_first_to_act = big_blind_seat.next(num_seats);
         if let Some(forced) = &self.forced_bets {
-            forced_blinds = forced
-                .blinds_bb
-                .iter()
-                .map(|&value| scale.from_bb(value).expect("validated blind must convert"))
-                .collect();
-            forced_antes = forced
-                .antes_bb
-                .iter()
-                .map(|&value| scale.from_bb(value).expect("validated ante must convert"))
-                .collect();
-            common_ante = scale
-                .from_bb(forced.common_ante_bb)
-                .expect("validated common ante must convert");
+            forced_blinds.clone_from(&forced.blinds_chips);
+            forced_antes.clone_from(&forced.antes_chips);
+            common_ante = forced.common_ante_chips;
+            nominal_big_blind = forced.nominal_big_blind_chips;
             preflop_first_to_act = forced.first_to_act;
         }
         Ok(ValidatedMultiwayConfig {
             seats: SeatVec::new_unchecked(seats),
             button: self.button,
             blinds: ValidatedBlinds {
-                small: scale
-                    .from_bb(self.blinds.small_bb)
-                    .expect("validated blind must convert"),
-                big: scale
-                    .from_bb(self.blinds.big_bb)
-                    .expect("validated blind must convert"),
+                small: self.blinds.small_chips,
+                big: self.blinds.big_chips,
             },
             ante,
             betting: self.betting.clone(),
@@ -728,20 +566,10 @@ impl MultiwayConfig {
             common_ante,
             nominal_big_blind,
             preflop_first_to_act,
-            straddles: self.forced_bets.as_ref().map_or_else(Vec::new, |forced| {
-                forced
-                    .straddles
-                    .iter()
-                    .map(|&(seat, amount)| {
-                        (
-                            seat,
-                            scale
-                                .from_bb(amount)
-                                .expect("validated straddle must convert"),
-                        )
-                    })
-                    .collect()
-            }),
+            straddles: self
+                .forced_bets
+                .as_ref()
+                .map_or_else(Vec::new, |forced| forced.straddles.clone()),
             abstraction: self.abstraction.clone(),
             chip_rounding: self.chip_rounding,
         })
@@ -798,41 +626,6 @@ fn validate_betting(config: &BettingConfig) -> Result<(), ConfigError> {
     for rule in &config.nlh_rules {
         rule.validate()?;
     }
-    for street in Street::ALL {
-        let section = config.for_street(street);
-        if street != Street::Preflop && section.isolate_sizes.is_some() {
-            return Err(ConfigError::PostflopIsolateSizes(street));
-        }
-        for (kind, sizes) in [
-            ("bet_sizes", &section.bet_sizes),
-            ("raise_sizes", &section.raise_sizes),
-        ] {
-            if sizes.len() > 32 {
-                return Err(ConfigError::TooManySizes { street, kind });
-            }
-            for size in sizes {
-                validate_size_spec(size)?;
-            }
-        }
-        if let Some(sizes) = section.isolate_sizes.as_ref() {
-            if sizes.len() > 32 {
-                return Err(ConfigError::TooManySizes {
-                    street,
-                    kind: "isolate_sizes",
-                });
-            }
-            for size in sizes {
-                validate_size_spec(size)?;
-            }
-        }
-        if street == Street::Preflop {
-            if section.max_betting_players.is_some() {
-                return Err(ConfigError::PreflopMaxBettingPlayers);
-            }
-        } else if section.max_betting_players == Some(0) {
-            return Err(ConfigError::MaxBettingPlayers);
-        }
-    }
     Ok(())
 }
 
@@ -847,15 +640,6 @@ fn finite(field: &str, value: f64) -> Result<(), ConfigError> {
 fn positive_finite(field: &str, value: f64) -> Result<(), ConfigError> {
     finite(field, value)?;
     if value > 0.0 {
-        Ok(())
-    } else {
-        Err(ConfigError::Number(field.into()))
-    }
-}
-
-fn nonnegative_finite(field: &str, value: f64) -> Result<(), ConfigError> {
-    finite(field, value)?;
-    if value >= 0.0 {
         Ok(())
     } else {
         Err(ConfigError::Number(field.into()))
@@ -892,10 +676,6 @@ pub enum ConfigError {
     Range { seat: usize, message: String },
     #[error("seat {0} range must contain positive combo weight")]
     EmptyRange(usize),
-    #[error("{street:?}.{kind} may contain at most 32 entries")]
-    TooManySizes { street: Street, kind: &'static str },
-    #[error("{0:?}.isolate_sizes is valid only for preflop")]
-    PostflopIsolateSizes(Street),
     #[error("previous-bet-multiple must be greater than one")]
     RaiseFactor,
     #[error("all postflop bucket counts must be positive")]
@@ -914,16 +694,6 @@ pub enum ConfigError {
     Ehs2TableOpponentBuckets,
     #[error("per-hand rake and tournament ICM cannot be combined")]
     IcmWithRake,
-    #[error(
-        "preflop.max_betting_players is not supported; check-down thresholds apply only to flop, turn, and river"
-    )]
-    PreflopMaxBettingPlayers,
-    #[error("max_betting_players must be at least 1")]
-    MaxBettingPlayers,
-    #[error(
-        "seat {seat} {street:?}.max_betting_players must match the table's value for that street"
-    )]
-    SeatMaxBettingPlayersMismatch { seat: usize, street: Street },
     #[error("invalid tree rule: {0}")]
     TreeRule(String),
 }
@@ -936,14 +706,14 @@ mod tests {
 button = 0
 
 [[seats]]
-stack_bb = 40
+stack_chips = 40000
 
 [[seats]]
-stack_bb = 25.5
+stack_chips = 25500
 range = "22+,A2s+"
 
 [[seats]]
-stack_bb = 12
+stack_chips = 12000
 "#
     }
 
@@ -951,10 +721,9 @@ stack_bb = 12
     fn minimal_three_seat_config_applies_defaults_and_round_trips() {
         let config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
         config.validate().unwrap();
-        assert_eq!(config.blinds.small_bb, 0.5);
+        assert_eq!(config.blinds.small_chips, MwChips(500));
         assert_eq!(config.abstraction.flop_buckets, 128);
         assert!(config.abstraction.active_opponent_buckets.is_empty());
-        assert!(config.betting.allow_limp);
         assert_eq!(config.compile_ranges().unwrap().len(), 3);
         let encoded = toml::to_string(&config).unwrap();
         let decoded: MultiwayConfig = toml::from_str(&encoded).unwrap();
@@ -962,7 +731,7 @@ stack_bb = 12
     }
 
     #[test]
-    fn validated_config_uses_thousand_chips_per_bb() {
+    fn validated_config_preserves_chip_amounts() {
         let config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
         let compiled = config.validated().unwrap();
         assert_eq!(compiled.seats[SeatId(0)].starting_stack, MwChips(40_000));
@@ -1033,10 +802,13 @@ stack_bb = 12
         assert!(matches!(
             config.validate_economics(
                 &utility,
-                &RakeConfig::PercentCap {
+                &RakeConfig::Generic {
                     rate: 0.05,
-                    cap_bb: 3.0,
-                    no_flop_no_drop: true,
+                    cap_chips: Some(3_000),
+                    when: "true".into(),
+                    allocation: RakeAllocation::default(),
+                    rounding: Rounding::default(),
+                    rounding_unit: MwChips(1),
                 }
             ),
             Err(ConfigError::IcmWithRake)
@@ -1044,37 +816,12 @@ stack_bb = 12
     }
 
     #[test]
-    fn min_raise_and_stack_fraction_sizes_validate_and_round_trip() {
-        let mut config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
-        config.betting.preflop.bet_sizes = vec![SizeSpec::MinRaise];
-        config.betting.preflop.raise_sizes = vec![
-            SizeSpec::MinRaise,
-            SizeSpec::StackFraction { fraction: 0.25 },
-            SizeSpec::StackFraction { fraction: 0.5 },
-        ];
-        config.validate().unwrap();
-
-        let encoded = toml::to_string(&config).unwrap();
-        assert!(encoded.contains("min-raise"));
-        assert!(encoded.contains("stack-fraction"));
-        let decoded: MultiwayConfig = toml::from_str(&encoded).unwrap();
-        decoded.validate().unwrap();
-        assert_eq!(decoded.betting.preflop.bet_sizes, vec![SizeSpec::MinRaise]);
-        assert_eq!(
-            decoded.betting.preflop.raise_sizes,
-            config.betting.preflop.raise_sizes
-        );
-    }
-
-    #[test]
     fn stack_fraction_rejects_nonpositive_or_nonfinite_values() {
-        let mut config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
         for bad in [0.0, -1.0, f64::NAN, f64::INFINITY] {
-            config.betting.preflop.bet_sizes = vec![SizeSpec::StackFraction { fraction: bad }];
-            assert!(
-                matches!(config.validate(), Err(ConfigError::Number(_))),
-                "fraction {bad} should be rejected"
-            );
+            assert!(matches!(
+                validate_size_spec(&SizeSpec::StackFraction { fraction: bad }),
+                Err(ConfigError::Number(_))
+            ));
         }
     }
 
@@ -1203,76 +950,29 @@ stack_bb = 12
     }
 
     #[test]
-    fn default_config_toml_and_behavior_are_unchanged_by_new_size_variants() {
-        // New size variants remain opt-in and do not alter default menus.
-        let config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
-        config.validate().unwrap();
-        let encoded = toml::to_string(&config).unwrap();
-        assert!(!encoded.contains("min-raise"));
-        assert!(!encoded.contains("stack-fraction"));
+    fn rejects_legacy_betting_menus_and_fractional_chips() {
+        assert!(toml::from_str::<BettingConfig>("allow_limp = true").is_err());
+        assert!(toml::from_str::<BettingConfig>("[preflop]\nbet_sizes = []").is_err());
+        let fractional = minimal_toml().replace("stack_chips = 40000", "stack_chips = 40.5");
+        assert!(toml::from_str::<MultiwayConfig>(&fractional).is_err());
     }
 
     #[test]
-    fn max_betting_players_absent_field_serializes_byte_identically() {
-        // Regression guard: fingerprint stability. A config that never sets
-        // max_betting_players must serialize (JSON, used for the game
-        // fingerprint, and TOML) exactly as it did before this field existed.
-        let config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
-        assert!(config.betting.flop.max_betting_players.is_none());
-        let json = serde_json::to_string(&config.betting.flop).unwrap();
-        assert!(!json.contains("max_betting_players"));
-        let toml_text = toml::to_string(&config).unwrap();
-        assert!(!toml_text.contains("max_betting_players"));
-
-        let mut capped = config;
-        capped.betting.flop.max_betting_players = Some(2);
-        let capped_json = serde_json::to_string(&capped.betting.flop).unwrap();
-        assert!(capped_json.contains("\"max_betting_players\":2"));
-        let decoded: StreetBettingConfig = serde_json::from_str(&capped_json).unwrap();
-        assert_eq!(decoded.max_betting_players, Some(2));
-
-        let encoded = toml::to_string(&capped).unwrap();
-        let redecoded: MultiwayConfig = toml::from_str(&encoded).unwrap();
-        redecoded.validate().unwrap();
-        assert_eq!(redecoded.betting.flop.max_betting_players, Some(2));
-    }
-
-    #[test]
-    fn max_betting_players_rejects_zero_and_preflop() {
+    fn forced_bets_preserve_chips_and_validate_straddles() {
         let mut config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
-        config.betting.flop.max_betting_players = Some(0);
-        assert!(matches!(
-            config.validate(),
-            Err(ConfigError::MaxBettingPlayers)
-        ));
-
-        config.betting.flop.max_betting_players = Some(1);
-        config.validate().unwrap();
-
-        config.betting.flop.max_betting_players = None;
-        config.betting.preflop.max_betting_players = Some(2);
-        assert!(matches!(
-            config.validate(),
-            Err(ConfigError::PreflopMaxBettingPlayers)
-        ));
-    }
-
-    #[test]
-    fn max_betting_players_seat_override_must_match_the_table() {
-        let mut config: MultiwayConfig = toml::from_str(minimal_toml()).unwrap();
-        config.betting.turn.max_betting_players = Some(2);
-
-        let mut mismatched_seat_betting = BettingConfig::default();
-        mismatched_seat_betting.turn.max_betting_players = Some(3);
-        config.seats[0].betting = Some(mismatched_seat_betting);
-        assert!(matches!(
-            config.validate(),
-            Err(ConfigError::SeatMaxBettingPlayersMismatch { seat: 0, street }) if street == Street::Turn
-        ));
-
-        let mut matched_seat_betting = BettingConfig::default();
-        matched_seat_betting.turn.max_betting_players = Some(2);
-        config.seats[0].betting = Some(matched_seat_betting);
-        config.validate().unwrap();
+        config.forced_bets = Some(ForcedBetConfig {
+            blinds_chips: vec![MwChips(0), MwChips(500), MwChips(1_000)],
+            antes_chips: vec![MwChips(10); 3],
+            common_ante_chips: MwChips(7),
+            nominal_big_blind_chips: MwChips(1_000),
+            first_to_act: SeatId(1),
+            straddles: vec![(SeatId(0), MwChips(2_000))],
+        });
+        let validated = config.validated().unwrap();
+        assert_eq!(validated.common_ante, MwChips(7));
+        assert_eq!(validated.nominal_big_blind, MwChips(1_000));
+        assert_eq!(validated.straddles, vec![(SeatId(0), MwChips(2_000))]);
+        config.forced_bets.as_mut().unwrap().straddles[0].1 = MwChips(1_999);
+        assert!(config.validate().is_err());
     }
 }

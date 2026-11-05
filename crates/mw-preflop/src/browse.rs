@@ -12,7 +12,10 @@ use std::{
 /// One public decision or leaf. Missing class rows remain unknown.
 pub struct Node {
     pub actor: Option<usize>,
+    /// Display labels (`raise to 2.5`), as `export` and `inspect` show them.
     pub actions: Vec<String>,
+    /// Stored labels (`raise-to:2500`), parallel to `actions`; they match strategy rows.
+    pub stored_actions: Vec<String>,
     pub children: Vec<Option<usize>>,
     pub parent: Option<(usize, usize)>,
     pub probabilities: Vec<Option<Vec<f64>>>,
@@ -24,12 +27,40 @@ impl Node {
         Self {
             actor: None,
             actions: Vec::new(),
+            stored_actions: Vec::new(),
             children: Vec::new(),
             parent: None,
             probabilities: vec![None; 169],
             pot_bb: None,
             stacks_bb: None,
         }
+    }
+    fn decision(actor: usize, stored_actions: Vec<String>, scale: nlh::ChipScale) -> Self {
+        Self {
+            actor: Some(actor),
+            actions: stored_actions
+                .iter()
+                .map(|label| display_label(label, scale))
+                .collect(),
+            children: vec![None; stored_actions.len()],
+            stored_actions,
+            ..Self::leaf()
+        }
+    }
+}
+/// Display form of a stored action label (`raise-to:2500:all-in` is `raise to 2.5`), the
+/// notation of `crate::views::display_action`. Unrecognized text is shown as stored.
+fn display_label(label: &str, scale: nlh::ChipScale) -> String {
+    let mut parts = label.split(':');
+    let kind = parts.next().unwrap_or_default();
+    let amount = parts.next().and_then(|amount| amount.parse::<u64>().ok());
+    match (kind, amount) {
+        ("call", Some(_)) => "call".into(),
+        ("bet-to", Some(chips)) => format!("bet {}", scale.amount_text(nlh::MwChips(chips))),
+        ("raise-to", Some(chips)) => {
+            format!("raise to {}", scale.amount_text(nlh::MwChips(chips)))
+        }
+        _ => label.into(),
     }
 }
 /// In-memory index; loading and domain queries never depend on CLI state.
@@ -44,6 +75,8 @@ pub struct Solution {
     pub sweeps: Option<u64>,
     pub stop_status: Option<String>,
     histories: BTreeMap<String, usize>,
+    scale: nlh::ChipScale,
+    rounding: nlh::Rounding,
 }
 /// Number of physical combinations in a matrix class.
 pub fn class_combos(class: usize) -> f64 {
@@ -129,11 +162,8 @@ impl Solution {
             );
             seats = seats.max(entry.actor + 1);
             nodes.push(Node {
-                actor: Some(entry.actor),
-                actions: entry.actions.clone(),
-                children: vec![None; entry.actions.len()],
                 probabilities: entry.probabilities.iter().cloned().map(Some).collect(),
-                ..Node::leaf()
+                ..Node::decision(entry.actor, entry.actions.clone(), nlh::ChipScale::DEFAULT)
             });
         }
         let root = *paths.get(&Vec::new()).context("profile has no root node")?;
@@ -145,7 +175,7 @@ impl Solution {
                 .get(&path[..path.len() - 1])
                 .context("profile path has missing parent")?;
             let action = nodes[parent]
-                .actions
+                .stored_actions
                 .iter()
                 .position(|a| a == path.last().unwrap())
                 .context("unknown profile path action")?;
@@ -167,7 +197,7 @@ impl Solution {
             }
         }
         Ok(Self {
-            kind: "p2-class-profile v1 (experimental; assumed full starting ranges)",
+            kind: "p2-class-profile v1 (experimental; assumed full starting ranges and default bb_chips)",
             nodes,
             root,
             positions: Vec::new(),
@@ -177,6 +207,8 @@ impl Solution {
             sweeps: None,
             stop_status: None,
             histories: BTreeMap::new(),
+            scale: nlh::ChipScale::DEFAULT,
+            rounding: nlh::Rounding::default(),
         })
     }
     fn config_prior(prepared: &crate::prepare::Prepared) -> Result<Vec<Vec<f64>>> {
@@ -210,6 +242,9 @@ impl Solution {
         // Also retain the standalone loader's strict probability-row validation.
         Self::profile(document)?;
         let prepared = crate::prepare::prepare(&raw, config)?;
+        let scale =
+            nlh::ChipScale::new(prepared.lowered.game.bb_chips).context("invalid bb_chips")?;
+        let bb_chips = prepared.lowered.game.bb_chips as f64;
         let mut states = vec![game.root_state()];
         let mut nodes = Vec::with_capacity(tree.nodes.len());
         for (i, node) in tree.nodes.iter().enumerate() {
@@ -226,18 +261,23 @@ impl Solution {
             }
             nodes.push(Node {
                 actor: node.actor,
-                actions: node.labels.clone(),
+                actions: node
+                    .labels
+                    .iter()
+                    .map(|label| display_label(label, scale))
+                    .collect(),
+                stored_actions: node.labels.clone(),
                 children: node.children.iter().copied().map(Some).collect(),
                 parent: node.parent,
                 probabilities: (0..169)
                     .map(|c| node.actor.map(|_| profile.row(&tree, i, c).to_vec()))
                     .collect(),
-                pot_bb: Some(state.pot_size().0 as f64 / 1000.0),
+                pot_bb: Some(state.pot_size().0 as f64 / bb_chips),
                 stacks_bb: Some(
                     state
                         .seats
                         .iter()
-                        .map(|s| s.remaining.0 as f64 / 1000.0)
+                        .map(|s| s.remaining.0 as f64 / bb_chips)
                         .collect(),
                 ),
             });
@@ -260,6 +300,8 @@ impl Solution {
             sweeps: None,
             stop_status: None,
             histories: BTreeMap::new(),
+            scale,
+            rounding: prepared.lowered.game.chip_rounding,
         })
     }
     fn mwsol(path: &Path) -> Result<Self> {
@@ -287,7 +329,12 @@ impl Solution {
             );
             nodes.push(Node {
                 actor: state.actor.map(usize::from),
-                actions: state.legal_actions.iter().map(|a| a.label()).collect(),
+                actions: state
+                    .legal_actions
+                    .iter()
+                    .map(|a| crate::views::display_action(a, metadata.bb_chips))
+                    .collect(),
+                stored_actions: state.legal_actions.iter().map(|a| a.label()).collect(),
                 children: vec![None; state.legal_actions.len()],
                 pot_bb: Some(state.pot_chips as f64 / bb_chips),
                 stacks_bb: Some(
@@ -328,7 +375,7 @@ impl Solution {
                     "inconsistent artifact strategy"
                 );
                 let row = nodes[node]
-                    .actions
+                    .stored_actions
                     .iter()
                     .map(|a| {
                         block
@@ -352,20 +399,25 @@ impl Solution {
             ev: metadata.seats,
             ev_unit,
             histories,
+            scale: nlh::ChipScale::new(metadata.bb_chips).context("invalid bb_chips")?,
+            rounding: prepared.lowered.game.chip_rounding,
         })
     }
+    /// An action by display label (amounts in display notation, BB, `Nbb` or `Nc`) or index.
     pub fn action(&self, node: usize, selector: &str) -> Result<usize> {
-        let actions = &self.nodes[node].actions;
-        selector
-            .parse::<usize>()
-            .ok()
-            .filter(|i| *i < actions.len())
-            .or_else(|| actions.iter().position(|a| a == selector))
-            .ok_or_else(|| anyhow!("unknown action {selector:?}; use show to list actions"))
+        let actions: Vec<_> = self.nodes[node]
+            .actions
+            .iter()
+            .map(String::as_str)
+            .collect();
+        nlh::resolve_scaled_action(&actions, selector, self.scale, self.rounding)
+            .map_err(|error| anyhow!("{error}; use show to list actions"))
     }
     pub fn child(&self, node: usize, action: usize) -> Result<usize> {
         self.nodes[node].children[action].context("child is not saved in this artifact")
     }
+    /// A node by the selectors `inspect --node` accepts: `root`, a history (`r2.5c`), a `/`
+    /// path of action labels or indices, or (`.mwsol`) the 32-hex history key.
     pub fn select(&self, selector: &str) -> Result<usize> {
         if selector.is_empty() || selector == "root" {
             return Ok(self.root);
@@ -373,11 +425,15 @@ impl Solution {
         if let Some(&node) = self.histories.get(&selector.to_ascii_lowercase()) {
             return Ok(node);
         }
-        let mut node = self.root;
-        for part in selector.split('/').filter(|s| !s.is_empty()) {
-            node = self.child(node, self.action(node, part)?)?;
-        }
-        Ok(node)
+        crate::views::walk_selector(
+            selector,
+            self.scale,
+            self.rounding,
+            self.root,
+            |node| Some(self.nodes[node].actions.clone()),
+            |node, action| self.nodes[node].children.get(action).copied().flatten(),
+        )
+        .ok_or_else(|| anyhow!("invalid node selector {selector:?}"))
     }
     pub fn path(&self, mut node: usize) -> Vec<(usize, usize)> {
         let mut path = Vec::new();
@@ -388,13 +444,13 @@ impl Solution {
         path.reverse();
         path
     }
+    /// The node's history in the action-token grammar (`r2.5c`), or `root`.
     pub fn selector(&self, node: usize) -> String {
-        let path = self
+        let path: String = self
             .path(node)
             .iter()
-            .map(|(_, a)| a.to_string())
-            .collect::<Vec<_>>()
-            .join("/");
+            .map(|&(parent, action)| nlh::history_token(&self.nodes[parent].actions[action]))
+            .collect();
         if path.is_empty() { "root".into() } else { path }
     }
     /// Seat's prior combo mass times only its own action probabilities; unknown stays unknown.

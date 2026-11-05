@@ -5,9 +5,9 @@ P1は2人が残ったFlop/Turn/Riverのstreet開始、P2は2〜9人のPreflop ro
 入力は[共通Input規範](nlh-input-v1.jp.md)、全flagは[CLI reference](cli-reference.jp.md)を参照する。
 P2の方式・品質は暫定であり、3人以上の結果にNash/GTO保証は無い。
 
-現行versionは`0.2.0`。`solvers --version`（`-V`）は`solvers 0.2.0 (<git-hash>)`、
-P1専用buildでは`solvers 0.2.0 (<git-hash>), heads-up postflop only`と表示する。
-`solversd --version`は`solversd 0.2.0 (<git-hash>)`で、Git情報が無いbuildのhashは`unknown`である。
+現行versionは`0.2.1`。`solvers --version`（`-V`）は`solvers 0.2.1 (<git-hash>)`、
+P1専用buildでは`solvers 0.2.1 (<git-hash>), heads-up postflop only`と表示する。
+`solversd --version`は`solversd 0.2.1 (<git-hash>)`で、Git情報が無いbuildのhashは`unknown`である。
 0.xでは入力schema `solvers.nlh/v1`を互換性単位とし、`.sol`・checkpointはminor releaseで変更し得る。
 minor releaseで`solvers.nlh/v1`のkeyを削除することがあり、削除したkeyはunknown-key errorになる（移行方法は変更履歴に記す）。
 P1の旧`.sol`と旧buildのcheckpointはconfigを現行形式へ移行して再solveする。特にv0.1.0のconfigには削除済みkeyが含まれるため、[変更履歴](../CHANGELOG.md)に従って移行する。
@@ -40,14 +40,14 @@ Intel macOSでは`sysctl -n machdep.cpu.leaf7_features`の`AVX2`で確認でき�
 
 ```powershell
 # Windows PowerShell（filenameは実際のdownloadに置換）
-Get-FileHash .\solvers-0.2.0-x86_64-pc-windows-msvc.zip -Algorithm SHA256
+Get-FileHash .\solvers-0.2.1-x86_64-pc-windows-msvc.zip -Algorithm SHA256
 ```
 
 ```sh
 # Linux
-sha256sum solvers-0.2.0-x86_64-unknown-linux-gnu.tar.gz
+sha256sum solvers-0.2.1-x86_64-unknown-linux-gnu.tar.gz
 # macOS
-shasum -a 256 solvers-0.2.0-aarch64-apple-darwin.tar.gz
+shasum -a 256 solvers-0.2.1-aarch64-apple-darwin.tar.gz
 ```
 
 WindowsはExplorerの「すべて展開」、Linux/macOSは`tar -xzf <archive>`で全体を展開する。
@@ -209,6 +209,7 @@ solvers validate spot.toml --resources
 P1は木と3種類のstorage bytes（JSON: `f32Bytes`・`i16Bytes`・`i16F32avgBytes`）を見積もる。P2の通常validateは木を歩かず、ruleHitStatusは`not-checked`となる。
 P2の`--resources`はpublic treeのarena countとrule hit測定を行うため、大きい木では時間が掛かる。
 `complete`なら未一致ruleの警告を確認する。`incomplete`なら未使用ruleの判定は保留である。
+警告のrule番号は各streetの展開後ruleを1から数える。
 withinLimitがfalseならmemoryまたはtreeを見直す。validateの成功はsolve可能なmemoryや品質を保証しない。
 
 lineを段階的に組み立てるときは、卓だけが有効な未完成configでも次の合法手を確認できる。
@@ -389,7 +390,7 @@ solvers export runs/my-spot/solution.sol strategy --node root --node x --format 
 solvers export runs/preflop/solution.mwsol strategy --format csv --output strategy.csv
 ```
 
-summary、tree、actions、strategy、range、evをJSON/CSVで読む。P1の`--node`は繰り返せ、1回の読込みで複数nodeの行を指定順に出す。
+summary、tree、actions、strategy、range、evをJSON/CSVで読む。`--node`はP1・P2とも繰り返せ、1回の読込みで複数nodeの行を指定順に出す。
 P1のtreeはaction・chance・terminalを返し、`children`のhistoryを次の`--node`にそのまま使える。
 chanceの`actions`は配るcard（`*`はiso併合、cardなしは`dealN`）、terminalは空配列である。
 action以外の`actor`・`pot`はnull。不明なselectorやaction以外へのstrategy等の指定は入力error（exit 2）。
@@ -425,14 +426,15 @@ browse> show
 browse> strat
 browse> go 1
 browse> path
-selector: 1
+selector: c
 browse> range
 browse> up
 browse> quit
 ```
 
 `grid 0`はaction 0の確率、`combos AKs`はclass単位のmix、`range 0`はseat 0の到達rangeを表示する。
-`--node 1`で同じnodeから開始できる。13×13はA〜2、suitedが対角の上である。
+actionは`export`と同じ表記（`fold`、`call`、`raise to 2.5`）で、`go raise to 2.5`や`go 2`のように選ぶ。
+`--node c`のように`path`が出すhistoryで同じnodeから開始できる。13×13はA〜2、suitedが対角の上である。
 実験用trunkの`p2-class-profile` version 1 JSONも内容判別で開ける。
 `solvers browse profile.json --config examples/bench/hu_pushfold_10bb.toml --color never`のように
 対応する設定を指定するとtrunk treeとのdecision数・path・actor・actionを検証し、設定のposition・開始rangeと各nodeのpot・残stack（BB）を表示する。
@@ -447,6 +449,14 @@ solvers inspect runs/preflop/solution.mwsol --node root --view strategy
 solvers evaluate runs/preflop/solution.mwsol --samples 4096 --seed 1 --br-traversals 20000
 solvers compare runs/a/solution.mwsol runs/b/solution.mwsol
 ```
+
+P2のexportとinspectはroot、履歴token、32桁history key、`/`区切りaction label/indexをnodeに使える。
+額は表示表記、BB、`Nbb`、`Nc`を受け、卓の丸め方式で照合する。exportのfield名とBB単位はP1と共通だが、
+保存されていない値はJSONのnull、CSVの空欄、無い配列は空配列であり、0とは異なる。
+actionsの頻度はclassごとの手番seatの到達weightで加重し、未訪問等で到達量が不明なら頻度も不明である。
+seat/actorは`table.positions`のseat順のposition名（`BTN`、`SB`、`BB`など）で、inspectのactor指定には名前またはseat indexを使える。`combo`は個別comboではなく169 class、weightはclass内全comboの平均per-combo weight（0..1）である。部分指定の個別combo weightは復元できず、後続nodeの到達weightも自席の過去actionだけで条件付けた近似で、他席のactionやcard removalは反映しない。class別EVは保存されない。
+`tree`の`stored`はそのnodeにstrategy blockが1つ以上保存されていることを示し、全classの訪問を保証しない。`summary`は共通名を使い、`pot`はroot potのBB値、`iterations`はsweep数、`nodes`はpublic state数、`stored_nodes`はblockを持つ異なるhistory数である。P2に単一effective stackはなく、artifactに経過時間もないため`effective_stack`と`wall_secs`はnull（CSVでは空欄）となる。
+P2では`--rest-of-street`を拒否し、`decision`・`lock`・`--resolve-rivers`はP1専用である。
 
 evaluateは保存averageを復元し、deviation gainとCI、coverageを再測定する。
 未訪問columnと量子化前の値は復元できない。小さいgainをexploitability上界やNash保証として読まない。
@@ -526,7 +536,7 @@ HTTPのsolution viewはP1・P2に対応する。P1では、例えば
 `GET /v1/runs/{id}/solution/tree?node=root`や
 `GET /v1/runs/{id}/solution/strategy?node=root&format=csv`で照会できる。
 `node`は繰り返せ、履歴中の`[`・`]`・`/`・space・`*`はURL encodingする（`+`もspaceとして復号）。
-P2では`node`を指定できない。不正selectorはHTTP 400 `invalid-request`としてCLIの診断を返す。
+P2も`node`を指定できる。不正selectorはHTTP 400 `invalid-request`としてCLIの診断を返す。P2では`restOfStreet=true`・`resolve=rivers`・`decision`を使えず、`lock` viewはHTTPでは提供しない。
 P1の`resolve=rivers`はno-riversで未保存のRiver節点を`export --resolve-rivers`で再solveして返す（requestごとにRiverを解く）。
 Riverのlock・incentive・固定祖先は再solveにも適用され、frequencyは元runの最終λを固定して使う。基準`.sol`は閲覧に不要で、再solveの値は元runの保存値ではない。
 同じnodeの`actions`・`strategy`・`ev`は`GET /v1/runs/{id}/solution/decision?node=...`の1 requestにまとめられる（P1のみ、JSONのみ）。
@@ -666,12 +676,13 @@ GUIの表示は英語である。sidebarのGuideは、各画面のscreenshot付�
 |---|---|
 | `NLH001` / 2 | schemaを`solvers.nlh/v1`にした現行例から入力を書き直す |
 | `NLH002` / 2 | 未知key・型・製品に適用されないkeyを確認 |
-| `NLH003` / 2 | 値、range、tree条件・size・最終menuを確認。script位置も読む |
+| `NLH003` / 2 | 値、range、tree条件・size・最終menuを確認。P2の木の深さ512超過ならtreeを簡素化する。script位置も読む |
 | 互換comboの重みが計算精度上0 | OOP/IPの重なりを確認し、極端に小さい互換handの重みを見直す |
 | `NLH004` / 2 | lineの綴り、action順、合法min-raise・callを確認 |
 | `NLH005` / 2 | 開始street・board・残player数が製品の対象か確認 |
 | `removed config family ...` / 3 | 現行configから再solve。旧solution/checkpoint/runは照会・再開できない |
 | 非互換・破損 / 3 | embedded config、fingerprint、artifact version、fileの完全性を確認 |
+| P2旧game fingerprint | scheme v3以前のsolution/checkpoint identityは互換にせず、現行configから再solveする |
 | 資源上限 / 75 | validate --resourcesで規模を確認し、treeやmemory予算を見直す |
 | 協調停止 / 130 | 保存checkpointからresume |
 | その他 / 1 | 使用中runへのresumeなら停止を待つか別directoryへfork。その他はfile path・権限・I/O診断を確認 |

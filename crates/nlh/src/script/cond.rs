@@ -1054,11 +1054,10 @@ mod tests {
         assert!(parse("facing_pct == 25").unwrap().eval(&context));
     }
 
-    /// [`Condition`]'s [`fmt::Display`] impl exists so a family with no
-    /// other source text for a rule (a nested `when`/`if` composition, in
-    /// multiway's `.mwtree` frontend) can still render one -- and that
-    /// rendering must itself be valid input to [`Condition::parse`], or the
-    /// round trip a compiled `.mwtree` rule depends on breaks.
+    /// [`Condition`]'s [`fmt::Display`] impl exists so a rule with no other
+    /// source text (a nested `when`/`if` composition) can still render one --
+    /// and that rendering must itself be valid input to [`Condition::parse`],
+    /// or a round trip through the rendered text breaks.
     #[test]
     fn display_output_reparses_to_an_equal_condition() {
         for source in [

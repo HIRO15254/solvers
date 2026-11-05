@@ -32,6 +32,17 @@ fn json(args: &[&str]) -> serde_json::Value {
 }
 
 #[test]
+fn tree_depth_spot_error_is_an_input_exit() {
+    let error = anyhow::Error::new(spot::SpotError::new(
+        spot::Code::NLH003,
+        "tree",
+        "exceeds the P2 traversal depth limit",
+    ))
+    .context("preparing multiway tree");
+    assert_eq!(cli::error_exit_code(&error), 2);
+}
+
+#[test]
 fn p2_validation_effective_resources_types_and_preflight_before_directory() {
     let started = Instant::now();
     let dir = tempfile::tempdir().unwrap();

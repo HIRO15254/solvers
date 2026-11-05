@@ -1,7 +1,7 @@
 """Write a P1 (HU Postflop, real cards) config for one L1 leaf of the B4 GTO Wizard tree under a class profile.
 
 usage: python p1_leaf.py <class profile> <line> <menu> <output toml> [<max time, default 3m>] [--stack-bb N]
-       [--min-weight W] [--extra FILE]
+       [--bb-chips N] [--min-weight W] [--extra FILE]
 
 <line> is a leaf line of tree labels (`raise-to:2000/fold/.../call:11500`, as in results/lines.txt). The two
 players' ranges are their class reach along the line under the profile (the product of their own action
@@ -12,7 +12,8 @@ are in the local-only `gtow_menus.py` (packaging/gtow-local-only.json); they are
 The board is a placeholder for `solvers report --boards-file`.
 Experimental options: `--min-weight W` (default 1e-6) drops classes whose weight is at most W; `--extra FILE`
 raises listed classes (lines `LINE SEAT CLASS WEIGHT`, used only when LINE equals <line>) to at least WEIGHT
-before the cut.
+before the cut. `--bb-chips N` (default 1000) must equal the P2 config's `table.bb_chips`: the line's amounts are
+the P2 labels' chips, written exactly (`r2000c`), and the P1 table uses the same chip scale.
 """
 import json
 import sys
@@ -49,6 +50,11 @@ def main():
         index = argv.index("--stack-bb")
         stack_bb = float(argv[index + 1])
         del argv[index:index + 2]
+    bb_chips = 1000
+    if "--bb-chips" in argv:
+        index = argv.index("--bb-chips")
+        bb_chips = int(argv[index + 1])
+        del argv[index:index + 2]
     min_weight = 1e-6
     if "--min-weight" in argv:
         index = argv.index("--min-weight")
@@ -72,11 +78,15 @@ def main():
         r = reach.setdefault(seat, [1.0] * 169)
         for c, name in enumerate(classes()):
             r[c] *= node["probabilities"][our_index(name)][a]
+        # Exact chips (`r2000c`) keep the line independent of the table's bb_chips; a stack-total raise is `a`
+        # and a zero-call player's check is `x` (docs/nlh-input-v1.jp.md section 7).
         kind, *amount = label.split(":")
         if kind == "raise-to":
-            actions.append(f"{SEATS[seat]} r{int(amount[0]) / 1000:g}")
+            actions.append(f"{SEATS[seat]} a" if amount[1:] == ["all-in"] else f"{SEATS[seat]} r{amount[0]}c")
         elif kind == "call":
             actions.append(f"{SEATS[seat]} c")
+        elif kind == "check":
+            actions.append(f"{SEATS[seat]} x")
     folded = {nodes[tuple(labels[:k])]["actor"] for k, label in enumerate(labels) if label == "fold"}
     active = [s for s in reach if s not in folded]
     ranges = {}
@@ -108,7 +118,7 @@ def main():
 
 [table]
 players = 6
-stack = {stack_bb:g}
+stack = {stack_bb:g}{chr(10) + f"bb_chips = {bb_chips}" if bb_chips != 1000 else ""}
 
 [economics]
 kind = "cash"

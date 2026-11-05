@@ -104,10 +104,11 @@ solve中にmappingを追加しない。cache pathはInputに書かない。
 同studyのCash 6max/100bb anchorでは256が良好だった。economicsに応じた自動default変更はしない。
 retired rollout/full recallのfingerprintを現方式へaliasしない。
 abstraction fingerprintは検証済みcontent、bucket数、current-street domainを含む。
-game fingerprintとabstraction fingerprintは別である。
-game fingerprintはutility設定を含む。ICMのMonte Carlo廃止（SOL-34）より前のtournament runは
-checkpoint・`.mwsol`のgame fingerprintが現行と一致しない。16人以上のrunは埋込みconfigに廃止key
-`samples`・`seed`を含み読み込めない。いずれも現行で再solveする。互換aliasは置かない。
+game fingerprintとabstraction fingerprintは別である。game fingerprint scheme v3はchip単位の
+game設定とutility設定を識別し、abstractionを含まない。旧schemeのsolution/checkpoint identityは
+現行のidentityとして受け入れず、現行configから再solveする。互換aliasは置かない。
+ICMのMonte Carlo廃止（SOL-34）より前の16人以上のrunは埋込みconfigに廃止key
+`samples`・`seed`を含み読み込めない。
 
 ## 5. arenaと資源検査
 
@@ -118,6 +119,8 @@ Postflop decision nodeもarenaに含む。一般Postflop treeではbucket数もa
 Preflopだけのdecision treeなら169 class × Preflop node × actionが支配する。
 設定memoryを厳密に超える最初のnode prefixで資源errorにする。固定50M node capは無い。
 資源上限errorは型でexit 75へ分類する。事前検査の`NLH003`診断表記は保つが、利用者の不正値による型付き入力error（exit 2）と区別する。
+public treeの構造的深さの上限は512（`MAX_TREE_DEPTH`）であり、超過は`NLH003`の入力error（exit 2）である。
+memory等の資源上限（exit 75）とは区別する。
 
 `run.memory = "auto"`は6 GiB、`run.threads = "auto"`はmin(論理CPU数, players × batch_sweeps)である。
 事前検査後のtree materializationは解決済みthread数のprivate poolで行う。
@@ -175,15 +178,27 @@ Preflop-only exportは未達である。これを完全な全street profileと�
 
 | surface | 報告内容・単位 |
 |---|---|
-| `export summary` | schemaVersion、sweeps、approximateProfile、visitedInfosets（保存block数）、seat別の記録評価 |
+| `export summary` | 共通summary fieldと保存block数・seat別の記録評価などのP2固有情報 |
 | `export tree` | public node/history/action。数値の額はBB、historyとaction labelは表示表記 |
-| `export strategy` / `range` | 保存bucket/classの平均確率 / 開始range weight。確率は0..1 |
-| `export actions` | public stateのhistory、actor、street、legal action list |
-| `export ev` | 保存している評価結果。cashはBB/hand、ICMは賞金単位。全nodeのper-hand EVではない |
+| `export strategy` / `range` | 保存classの平均確率 / 選択nodeのclass到達weight。確率とweightは0..1 |
+| `export actions` | public stateのhistory、actor、street、legal actionと到達量加重頻度 |
+| `export ev` | 選択nodeのclass別到達weight。class別EVは保存されないためnull |
 | `evaluate` | artifactの保存averageを再評価し、baseline utility、候補gain・CI、coverageを報告 |
 | `inspect` | root/historyのnode、summary、169 class matrix、strategy/range。未訪問はunvisited/null |
-| `browse` | 保存P2 Preflopの対話閲覧。class strategy、席自身のactionで条件付けたrangeとcombo加重頻度、保存root評価。実験用class-profile v1 JSONは任意の`--config`でtrunk構造を照合しposition・開始range・pot/stackを補う。設定なしはfull開始rangeを明示して仮定。操作は[CLI reference](cli-reference.jp.md#solvers-browse) |
+| `browse` | 保存P2 Preflopの対話閲覧。class strategy、席自身のactionで条件付けたrangeとcombo加重頻度、保存root評価。action labelとhistoryは`export`と同じ表示表記、node・action指定も`export --node`と同じ形式を受ける。実験用class-profile v1 JSONは任意の`--config`でtrunk構造を照合しposition・開始range・pot/stack・`bb_chips`・丸め方式を補う。設定なしはfull開始rangeと既定の`bb_chips`を明示して仮定。操作は[CLI reference](cli-reference.jp.md#solvers-browse) |
 | `inspect ev` | rootはformal-average-profileの再評価、後続nodeはnode-conditioned-profileの条件付き再評価 |
+
+P2の`export`はP1と共通の行・field名を使い、額をBBで返す。Preflopのnodeは
+`root`（空文字列も可）、履歴token、`/`区切りのaction labelまたはindex、32桁history keyで選べる。
+額は表示表記、BB、`Nbb`、`Nc`を受け付け、卓の丸め方式で照合する。複数selectorは指定順に処理する。
+seat/actorは埋め込みInputの`table.positions`のseat順に対応するposition名（`BTN`、`SB`、`BB`など）であり、P1の`oop` / `ip`ではない。`inspect`のactor指定はposition名またはseat indexを受け付ける。
+`range`・`strategy`・`ev`の`combo`は個別comboではなく169 starting-hand classである。weightはそのclassの全comboに対する平均per-combo weight（0..1）で、combo数の合計ではない。開始rangeの部分的なcombo指定も平均されるため、個々のcomboのweightはこの出力から復元できない。後続nodeでは自席の過去actionで条件付けた到達weightであり、他席のactionやcard removalを反映した正確な条件付き確率ではない。
+`summary`は`iterations`、`wall_secs`、`nodes`、`stored_nodes`など共通名を使う。P2には単一のeffective stackがなく`effective_stack`はnull、artifactに経過時間がないため`wall_secs`もnull（CSVでは空欄）である。近傍のrun metadataから補わない。
+`summary`の`pot`はroot potのBB値、`iterations`はsweep数、`nodes`はpublic state数、`stored_nodes`はstrategy blockを持つ異なるhistoryの数である。`tree`の`stored`はそのnodeに保存strategy blockが1つ以上ある場合だけtrueであり、全classの訪問や戦略の完全性を保証しない。
+`actions`の頻度はclassごとの当該seatの到達weightで加重する。未訪問などで到達量が不明なら
+頻度も不明であり0と扱わない。P2 artifactに存在しない値はJSONではnull、CSVでは空欄、
+存在しない配列は空配列とする。これは計算値の0を意味しない。
+`--rest-of-street`はP2では拒否する。`decision`・`lock`・`--resolve-rivers`はP1専用である。
 
 cash utilityはhand開始のstackを基準としたBB増減であり、P1のspot開始pot基準とは異なる。
 ICMはhand開始ICMを基準とした賞金単位の増減である。potはuncalled refund後にrakeを適用する。
@@ -196,12 +211,11 @@ historyとaction labelの額は、`bb_chips`の素因数が2と5だけなら最�
 
 evaluateは保存blockからprofileを復元する。未保存columnと量子化前の値は復元できない。
 学習時profile、checkpoint監査、外部solverの完全解と同一視しない。
-`export ev`のCSV列は`seat,profile_ev,stderr,ci95_low,ci95_high,measured_deviation_mean,measured_deviation_ci95_high`である。
-未記録の値はNaNであり、0の測定値ではない。
-`inspect ev`はsolution fingerprint・history・samples・seed・brTraversalsが一致する評価cacheを使う。
+`export ev`のCSV列は`history,seat,combo,weight,ev`であり、class別EVは空欄である。
+`inspect ev`はsolution fingerprint・history・samples・seed・br_traversalsが一致する評価cacheを使う。
 cacheの値も新たに評価した推定値であり、保存済みper-hand EVではない。
 retired abstraction/recallのartifactは静的summary等を読めてもlive再評価を拒否する。
-run.jsonのelapsedSecsはsession/abstraction初期化を除き、学習・run内評価・最終出力を含む累積時間である。
+run.jsonの`iterations`は完了sweep数、`wallSecs`はsession/abstraction初期化を除き、学習・run内評価・最終出力を含む累積時間である。progress行の共通fieldは`iteration`・`elapsed_secs`で、P2固有の評価も併記する。
 progress/run summaryのcoverageは測定済みの訪問内訳であり、過去の未測定JSONはnullである。
 
 ## 8. 既定の根拠と品質境界

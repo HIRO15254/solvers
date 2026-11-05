@@ -28,7 +28,7 @@ P2D1〜P2D6は2026-10-06、P2D7とP2D8は2026-10-07、P2D9は2026-10-11、P2D10�
 | P2D3 | P1による検証・較正（L2）は実験側に置く。当面は作らず、実行もしない |
 | P2D4 | suit非対称なrange（`AhKh`等）はerrorにせず警告し、classの中のcombo weightを平均して扱う |
 | P2D5 | 計算予算の目標は、L0の木で数分〜数十分、L1の木で1〜数時間とする。ローカルで測れない計測はGCPを合計$20まで使える（使う前に見積もりを報告する） |
-| P2D6 | 新方式は新しい`solver.kind`として暫定方式と並存させ、第5節のゲートを通過した後に暫定方式を削除する。`.mwsol` v4の読み込み互換は持たない |
+| P2D6 | 新方式は新しい`solver.kind`として暫定方式と並存させ、第5節のゲートを通過した後に暫定方式を削除する。暫定方式の`.mwsol`（決定時はv4、v0.2.0以降はchip単位のv5）の読み込み互換は持たない |
 | P2D7 | 4人以上のshowdownの費用は、solverの中だけの近似で下げる。L0モデル（4人以上は2048標本・seed 0）と評価器・`NashConv`の定義は変えない。solverは少ない標本をiterationごとに替えて使い、到達確率の小さい終端では標本をさらに減らす。B3で`NashConv`の下がり方が厳密なsolverと同程度であることを確かめてから採用する |
 | P2D8 | L1を含む木の主指標（停止判定と完了条件に使う値）は、Postflopの平均戦略をleaf modelの一部として固定し、Preflopの戦略を変える逸脱だけを数えた`g_i`と`NashConv`とする。L1 leafの値は固定seedの評価用boardによるMonte Carlo推定とする。応答者が実際のboardと自分の手札を見てPostflopでも最適に打つ場合の利得は、補助指標として同時に出力する |
 | P2D9 | L1のカード抽象化（Postflopの戦略を共有するcomboの組）は第3.4節の推奨値を既定とし、各部分を手で替えられるようにする。S4-3までは本計画の仕様と`mw-preflop`の内部API・実験CLIで扱い、入力のkeyはS4-3で同じ部分のまま公開する |
@@ -238,7 +238,7 @@ S4-2bで過去に用いたB4 SimpleのPostflopありの木も同様である。
 | **S4-1b** | trunk＋L0を新しい`solver.kind`として並存実装。L0の`NashConv`が妥当と仮定し、S4-1a3の結論を待たずに並行して着手する（2026-10-06の利用者判断）。S4-1a3で妥当でないと分かれば、完了条件の指標を見直す | B1の3つのstackで`NashConv`が1×10⁻⁴ bb/hand以下（2026-10-06の利用者判断）。B3で暫定方式の300k sweepの解より小さい`NashConv`。B4で1 iterationの時間を記録。後半（S4-1b-2）で、値を変えない計算の整理とP2D7の近似により1 iterationを短くする |
 | **S4-2a** | L1の核と評価器。Flopで木を切り、2人でFlopへ行くleafにPostflopの抽象化木を付けて、trunkと同じiterationで更新する。P2D8の主指標と補助指標を測る評価器。Postflopの判断が残る入力をL0で解くmode（Flop以降をcheckdownとみなす）も作る。B6で試す | (1) 固定したboardで、vectorの計算が手札の組を総当たりする参照実装と一致する。checkだけを選ぶPostflop戦略のL1の値が、全boardの平均でL0と一致する。L0のmodeで解いたB7がB3とbit一致する (2) B6で主指標がiterationとともに下がり、2000 iteration以内に、評価用4096 boardの上振れする値（同じboardで最適応答を求めた値）が0.005 bb/hand以下になる（2026-10-07の利用者判断） (3) B6のL0とL1の解の差、1 iterationの時間、評価の時間を記録 |
 | **S4-2b** | 6maxのL1。B7とB4 Simpleの元の木を解く | P2D5の予算（L1の木で1〜数時間）で主指標の推移を記録。L0とL1の解の差を記録。B4 Simpleのopenのclass表を、GTO Wizard参照・L0の解・暫定方式の記録と並べる（sanity check）。合否の基準は、B7とB4 Simpleを予算内で解いた初回の記録を見て決める（2026-10-07の利用者判断） |
-| **S4-3** | 製品の切替 | `.mwsol` v5（Preflopだけ）、`[solver]`、evaluate・inspect・derive、規範・CLI reference・user guideの同期。CLIとdaemonの経路が新方式で通る |
+| **S4-3** | 製品の切替 | `.mwsol` v6（Preflopだけ。v0.2.0のv5の次）、`[solver]`、evaluate・inspect・derive、規範・CLI reference・user guideの同期。CLIとdaemonの経路が新方式で通る |
 | **S4-4** | 9max・ICM・straddle、bunchingの補正、GUI | B5が予算内で解ける。bunchingの影響を暫定方式（同時配札）と比べて記録 |
 | **S4-5** | 暫定方式の削除 | 全benchmarkで、同じ評価器で測った新方式の`NashConv`が暫定方式以下 |
 

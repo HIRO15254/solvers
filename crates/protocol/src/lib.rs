@@ -89,9 +89,8 @@ pub struct TreeRequest {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateRunRequest {
-    /// A self-contained config. A config carrying a path -- an mwtree
-    /// `source`, say -- is rejected rather than resolved against the
-    /// daemon's filesystem, where it would mean something else (R10).
+    /// A self-contained config: the common input has no key that names a
+    /// file, so nothing is resolved against the daemon's filesystem (R10).
     pub config_toml: String,
     /// Optional name for the run directory. The daemon assigns one when
     /// absent, and rejects a name that is not a single path component.

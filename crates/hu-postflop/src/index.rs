@@ -30,9 +30,9 @@ use hu_engine::{
     CompiledGame, Deal, MAX_TREE_DEPTH, NodeId, NodeKind, PublicTree, ReachMap, ShapeNode,
     SparseTransition, TreeShape, parent_array,
 };
+use nlh::selector::history_token_matches;
 use nlh::{Card, PerPlayer, Player, Street};
 
-use crate::queries::history_token_matches;
 use crate::sol::SolError;
 use crate::{PostflopConfig, PostflopEvaluator, PostflopHands, PostflopNodeInfo, node_streets};
 
@@ -204,10 +204,7 @@ impl GameIndex {
         GameIndex {
             scale,
             rounding,
-            tokens: labels
-                .iter()
-                .map(|l| crate::queries::history_token(l))
-                .collect(),
+            tokens: labels.iter().map(|l| nlh::history_token(l)).collect(),
             labels,
             edges,
             deal_cards,
@@ -262,7 +259,7 @@ impl<'a> TreeView<'a> {
 
     /// Resolve an action label or index using the tree's chip scale and rounding.
     pub fn resolve_action(&self, node: NodeId, label: &str) -> Result<usize, String> {
-        crate::queries::resolve_scaled_action(
+        nlh::selector::resolve_scaled_action(
             &self.actions(node),
             label,
             self.index.scale,
@@ -326,7 +323,7 @@ impl<'a> TreeView<'a> {
     /// A node of any kind named by history, including chance and terminal nodes.
     /// Cardless runout branches use `[dealN]`, where N is the child position.
     pub fn node_by_history_any(&self, history: &str) -> Option<NodeId> {
-        crate::queries::selector_history_steps(history, self.index.scale)
+        nlh::selector::selector_history_steps(history, self.index.scale, hu_engine::MAX_TREE_DEPTH)
             .iter()
             .find_map(|steps| self.walk_history(steps))
     }
@@ -384,10 +381,14 @@ impl<'a> TreeView<'a> {
         }
         let history = selector.contains("[?]") || self.node_by_history_any(selector).is_some();
         if history {
-            return crate::queries::selector_history_steps(selector, self.index.scale)
-                .iter()
-                .find_map(|steps| self.walk_profile(steps, true))
-                .ok_or_else(error);
+            return nlh::selector::selector_history_steps(
+                selector,
+                self.index.scale,
+                hu_engine::MAX_TREE_DEPTH,
+            )
+            .iter()
+            .find_map(|steps| self.walk_profile(steps, true))
+            .ok_or_else(error);
         }
         let steps: Vec<_> = selector
             .split('/')

@@ -282,7 +282,8 @@ cacheのbuild/loadと互換性検証は製品側にある。CLIはcache rootを�
 実験中の`trunk` module（[P2方式の再設計計画](plans/p2-method-redesign.jp.md)のS4-1a、製品契約の外）は、
 169 hand classと、L0モデルの2人showdown表（厳密）・3人の順位表（Monte Carlo）を持つ。`trunk::l0`はPostflopに
 判断の無い木で、class単位のprofileに対するseat別の最適応答の利得と`NashConv`をL0モデルの中で計算する
-（example `l0_eval`）。CLIからは使わない。
+（example `l0_eval`）。`trunk::l1`はFlopで木を切り、leafにPostflopの抽象化木を付ける。
+CLIは`browse --config`でclass-profile JSONをtrunk treeと照合するときだけ使う（第2節）。
 
 ## 7. 正当性検証
 

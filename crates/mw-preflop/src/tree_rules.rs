@@ -272,7 +272,7 @@ mod tests {
             seats: (0..6)
                 .map(|_| SeatConfig {
                     name: None,
-                    stack_bb: 100.0,
+                    stack_chips: crate::types::MwChips(100_000),
                     range: String::new(),
                     betting: None,
                 })
@@ -309,7 +309,7 @@ mod tests {
             seats: (0..6)
                 .map(|_| SeatConfig {
                     name: None,
-                    stack_bb: 100.0,
+                    stack_chips: crate::types::MwChips(100_000),
                     range: String::new(),
                     betting: None,
                 })

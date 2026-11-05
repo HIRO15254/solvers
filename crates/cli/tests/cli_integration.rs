@@ -1534,7 +1534,7 @@ fn fabricate_run(directory: &std::path::Path, state: &str, with_checkpoint: bool
     std::fs::write(directory.join("events.jsonl"), events).unwrap();
     std::fs::write(
         directory.join("progress.jsonl"),
-        "{\"sweeps\":128,\"elapsedSecs\":12.5}\n",
+        "{\"iteration\":128,\"elapsed_secs\":12.5}\n",
     )
     .unwrap();
     if with_checkpoint {

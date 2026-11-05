@@ -55,4 +55,4 @@ pub mod run;
 pub mod views;
 pub use hu_engine::{CompiledGame, NodeId, NodeKind, PublicTree, SolverState};
 pub use nlh::betting::Action as BettingAction;
-pub use nlh::{Card, PerPlayer, Player, Street};
+pub use nlh::{Card, PerPlayer, Player, Street, history_token};

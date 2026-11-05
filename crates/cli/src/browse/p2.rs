@@ -263,9 +263,10 @@ fn strategy_grid(
     let node = &solution.nodes[current];
     let actor = node.actor.context("terminal node has no strategy")?;
     let range = solution.range(current, actor)?;
-    let palette = palette(&node.actions);
+    // Stored labels keep the all-in flag and chip amounts that colors and short names use.
+    let palette = palette(&node.stored_actions);
     let short: Vec<_> = node
-        .actions
+        .stored_actions
         .iter()
         .enumerate()
         .map(|(i, a)| {

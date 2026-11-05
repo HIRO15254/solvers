@@ -24,6 +24,38 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
 
 ## [Unreleased]
 
+### Changed
+
+- P2 solution exports use shared P1 field names and BB units, with node
+  selectors available through the CLI and daemon. Seat and actor names are
+  table positions (such as `BTN`, `SB`, `BB`). The 169 class weights are
+  average per-combo weights in 0..1, not combo totals; individual combo weights
+  cannot be recovered, and node reach does not account for other seats' actions
+  or card removal. Action frequencies use acting-seat class reach weights and
+  remain unknown when reach is unknown.
+- P2 `export` and `inspect` show actions as P1 does (`fold`, `check`, `call`,
+  `bet X`, `raise to X` with the street raise-to amount in display notation)
+  and histories in P1's token grammar (`r2.5c`; the root is empty). Node
+  selectors accept P1's forms (tokens, `/` label paths, indices, BB, `Nbb`,
+  `Nc`) plus the 32-hex history key; a bad selector exits 2. `.mwsol` files
+  keep their stored labels. Tree `children` and inspect children follow the
+  action order, and streets are named (`preflop`).
+- P2 tree `stored` means at least one strategy block exists at that history,
+  not that every class was visited. Summary uses common names including
+  `iterations`, `nodes`, and `stored_nodes`; `effective_stack` and `wall_secs`
+  are null because a single effective stack and artifact elapsed time are not
+  available. Unavailable values are null in JSON or empty in CSV, not zero.
+- P2 rejects rest-of-street expansion; decision and lock exports and river
+  re-solving remain P1-only.
+- P2 run and progress metadata use the shared iteration and elapsed-time
+  field names while retaining P2-specific metrics.
+- P2 game fingerprint scheme v3 identifies chip-based game configuration
+  independently of abstraction. Legacy game identities are incompatible;
+  re-solve their solutions and checkpoints from current configs.
+- P2 public trees deeper than 512 are rejected as input errors (NLH003,
+  exit 2), distinct from resource exhaustion. Unused-rule warning numbers
+  count expanded rules separately per street.
+
 ## [0.2.1] - 2026-11-03
 
 This patch release reads `.sol` files and resumes checkpoints and run

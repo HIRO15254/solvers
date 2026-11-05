@@ -458,7 +458,7 @@ fn a_submitted_config_becomes_a_run_directory() {
     assert_eq!(finished["progress"], 42);
     assert_eq!(
         finished["lastProgress"],
-        serde_json::json!({"iteration": 42, "elapsedSecs": 0.5})
+        serde_json::json!({"iteration": 42, "elapsed_secs": 0.5})
     );
     let (_, listed) = daemon.get("/v1/runs");
     let listed_run = listed["runs"]
@@ -1126,20 +1126,24 @@ threads = 1
 }
 
 #[test]
-fn node_selectors_are_rejected_for_multiway_artifacts_before_export() {
+fn multiway_node_selectors_are_forwarded_and_p1_only_options_rejected() {
     let daemon = Daemon::start(1);
     let (_, created) = daemon.post("/v1/runs", &config("multiway-node"));
     let run_id = created["runId"].as_str().unwrap();
     daemon.await_terminal(run_id);
-    // No valid artifact is needed: the daemon rejects the P1-only option
-    // before invoking export.
+    // The stub echoes the selector; no valid artifact is needed to test routing.
     std::fs::write(
         daemon.runs.join(run_id).join("solution.mwsol"),
         b"placeholder",
     )
     .unwrap();
+    for path in ["tree", "actions", "strategy", "range", "ev"] {
+        let (status, body) = daemon.get(&format!("/v1/runs/{run_id}/solution/{path}?node=r2500c"));
+        assert_eq!(status, 200, "{path}: {body}");
+        assert_eq!(body["node"], "r2500c");
+    }
     for path in [
-        "tree?node=root",
+        "tree?node=root&resolve=rivers",
         "tree?resolve=rivers",
         "tree?restOfStreet=true",
         "decision",

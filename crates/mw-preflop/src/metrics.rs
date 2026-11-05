@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 pub const MULTIWAY_SCHEMA_VERSION: u16 = 3;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub struct Estimate {
     pub mean: f64,
     /// Standard error of the reported point-estimate candidate. For a
@@ -26,7 +26,7 @@ pub struct Estimate {
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub struct MultiwayStreetVisitCounts {
     pub preflop: u64,
     pub flop: u64,
@@ -37,7 +37,7 @@ pub struct MultiwayStreetVisitCounts {
 /// Strategy sources on held-out baseline trajectories only. These are
 /// decision-visit counts, not unique infosets or action-value accuracy.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub struct MultiwayPolicyCoverage {
     pub decision_visits: u64,
     pub stored_strategy_visits: u64,
@@ -54,7 +54,7 @@ pub struct MultiwayPolicyCoverage {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub struct MultiwaySeatMetrics {
     pub seat: u8,
     pub profile_ev: Option<Estimate>,
@@ -67,10 +67,11 @@ pub struct MultiwaySeatMetrics {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub struct MultiwayMetricsRow {
     pub schema_version: u16,
     pub phase: String,
+    #[serde(rename = "iteration")]
     pub sweeps: u64,
     pub traversals: u64,
     pub elapsed_secs: f64,
@@ -114,7 +115,7 @@ impl MultiwayMetricsRow {
 }
 
 #[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 struct ProgressEvent<'a> {
     sequence: u64,
     event: &'a str,
@@ -172,6 +173,13 @@ mod tests {
         let json = serde_json::to_string(&row).unwrap();
         assert!(!json.contains("nashConv"));
         assert!(!json.contains("exploitability"));
+        let value: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert_eq!(value["iteration"], 0);
+        assert_eq!(value["elapsed_secs"], 0.0);
+        assert!(value.get("sweeps").is_none());
+        assert!(value.get("elapsedSecs").is_none());
+        assert!(value["seats"][0].get("candidate_policy_coverage").is_some());
+        assert!(value["seats"][0].get("candidatePolicyCoverage").is_none());
         assert_eq!(
             serde_json::from_str::<MultiwayMetricsRow>(&json).unwrap(),
             row
@@ -185,7 +193,7 @@ mod tests {
         for seat in json["seats"].as_array_mut().unwrap() {
             seat.as_object_mut()
                 .unwrap()
-                .remove("candidatePolicyCoverage");
+                .remove("candidate_policy_coverage");
         }
         let restored: MultiwayMetricsRow = serde_json::from_value(json).unwrap();
         assert_eq!(restored, row);
