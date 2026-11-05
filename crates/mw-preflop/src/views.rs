@@ -342,6 +342,47 @@ pub fn parse_history(
     let rounding = parse_solution_config(&metadata.config_toml)?
         .game
         .chip_rounding;
+    walk_selector(
+        requested,
+        scale,
+        rounding,
+        [0; 16],
+        |current| {
+            let state = metadata
+                .public_states
+                .iter()
+                .find(|state| state.history == current)?;
+            Some(
+                state
+                    .legal_actions
+                    .iter()
+                    .map(|action| display_action(action, metadata.bb_chips))
+                    .collect(),
+            )
+        },
+        |current, index| {
+            metadata
+                .histories
+                .iter()
+                .find(|edge| edge.parent == current && edge.action_index as usize == index)
+                .map(|edge| edge.key)
+        },
+    )
+    .ok_or_else(|| anyhow::anyhow!("NLH003: invalid node selector {requested:?}"))
+}
+
+/// Walk a node selector from `root`: P1 history tokens (`r2.5c`), or a `/` path of display
+/// labels and indices, with amounts in display notation, BB, `Nbb` or `Nc` matched after the
+/// table rounding. `labels(node)` lists a node's display labels and `child(node, index)` its
+/// child; `None` from either ends that reading of the selector.
+pub fn walk_selector<N: Copy>(
+    requested: &str,
+    scale: nlh::ChipScale,
+    rounding: nlh::Rounding,
+    root: N,
+    labels: impl Fn(N) -> Option<Vec<String>>,
+    child: impl Fn(N, usize) -> Option<N>,
+) -> Option<N> {
     let label_path = requested.contains('/')
         || requested.contains(' ')
         || requested.parse::<usize>().is_ok()
@@ -356,23 +397,12 @@ pub fn parse_history(
     } else {
         nlh::selector_history_steps(requested, scale, 512)
     };
-    for steps in tokenizations {
-        let mut current = [0; 16];
-        let mut matched = true;
+    'tokenizations: for steps in tokenizations {
+        let mut current = root;
         for step in steps {
-            let Some(state) = metadata
-                .public_states
-                .iter()
-                .find(|state| state.history == current)
-            else {
-                matched = false;
-                break;
+            let Some(labels) = labels(current) else {
+                continue 'tokenizations;
             };
-            let labels: Vec<_> = state
-                .legal_actions
-                .iter()
-                .map(|action| display_action(action, metadata.bb_chips))
-                .collect();
             let refs: Vec<_> = labels.iter().map(String::as_str).collect();
             let index = if label_path {
                 nlh::resolve_scaled_action(&refs, step, scale, rounding).ok()
@@ -381,22 +411,14 @@ pub fn parse_history(
                     nlh::history_token_matches(&nlh::history_token(label), step, scale, rounding)
                 })
             };
-            let Some(edge) = index.and_then(|index| {
-                metadata
-                    .histories
-                    .iter()
-                    .find(|edge| edge.parent == current && edge.action_index as usize == index)
-            }) else {
-                matched = false;
-                break;
+            let Some(next) = index.and_then(|index| child(current, index)) else {
+                continue 'tokenizations;
             };
-            current = edge.key;
+            current = next;
         }
-        if matched {
-            return Ok(current);
-        }
+        return Some(current);
     }
-    bail!("NLH003: invalid node selector {requested:?}")
+    None
 }
 
 fn parse_runtime_range(raw: &str) -> Result<nlh::Range> {
