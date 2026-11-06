@@ -13,7 +13,7 @@
 GTO Wizardの値を含む記録はlocal-onlyで、配布しない（`packaging/gtow-local-only.json`）。
 索引では、そのREADMEをlinkにせず、pathだけを書く。
 
-## 現在地（2026-11-04）
+## 現在地（2026-11-06）
 
 - 製品のP2は、今も暫定方式（`solver.kind = "range-vector"`、ES-MCCFR）で解く。
   trunk・L0・L1は実験用のcodeで（`crates/mw-preflop/src/lib.rs`の`trunk`は製品の契約の外）、製品の既定値は変えていない。
@@ -57,6 +57,17 @@ GTO Wizardの値を含む記録はlocal-onlyで、配布しない（`packaging/g
   この境は結果を見てから決めた。利用者の決定（2026-10-30）で、leafごとの群を推奨値に加えた（P2D12）。turn・riverの分割は推奨値に入れない（P2D13）。
   Rustの実装（`trunk::l1::own`）とPythonの群の照合、群を作るiteration数は[`rust-check.md`](gtow-fixed/results/leaf-own/rust-check.md)。
   全体の解での確認は`full-solve.md`。
+- 標本の数（2026-11-05、[`eval-samples.md`](gtow-fixed/results/abs-level/eval-samples.md)）：15本で1 iterationのboardを32から128にすると
+  （`b128`。後半の1000 iterationだけなら`bl1k`）、1 sizeのP1との差は−0.15 ± 0.10・−0.22 ± 0.07 % pot、KPIは−0.27 ± 0.12・
+  −0.41 ± 0.13 % pot変わる。学習時間は3betの11で2.06倍・1.58倍。悪くなるlineもある（4betの15で2.76 → 5.33・4.71 % pot）。
+- 学習を増やすと崩れる（2026-11-05、[`fine/eval-fine.md`](gtow-fixed/results/abs-level/fine/eval-fine.md)）：3betのline 13を8 flopで
+  1 flopずつ学習し直すと、手の組を細かくしても（32 × 8、128 × 8）誤差は小さくならず、flopの群ごとのboardが8,000〜16,000を
+  超えるとL1の値が崩れる。原因は、推奨の組の順位とlevelを学習中の現行戦略のreachで決める作り（`--l1-relative-reach current`）である。
+  組を戦略に依らなくすると（`--l1-relative-prior 1e12 --l1-relative-opponent-levels none`）、flopごとの誤差は1・32・128 boardで
+  7.00・5.68・5.71 % potと、標本を増やすほど下がって止まる（今の作りは1・32 boardで7.12・12.07）。学習でも平均戦略で組を決めると
+  （`--l1-relative-reach average`）一部だけ戻る（32 boardで10.07）。lineごとに学び直した推奨値の学習（2000 iteration・1 iterationに
+  32 board、群ごとに平均約1,300 board）は崩れる前にある。全flopの学習で戦略に依らない組がどうなるかは未測定で、次の案
+  （cardだけで決める組と、1回目の解の平均戦略で決めて固定する組）は利用者の判断を待つ。
 
 ## 索引：現行の実装と方法の根拠
 
@@ -75,7 +86,7 @@ GTO Wizardの値を含む記録はlocal-onlyで、配布しない（`packaging/g
 | L1の相対の組（`l1-relative/README.md`、local-only） | 2026-10-08 | L1のPostflopの組の作り方（到達rangeの中の順位・模様・前のstreet）で、補助指標はどれだけ減るか | 相対bucket（8 × 2）を採用。B6の補助指標は1.70から1.13、B4 Simpleでは20.93から10.15 bb/handに減った。模様・前のstreetの`refine`とriverのequityの組は採らない | `m-aux`、`m-open-mae`（廃止） | `verified` |
 | 相対の組の到達rangeを直す（`relative-reach/README.md`、local-only） | 2026-10-09 | 到達rangeがほぼ空のnodeで組が潰れる問題を、事前の重み（prior）と平均の戦略の到達rangeで直せるか | prior 10 comboを採用（`CardSpec::recommended()`）。1 iterationの時間は変わらない。`--l1-relative-reach average`は採らない | `m-gtow-loss`（警報のみ）、`m-gtow-tv`（廃止）、`m-aux` | `partial` |
 | GTO Wizard 100bb相当の木（`b4s-8h/README.md`、local-only） | 2026-10-09 | GTO Wizard Simple 100bb相当の木を長く解くと、GTO Wizardの解に近づくか | 木（`b4s-gtow-raise5.toml`は今の基準の木）と道具（`compare.py`、`cloud_progress.sh`、`gcp/`、`aws/`）は今も使う。GTO Wizardに近づくかという結果は、2026-10-15のKPIの変更で採否に使わない | `m-gtow-loss`（警報のみ）、`m-gtow-tv`（廃止）、`m-main` | `partial` |
-| GTO WizardのPreflopを固定してL1を測る（`gtow-fixed/README.md`、local-only） | 2026-10-10〜 | L1の抽象化（カードの組・Postflopのmenu）の案を、実際のカードのP1を正解にして選ぶ | 前の推奨の組E2（25群、`draws`、prior 10）と攻撃5回の木を決めた。2026-10-29に推奨の組を`r16g49q`に替え（計画のP2D11）、2026-10-30にleafごとの群を加えた（P2D12）。KPIの候補は上の「現在地」。概要は`gtow-fixed/README.md`、現行に効く節は`gtow-fixed/notes/`、効かない節は`gtow-fixed/archive/` | `m-kpi`、`m-class`ほか | 節ごとに記録 |
+| GTO WizardのPreflopを固定してL1を測る（`gtow-fixed/README.md`、local-only） | 2026-10-10〜 | L1の抽象化（カードの組・Postflopのmenu）の案を、実際のカードのP1を正解にして選ぶ | 前の推奨の組E2（25群、`draws`、prior 10）と攻撃5回の木を決めた。2026-10-29に推奨の組を`r16g49q`に替え（計画のP2D11）、2026-10-30にleafごとの群を加え（P2D12）、2026-11-04に強さのlevelを替えた（P2D14）。2026-11-05に、学習を増やすと推奨の組の値が崩れ、原因は組を学習中の現行戦略で決める作りだと分かった。KPIの候補と崩れの記録は上の「現在地」。概要は`gtow-fixed/README.md`、現行に効く節は`gtow-fixed/notes/`、効かない節は`gtow-fixed/archive/` | `m-kpi`、`m-class`ほか | 節ごとに記録 |
 
 ## 索引：アーカイブ（現行の実装と方法に影響しない）
 

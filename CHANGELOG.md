@@ -24,6 +24,15 @@ run manifests keep `cliVersion` as the plain workspace semantic version.
 
 ## [Unreleased]
 
+### Added
+
+- P2 builds add `solvers browse`, an interactive stdin/stdout viewer for a
+  saved P2 `.mwsol` (Preflop only) or an experimental `p2-class-profile`
+  version 1 JSON, detected by content. It shows class strategies, the seat's
+  own reach, combo-weighted frequencies and the stored root evaluation, with
+  `--node` (the selectors of `export --node`), `--config` (class-profile JSON
+  only) and `--color auto|always|never`. P1-only builds do not include it.
+
 ### Changed
 
 - P2 solution exports use shared P1 field names and BB units, with node

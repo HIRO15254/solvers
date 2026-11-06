@@ -187,6 +187,16 @@ leafごとの群は2026-10-30に推奨値に加えた（P2D12）。根拠（実�
 2026-11-04に利用者の決定で後者を推奨値にした（P2D14、暫定）。turn・riverの分割は推奨値に入れない。
 `--l1-cards`の推奨値で解いた全体の解のKPIは未測定である。
 
+2026-11-05の試験で、この推奨値の組は学習を増やすと崩れることが分かった（3betのline 13を8 flopで1 flopずつ学習し直したもの、
+`experiments/p2-method-2026-10/gtow-fixed/results/abs-level/fine/eval-fine.md`）。順位bucketとlevelは、学習中は現在の戦略の
+reachで決まり（`--l1-relative-reach current`）、学習で組が動く。flopの群ごとのboardが8,000〜16,000を超えると、callerの値が
+崩れる（5cTdJdで5.69から29.27 % pot）。順位を一様なpriorだけで決め（`--l1-relative-prior 1e12`）、levelを128組のEHS²表にして
+（`--l1-relative-opponent-levels none`）組を戦略に依らなくすると、8 flopのflopごとの誤差は1・32・128 boardで7.00・5.68・5.71 % potと、
+標本を増やすほど下がって止まる（今の組は1・32 boardで7.12・12.07）。学習の順位のreachを`average`にしても一部しか戻らない
+（32 boardで10.07）。lineごとに学び直した推奨値の学習（2000 iteration・1 iterationに32 board、群ごとに平均約1,300 board）は
+崩れる前にあり、標本や反復を増やす設定は、組の決め方を直すまで精度が上がるとは限らない。全flopの学習で戦略に依らない組が
+どうなるかは未測定である。
+
 leafごとの群のほかの部分の推奨値は、2026-10-29に前の推奨E2（各street 8 × level 2、25群、`draws`）から`r16g49q`に替えた（P2D11）。
 根拠（実験記録`experiments/p2-method-2026-10/gtow-fixed/`、攻撃5回の木のraise menu。GTO Wizardとの比較値は
 local-only記録にだけ置く。物差しのIDは[物差しの一覧](../../experiments/p2-method-2026-10/metrics.md)）:
