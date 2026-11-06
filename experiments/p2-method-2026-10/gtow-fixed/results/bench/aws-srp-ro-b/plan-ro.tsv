@@ -1,0 +1,3 @@
+srp	3	raise-to:2000/fold/fold/fold/fold/call:1000	--l1-flop-groups none --l1-leaf-flop-groups ../ll-own-L03.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+srp	4	fold/fold/fold/raise-to:2500/fold/call:1500	--l1-flop-groups none --l1-leaf-flop-groups ../ll-own-L04.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+srp	5	fold/fold/raise-to:2300/fold/fold/call:1300	--l1-flop-groups none --l1-leaf-flop-groups ../ll-own-L05.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295

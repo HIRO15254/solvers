@@ -74,3 +74,19 @@ DとJ（記録の「D」「J」）で、iterationごとの確保はなくした�
 2. S1・S2（16・32 threadで伸びない段階）。S5の手順で、perfを含めて測ってから手を入れる。
 3. Q1（pairの扱い）。製品の品質に関わるので、S4-3の前に原因だけでも確かめる。
 4. S3・S4、M1〜M3。
+
+## 7. 2026-10-08の追加の結果
+
+同日、利用者の指示（少ない資源でより良い解、GTO Wizardを手本に）で、次を行った。採否（既定にするか）は未決定。
+
+| 案 | 結果 | 記録 |
+|---|---|---|
+| S1〜S3 | `backward_values`の部分木の並列化、regretと戦略の更新の並列化、T3の終盤の並列化、K4のbufferの使い回しと重いgroupの先行（L1の割引の並列化は32 threadsで遅くなり戻した）。B3・B6・B7・B4 Simpleで旧版とbit一致し、thread数によらない。GCPの32 threadsで1 iterationがB3 0.88倍、B7 0.96倍、B4 Simple 0.99倍（16 threadsで0.85・0.94・0.97倍）。主にK4と更新が縮み、T3は縮まなかった | [trunk-parallel](../../experiments/p2-method-2026-10/trunk-parallel/README.md) |
+| Q1 | 保存したB4 Simpleの解のUTG対BBのleafで、中・小pairのL1の値がcheckdownより0.28〜0.46 bb低く、実際のcardでの最善応答との差もpairで最大。抽象化したPostflopでpairを下手に打つことが原因 | `experiments/p2-method-2026-10/l1-relative/`の「Q1」（GTO Wizardとの比較値を含むlocal-only記録、非配布） |
+| Q2 | Postflopの組を、行動する人の到達rangeの中の強さの順位（`--l1-relative`）にした。B4 Simpleで補助指標20.93 → 10.15、openのclass表も参照に近づき、記憶量は1/2（8x2）。B6・B7でも補助指標が約1/3下がる。従来の組を細かくする案（模様・前のstreet・128組）は記憶量4〜17倍で6〜18%しか下がらなかった | 同上 |
+
+相対の組は、Postflopのpassで1 nodeあたり1,081 comboの走査が増え、B4 Simpleの32 threadsでPostflopが約17%、1 iterationが
+約10%長い。それでも、相対の組の1000 iterationで従来の組の2000 iterationより補助指標・openのclass表とも良い。組の数が
+戦略の記憶量を決めるので、8x2なら記憶量は従来の半分になる。L1を製品にするとき（S4-3）の組の作り方の候補として、
+利用者の判断を要する。中・小pair（UTGの77〜55）のopenと小さいsuited
+connectorのopenは、相対の組でもまだ足りない。

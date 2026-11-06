@@ -1,0 +1,15 @@
+L06-gt3bet gt3bet 5m flops32.txt fold/fold/fold/raise-to:2500/fold/raise-to:13000/call:10500
+L07-gt3bet gt3bet 5m flops32.txt fold/fold/fold/raise-to:2500/raise-to:12000/fold/call:9500
+L09-gt3bet gt3bet 5m flops32.txt fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000
+L12-gt3bet gt3bet 5m flops32.txt fold/fold/raise-to:2300/fold/fold/raise-to:13500/call:11200
+L13-gt3bet gt3bet 5m flops32.txt fold/raise-to:2000/fold/fold/fold/raise-to:12300/call:10300
+L18-gt3bet gt3bet 5m flops32.txt fold/fold/raise-to:2300/fold/raise-to:11500/fold/call:9200
+L19-gt3bet gt3bet 5m flops32.txt raise-to:2000/fold/fold/fold/fold/raise-to:12000/call:10000
+L20-gt3bet gt3bet 5m flops32.txt raise-to:2000/fold/fold/fold/raise-to:10000/fold/call:8000
+L22-gt3bet gt3bet 5m flops32.txt fold/fold/raise-to:2300/raise-to:7500/fold/fold/call:5200
+L24-gt3bet gt3bet 5m flops32.txt raise-to:2000/raise-to:6500/fold/fold/fold/fold/call:4500
+L26-gt3bet gt3bet 5m flops32.txt fold/raise-to:2000/raise-to:6500/fold/fold/fold/call:4500
+L27-gt3bet gt3bet 5m flops32.txt raise-to:2000/fold/raise-to:6500/fold/fold/fold/call:4500
+L28-gt3bet gt3bet 5m flops32.txt fold/raise-to:2000/fold/fold/raise-to:11000/fold/call:9000
+L30-gt3bet gt3bet 5m flops32.txt raise-to:2000/fold/fold/raise-to:7500/fold/fold/call:5500
+L32-gt3bet gt3bet 5m flops32.txt fold/raise-to:2000/fold/raise-to:7500/fold/fold/call:5500

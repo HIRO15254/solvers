@@ -18,7 +18,7 @@
 | P1の品質検証の参照候補 | [HU Postflop参照候補](plans/hu-postflop-validation/README.md) |
 | P1の速度・資源改善の段階と受入条件 | [P1性能計画](plans/p1-performance.jp.md)、[T26後の改善案](research/2026-10-08-p1-t26-improvements.jp.md)、[P1資源効率計画](plans/p1-efficiency.jp.md) |
 | P1のNodelock・相手profileの決定・設計方針・段階 | [P1 Nodelock・相手profile計画](plans/p1-nodelock.jp.md)、[既存solverの調査](research/2026-10-28-nodelock-survey.jp.md) |
-| P2の方式の再設計（決定・benchmark・段階） | [P2方式の再設計計画](plans/p2-method-redesign.jp.md)、[調査](research/2026-10-06-p2-method-survey.jp.md)、[S4-2b後の改善案](research/2026-10-08-p2-s4-2b-improvements.jp.md) |
+| P2の方式の再設計（決定・benchmark・段階） | [P2方式の再設計計画](plans/p2-method-redesign.jp.md)、[調査](research/2026-10-06-p2-method-survey.jp.md)、[S4-2b後の改善案](research/2026-10-08-p2-s4-2b-improvements.jp.md)、[実験の索引と現在地](../experiments/p2-method-2026-10/README.md)、[実験の物差しの一覧](../experiments/p2-method-2026-10/metrics.md) |
 | P1の配布（v0.1.0、v0.2.0）の範囲・成果物・手順 | [v0.1.0の配布計画](plans/release-v0.1.jp.md)、[v0.2.0の配布計画](plans/release-v0.2.jp.md) |
 | 現行solverの構造・実装境界 | [architecture.md](architecture.md) |
 | 現行CLI・daemon・protocolとviewer境界 | [app-architecture.md](app-architecture.md) |

@@ -1,0 +1,36 @@
+srp	1	fold/raise-to:2000/fold/fold/fold/call:1000	--l1-flop-groups none --l1-leaf-flop-groups ../ll-own-L01.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+srp	2	fold/fold/fold/fold/raise-to:3000/call:2000	--l1-flop-groups none --l1-leaf-flop-groups ../ll-own-L02.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+srp	3	raise-to:2000/fold/fold/fold/fold/call:1000	--l1-flop-groups none --l1-leaf-flop-groups ../ll-own-L03.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+srp	4	fold/fold/fold/raise-to:2500/fold/call:1500	--l1-flop-groups none --l1-leaf-flop-groups ../ll-own-L04.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+srp	5	fold/fold/raise-to:2300/fold/fold/call:1300	--l1-flop-groups none --l1-leaf-flop-groups ../ll-own-L05.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	1	fold/fold/fold/raise-to:2500/fold/raise-to:13000/call:10500	--l1-flop-groups ../own-L06.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	2	fold/fold/fold/raise-to:2500/raise-to:12000/fold/call:9500	--l1-flop-groups ../own-L07.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	3	fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000	--l1-flop-groups ../own-L09.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	4	fold/fold/raise-to:2300/fold/fold/raise-to:13500/call:11200	--l1-flop-groups ../own-L12.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	5	fold/raise-to:2000/fold/fold/fold/raise-to:12300/call:10300	--l1-flop-groups ../own-L13.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	6	fold/fold/raise-to:2300/fold/raise-to:11500/fold/call:9200	--l1-flop-groups ../own-L18.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	7	raise-to:2000/fold/fold/fold/fold/raise-to:12000/call:10000	--l1-flop-groups ../own-L19.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	8	raise-to:2000/fold/fold/fold/raise-to:10000/fold/call:8000	--l1-flop-groups ../own-L20.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	9	fold/fold/raise-to:2300/raise-to:7500/fold/fold/call:5200	--l1-flop-groups ../own-L22.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	10	raise-to:2000/raise-to:6500/fold/fold/fold/fold/call:4500	--l1-flop-groups ../own-L24.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	11	fold/raise-to:2000/raise-to:6500/fold/fold/fold/call:4500	--l1-flop-groups ../own-L26.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	12	raise-to:2000/fold/raise-to:6500/fold/fold/fold/call:4500	--l1-flop-groups ../own-L27.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	13	fold/raise-to:2000/fold/fold/raise-to:11000/fold/call:9000	--l1-flop-groups ../own-L28.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	14	raise-to:2000/fold/fold/raise-to:7500/fold/fold/call:5500	--l1-flop-groups ../own-L30.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+3bet	15	fold/raise-to:2000/fold/raise-to:7500/fold/fold/call:5500	--l1-flop-groups ../own-L32.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+4bet	1	fold/fold/raise-to:2300/raise-to:7500/fold/fold/raise-to:21000/call:13500	--l1-flop-groups ../own-L08.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+4bet	2	raise-to:2000/fold/raise-to:6500/fold/fold/fold/raise-to:18000/call:11500	--l1-flop-groups ../own-L10.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+4bet	3	fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/call:11000	--l1-flop-groups ../own-L11.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+4bet	4	fold/fold/fold/raise-to:2500/raise-to:12000/fold/raise-to:26000/call:14000	--l1-flop-groups ../own-L14.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+4bet	5	fold/raise-to:2000/raise-to:6500/fold/fold/fold/raise-to:19000/call:12500	--l1-flop-groups ../own-L15.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+4bet	6	raise-to:2000/fold/fold/raise-to:7500/fold/fold/raise-to:20000/call:12500	--l1-flop-groups ../own-L16.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+4bet	7	fold/raise-to:2000/fold/raise-to:7500/fold/fold/raise-to:20000/call:12500	--l1-flop-groups ../own-L17.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+4bet	8	raise-to:2000/raise-to:6500/fold/fold/fold/fold/raise-to:19000/call:12500	--l1-flop-groups ../own-L21.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+4bet	9	raise-to:2000/fold/fold/fold/raise-to:10000/fold/raise-to:19000/call:9000	--l1-flop-groups ../own-L23.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+4bet	10	fold/fold/fold/raise-to:2500/fold/raise-to:13000/raise-to:27000/call:14000	--l1-flop-groups ../own-L25.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+4bet	11	fold/raise-to:2000/fold/fold/raise-to:11000/fold/raise-to:22000/call:11000	--l1-flop-groups ../own-L29.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+4bet	12	fold/fold/raise-to:2300/fold/raise-to:11500/fold/raise-to:25000/call:13500	--l1-flop-groups ../own-L31.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+4bet	13	fold/raise-to:2000/fold/fold/fold/raise-to:12300/raise-to:24900/call:12600	--l1-flop-groups ../own-L33.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+4bet	14	raise-to:2000/fold/fold/fold/fold/raise-to:12000/raise-to:22000/call:10000	--l1-flop-groups ../own-L34.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+4bet	15	fold/fold/raise-to:2300/fold/fold/raise-to:13500/raise-to:28000/call:14500	--l1-flop-groups ../own-L35.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard
+5bet	1	fold/raise-to:2000/raise-to:6500/fold/fold/fold/raise-to:19000/raise-to:34000/call:15000	--l1-flop-groups ../own-L36.txt --l1-relative 16x4:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard

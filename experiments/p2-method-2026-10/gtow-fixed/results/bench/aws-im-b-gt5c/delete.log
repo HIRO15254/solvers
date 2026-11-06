@@ -1,0 +1,131 @@
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-5h1znssj",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-1vszq9ak",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-tsizqqaj",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-yaxzprjk",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-y5xfqrjk",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-1rcznsfk",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-aejqnmgh",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-czh7nsnk",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-afizpddh",
+            "State": "cancelled"
+        }
+    ]
+}
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the CancelSpotInstanceRequests operation: The spot instance request ID 'sir-5h1znssj' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the DescribeSpotInstanceRequests operation: The spot instance request ID 'sir-5h1znssj' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the CancelSpotInstanceRequests operation: The spot instance request ID 'sir-1vszq9ak' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the DescribeSpotInstanceRequests operation: The spot instance request ID 'sir-1vszq9ak' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the CancelSpotInstanceRequests operation: The spot instance request ID 'sir-tsizqqaj' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the DescribeSpotInstanceRequests operation: The spot instance request ID 'sir-tsizqqaj' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the CancelSpotInstanceRequests operation: The spot instance request ID 'sir-yaxzprjk' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the DescribeSpotInstanceRequests operation: The spot instance request ID 'sir-yaxzprjk' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the CancelSpotInstanceRequests operation: The spot instance request ID 'sir-y5xfqrjk' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the DescribeSpotInstanceRequests operation: The spot instance request ID 'sir-y5xfqrjk' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the CancelSpotInstanceRequests operation: The spot instance request ID 'sir-1rcznsfk' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the DescribeSpotInstanceRequests operation: The spot instance request ID 'sir-1rcznsfk' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the CancelSpotInstanceRequests operation: The spot instance request ID 'sir-aejqnmgh' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the DescribeSpotInstanceRequests operation: The spot instance request ID 'sir-aejqnmgh' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the CancelSpotInstanceRequests operation: The spot instance request ID 'sir-czh7nsnk' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the DescribeSpotInstanceRequests operation: The spot instance request ID 'sir-czh7nsnk' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the CancelSpotInstanceRequests operation: The spot instance request ID 'sir-afizpddh' does not exist
+
+aws: [ERROR]: An error occurred (InvalidSpotInstanceRequestID.NotFound) when calling the DescribeSpotInstanceRequests operation: The spot instance request ID 'sir-afizpddh' does not exist
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-r4wqqa3j",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "TerminatingInstances": [
+        {
+            "InstanceId": "i-0547b3d4b5bbdfe43",
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "PreviousState": {
+                "Code": 16,
+                "Name": "running"
+            }
+        }
+    ]
+}

@@ -1,0 +1,31 @@
+
+b4s-gtow.toml             | 4 kB |   4.0 kB/s | ETA: 00:00:06 |  12%
+b4s-gtow.toml             | 31 kB |  31.8 kB/s | ETA: 00:00:00 | 100%
+
+b4s-gtow-raise5.toml      | 4 kB |   4.0 kB/s | ETA: 00:00:06 |  12%
+b4s-gtow-raise5.toml      | 31 kB |  31.5 kB/s | ETA: 00:00:00 | 100%
+
+compare.py                | 4 kB |   4.0 kB/s | ETA: 00:00:01 |  34%
+compare.py                | 11 kB |  11.7 kB/s | ETA: 00:00:00 | 100%
+
+gtowizard-simple-100bb-pr | 4 kB |   4.0 kB/s | ETA: 00:03:31 |   0%
+gtowizard-simple-100bb-pr | 356 kB | 356.0 kB/s | ETA: 00:00:01 |  41%
+gtowizard-simple-100bb-pr | 848 kB | 849.0 kB/s | ETA: 00:00:00 | 100%
+
+job.sh                    | 4 kB |   4.0 kB/s | ETA: 00:00:01 |  38%
+job.sh                    | 10 kB |  10.3 kB/s | ETA: 00:00:00 | 100%
+
+k25-groups.txt            | 4 kB |   4.0 kB/s | ETA: 00:00:03 |  20%
+k25-groups.txt            | 19 kB |  19.7 kB/s | ETA: 00:00:00 | 100%
+
+loss-cap.txt              | 0 kB |   0.0 kB/s | ETA: 00:00:00 | 100%
+
+plateau.txt               | 0 kB |   0.0 kB/s | ETA: 00:00:00 | 100%
+
+seconds.txt               | 0 kB |   0.0 kB/s | ETA: 00:00:00 | 100%
+
+src.tar                   | 4 kB |   4.0 kB/s | ETA: 00:17:11 |   0%
+src.tar                   | 2628 kB | 2628.0 kB/s | ETA: 00:00:00 |  63%
+src.tar                   | 4130 kB | 4130.0 kB/s | ETA: 00:00:00 | 100%
+
+variants.txt              | 0 kB |   0.0 kB/s | ETA: 00:00:00 | 100%

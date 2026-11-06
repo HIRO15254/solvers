@@ -1,0 +1,4 @@
+Tree: 12 decisions, 22 terminals (0.001s)
+Tables: 0.253s; model: 0.002s
+L1: 5 leaves; 302 postflop decisions; 86784 slots; 1388544 storage bytes
+Iterations: 1; reached target: false; stopped by stop file: false; solve phases Timings { trunk: SolveTimings { reaches: 0.001497347, t2: 0.0028189210000000003, t3: 2e-7, k4: 3.11e-6, update: 0.00044655, evaluation: 0.0 }, board_preparation: 0.02043945, postflop: 0.024878429, evaluation_board_preparation: 1.6e-7 }

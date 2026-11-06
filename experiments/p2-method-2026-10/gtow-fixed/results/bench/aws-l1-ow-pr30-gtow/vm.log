@@ -1,0 +1,125 @@
+2026-10-17T09:24:46Z ranked candidates: score=USD/hour/relative-speed region AZ type USD/hour speed
+2026-10-17T09:24:46Z 0.195900000 sa-east-1 sa-east-1c c6a.8xlarge 0.195900 1.0
+2026-10-17T09:24:46Z 0.206500000 sa-east-1 sa-east-1a c6a.8xlarge 0.206500 1.0
+2026-10-17T09:24:46Z 0.209600000 sa-east-1 sa-east-1a c6i.8xlarge 0.209600 1.0
+2026-10-17T09:24:46Z 0.209600000 sa-east-1 sa-east-1c c6i.8xlarge 0.209600 1.0
+2026-10-17T09:24:47Z 0.218533333 us-east-2 us-east-2b c7a.8xlarge 0.327800 1.5
+2026-10-17T09:24:47Z 0.222700000 sa-east-1 sa-east-1a c7i.8xlarge 0.222700 1.0
+2026-10-17T09:24:47Z 0.223133333 us-east-2 us-east-2c c7a.8xlarge 0.334700 1.5
+2026-10-17T09:24:47Z 0.252866667 us-east-2 us-east-2a c7a.8xlarge 0.379300 1.5
+2026-10-17T09:24:47Z 0.297000000 us-east-2 us-east-2c c6i.8xlarge 0.297000 1.0
+2026-10-17T09:24:47Z 0.298700000 us-east-2 us-east-2a c6i.8xlarge 0.298700 1.0
+2026-10-17T09:24:47Z 0.302500000 us-east-2 us-east-2b c6i.8xlarge 0.302500 1.0
+2026-10-17T09:24:47Z 0.303400000 us-east-2 us-east-2c c6a.8xlarge 0.303400 1.0
+2026-10-17T09:24:47Z 0.309900000 sa-east-1 sa-east-1c c7i.8xlarge 0.309900 1.0
+2026-10-17T09:24:47Z 0.316600000 sa-east-1 sa-east-1b c6i.8xlarge 0.316600 1.0
+2026-10-17T09:24:47Z 0.319400000 us-east-2 us-east-2a c6a.8xlarge 0.319400 1.0
+2026-10-17T09:24:47Z 0.320600000 us-east-2 us-east-2b c6a.8xlarge 0.320600 1.0
+2026-10-17T09:24:47Z 0.334000000 us-east-2 us-east-2c c7i.8xlarge 0.334000 1.0
+2026-10-17T09:24:47Z 0.359600000 us-east-2 us-east-2a c7i.8xlarge 0.359600 1.0
+2026-10-17T09:24:47Z 0.392800000 us-east-1 us-east-1a c7a.8xlarge 0.589200 1.5
+2026-10-17T09:24:48Z 0.399500000 sa-east-1 sa-east-1b c6a.8xlarge 0.399500 1.0
+2026-10-17T09:24:48Z 0.402000000 us-east-1 us-east-1b c7a.8xlarge 0.603000 1.5
+2026-10-17T09:24:48Z 0.409733333 us-east-1 us-east-1d c7a.8xlarge 0.614600 1.5
+2026-10-17T09:24:48Z 0.415300000 us-east-2 us-east-2b c7i.8xlarge 0.415300 1.0
+2026-10-17T09:24:48Z 0.416200000 us-east-1 us-east-1c c7a.8xlarge 0.624300 1.5
+2026-10-17T09:24:48Z 0.417000000 sa-east-1 sa-east-1b c7i.8xlarge 0.417000 1.0
+2026-10-17T09:24:48Z 0.441000000 us-east-1 us-east-1f c7a.8xlarge 0.661500 1.5
+2026-10-17T09:24:48Z 0.519800000 us-east-1 us-east-1b c6a.8xlarge 0.519800 1.0
+2026-10-17T09:24:48Z 0.534300000 us-east-1 us-east-1f c6a.8xlarge 0.534300 1.0
+2026-10-17T09:24:48Z 0.542500000 us-east-1 us-east-1d c6a.8xlarge 0.542500 1.0
+2026-10-17T09:24:48Z 0.618500000 us-east-1 us-east-1a c6a.8xlarge 0.618500 1.0
+2026-10-17T09:24:48Z 0.643800000 us-east-1 us-east-1f c6i.8xlarge 0.643800 1.0
+2026-10-17T09:24:48Z 0.645200000 us-east-1 us-east-1c c6a.8xlarge 0.645200 1.0
+2026-10-17T09:24:48Z 0.719300000 us-east-1 us-east-1a c7i.8xlarge 0.719300 1.0
+2026-10-17T09:24:48Z 0.719800000 us-east-1 us-east-1f c7i.8xlarge 0.719800 1.0
+2026-10-17T09:24:49Z 0.785900000 us-east-1 us-east-1d c7i.8xlarge 0.785900 1.0
+2026-10-17T09:24:49Z 0.793600000 us-east-1 us-east-1b c7i.8xlarge 0.793600 1.0
+2026-10-17T09:24:49Z 0.839400000 us-east-1 us-east-1c c7i.8xlarge 0.839400 1.0
+2026-10-17T09:24:49Z 0.861200000 us-east-1 us-east-1b c6i.8xlarge 0.861200 1.0
+2026-10-17T09:24:49Z 1.014300000 us-east-1 us-east-1a c6i.8xlarge 1.014300 1.0
+2026-10-17T09:24:49Z 1.193900000 us-east-1 us-east-1d c6i.8xlarge 1.193900 1.0
+2026-10-17T09:24:49Z 1.205200000 us-east-1 us-east-1c c6i.8xlarge 1.205200 1.0
+2026-10-17T09:25:09Z requesting region=sa-east-1 az=sa-east-1c type=c6a.8xlarge ami=ami-01b4d0596a944c035
+2026-10-17T09:25:15Z request=sir-f2rqm8qg status=capacity-not-available state=open
+2026-10-17T09:25:17Z capacity fallback canceled request=sir-f2rqm8qg
+2026-10-17T09:25:39Z requesting region=sa-east-1 az=sa-east-1a type=c6a.8xlarge ami=ami-01b4d0596a944c035
+2026-10-17T09:25:45Z request=sir-kkzzpdtg status=fulfilled state=active
+2026-10-17T09:25:48Z using region=sa-east-1 instance=i-062d4e516af1e5f07 request=sir-kkzzpdtg az=sa-east-1a type=c6a.8xlarge spot-price-usd-per-hour=0.206500 speed=1.0 score=0.206500000
+2026-10-17T09:25:51Z instance=i-062d4e516af1e5f07 status=running ip=52.67.199.180
+2026-10-17T09:26:53Z uploaded source, job and flat extra files
+2026-10-17T09:26:57Z launched instance=i-062d4e516af1e5f07
+2026-10-17T09:27:00Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.206500	2026-10-17T04:00:00+00:00
+2026-10-17T09:27:03Z downloaded results
+2026-10-17T09:32:12Z spot-price-usd-per-hour type=c6a.8xlarge az=sa-east-1a price=0.206500	2026-10-17T04:00:00+00:00
+2026-10-17T09:32:16Z downloaded results
+2026-10-17T09:34:02Z instance=i-062d4e516af1e5f07 status=stopping ip=52.67.199.180
+2026-10-17T09:34:02Z spot reclaim log: kind=quick region=sa-east-1 ran_s=491
+2026-10-17T09:34:02Z region=sa-east-1 reached 3 consecutive quick Spot reclaims; moving to another market
+2026-10-17T09:34:25Z abandoned region=sa-east-1 request=sir-kkzzpdtg instance=i-062d4e516af1e5f07; the job restarts from scratch elsewhere
+2026-10-17T09:34:25Z skipping region=sa-east-1 until 2026-10-17T17:34:03Z: consecutive quick Spot reclaims (/c/Users/PC_User/.cache/p2-aws/spot-reclaims.log)
+2026-10-17T09:34:31Z ranked candidates: score=USD/hour/relative-speed region AZ type USD/hour speed
+2026-10-17T09:34:31Z 0.218533333 us-east-2 us-east-2b c7a.8xlarge 0.327800 1.5
+2026-10-17T09:34:31Z 0.223133333 us-east-2 us-east-2c c7a.8xlarge 0.334700 1.5
+2026-10-17T09:34:31Z 0.252866667 us-east-2 us-east-2a c7a.8xlarge 0.379300 1.5
+2026-10-17T09:34:32Z 0.297000000 us-east-2 us-east-2c c6i.8xlarge 0.297000 1.0
+2026-10-17T09:34:32Z 0.298700000 us-east-2 us-east-2a c6i.8xlarge 0.298700 1.0
+2026-10-17T09:34:32Z 0.302500000 us-east-2 us-east-2b c6i.8xlarge 0.302500 1.0
+2026-10-17T09:34:32Z 0.303400000 us-east-2 us-east-2c c6a.8xlarge 0.303400 1.0
+2026-10-17T09:34:32Z 0.319400000 us-east-2 us-east-2a c6a.8xlarge 0.319400 1.0
+2026-10-17T09:34:32Z 0.320600000 us-east-2 us-east-2b c6a.8xlarge 0.320600 1.0
+2026-10-17T09:34:32Z 0.334000000 us-east-2 us-east-2c c7i.8xlarge 0.334000 1.0
+2026-10-17T09:34:32Z 0.359600000 us-east-2 us-east-2a c7i.8xlarge 0.359600 1.0
+2026-10-17T09:34:32Z 0.392800000 us-east-1 us-east-1a c7a.8xlarge 0.589200 1.5
+2026-10-17T09:34:32Z 0.402000000 us-east-1 us-east-1b c7a.8xlarge 0.603000 1.5
+2026-10-17T09:34:32Z 0.409733333 us-east-1 us-east-1d c7a.8xlarge 0.614600 1.5
+2026-10-17T09:34:32Z 0.415300000 us-east-2 us-east-2b c7i.8xlarge 0.415300 1.0
+2026-10-17T09:34:32Z 0.416200000 us-east-1 us-east-1c c7a.8xlarge 0.624300 1.5
+2026-10-17T09:34:33Z 0.441000000 us-east-1 us-east-1f c7a.8xlarge 0.661500 1.5
+2026-10-17T09:34:33Z 0.519800000 us-east-1 us-east-1b c6a.8xlarge 0.519800 1.0
+2026-10-17T09:34:33Z 0.534300000 us-east-1 us-east-1f c6a.8xlarge 0.534300 1.0
+2026-10-17T09:34:33Z 0.542500000 us-east-1 us-east-1d c6a.8xlarge 0.542500 1.0
+2026-10-17T09:34:33Z 0.618500000 us-east-1 us-east-1a c6a.8xlarge 0.618500 1.0
+2026-10-17T09:34:33Z 0.643800000 us-east-1 us-east-1f c6i.8xlarge 0.643800 1.0
+2026-10-17T09:34:33Z 0.645200000 us-east-1 us-east-1c c6a.8xlarge 0.645200 1.0
+2026-10-17T09:34:33Z 0.719300000 us-east-1 us-east-1a c7i.8xlarge 0.719300 1.0
+2026-10-17T09:34:33Z 0.719800000 us-east-1 us-east-1f c7i.8xlarge 0.719800 1.0
+2026-10-17T09:34:33Z 0.785900000 us-east-1 us-east-1d c7i.8xlarge 0.785900 1.0
+2026-10-17T09:34:33Z 0.793600000 us-east-1 us-east-1b c7i.8xlarge 0.793600 1.0
+2026-10-17T09:34:33Z 0.839400000 us-east-1 us-east-1c c7i.8xlarge 0.839400 1.0
+2026-10-17T09:34:33Z 0.861200000 us-east-1 us-east-1b c6i.8xlarge 0.861200 1.0
+2026-10-17T09:34:33Z 1.014300000 us-east-1 us-east-1a c6i.8xlarge 1.014300 1.0
+2026-10-17T09:34:34Z 1.193900000 us-east-1 us-east-1d c6i.8xlarge 1.193900 1.0
+2026-10-17T09:34:34Z 1.205200000 us-east-1 us-east-1c c6i.8xlarge 1.205200 1.0
+2026-10-17T09:34:49Z requesting region=us-east-2 az=us-east-2b type=c7a.8xlarge ami=ami-09519cc56eb20524a
+2026-10-17T09:34:54Z request=sir-8sh7nm2g status=fulfilled state=active
+2026-10-17T09:34:56Z using region=us-east-2 instance=i-0224cf66666fa703d request=sir-8sh7nm2g az=us-east-2b type=c7a.8xlarge spot-price-usd-per-hour=0.327800 speed=1.5 score=0.218533333
+2026-10-17T09:34:58Z instance=i-0224cf66666fa703d status=running ip=18.218.62.37
+2026-10-17T09:35:39Z uploaded source, job and flat extra files
+2026-10-17T09:35:41Z launched instance=i-0224cf66666fa703d
+2026-10-17T09:35:43Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T09:35:45Z downloaded results
+2026-10-17T09:40:56Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T09:40:58Z downloaded results
+2026-10-17T09:46:08Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T09:46:11Z downloaded results
+2026-10-17T09:51:22Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T09:51:24Z downloaded results
+2026-10-17T09:56:34Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T09:56:36Z downloaded results
+2026-10-17T10:01:47Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T10:01:49Z downloaded results
+2026-10-17T10:04:58Z spot reclaim log: kind=ok region=us-east-2 ran_s=1800
+2026-10-17T10:07:00Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T10:07:02Z downloaded results
+2026-10-17T10:12:12Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T10:12:18Z downloaded results
+2026-10-17T10:17:27Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T10:17:48Z downloaded results
+2026-10-17T10:22:41Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.327800	2026-10-17T08:00:00+00:00
+2026-10-17T10:22:57Z downloaded results
+2026-10-17T10:24:09Z ALL_DONE final downloaded
+2026-10-17T10:24:18Z canceled request=sir-f2rqm8qg
+2026-10-17T10:24:23Z canceled request=sir-kkzzpdtg
+2026-10-17T10:24:28Z canceled request=sir-8sh7nm2g
+2026-10-17T10:25:04Z deleted instance=i-0224cf66666fa703d request=sir-8sh7nm2g

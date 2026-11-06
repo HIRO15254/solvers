@@ -1,0 +1,135 @@
+2026-11-02T16:29:58Z ranked regions: placement-score cheapest-USD/hour region
+2026-11-02T16:29:58Z 9 0.229000 us-east-2
+2026-11-02T16:29:58Z 9 0.418800 us-east-1
+2026-11-02T16:30:27Z created launch template=p2-1793636984-59354-26324 region=us-east-2 ami=ami-0fc53b217ec1ad816
+2026-11-02T16:30:27Z requesting instant fleet region=us-east-2 placement-score=9 types=c6a.8xlarge c5a.8xlarge m7a.8xlarge r6a.8xlarge m6a.8xlarge c7a.8xlarge m7i.8xlarge subnets=3
+2026-11-02T16:30:39Z using region=us-east-2 instance=i-0c0a9fd292900d8c0 az=us-east-2b type=m7i.8xlarge spot-price-usd-per-hour=0.734400 placement-score=9
+2026-11-02T16:30:42Z instance=i-0c0a9fd292900d8c0 status=running ip=13.59.215.169
+2026-11-02T16:30:52Z ssh ingress refreshed ip=106.178.125.134
+2026-11-02T16:32:19Z uploaded source, job and flat extra files
+2026-11-02T16:32:21Z launched instance=i-0c0a9fd292900d8c0
+2026-11-02T16:32:24Z spot-price-usd-per-hour type=m7i.8xlarge az=us-east-2b price=0.734400	2026-11-02T11:00:00+00:00
+2026-11-02T16:32:26Z downloaded results
+2026-11-02T16:37:39Z deleted instance=i-0c0a9fd292900d8c0
+2026-11-02T16:37:42Z deleted launch template=p2-1793636984-59354-26324 region=us-east-2
+2026-11-02T16:38:22Z ranked regions: placement-score cheapest-USD/hour region
+2026-11-02T16:38:22Z 9 0.229000 us-east-2
+2026-11-02T16:38:22Z 9 0.440100 us-east-1
+2026-11-02T16:38:51Z created launch template=p2-1793637485-61476-18394 region=us-east-2 ami=ami-0fc53b217ec1ad816
+2026-11-02T16:38:51Z requesting instant fleet region=us-east-2 placement-score=9 types=c7a.8xlarge c6a.8xlarge c5a.8xlarge subnets=3
+2026-11-02T16:38:56Z no instance from the fleet in region=us-east-2; errors:  9 UnfulfillableCapacity 
+2026-11-02T16:39:24Z created launch template=p2-1793637485-61476-18394 region=us-east-1 ami=ami-0d6dd9e8265d48906
+2026-11-02T16:39:24Z requesting instant fleet region=us-east-1 placement-score=9 types=c7a.8xlarge c6a.8xlarge c5a.8xlarge subnets=6
+2026-11-02T16:39:36Z using region=us-east-1 instance=i-0b36033ecab4dd267 az=us-east-1f type=c5a.8xlarge spot-price-usd-per-hour=0.440100 placement-score=9
+2026-11-02T16:39:39Z instance=i-0b36033ecab4dd267 status=running ip=18.207.224.79
+2026-11-02T16:39:49Z ssh ingress refreshed ip=106.178.125.134
+2026-11-02T16:41:13Z uploaded source, job and flat extra files
+2026-11-02T16:41:16Z launched instance=i-0b36033ecab4dd267
+2026-11-02T16:41:19Z spot-price-usd-per-hour type=c5a.8xlarge az=us-east-1f price=0.440100	2026-11-02T15:00:00+00:00
+2026-11-02T16:41:22Z downloaded results
+2026-11-02T16:46:35Z spot-price-usd-per-hour type=c5a.8xlarge az=us-east-1f price=0.440100	2026-11-02T15:00:00+00:00
+2026-11-02T16:46:38Z downloaded results
+2026-11-02T16:51:50Z spot-price-usd-per-hour type=c5a.8xlarge az=us-east-1f price=0.440100	2026-11-02T15:00:00+00:00
+2026-11-02T16:51:53Z downloaded results
+2026-11-02T16:57:02Z spot-price-usd-per-hour type=c5a.8xlarge az=us-east-1f price=0.440100	2026-11-02T15:00:00+00:00
+2026-11-02T16:57:05Z downloaded results
+2026-11-02T17:02:19Z spot-price-usd-per-hour type=c5a.8xlarge az=us-east-1f price=0.440100	2026-11-02T15:00:00+00:00
+2026-11-02T17:02:21Z downloaded results
+2026-11-02T17:07:30Z spot-price-usd-per-hour type=c5a.8xlarge az=us-east-1f price=0.440100	2026-11-02T15:00:00+00:00
+2026-11-02T17:07:34Z downloaded results
+2026-11-02T17:09:44Z spot reclaim log: kind=ok region=us-east-1 ran_s=1805
+2026-11-02T17:12:32Z spot-price-usd-per-hour type=c5a.8xlarge az=us-east-1f price=0.440100	2026-11-02T15:00:00+00:00
+2026-11-02T17:12:36Z downloaded results
+2026-11-02T17:17:33Z spot-price-usd-per-hour type=c5a.8xlarge az=us-east-1f price=0.440100	2026-11-02T15:00:00+00:00
+2026-11-02T17:17:36Z downloaded results
+2026-11-02T17:20:03Z instance=i-0b36033ecab4dd267 status=shutting-down ip=18.207.224.79
+2026-11-02T17:20:03Z instance=i-0b36033ecab4dd267 interrupted (state=shutting-down); relaunching
+2026-11-02T17:20:07Z packed the downloaded results into resume.tgz
+2026-11-02T17:20:18Z ranked regions: placement-score cheapest-USD/hour region
+2026-11-02T17:20:18Z 9 0.440100 us-east-1
+2026-11-02T17:20:18Z 1 0.229000 us-east-2
+2026-11-02T17:20:44Z requesting instant fleet region=us-east-1 placement-score=9 types=c7a.8xlarge c6a.8xlarge c5a.8xlarge subnets=6
+2026-11-02T17:20:55Z using region=us-east-1 instance=i-057419c0fa794fad3 az=us-east-1f type=c5a.8xlarge spot-price-usd-per-hour=0.440100 placement-score=9
+2026-11-02T17:20:59Z instance=i-057419c0fa794fad3 status=running ip=3.238.240.37
+2026-11-02T17:21:09Z ssh ingress refreshed ip=106.178.125.134
+2026-11-02T17:22:33Z uploaded source, job and flat extra files
+2026-11-02T17:22:36Z launched instance=i-057419c0fa794fad3
+2026-11-02T17:22:39Z spot-price-usd-per-hour type=c5a.8xlarge az=us-east-1f price=0.440100	2026-11-02T15:00:00+00:00
+2026-11-02T17:22:42Z downloaded results
+2026-11-02T17:27:41Z spot-price-usd-per-hour type=c5a.8xlarge az=us-east-1f price=0.440100	2026-11-02T15:00:00+00:00
+2026-11-02T17:27:44Z downloaded results
+2026-11-02T17:32:58Z spot-price-usd-per-hour type=c5a.8xlarge az=us-east-1f price=0.440100	2026-11-02T15:00:00+00:00
+2026-11-02T17:33:01Z downloaded results
+2026-11-02T17:38:13Z spot-price-usd-per-hour type=c5a.8xlarge az=us-east-1f price=0.440100	2026-11-02T15:00:00+00:00
+2026-11-02T17:38:17Z downloaded results
+2026-11-02T17:43:14Z spot-price-usd-per-hour type=c5a.8xlarge az=us-east-1f price=0.440100	2026-11-02T15:00:00+00:00
+2026-11-02T17:43:17Z downloaded results
+2026-11-02T17:48:16Z spot-price-usd-per-hour type=c5a.8xlarge az=us-east-1f price=0.440100	2026-11-02T15:00:00+00:00
+2026-11-02T17:48:20Z downloaded results
+2026-11-02T17:49:15Z instance=i-057419c0fa794fad3 status=shutting-down ip=None
+2026-11-02T17:49:15Z spot reclaim log: kind=quick region=us-east-1 ran_s=1696
+2026-11-02T17:49:15Z instance=i-057419c0fa794fad3 interrupted (state=shutting-down); relaunching
+2026-11-02T17:49:19Z packed the downloaded results into resume.tgz
+2026-11-02T17:49:30Z ranked regions: placement-score cheapest-USD/hour region
+2026-11-02T17:49:30Z 9 0.440100 us-east-1
+2026-11-02T17:49:30Z 1 0.229000 us-east-2
+2026-11-02T17:49:54Z requesting instant fleet region=us-east-1 placement-score=9 types=c7a.8xlarge c6a.8xlarge c5a.8xlarge subnets=6
+2026-11-02T17:50:00Z no instance from the fleet in region=us-east-1; errors:  2 InsufficientInstanceCapacity 3 InvalidFleetConfiguration 13 UnfulfillableCapacity 
+2026-11-02T17:50:27Z requesting instant fleet region=us-east-2 placement-score=1 types=c7a.8xlarge c6a.8xlarge c5a.8xlarge subnets=3
+2026-11-02T17:50:39Z using region=us-east-2 instance=i-073502cf8b9a2932e az=us-east-2c type=c6a.8xlarge spot-price-usd-per-hour=0.311200 placement-score=1
+2026-11-02T17:50:42Z instance=i-073502cf8b9a2932e status=running ip=3.134.114.0
+2026-11-02T17:50:52Z ssh ingress refreshed ip=106.178.125.134
+2026-11-02T17:52:14Z uploaded source, job and flat extra files
+2026-11-02T17:52:17Z launched instance=i-073502cf8b9a2932e
+2026-11-02T17:52:20Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-2c price=0.311200	2026-11-02T13:00:00+00:00
+2026-11-02T17:52:22Z downloaded results
+2026-11-02T17:54:30Z instance=i-073502cf8b9a2932e status=shutting-down ip=3.134.114.0
+2026-11-02T17:54:30Z spot reclaim log: kind=quick region=us-east-2 ran_s=228
+2026-11-02T17:54:30Z instance=i-073502cf8b9a2932e interrupted (state=shutting-down); relaunching
+2026-11-02T17:54:34Z packed the downloaded results into resume.tgz
+2026-11-02T17:54:44Z ranked regions: placement-score cheapest-USD/hour region
+2026-11-02T17:54:44Z 5 0.440100 us-east-1
+2026-11-02T17:54:44Z 1 0.229000 us-east-2
+2026-11-02T17:55:08Z requesting instant fleet region=us-east-1 placement-score=5 types=c7a.8xlarge c6a.8xlarge c5a.8xlarge subnets=6
+2026-11-02T17:55:21Z using region=us-east-1 instance=i-074bf43f17ea62f50 az=us-east-1f type=c6a.8xlarge spot-price-usd-per-hour=0.496700 placement-score=5
+2026-11-02T17:55:24Z instance=i-074bf43f17ea62f50 status=running ip=3.237.34.60
+2026-11-02T17:55:34Z ssh ingress refreshed ip=106.178.125.134
+2026-11-02T17:57:03Z uploaded source, job and flat extra files
+2026-11-02T17:57:06Z launched instance=i-074bf43f17ea62f50
+2026-11-02T17:57:09Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-1f price=0.496700	2026-11-02T14:00:00+00:00
+2026-11-02T17:57:12Z downloaded results
+2026-11-02T18:02:21Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-1f price=0.496700	2026-11-02T18:00:00+00:00
+2026-11-02T18:02:24Z downloaded results
+2026-11-02T18:07:27Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-1f price=0.496700	2026-11-02T18:00:00+00:00
+2026-11-02T18:07:30Z downloaded results
+2026-11-02T18:12:32Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-1f price=0.496700	2026-11-02T18:00:00+00:00
+2026-11-02T18:12:34Z downloaded results
+2026-11-02T18:12:52Z instance=i-074bf43f17ea62f50 status=shutting-down ip=3.237.34.60
+2026-11-02T18:12:52Z spot reclaim log: kind=quick region=us-east-1 ran_s=1048
+2026-11-02T18:12:52Z instance=i-074bf43f17ea62f50 interrupted (state=shutting-down); relaunching
+2026-11-02T18:12:55Z packed the downloaded results into resume.tgz
+2026-11-02T18:13:03Z ranked regions: placement-score cheapest-USD/hour region
+2026-11-02T18:13:03Z 3 0.440100 us-east-1
+2026-11-02T18:13:03Z 1 0.229000 us-east-2
+2026-11-02T18:13:23Z requesting instant fleet region=us-east-1 placement-score=3 types=c7a.8xlarge c6a.8xlarge c5a.8xlarge subnets=6
+2026-11-02T18:13:28Z no instance from the fleet in region=us-east-1; errors:  2 InsufficientInstanceCapacity 3 InvalidFleetConfiguration 13 UnfulfillableCapacity 
+2026-11-02T18:13:47Z requesting instant fleet region=us-east-2 placement-score=1 types=c7a.8xlarge c6a.8xlarge c5a.8xlarge subnets=3
+2026-11-02T18:13:56Z using region=us-east-2 instance=i-041d23d01924ca82a az=us-east-2c type=c7a.8xlarge spot-price-usd-per-hour=0.369700 placement-score=1
+2026-11-02T18:13:58Z instance=i-041d23d01924ca82a status=running ip=3.143.253.109
+2026-11-02T18:14:08Z ssh ingress refreshed ip=106.178.125.134
+2026-11-02T18:15:23Z uploaded source, job and flat extra files
+2026-11-02T18:15:26Z launched instance=i-041d23d01924ca82a
+2026-11-02T18:15:28Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.369700	2026-11-02T14:00:00+00:00
+2026-11-02T18:15:31Z downloaded results
+2026-11-02T18:20:30Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.369700	2026-11-02T14:00:00+00:00
+2026-11-02T18:20:33Z downloaded results
+2026-11-02T18:25:43Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.369700	2026-11-02T14:00:00+00:00
+2026-11-02T18:25:46Z downloaded results
+2026-11-02T18:30:57Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.369700	2026-11-02T14:00:00+00:00
+2026-11-02T18:30:59Z downloaded results
+2026-11-02T18:35:59Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2c price=0.369700	2026-11-02T14:00:00+00:00
+2026-11-02T18:36:02Z downloaded results
+2026-11-02T18:38:22Z deadline passed
+2026-11-02T18:38:59Z deleted instance=i-041d23d01924ca82a
+2026-11-02T18:39:01Z deleted launch template=p2-1793637485-61476-18394 region=us-east-2
+2026-11-02T18:39:06Z deleted launch template=p2-1793637485-61476-18394 region=us-east-1

@@ -1,0 +1,6 @@
+FLOP L04-gtsrp 5c 7c Kd wall_s=417.4 it=350 cap=0
+FLOP L04-gtsrp 6c Tc Kd wall_s=369.4 it=318 cap=0
+FLOP L04-gtsrp 4c 8d Tc wall_s=468.9 it=350 cap=0
+FLOP L04-gtsrp Tc Qd Ah wall_s=641.1 it=350 cap=0
+FLOP L04-gtsrp 3c Jd Kh wall_s=1015.8 it=448 cap=1
+TASK L04-gtsrp flops=5

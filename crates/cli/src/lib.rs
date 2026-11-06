@@ -177,6 +177,8 @@ pub fn error_exit_code(error: &anyhow::Error) -> i32 {
     }
 }
 pub mod artifact_args;
+#[cfg(feature = "p2")]
+pub mod browse;
 pub mod cache;
 pub mod config_new;
 #[cfg(feature = "p2")]
@@ -436,6 +438,19 @@ enum Command {
         /// Override periodic checkpoint cadence (for example, 15m).
         #[arg(long)]
         checkpoint_interval: Option<String>,
+    },
+    #[cfg(feature = "p2")]
+    /// Browse a saved P2 .mwsol or experimental class-profile JSON interactively.
+    Browse {
+        file: std::path::PathBuf,
+        /// Matching trunk TOML for class-profile JSON only.
+        #[arg(long)]
+        config: Option<std::path::PathBuf>,
+        #[arg(long, value_enum, default_value = "auto")]
+        color: browse::Color,
+        /// root, a history (`r2.5c`), slash-separated action labels/indices, or a 32-digit history key (.mwsol).
+        #[arg(long, default_value = "root")]
+        node: String,
     },
     /// Open the heads-up postflop explorer.
     #[cfg_attr(
@@ -792,6 +807,13 @@ pub fn main_impl() -> Result<()> {
             },
             checkpoint_interval.as_deref(),
         ),
+        #[cfg(feature = "p2")]
+        Command::Browse {
+            file,
+            config,
+            color,
+            node,
+        } => browse::run(&file, config.as_deref(), color, &node),
         Command::Inspect {
             config,
             #[cfg(feature = "p2")]

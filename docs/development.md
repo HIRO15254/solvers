@@ -249,13 +249,13 @@ P2の時間はCLIの`solve`で計る。`.mwsol`の書換えは`mw-preflop`のexa
 利用者決定（2026-10-29）: 時間の受入はAWS c6a.8xlarge（AMD EPYC 7R13、32 vCPU、64 GB）で行う。
 
 - 16・32 threadの対を、同じVMで新旧交互に測る。各variantはVM上で`cargo build --release`する。
-- Spotの容量が無い場合は同じ機種のOn-demandを使い、市場を記録する。
+- Spotの容量が無い場合もSpot以外のinstanceは使わず（5.5節）、5.5節の規則1からregionを選び直す。
 - 型を固定するので、起動は5.5節の規則3に従う。
 - 2026-10-09までの受入はGCP c2d-highcpu-32（AMD EPYC 7B13、同世代）で測った。絶対時間を比べるときは機種を確かめる。
 
 ### 5.5 AWSの計算機
 
-利用者決定（2026-10-28）。AWSのSpotで計算機を起動するときは次に従う。
+利用者決定（2026-10-28）。AWSのSpotで計算機を起動するときは次に従う。利用者決定（2026-10-29）: Spot以外のinstanceは使わない。
 
 1. 起動の直前に`aws ec2 get-spot-placement-scores`で、Spot quotaのあるregionを候補の型の組で比べ、
    scoreが最も高いregionを選ぶ。1つのAZに揃える必要があるときは`--single-availability-zone`でAZも選ぶ。
@@ -272,6 +272,9 @@ Spot quota（`L-34B43A08`）はregionごとに
 `aws service-quotas get-service-quota --service-code ec2 --quota-code L-34B43A08 --region REGION`で確認する。
 key pair・security group・launch template・AMIのIDはregionごとに異なる。
 32 vCPUの候補の例は`c7a` `c6a` `c7i` `c6i` `m7a` `m7i` `m6a`の`.8xlarge`である。
+P2の実験の起動器`experiments/p2-method-2026-10/b4s-8h/aws/aws_run.sh`はこの手順で起動する（2026-10-30から）。
+`create-fleet`には、`run-instances`の権限に加えてIAMの`ec2:CreateFleet`と、起動ごとのlaunch templateを作って消す
+`ec2:CreateLaunchTemplate`・`ec2:DeleteLaunchTemplate`が要り、accountには`AWSServiceRoleForEC2Fleet` roleが要る。
 
 ```sh
 aws ec2 get-spot-placement-scores --region us-east-1 --target-capacity 2 \

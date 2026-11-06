@@ -1,0 +1,54 @@
+FLOP L04-raise 3c Td Jc wall_s=108.1 it=321 cap=0
+FLOP L04-raise 4c 5d Qh wall_s=135.4 it=257 cap=0
+FLOP L04-raise Qc Qd Kh wall_s=81.5 it=235 cap=0
+FLOP L04-raise 5c 8d Kd wall_s=77.8 it=228 cap=0
+FLOP L04-raise 4c 8c Td wall_s=75.6 it=225 cap=0
+FLOP L04-raise 2c 8d Kh wall_s=122.6 it=233 cap=0
+FLOP L04-raise 2c 3d Kd wall_s=78.1 it=238 cap=0
+FLOP L04-raise 6c 9d Kh wall_s=130.7 it=249 cap=0
+TASK L04-raise flops=8
+FLOP L13-raise 3c Td Jc wall_s=5.2 it=101 cap=0
+FLOP L13-raise 4c 5d Qh wall_s=8.9 it=122 cap=0
+FLOP L13-raise Qc Qd Kh wall_s=6.7 it=136 cap=0
+FLOP L13-raise 5c 8d Kd wall_s=5.0 it=101 cap=0
+FLOP L13-raise 4c 8c Td wall_s=5.3 it=105 cap=0
+FLOP L13-raise 2c 8d Kh wall_s=10.4 it=144 cap=0
+FLOP L13-raise 2c 3d Kd wall_s=4.3 it=90 cap=0
+FLOP L13-raise 6c 9d Kh wall_s=10.7 it=148 cap=0
+TASK L13-raise flops=8
+FLOP L23-raise 3c Td Jc wall_s=1.5 it=116 cap=0
+FLOP L23-raise 4c 5d Qh wall_s=1.7 it=93 cap=0
+FLOP L23-raise Qc Qd Kh wall_s=1.4 it=114 cap=0
+FLOP L23-raise 5c 8d Kd wall_s=0.9 it=71 cap=0
+FLOP L23-raise 4c 8c Td wall_s=1.2 it=97 cap=0
+FLOP L23-raise 2c 8d Kh wall_s=1.2 it=70 cap=0
+FLOP L23-raise 2c 3d Kd wall_s=0.7 it=50 cap=0
+FLOP L23-raise 6c 9d Kh wall_s=1.1 it=62 cap=0
+TASK L23-raise flops=8
+FLOP L04-raise 3c Td Jc wall_s=50.0 it=217 cap=0
+FLOP L04-raise 4c 5d Qh wall_s=90.9 it=252 cap=0
+FLOP L04-raise Qc Qd Kh wall_s=68.7 it=296 cap=0
+FLOP L04-raise 5c 8d Kd wall_s=51.4 it=222 cap=0
+FLOP L04-raise 4c 8c Td wall_s=52.7 it=229 cap=0
+FLOP L04-raise 2c 8d Kh wall_s=83.5 it=230 cap=0
+FLOP L04-raise 2c 3d Kd wall_s=55.8 it=242 cap=0
+FLOP L04-raise 6c 9d Kh wall_s=78.6 it=219 cap=0
+TASK L04-raise flops=8
+FLOP L13-raise 3c Td Jc wall_s=3.9 it=111 cap=0
+FLOP L13-raise 4c 5d Qh wall_s=5.2 it=111 cap=0
+FLOP L13-raise Qc Qd Kh wall_s=3.1 it=103 cap=0
+FLOP L13-raise 5c 8d Kd wall_s=4.3 it=133 cap=0
+FLOP L13-raise 4c 8c Td wall_s=3.9 it=113 cap=0
+FLOP L13-raise 2c 8d Kh wall_s=4.9 it=110 cap=0
+FLOP L13-raise 2c 3d Kd wall_s=4.2 it=132 cap=0
+FLOP L13-raise 6c 9d Kh wall_s=5.6 it=134 cap=0
+TASK L13-raise flops=8
+FLOP L23-raise 3c Td Jc wall_s=1.7 it=126 cap=0
+FLOP L23-raise 4c 5d Qh wall_s=2.3 it=121 cap=0
+FLOP L23-raise Qc Qd Kh wall_s=1.2 it=100 cap=0
+FLOP L23-raise 5c 8d Kd wall_s=0.8 it=62 cap=0
+FLOP L23-raise 4c 8c Td wall_s=1.3 it=104 cap=0
+FLOP L23-raise 2c 8d Kh wall_s=2.2 it=129 cap=0
+FLOP L23-raise 2c 3d Kd wall_s=1.9 it=143 cap=0
+FLOP L23-raise 6c 9d Kh wall_s=1.4 it=83 cap=0
+TASK L23-raise flops=8

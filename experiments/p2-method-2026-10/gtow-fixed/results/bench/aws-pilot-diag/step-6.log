@@ -1,0 +1,26 @@
+rel8x2@raise5+g25+hd 20s 
+rel8x2@raise5+g25+hd 16s 
+rel8x2@raise5+g25+hd 17s 
+	Command being timed: "bash -c DIAG_RIVERS=1 DIAG_JOBS=8 bash $X/bench_diag.sh ~/e2.profile.json ~/e2.postflop.bin ~/out/pilot/l1-e2-rivers1 rel8x2@raise5+g25+hd ~/bands-pilot.txt"
+	User time (seconds): 170.11
+	System time (seconds): 4.65
+	Percent of CPU this job got: 333%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:52.36
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 1718104
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 2020598
+	Voluntary context switches: 22930
+	Involuntary context switches: 8387
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 2952
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

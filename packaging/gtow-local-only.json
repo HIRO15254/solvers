@@ -252,6 +252,662 @@
     {
       "path": "experiments/p1-efficiency-2026-10/templates-20261009/results/raw/gw_strategy_rootxx_3c_xx_8d_.csv",
       "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    },
+    {
+      "path": "docs/research/2026-10-13-p2-accuracy-survey.jp.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "docs/research/2026-10-13-p2-accuracy-survey/abstraction.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "docs/research/2026-10-13-p2-accuracy-survey/adjacent.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "docs/research/2026-10-13-p2-accuracy-survey/cfr.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "docs/research/2026-10-13-p2-accuracy-survey/commercial.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "docs/research/2026-10-13-p2-accuracy-survey/concepts.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "docs/research/2026-10-13-p2-accuracy-survey/context.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "docs/research/2026-10-13-p2-accuracy-survey/search.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/README.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/references/gtowizard-simple-100bb-preflop-tree-2026-10-09.json",
+      "reason": "Raw GTOW per-combo ranges, strategies and EVs."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/results/8h/compare-it30000.json",
+      "reason": "Copied GTOW class/node action frequencies and reference hand observations."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/results/8h/trajectory.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/results/fixed32/trajectory.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/results/postflop/compare-1.5h.json",
+      "reason": "Copied GTOW class/node action frequencies and reference hand observations."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/results/postflop/gtow-trajectory.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/results/postflop/raise-trajectory.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/results/postflop/sizes-trajectory.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/geo-menu/README.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/geo-menu/results/compare-1000.json",
+      "reason": "Copied GTOW class/node action frequencies and reference hand observations."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/geo-menu/results/compare-1000.txt",
+      "reason": "Embedded GTOW reference EVs, equities or action-frequency comparison tables."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/geo-menu/results/tgeo33+p10-trajectory.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/geo-menu/results/tgeo50+p10-trajectory.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/README.md",
+      "reason": "Embedded GTOW reference EVs, equities or action-frequency comparison tables."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/notes/",
+      "reason": "Per-section records split from gtow-fixed/README.md on 2026-10-29; they embed GTOW reference EVs and comparison tables."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/archive/",
+      "reason": "Per-section records split from gtow-fixed/README.md on 2026-10-29; they embed GTOW reference EVs and comparison tables."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/axes-full/compare.txt",
+      "reason": "Embedded GTOW reference EVs, equities or action-frequency comparison tables."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/b01/aws-fit/paired-e2-it2000.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/b01/aws-fit/paired-e2-it2000.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/b01/aws-fit/progress.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/b01/aws-fit/traise5+p10+g49+hd+sub49-fit.plateau.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/b01/aws-k49/paired-e2-it2000.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/b01/aws-k49/paired-e2-it2000.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/b01/aws-k49/progress.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/b01/aws-k49/traise5+p10+g49+hd+sub49.plateau.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/bench/class-error-gtow-dev.json",
+      "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/bench/class-error-gtow-held.json",
+      "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/bench/class-error-gtow.json",
+      "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/bench/decision-gtow.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/bench/decision-gtow.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/bench/pilot.json",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/bench/pilot.md",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/bench/reach-gtow.json",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/dashboard/baseline.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/dashboard/baseline.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/dashboard/it4000-vs-it6000.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/dashboard/it4000-vs-it6000.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/dashboard/noise.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/dashboard/noise.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/dashboard/self-paired.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/dashboard/self-paired.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/flop-recall/aws-full/progress.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/flop-recall/aws-full/solve.plateau.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/flop-recall/full-compare.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/flop-recall/full-compare.txt",
+      "reason": "Copied GTOW class/node action frequencies and reference hand observations."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/flop-recall/full-summary.json",
+      "reason": "Copied GTOW class/node action frequencies and reference hand observations."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/game-audit/audit.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/groups-flop-full/compare.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/groups-flop-full/compare.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/groups-full/compare.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/groups-full/compare.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/groups-full/pool/compare.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/hand-full/compare.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/hand-full/compare.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/improve/aws-im-d-r16g49q-sd0/traise5+p10+g49+hdq+rel16x2.plateau.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/improve/aws-im-d-r16g49q-own-sd0/traise5+p10+g49+hdq+rel16x2+own.plateau.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/improve/aws-im-d-r16g49q-sd1/traise5+p10+g49+hdq+rel16x2+sd1.plateau.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/improve/aws-im-d-r8g25q-sd0/traise5+p10+g25+hdq.plateau.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/improve/bench-gtow.json",
+      "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/improve/bias-gtow.json",
+      "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/improve/decision-gtow.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/improve/decision-gtow.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/improve/full.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/improve/full.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/improve/ruler.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/improve/ruler.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/it1000/call-ev.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/it1000/call-ev.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/own-reach/bench-gtow.json",
+      "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/own-reach/decision-gtow.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/own-reach/decision-gtow.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/own-reach/full/compare.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/own-reach/full/progress.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/own-reach/full/traise5+p10+g25+hd+ow.plateau.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/own-reach/l13/class-error.json",
+      "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/p1/btnbb-raise.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/p1/co-base.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/p1/co-lowraise.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/p1/co-lowspr.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/p1/co-raise.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/p1/cobb-raise.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/p1/sb-base.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/p1/sb-lowspr.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/p1/sb-raise.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/p1/sbbb-raise.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/p1/utg3b-base.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/p1/utg3b-raise.toml",
+      "reason": "Solver input containing copied GTOW weighted ranges, not merely a tree design."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/prior/bench-gtow.json",
+      "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/prior/decision-gtow.json",
+      "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/prior/decision-gtow.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/qre-genuine/aws/traise5+p10+g25+hd+qp0.5.plateau.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/qre-genuine/gate-compare.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/qre-genuine/gate.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/qre-reach/baseline-compare.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/qre-reach/baseline-compare.txt",
+      "reason": "Embedded GTOW reference EVs, equities or action-frequency comparison tables."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/qre-reach/checks.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/qre-reach/cloud-summary.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/qre-reach/compare.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/qre-reach/compare.txt",
+      "reason": "Embedded GTOW reference EVs, equities or action-frequency comparison tables."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/qre-reach/traise5+p10+g25+hd+q0.5.plateau.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/qre-reach/watcher-check.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/raise-full/compare-1000.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/raise-full/compare-2000.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/raise-full/compare-2000.txt",
+      "reason": "Copied GTOW class/node action frequencies and reference hand observations."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/raise-full/compare-final.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/raise-full/compare-final.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/raise-long/compare.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/raise-long/compare.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/raise5-full/compare.md",
+      "reason": "Copied GTOW class/node action frequencies and reference hand observations."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/raise5-plateau/compare.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/raise5-plateau/detail-4bet.md",
+      "reason": "Copied GTOW class/node action frequencies and reference hand observations."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/replan/aws-rep1/pair-seed-002000.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/replan/aws-rep1/pair-seed-002000.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/replan/aws-rep1/pair-seed-004000.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/replan/aws-rep1/pair-seed-004000.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/replan/decision.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/replan/gtow-flop-ev.json",
+      "reason": "Raw GTOW per-combo ranges, strategies and EVs."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/replan/gtow-flop-ev.txt",
+      "reason": "Raw GTOW per-combo ranges, strategies and EVs."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/replan/gtow-tree.md",
+      "reason": "Acquired GTOW solution-node observations and derived action menus."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/replan/noise.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/v2/aws-e2/traise5+p10+g25+hd.plateau.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/v2/aws-e2sd1/traise5+p10+g25+hd+sd1.plateau.txt",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/v2/decision.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/weak-draws/bench-gtow.json",
+      "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/weak-draws/decision-gtow.json",
+      "reason": "Weight column retains copied GTOW range weights alongside our strategy."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/results/weak-draws/decision-gtow.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-relative/README.md",
+      "reason": "Copied GTOW class/node action frequencies and reference hand observations."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-relative/results/rfi.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/lowspr-menu/README.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/lowspr-menu/results/compare.json",
+      "reason": "Copied GTOW class/node action frequencies and reference hand observations."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/lowspr-menu/results/compare.txt",
+      "reason": "Embedded GTOW reference EVs, equities or action-frequency comparison tables."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/lowspr-menu/results/p10-trajectory.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/relative-reach/README.md",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/relative-reach/results/gtow/avg+p1-trajectory.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/relative-reach/results/gtow/avg-trajectory.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/relative-reach/results/gtow/compare-0.5h.json",
+      "reason": "Copied GTOW class/node action frequencies and reference hand observations."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/relative-reach/results/gtow/compare-0.5h.txt",
+      "reason": "Embedded GTOW reference EVs, equities or action-frequency comparison tables."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/relative-reach/results/gtow/p1-trajectory.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/relative-reach/results/gtow/p10-trajectory.json",
+      "reason": "GTOW reference EVs/frequencies and differences against our solver."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/b4s-gtow.toml",
+      "reason": "Preflop tree with GTO Wizard Simple's action menus observed at the 135 nodes of the 2026-10-09 tree reference (gtow_tree.py output); main's 2026-10-15 rule for observed GTOW menus."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/b4s-gtow-gt5.toml",
+      "reason": "Preflop tree with GTO Wizard Simple's action menus observed at the 135 nodes of the 2026-10-09 tree reference (gtow_tree.py output); main's 2026-10-15 rule for observed GTOW menus. Its postflop menu approximates GTO Wizard's per-pot-type sizes."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/b4s-gtow-gt5c.toml",
+      "reason": "Preflop tree with GTO Wizard Simple's action menus observed at the 135 nodes of the 2026-10-09 tree reference (gtow_tree.py output); main's 2026-10-15 rule for observed GTOW menus. Its postflop menu approximates GTO Wizard's per-pot-type sizes."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/b4s-gtow-gtow.toml",
+      "reason": "Preflop tree with GTO Wizard Simple's action menus observed at the 135 nodes of the 2026-10-09 tree reference (gtow_tree.py output); main's 2026-10-15 rule for observed GTOW menus."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/b4s-gtow-raise.toml",
+      "reason": "Preflop tree with GTO Wizard Simple's action menus observed at the 135 nodes of the 2026-10-09 tree reference (gtow_tree.py output); main's 2026-10-15 rule for observed GTOW menus."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/b4s-gtow-raise5-50bb.toml",
+      "reason": "Preflop tree with GTO Wizard Simple's action menus observed at the 135 nodes of the 2026-10-09 tree reference (gtow_tree.py output); main's 2026-10-15 rule for observed GTOW menus."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/b4s-gtow-raise5.toml",
+      "reason": "Preflop tree with GTO Wizard Simple's action menus observed at the 135 nodes of the 2026-10-09 tree reference (gtow_tree.py output); main's 2026-10-15 rule for observed GTOW menus."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/b4s-gtow-sizes.toml",
+      "reason": "Preflop tree with GTO Wizard Simple's action menus observed at the 135 nodes of the 2026-10-09 tree reference (gtow_tree.py output); main's 2026-10-15 rule for observed GTOW menus."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/b4s-gtow-sp5.toml",
+      "reason": "Preflop tree with GTO Wizard Simple's action menus observed at the 135 nodes of the 2026-10-09 tree reference (gtow_tree.py output); main's 2026-10-15 rule for observed GTOW menus. Adds GTO Wizard's 4bet-pot bet sizes."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/geo-menu/b4s-gtow-geo33.toml",
+      "reason": "Preflop tree with GTO Wizard Simple's action menus observed at the 135 nodes of the 2026-10-09 tree reference (gtow_tree.py output); main's 2026-10-15 rule for observed GTOW menus."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/geo-menu/b4s-gtow-geo50.toml",
+      "reason": "Preflop tree with GTO Wizard Simple's action menus observed at the 135 nodes of the 2026-10-09 tree reference (gtow_tree.py output); main's 2026-10-15 rule for observed GTOW menus."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/lowspr-menu/b4s-gtow-lowspr.toml",
+      "reason": "Preflop tree with GTO Wizard Simple's action menus observed at the 135 nodes of the 2026-10-09 tree reference (gtow_tree.py output); main's 2026-10-15 rule for observed GTOW menus. Adds GTO Wizard's 3bet- and 4bet-pot flop sizes."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/b4s-gtow-lowraise.toml",
+      "reason": "Preflop tree with GTO Wizard Simple's action menus observed at the 135 nodes of the 2026-10-09 tree reference (gtow_tree.py output); main's 2026-10-15 rule for observed GTOW menus. Adds GTO Wizard's 3bet- and 4bet-pot flop sizes."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/l1-6max/results/buckets/b4s-b128.toml",
+      "reason": "Copy of the local-only examples/bench/6max_100bb_nl50_partial_simple_reference.toml tree (observed GTOW action menus)."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/b4s-8h/postflop_variants.py",
+      "reason": "Embeds GTO Wizard's postflop bet sizes sampled from its UI on 2026-10-09."
+    },
+    {
+      "path": "experiments/p2-method-2026-10/gtow-fixed/gtow_menus.py",
+      "reason": "P1 leaf menus copied from GTO Wizard's postflop sizes (split out of p1_leaf.py)."
     }
   ]
 }

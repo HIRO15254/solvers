@@ -1,0 +1,1 @@
+TRAIN_ARGS='--l1-boards-late 128:1001' bash ~/run_own_cloud.sh bl1k <(awk -F'\t' '$1=="srp" && $2==1' ~/plan-sb.tsv)

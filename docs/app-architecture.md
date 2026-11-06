@@ -226,7 +226,7 @@ statusの`eventsOffset`も最後の改行までの完全record境界を返す。
 ## 6. CLI 表面
 
 `config new` / `validate` / `line` / `tree` が入力、`solve` / `resume` / `relock` が計算、
-`status` / `watch` / `runs ls` が監視、`inspect` / `evaluate` / `export` / `compare` / `report` が閲覧・評価を担う。
+`status` / `watch` / `runs ls` が監視、`inspect` / `browse` / `evaluate` / `export` / `compare` / `report` が閲覧・評価を担う。
 P1 compareは木・保存node・seat別comboリスト・utility単位を常に検証し、
 `--cross-game`はspotとsize込みaction labelのidentity条件だけを外す。木/index共有は保存index checksumと復元support・root range・開始streetの一致時だけ行い、右index frameも検証する。
 `derive`はP2 runとPreflop line・Flop boardからP1の実効Inputを生成する。

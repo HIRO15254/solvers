@@ -7,6 +7,104 @@ use rand_chacha::ChaCha8Rng;
 use std::path::Path;
 
 struct Synthetic;
+
+#[test]
+fn parallel_backward_and_updates_match_serial_arena_bitwise() {
+    use super::eval::reaches;
+    use super::solve::{Discounts, backward_values, regret_matching, update_row, update_rows};
+
+    let game = game(include_str!("../../../../../examples/bench/6max_20bb.toml"));
+    let tree = Tree::build_with(&game, FlopLeaves::Checkdown).unwrap();
+    assert!(tree.nodes.len() > 128);
+    let model = Model::new(&game, &Synthetic, EvaluationOptions::default()).unwrap();
+    let profile = random_profile(&tree, 912);
+    let reach = reaches(&tree, &profile, &model);
+    let initial: Vec<[f64; 169]> = (0..tree.nodes.len())
+        .map(|z| std::array::from_fn(|c| ((z * 17 + c * 11) % 97) as f64 - 48.0))
+        .collect();
+    let discount = Discounts::new(7, SolveOptions::default()).unwrap();
+    for seat in [0, tree.seats - 1] {
+        let mut serial = initial.clone();
+        for z in (0..tree.nodes.len()).rev() {
+            let node = &tree.nodes[z];
+            if node.terminal.is_some() {
+                continue;
+            }
+            for &c in &model.support[seat] {
+                serial[z][c] = if node.actor == Some(seat) {
+                    let row = profile.row(&tree, z, c);
+                    let mut value = 0.0;
+                    for (a, &child) in node.children.iter().enumerate() {
+                        value += row[a] * serial[child][c];
+                    }
+                    value
+                } else {
+                    node.children.iter().map(|&child| serial[child][c]).sum()
+                };
+            }
+        }
+        let mut expected = (profile.clone(), profile.clone(), profile.clone());
+        for (z, node) in tree.nodes.iter().enumerate() {
+            if node.actor != Some(seat) {
+                continue;
+            }
+            for &c in &model.support[seat] {
+                let r = expected.1.row_mut(&tree, z, c);
+                update_row(
+                    r,
+                    expected.2.row_mut(&tree, z, c),
+                    expected.0.row(&tree, z, c),
+                    node.children.iter().map(|&child| serial[child][c]),
+                    serial[z][c],
+                    reach[z].pi(seat, c),
+                    &discount,
+                );
+                regret_matching(r, expected.0.row_mut(&tree, z, c));
+            }
+        }
+        for threads in [1, 4, 16] {
+            let mut values = initial.clone();
+            let mut actual = (profile.clone(), profile.clone(), profile.clone());
+            rayon::ThreadPoolBuilder::new()
+                .num_threads(threads)
+                .build()
+                .unwrap()
+                .install(|| {
+                    backward_values(&tree, &profile, &model.support[seat], seat, &mut values);
+                    update_rows(
+                        &tree,
+                        &model,
+                        seat,
+                        (&mut actual.0, &mut actual.1, &mut actual.2),
+                        &values,
+                        &reach,
+                        &discount,
+                    );
+                });
+            for (a, b) in values.iter().flatten().zip(serial.iter().flatten()) {
+                assert_eq!(
+                    a.to_bits(),
+                    b.to_bits(),
+                    "backward: seat {seat}, threads {threads}"
+                );
+            }
+            for (a, b) in [&actual.0, &actual.1, &actual.2].into_iter().zip([
+                &expected.0,
+                &expected.1,
+                &expected.2,
+            ]) {
+                for (a, b) in a.rows.iter().flatten().zip(b.rows.iter().flatten()) {
+                    assert_eq!(
+                        a.to_bits(),
+                        b.to_bits(),
+                        "update: seat {seat}, threads {threads}"
+                    );
+                }
+            }
+        }
+    }
+}
+
 impl Tables for Synthetic {
     fn t2(&self, c: usize, d: usize) -> Result<[f64; 3]> {
         let k = f64::from(Classes::get().k(c, d));

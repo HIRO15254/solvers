@@ -1,0 +1,3 @@
+target/release/examples/trunk_solve --config examples/bench/hu_20bb_postflop.toml --leaf-model l1 --ehs2-cache ~/ehs2/v2-f32-t32-r32.postcard --l1-relative 16:$HOME/ehs2/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024 --iterations 1 --eval-every 0 > ~/out/tables1024.log 2>&1 && sha256sum ~/ehs2/v2-f1024-t1024-r1024.postcard >> ~/out/tables1024.log
+python3 ~/fine_sched.py ~/tasks-check.txt 5 ~/out/fine-check-log
+python3 ~/fine_sched.py ~/tasks-fine.txt 8 ~/out/fine-log

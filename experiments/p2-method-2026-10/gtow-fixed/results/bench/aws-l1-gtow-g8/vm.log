@@ -1,0 +1,44 @@
+2026-10-16T18:34:46Z skipping region=sa-east-1 until 2026-10-16T20:49:37Z: consecutive quick Spot reclaims (/c/Users/PC_User/.cache/p2-aws/spot-reclaims.log)
+2026-10-16T18:34:47Z skipping region=us-east-2 until 2026-10-16T22:55:44Z: consecutive quick Spot reclaims (/c/Users/PC_User/.cache/p2-aws/spot-reclaims.log)
+2026-10-16T18:34:50Z ranked candidates: score=USD/hour/relative-speed region AZ type USD/hour speed
+2026-10-16T18:34:50Z 0.380400000 us-east-1 us-east-1a c7a.8xlarge 0.570600 1.5
+2026-10-16T18:34:50Z 0.399466667 us-east-1 us-east-1d c7a.8xlarge 0.599200 1.5
+2026-10-16T18:34:50Z 0.400466667 us-east-1 us-east-1b c7a.8xlarge 0.600700 1.5
+2026-10-16T18:34:50Z 0.405800000 us-east-1 us-east-1c c7a.8xlarge 0.608700 1.5
+2026-10-16T18:34:50Z 0.441733333 us-east-1 us-east-1f c7a.8xlarge 0.662600 1.5
+2026-10-16T18:34:50Z 0.524100000 us-east-1 us-east-1b c6a.8xlarge 0.524100 1.0
+2026-10-16T18:34:50Z 0.533000000 us-east-1 us-east-1f c6a.8xlarge 0.533000 1.0
+2026-10-16T18:34:50Z 0.537900000 us-east-1 us-east-1d c6a.8xlarge 0.537900 1.0
+2026-10-16T18:34:50Z 0.632200000 us-east-1 us-east-1a c6a.8xlarge 0.632200 1.0
+2026-10-16T18:34:50Z 0.636200000 us-east-1 us-east-1f c6i.8xlarge 0.636200 1.0
+2026-10-16T18:34:51Z 0.647600000 us-east-1 us-east-1c c6a.8xlarge 0.647600 1.0
+2026-10-16T18:34:51Z 0.696600000 us-east-1 us-east-1f c7i.8xlarge 0.696600 1.0
+2026-10-16T18:34:51Z 0.736800000 us-east-1 us-east-1a c7i.8xlarge 0.736800 1.0
+2026-10-16T18:34:51Z 0.793500000 us-east-1 us-east-1b c7i.8xlarge 0.793500 1.0
+2026-10-16T18:34:51Z 0.800400000 us-east-1 us-east-1d c7i.8xlarge 0.800400 1.0
+2026-10-16T18:34:51Z 0.821900000 us-east-1 us-east-1b c6i.8xlarge 0.821900 1.0
+2026-10-16T18:34:51Z 0.845200000 us-east-1 us-east-1c c7i.8xlarge 0.845200 1.0
+2026-10-16T18:34:51Z 1.024600000 us-east-1 us-east-1a c6i.8xlarge 1.024600 1.0
+2026-10-16T18:34:51Z 1.174500000 us-east-1 us-east-1c c6i.8xlarge 1.174500 1.0
+2026-10-16T18:34:51Z 1.181300000 us-east-1 us-east-1d c6i.8xlarge 1.181300 1.0
+2026-10-16T18:35:07Z requesting region=us-east-1 az=us-east-1a type=c7a.8xlarge ami=ami-0fa5967347d08d2df
+2026-10-16T18:35:12Z request=sir-41azprjk status=capacity-not-available state=open
+2026-10-16T18:35:14Z capacity fallback canceled request=sir-41azprjk
+2026-10-16T18:35:32Z requesting region=us-east-1 az=us-east-1d type=c7a.8xlarge ami=ami-0fa5967347d08d2df
+2026-10-16T18:35:37Z request=sir-nvtfmfyj status=fulfilled state=active
+2026-10-16T18:35:39Z using region=us-east-1 instance=i-0c5a750e074d525d6 request=sir-nvtfmfyj az=us-east-1d type=c7a.8xlarge spot-price-usd-per-hour=0.599200 speed=1.5 score=0.399466667
+2026-10-16T18:35:41Z instance=i-0c5a750e074d525d6 status=running ip=54.166.212.143
+2026-10-16T18:37:27Z uploaded source, job and flat extra files
+2026-10-16T18:37:29Z launched instance=i-0c5a750e074d525d6
+2026-10-16T18:37:31Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1d price=0.599200	2026-10-16T18:00:00+00:00
+2026-10-16T18:37:34Z downloaded results
+2026-10-16T18:42:44Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1d price=0.599200	2026-10-16T18:00:00+00:00
+2026-10-16T18:42:47Z downloaded results
+2026-10-16T18:47:59Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1d price=0.599200	2026-10-16T18:00:00+00:00
+2026-10-16T18:48:11Z downloaded results
+2026-10-16T18:53:04Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1d price=0.599200	2026-10-16T18:00:00+00:00
+2026-10-16T18:53:22Z downloaded results
+2026-10-16T18:53:43Z ALL_DONE final downloaded
+2026-10-16T18:53:51Z canceled request=sir-41azprjk
+2026-10-16T18:53:55Z canceled request=sir-nvtfmfyj
+2026-10-16T18:54:32Z deleted instance=i-0c5a750e074d525d6 request=sir-nvtfmfyj

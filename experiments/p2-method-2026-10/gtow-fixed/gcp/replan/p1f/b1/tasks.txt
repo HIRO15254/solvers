@@ -1,0 +1,13 @@
+L01-gtsrp gtsrp 15m 4 fold/raise-to:2000/fold/fold/fold/call:1000
+L08-gt4bet gt4bet 4m 8 fold/fold/raise-to:2300/raise-to:7500/fold/fold/raise-to:21000/call:13500
+L15-gt4bet gt4bet 4m 8 fold/raise-to:2000/raise-to:6500/fold/fold/fold/raise-to:19000/call:12500
+L03-raise raise 3m 8 raise-to:2000/fold/fold/fold/fold/call:1000
+L07-raise raise 90s 8 fold/fold/fold/raise-to:2500/raise-to:12000/fold/call:9500
+L12-raise raise 90s 8 fold/fold/raise-to:2300/fold/fold/raise-to:13500/call:11200
+L20-raise raise 90s 8 raise-to:2000/fold/fold/fold/raise-to:10000/fold/call:8000
+L27-raise raise 90s 8 raise-to:2000/fold/raise-to:6500/fold/fold/fold/call:4500
+L08-raise raise 45s 8 fold/fold/raise-to:2300/raise-to:7500/fold/fold/raise-to:21000/call:13500
+L14-raise raise 45s 8 fold/fold/fold/raise-to:2500/raise-to:12000/fold/raise-to:26000/call:14000
+L21-raise raise 45s 8 raise-to:2000/raise-to:6500/fold/fold/fold/fold/raise-to:19000/call:12500
+L31-raise raise 45s 8 fold/fold/raise-to:2300/fold/raise-to:11500/fold/raise-to:25000/call:13500
+L36-raise raise 45s 8 fold/raise-to:2000/raise-to:6500/fold/fold/fold/raise-to:19000/raise-to:34000/call:15000

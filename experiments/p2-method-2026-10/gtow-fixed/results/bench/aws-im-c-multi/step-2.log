@@ -1,0 +1,23 @@
+	Command being timed: "bash -c bash ~/override_solve.sh ~/out/ruler ovm-e2-sd0 0 ~/xm-e2.json ~/truth-multi.json"
+	User time (seconds): 34351.96
+	System time (seconds): 200.99
+	Percent of CPU this job got: 2143%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 26:51.95
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 4342652
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 56
+	Minor (reclaiming a frame) page faults: 19060396
+	Voluntary context switches: 4985670
+	Involuntary context switches: 321425
+	Swaps: 0
+	File system inputs: 2858032
+	File system outputs: 6588616
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

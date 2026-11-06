@@ -1,0 +1,106 @@
+tree: nodes=7860670 terminals=5023745 rank_tables=799 storage=34204.7 MiB (f32) / 17123.8 MiB (i16) / 25664.2 MiB (i16-f32avg)
+memory estimate: 34402.1 MiB (f32) / 17321.3 MiB (i16) / 25861.7 MiB (i16-f32avg)
+storage: i16
+iter=      25 expl_p0=2.413e0 expl_p1=1.893e0 nash_conv=4.306e0
+iter=      50 expl_p0=7.551e-1 expl_p1=5.886e-1 nash_conv=1.344e0
+iter=     100 expl_p0=1.819e-1 expl_p1=1.628e-1 nash_conv=3.446e-1
+iter=     150 expl_p0=7.370e-2 expl_p1=6.583e-2 nash_conv=1.395e-1
+iter=     200 expl_p0=4.187e-2 expl_p1=4.032e-2 nash_conv=8.219e-2
+iter=     250 expl_p0=3.043e-2 expl_p1=3.106e-2 nash_conv=6.149e-2
+iter=     300 expl_p0=2.330e-2 expl_p1=2.521e-2 nash_conv=4.850e-2
+iter=     350 expl_p0=1.467e-2 expl_p1=1.389e-2 nash_conv=2.856e-2
+done: iterations=350 wall=417.39s ev_p0=2.089788 ev_p1=2.766136 nash_conv=2.856e-2
+sol: wrote /home/ubuntu/out/sc/p1m/base/L04-gtsrp/tmp/solution.sol (21.47 MB, 18043 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1m/base/L04-gtsrp/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1m/base/L04-gtsrp/tmp/summary.csv
+FLOP L04-gtsrp 5c 7c Kd wall_s=417.4 it=350 cap=0
+tree: nodes=7860670 terminals=5023745 rank_tables=799 storage=33468.8 MiB (f32) / 16755.9 MiB (i16) / 25112.3 MiB (i16-f32avg)
+memory estimate: 33666.1 MiB (f32) / 16953.2 MiB (i16) / 25309.7 MiB (i16-f32avg)
+storage: i16
+iter=      25 expl_p0=2.154e0 expl_p1=1.636e0 nash_conv=3.789e0
+iter=      50 expl_p0=5.811e-1 expl_p1=6.026e-1 nash_conv=1.184e0
+iter=     100 expl_p0=1.371e-1 expl_p1=1.714e-1 nash_conv=3.085e-1
+iter=     150 expl_p0=5.453e-2 expl_p1=6.786e-2 nash_conv=1.224e-1
+iter=     200 expl_p0=3.414e-2 expl_p1=4.113e-2 nash_conv=7.527e-2
+iter=     250 expl_p0=2.563e-2 expl_p1=2.980e-2 nash_conv=5.542e-2
+iter=     300 expl_p0=1.845e-2 expl_p1=1.977e-2 nash_conv=3.822e-2
+iter=     318 expl_p0=1.475e-2 expl_p1=1.577e-2 nash_conv=3.051e-2
+done: iterations=318 wall=369.43s ev_p0=1.777199 ev_p1=3.053624 nash_conv=3.051e-2
+sol: wrote /home/ubuntu/out/sc/p1m/base/L04-gtsrp/tmp/solution.sol (21.01 MB, 18043 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1m/base/L04-gtsrp/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1m/base/L04-gtsrp/tmp/summary.csv
+FLOP L04-gtsrp 6c Tc Kd wall_s=369.4 it=318 cap=0
+tree: nodes=7860670 terminals=5023745 rank_tables=799 storage=34395.4 MiB (f32) / 17219.2 MiB (i16) / 25807.3 MiB (i16-f32avg)
+memory estimate: 34593.0 MiB (f32) / 17416.7 MiB (i16) / 26004.9 MiB (i16-f32avg)
+storage: i16
+iter=      25 expl_p0=2.252e0 expl_p1=1.795e0 nash_conv=4.046e0
+iter=      50 expl_p0=6.711e-1 expl_p1=6.334e-1 nash_conv=1.304e0
+iter=     100 expl_p0=1.560e-1 expl_p1=1.897e-1 nash_conv=3.458e-1
+iter=     150 expl_p0=6.397e-2 expl_p1=7.471e-2 nash_conv=1.387e-1
+iter=     200 expl_p0=3.826e-2 expl_p1=4.263e-2 nash_conv=8.089e-2
+iter=     250 expl_p0=2.748e-2 expl_p1=3.126e-2 nash_conv=5.875e-2
+iter=     300 expl_p0=2.855e-2 expl_p1=2.849e-2 nash_conv=5.704e-2
+iter=     350 expl_p0=1.513e-2 expl_p1=1.476e-2 nash_conv=2.989e-2
+done: iterations=350 wall=468.93s ev_p0=1.931247 ev_p1=2.872857 nash_conv=2.989e-2
+sol: wrote /home/ubuntu/out/sc/p1m/base/L04-gtsrp/tmp/solution.sol (24.89 MB, 18043 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1m/base/L04-gtsrp/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1m/base/L04-gtsrp/tmp/summary.csv
+FLOP L04-gtsrp 4c 8d Tc wall_s=468.9 it=350 cap=0
+tree: nodes=12922896 terminals=8263891 rank_tables=1176 storage=53584.4 MiB (f32) / 26827.5 MiB (i16) / 40206.0 MiB (i16-f32avg)
+memory estimate: 53792.3 MiB (f32) / 27035.5 MiB (i16) / 40413.9 MiB (i16-f32avg)
+storage: i16
+iter=      25 expl_p0=2.488e0 expl_p1=1.712e0 nash_conv=4.200e0
+iter=      50 expl_p0=8.028e-1 expl_p1=6.236e-1 nash_conv=1.426e0
+iter=     100 expl_p0=1.742e-1 expl_p1=1.884e-1 nash_conv=3.626e-1
+iter=     150 expl_p0=6.886e-2 expl_p1=7.486e-2 nash_conv=1.437e-1
+iter=     200 expl_p0=3.879e-2 expl_p1=4.271e-2 nash_conv=8.151e-2
+iter=     250 expl_p0=2.870e-2 expl_p1=3.251e-2 nash_conv=6.121e-2
+iter=     300 expl_p0=2.433e-2 expl_p1=2.210e-2 nash_conv=4.643e-2
+iter=     350 expl_p0=1.521e-2 expl_p1=1.625e-2 nash_conv=3.145e-2
+done: iterations=350 wall=641.08s ev_p0=1.749190 ev_p1=3.137244 nash_conv=3.145e-2
+sol: wrote /home/ubuntu/out/sc/p1m/base/L04-gtsrp/tmp/solution.sol (28.45 MB, 24543 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1m/base/L04-gtsrp/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1m/base/L04-gtsrp/tmp/summary.csv
+FLOP L04-gtsrp Tc Qd Ah wall_s=641.1 it=350 cap=0
+tree: nodes=12922896 terminals=8263891 rank_tables=1176 storage=55869.3 MiB (f32) / 27970.0 MiB (i16) / 41919.7 MiB (i16-f32avg)
+memory estimate: 56077.7 MiB (f32) / 28178.4 MiB (i16) / 42128.1 MiB (i16-f32avg)
+storage: i16
+iter=      25 expl_p0=2.535e0 expl_p1=1.763e0 nash_conv=4.298e0
+iter=      50 expl_p0=6.734e-1 expl_p1=5.481e-1 nash_conv=1.222e0
+iter=     100 expl_p0=1.563e-1 expl_p1=1.676e-1 nash_conv=3.238e-1
+iter=     150 expl_p0=6.243e-2 expl_p1=6.663e-2 nash_conv=1.291e-1
+iter=     200 expl_p0=3.677e-2 expl_p1=3.869e-2 nash_conv=7.546e-2
+iter=     250 expl_p0=2.795e-2 expl_p1=2.859e-2 nash_conv=5.654e-2
+iter=     300 expl_p0=1.062e-1 expl_p1=7.930e-2 nash_conv=1.856e-1
+iter=     325 expl_p0=6.468e-2 expl_p1=5.129e-2 nash_conv=1.160e-1
+iter=     375 expl_p0=3.422e-2 expl_p1=2.815e-2 nash_conv=6.237e-2
+iter=     423 expl_p0=2.814e-2 expl_p1=1.958e-2 nash_conv=4.771e-2
+done: iterations=448 wall=1015.82s ev_p0=1.798212 ev_p1=3.071532 nash_conv=4.453e-2
+sol: wrote /home/ubuntu/out/sc/p1m/base/L04-gtsrp/tmp/solution.sol (41.31 MB, 24543 blocks, mode=NoRivers)
+wrote /home/ubuntu/out/sc/p1m/base/L04-gtsrp/tmp/ev.csv
+wrote /home/ubuntu/out/sc/p1m/base/L04-gtsrp/tmp/summary.csv
+FLOP L04-gtsrp 3c Jd Kh wall_s=1015.8 it=448 cap=1
+TASK L04-gtsrp flops=5
+	Command being timed: "bash -c python3 $X/p1_classes.py ~/base.profile.json ~/tasks-sc-multi-a.txt ~ ~/out/sc/p1m/base --solvers $S --min-weight 0.0001"
+	User time (seconds): 90379.71
+	System time (seconds): 143.79
+	Percent of CPU this job got: 3063%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 49:14.58
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 32538236
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 32684105
+	Voluntary context switches: 644836
+	Involuntary context switches: 92974
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 26842408
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

@@ -1,0 +1,78 @@
+variant	where	band	index	line	extra args (after rel16x2@raise5+g49+hdq; run-own.sh / run_own_cloud.sh)
+own	local	3bet	1	fold/fold/fold/raise-to:2500/fold/raise-to:13000/call:10500	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L06.txt
+own	local	3bet	2	fold/fold/fold/raise-to:2500/raise-to:12000/fold/call:9500	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L07.txt
+own	local	3bet	3	fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L09.txt
+own	local	3bet	4	fold/fold/raise-to:2300/fold/fold/raise-to:13500/call:11200	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L12.txt
+own	local	3bet	5	fold/raise-to:2000/fold/fold/fold/raise-to:12300/call:10300	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L13.txt
+own	local	3bet	6	fold/fold/raise-to:2300/fold/raise-to:11500/fold/call:9200	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L18.txt
+own	local	3bet	7	raise-to:2000/fold/fold/fold/fold/raise-to:12000/call:10000	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L19.txt
+own	local	3bet	8	raise-to:2000/fold/fold/fold/raise-to:10000/fold/call:8000	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L20.txt
+own	local	3bet	9	fold/fold/raise-to:2300/raise-to:7500/fold/fold/call:5200	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L22.txt
+own	local	3bet	10	raise-to:2000/raise-to:6500/fold/fold/fold/fold/call:4500	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L24.txt
+own	local	3bet	11	fold/raise-to:2000/raise-to:6500/fold/fold/fold/call:4500	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L26.txt
+own	local	3bet	12	raise-to:2000/fold/raise-to:6500/fold/fold/fold/call:4500	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L27.txt
+own	local	3bet	13	fold/raise-to:2000/fold/fold/raise-to:11000/fold/call:9000	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L28.txt
+own	local	3bet	14	raise-to:2000/fold/fold/raise-to:7500/fold/fold/call:5500	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L30.txt
+own	local	3bet	15	fold/raise-to:2000/fold/raise-to:7500/fold/fold/call:5500	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L32.txt
+own	local	4bet	1	fold/fold/raise-to:2300/raise-to:7500/fold/fold/raise-to:21000/call:13500	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L08.txt
+own	local	4bet	2	raise-to:2000/fold/raise-to:6500/fold/fold/fold/raise-to:18000/call:11500	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L10.txt
+own	local	4bet	3	fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/call:11000	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L11.txt
+own	local	4bet	4	fold/fold/fold/raise-to:2500/raise-to:12000/fold/raise-to:26000/call:14000	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L14.txt
+own	local	4bet	5	fold/raise-to:2000/raise-to:6500/fold/fold/fold/raise-to:19000/call:12500	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L15.txt
+own	local	4bet	6	raise-to:2000/fold/fold/raise-to:7500/fold/fold/raise-to:20000/call:12500	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L16.txt
+own	local	4bet	7	fold/raise-to:2000/fold/raise-to:7500/fold/fold/raise-to:20000/call:12500	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L17.txt
+own	local	4bet	8	raise-to:2000/raise-to:6500/fold/fold/fold/fold/raise-to:19000/call:12500	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L21.txt
+own	local	4bet	9	raise-to:2000/fold/fold/fold/raise-to:10000/fold/raise-to:19000/call:9000	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L23.txt
+own	local	4bet	10	fold/fold/fold/raise-to:2500/fold/raise-to:13000/raise-to:27000/call:14000	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L25.txt
+own	local	4bet	11	fold/raise-to:2000/fold/fold/raise-to:11000/fold/raise-to:22000/call:11000	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L29.txt
+own	local	4bet	12	fold/fold/raise-to:2300/fold/raise-to:11500/fold/raise-to:25000/call:13500	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L31.txt
+own	local	4bet	13	fold/raise-to:2000/fold/fold/fold/raise-to:12300/raise-to:24900/call:12600	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L33.txt
+own	local	4bet	14	raise-to:2000/fold/fold/fold/fold/raise-to:12000/raise-to:22000/call:10000	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L34.txt
+own	local	4bet	15	fold/fold/raise-to:2300/fold/fold/raise-to:13500/raise-to:28000/call:14500	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L35.txt
+own	local	5bet	1	fold/raise-to:2000/raise-to:6500/fold/fold/fold/raise-to:19000/raise-to:34000/call:15000	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L36.txt
+own	local	srp	1	fold/raise-to:2000/fold/fold/fold/call:1000	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L01.txt
+own	local	srp	2	fold/fold/fold/fold/raise-to:3000/call:2000	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L02.txt
+own	local	srp	3	raise-to:2000/fold/fold/fold/fold/call:1000	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L03.txt
+own	local	srp	4	fold/fold/fold/raise-to:2500/fold/call:1500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L04.txt
+own	local	srp	5	fold/fold/raise-to:2300/fold/fold/call:1300	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L05.txt
+own-ro	local	4bet	1	fold/fold/raise-to:2300/raise-to:7500/fold/fold/raise-to:21000/call:13500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L08.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	4bet	2	raise-to:2000/fold/raise-to:6500/fold/fold/fold/raise-to:18000/call:11500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L10.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	4bet	3	fold/fold/fold/fold/raise-to:3000/raise-to:10000/raise-to:21000/call:11000	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L11.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	4bet	4	fold/fold/fold/raise-to:2500/raise-to:12000/fold/raise-to:26000/call:14000	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L14.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	4bet	5	fold/raise-to:2000/raise-to:6500/fold/fold/fold/raise-to:19000/call:12500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L15.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	4bet	6	raise-to:2000/fold/fold/raise-to:7500/fold/fold/raise-to:20000/call:12500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L16.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	4bet	7	fold/raise-to:2000/fold/raise-to:7500/fold/fold/raise-to:20000/call:12500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L17.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	4bet	8	raise-to:2000/raise-to:6500/fold/fold/fold/fold/raise-to:19000/call:12500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L21.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	4bet	9	raise-to:2000/fold/fold/fold/raise-to:10000/fold/raise-to:19000/call:9000	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L23.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	4bet	10	fold/fold/fold/raise-to:2500/fold/raise-to:13000/raise-to:27000/call:14000	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L25.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	4bet	11	fold/raise-to:2000/fold/fold/raise-to:11000/fold/raise-to:22000/call:11000	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L29.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	4bet	12	fold/fold/raise-to:2300/fold/raise-to:11500/fold/raise-to:25000/call:13500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L31.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	4bet	13	fold/raise-to:2000/fold/fold/fold/raise-to:12300/raise-to:24900/call:12600	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L33.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	4bet	14	raise-to:2000/fold/fold/fold/fold/raise-to:12000/raise-to:22000/call:10000	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L34.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	4bet	15	fold/fold/raise-to:2300/fold/fold/raise-to:13500/raise-to:28000/call:14500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L35.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	5bet	1	fold/raise-to:2000/raise-to:6500/fold/fold/fold/raise-to:19000/raise-to:34000/call:15000	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L36.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	3bet	1	fold/fold/fold/raise-to:2500/fold/raise-to:13000/call:10500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L06.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	3bet	2	fold/fold/fold/raise-to:2500/raise-to:12000/fold/call:9500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L07.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	3bet	3	fold/fold/fold/fold/raise-to:3000/raise-to:10000/call:7000	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L09.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	3bet	4	fold/fold/raise-to:2300/fold/fold/raise-to:13500/call:11200	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L12.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	3bet	5	fold/raise-to:2000/fold/fold/fold/raise-to:12300/call:10300	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L13.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	3bet	6	fold/fold/raise-to:2300/fold/raise-to:11500/fold/call:9200	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L18.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	3bet	7	raise-to:2000/fold/fold/fold/fold/raise-to:12000/call:10000	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L19.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	3bet	8	raise-to:2000/fold/fold/fold/raise-to:10000/fold/call:8000	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L20.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	3bet	9	fold/fold/raise-to:2300/raise-to:7500/fold/fold/call:5200	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L22.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	3bet	10	raise-to:2000/raise-to:6500/fold/fold/fold/fold/call:4500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L24.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	3bet	11	fold/raise-to:2000/raise-to:6500/fold/fold/fold/call:4500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L26.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	3bet	12	raise-to:2000/fold/raise-to:6500/fold/fold/fold/call:4500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L27.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	3bet	13	fold/raise-to:2000/fold/fold/raise-to:11000/fold/call:9000	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L28.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	3bet	14	raise-to:2000/fold/fold/raise-to:7500/fold/fold/call:5500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L30.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	local	3bet	15	fold/raise-to:2000/fold/raise-to:7500/fold/fold/call:5500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L32.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	aws srp-ro-a	srp	1	fold/raise-to:2000/fold/fold/fold/call:1000	--l1-flop-groups none --l1-leaf-flop-groups ../ll-own-L01.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	aws srp-ro-a	srp	2	fold/fold/fold/fold/raise-to:3000/call:2000	--l1-flop-groups none --l1-leaf-flop-groups ../ll-own-L02.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	aws srp-ro-b	srp	3	raise-to:2000/fold/fold/fold/fold/call:1000	--l1-flop-groups none --l1-leaf-flop-groups ../ll-own-L03.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	aws srp-ro-b	srp	4	fold/fold/fold/raise-to:2500/fold/call:1500	--l1-flop-groups none --l1-leaf-flop-groups ../ll-own-L04.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro	aws srp-ro-b	srp	5	fold/fold/raise-to:2300/fold/fold/call:1300	--l1-flop-groups none --l1-leaf-flop-groups ../ll-own-L05.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-cloud	aws srp-ro-a	srp	1	fold/raise-to:2000/fold/fold/fold/call:1000	--l1-flop-groups none --l1-leaf-flop-groups ../ll-own-L01.txt
+own-sd2	local SEED=2	3bet	1	fold/fold/fold/raise-to:2500/fold/raise-to:13000/call:10500	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L06.txt
+own-sd2	local SEED=2	3bet	9	fold/fold/raise-to:2300/raise-to:7500/fold/fold/call:5200	--l1-flop-groups runs/sc-x/leafgroups/r16g49q/L22.txt
+own-ro-sd2	local SEED=2	3bet	1	fold/fold/fold/raise-to:2500/fold/raise-to:13000/call:10500	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L06.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295
+own-ro-sd2	local SEED=2	3bet	9	fold/fold/raise-to:2300/raise-to:7500/fold/fold/call:5200	--l1-flop-groups none --l1-leaf-flop-groups runs/sc-x/lists/own-L22.txt --l1-runout flush,pair,straight,over --l1-runout-max-slots 4294967295

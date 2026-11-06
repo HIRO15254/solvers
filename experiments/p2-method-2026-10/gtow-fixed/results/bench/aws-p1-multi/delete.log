@@ -1,0 +1,35 @@
+
+aws: [ERROR]: Your session has expired. Please reauthenticate using 'aws login'.
+
+aws: [ERROR]: Your session has expired. Please reauthenticate using 'aws login'.
+
+aws: [ERROR]: Your session has expired. Please reauthenticate using 'aws login'.
+
+aws: [ERROR]: Your session has expired. Please reauthenticate using 'aws login'.
+
+aws: [ERROR]: Your session has expired. Please reauthenticate using 'aws login'.
+
+aws: [ERROR]: Your session has expired. Please reauthenticate using 'aws login'.
+{
+    "CancelledSpotInstanceRequests": [
+        {
+            "SpotInstanceRequestId": "sir-b31fn6zh",
+            "State": "cancelled"
+        }
+    ]
+}
+{
+    "TerminatingInstances": [
+        {
+            "InstanceId": "i-0847ea73b7509486d",
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "PreviousState": {
+                "Code": 16,
+                "Name": "running"
+            }
+        }
+    ]
+}

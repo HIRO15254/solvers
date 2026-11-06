@@ -6,6 +6,8 @@ use anyhow::{Result, ensure};
 
 pub struct Subtree {
     pub active: [usize; 2],
+    /// Effective remaining stack divided by the pot before flop betting.
+    pub flop_spr: f64,
     pub nodes: Vec<Node>,
 }
 
@@ -27,6 +29,12 @@ impl Subtree {
     ) -> Result<Self> {
         let mut tree = Self {
             active,
+            flop_spr: active
+                .iter()
+                .map(|&s| root.seats[crate::SeatId(s as u8)].remaining.raw())
+                .min()
+                .unwrap() as f64
+                / root.pot_size().raw() as f64,
             nodes: Vec::new(),
         };
         tree.visit(game, root, None)?;

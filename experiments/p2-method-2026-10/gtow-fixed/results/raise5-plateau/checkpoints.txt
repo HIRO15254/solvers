@@ -1,0 +1,7 @@
+Checkpoint 0: NashConv 74.291511427382; held 74.291511098425
+Checkpoint 1000: NashConv 0.025190473440; held 0.00055424701
+Checkpoint 2000: NashConv 0.019741642938; held -0.0066055120
+Checkpoint 3000: NashConv 0.017744932885; held -0.0084916877
+Checkpoint 4000: NashConv 0.016990123271; held -0.0097080626
+Checkpoint 5000: NashConv 0.016687869522; held -0.0111036961
+Checkpoint 6000: NashConv 0.016246293303; held -0.0115571335

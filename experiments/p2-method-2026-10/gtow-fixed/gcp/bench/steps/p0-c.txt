@@ -1,0 +1,8 @@
+bash ~/run_own_cloud.sh own-pr0 <(awk -F'\t' '$1=="srp" && $2==2' ~/plan-p0.tsv)
+bash ~/run_own_cloud.sh own-pr0 <(awk -F'\t' '$1=="5bet" && $2==1' ~/plan-p0.tsv)
+bash ~/run_own_cloud.sh own-pr0 <(awk -F'\t' '$1=="4bet" && $2==1' ~/plan-p0.tsv)
+bash ~/run_own_cloud.sh own-pr0 <(awk -F'\t' '$1=="4bet" && $2==2' ~/plan-p0.tsv)
+bash ~/run_own_cloud.sh own-pr0 <(awk -F'\t' '$1=="4bet" && $2==3' ~/plan-p0.tsv)
+bash ~/run_own_cloud.sh own-pr0 <(awk -F'\t' '$1=="4bet" && $2==4' ~/plan-p0.tsv)
+bash ~/run_own_cloud.sh own-pr0 <(awk -F'\t' '$1=="4bet" && $2==5' ~/plan-p0.tsv)
+bash ~/run_own_cloud.sh own-pr0 <(awk -F'\t' '$1=="4bet" && $2==6' ~/plan-p0.tsv)

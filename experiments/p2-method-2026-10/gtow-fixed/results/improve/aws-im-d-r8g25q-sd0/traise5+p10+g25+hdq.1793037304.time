@@ -1,0 +1,23 @@
+	Command being timed: "target/release/examples/trunk_solve --config /home/ubuntu/b4s-gtow-raise5.toml --leaf-model l1 --ehs2-cache /home/ubuntu/ehs2/v2-f32-t32-r32.postcard --l1-relative 8x2:/home/ubuntu/ehs2/v2-f128-t128-r128.postcard --l1-relative-prior 10 --l1-flop-groups /home/ubuntu/k25-groups.txt --l1-hand draws,pairs --solver-k4-samples 256 --solver-k4-min-samples 16 --l1-eval-boards 1024 --iterations 2000 --eval-every 1000 --print-every 100 --max-seconds 28800 --stop-file /home/ubuntu/state/traise5+p10+g25+hdq.stop --state /home/ubuntu/state/traise5+p10+g25+hdq.state --state-every 300 --snapshot-dir /home/ubuntu/snap-traise5+p10+g25+hdq --output /home/ubuntu/results/traise5+p10+g25+hdq.json --output-profile /home/ubuntu/final/traise5+p10+g25+hdq.profile.json --output-postflop /home/ubuntu/final/traise5+p10+g25+hdq.postflop.bin"
+	User time (seconds): 60014.08
+	System time (seconds): 376.57
+	Percent of CPU this job got: 2004%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 50:13.11
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 5974556
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 43615932
+	Voluntary context switches: 9439837
+	Involuntary context switches: 994621
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 22995544
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

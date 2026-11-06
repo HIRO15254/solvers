@@ -153,7 +153,7 @@ fn help_surfaces_only_supported_commands_and_options() {
         }
     }
     let help = String::from_utf8(cli(&["--help"]).stdout).unwrap();
-    for command in ["derive", "evaluate"] {
+    for command in ["browse", "derive", "evaluate"] {
         assert!(
             !help
                 .lines()

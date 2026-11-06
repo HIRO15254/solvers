@@ -1,0 +1,8 @@
+L08-gt4bet gt4bet 4m flops32.txt fold/fold/raise-to:2300/raise-to:7500/fold/fold/raise-to:21000/call:13500
+L10-gt4bet gt4bet 4m flops32.txt raise-to:2000/fold/raise-to:6500/fold/fold/fold/raise-to:18000/call:11500
+L15-gt4bet gt4bet 4m flops32.txt fold/raise-to:2000/raise-to:6500/fold/fold/fold/raise-to:19000/call:12500
+L16-gt4bet gt4bet 4m flops32.txt raise-to:2000/fold/fold/raise-to:7500/fold/fold/raise-to:20000/call:12500
+L25-gt4bet gt4bet 4m flops32.txt fold/fold/fold/raise-to:2500/fold/raise-to:13000/raise-to:27000/call:14000
+L29-gt4bet gt4bet 4m flops32.txt fold/raise-to:2000/fold/fold/raise-to:11000/fold/raise-to:22000/call:11000
+L33-gt4bet gt4bet 4m flops32.txt fold/raise-to:2000/fold/fold/fold/raise-to:12300/raise-to:24900/call:12600
+L36-gt4bet gt4bet 4m flops32.txt fold/raise-to:2000/raise-to:6500/fold/fold/fold/raise-to:19000/raise-to:34000/call:15000

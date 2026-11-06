@@ -1,0 +1,2 @@
+python3 $X/p1_classes.py ~/r8g25q.profile.json ~/tasks-raise-ns.txt ~ ~/out/p1/p1-r8g25q/out --solvers $S --min-weight 0.0001
+python3 $X/p1_classes.py ~/r8g25q.profile.json ~/tasks-multi-4b.txt ~ ~/out/p1/p1m-r8g25q/out --solvers $S --min-weight 0.0001

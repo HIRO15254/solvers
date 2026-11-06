@@ -1,0 +1,60 @@
+2026-11-02T15:44:15Z ranked regions: placement-score cheapest-USD/hour region
+2026-11-02T15:44:15Z 9 0.209600 sa-east-1
+2026-11-02T15:44:15Z 9 0.311200 us-east-2
+2026-11-02T15:44:15Z 9 0.493700 us-east-1
+2026-11-02T15:44:44Z created launch template=p2-1793634236-46536-2185 region=sa-east-1 ami=ami-06ae896a166ca24f2
+2026-11-02T15:44:44Z requesting instant fleet region=sa-east-1 placement-score=9 types=c6a.8xlarge c6i.8xlarge c7a.8xlarge c7i.8xlarge subnets=3
+2026-11-02T15:44:55Z using region=sa-east-1 instance=i-0592f7ecaace9da9d az=sa-east-1a type=c6i.8xlarge spot-price-usd-per-hour=0.209600 placement-score=9
+2026-11-02T15:44:57Z instance=i-0592f7ecaace9da9d status=running ip=18.231.45.34
+2026-11-02T15:46:45Z uploaded source, job and flat extra files
+2026-11-02T15:46:49Z launched instance=i-0592f7ecaace9da9d
+2026-11-02T15:46:51Z spot-price-usd-per-hour type=c6i.8xlarge az=sa-east-1a price=0.209600	2026-11-02T09:00:00+00:00
+2026-11-02T15:46:56Z downloaded results
+2026-11-02T15:49:19Z instance=i-0592f7ecaace9da9d status=shutting-down ip=18.231.45.34
+2026-11-02T15:49:19Z spot reclaim log: kind=quick region=sa-east-1 ran_s=262
+2026-11-02T15:49:19Z instance=i-0592f7ecaace9da9d interrupted (state=shutting-down); relaunching
+2026-11-02T15:49:22Z packed the downloaded results into resume.tgz
+2026-11-02T15:49:26Z skipping region=sa-east-1 until 2026-11-02T23:49:24Z: consecutive quick Spot reclaims (/c/Users/PC_User/.cache/p2-aws/spot-reclaims.log)
+2026-11-02T15:49:31Z ranked regions: placement-score cheapest-USD/hour region
+2026-11-02T15:49:31Z 9 0.311200 us-east-2
+2026-11-02T15:49:31Z 9 0.493700 us-east-1
+2026-11-02T15:49:54Z created launch template=p2-1793634236-46536-2185 region=us-east-2 ami=ami-0fc53b217ec1ad816
+2026-11-02T15:49:54Z requesting instant fleet region=us-east-2 placement-score=9 types=c6a.8xlarge c6i.8xlarge c7a.8xlarge c7i.8xlarge subnets=3
+2026-11-02T15:50:04Z using region=us-east-2 instance=i-0bdcbfaa768b36871 az=us-east-2c type=c6a.8xlarge spot-price-usd-per-hour=0.311200 placement-score=9
+2026-11-02T15:50:07Z instance=i-0bdcbfaa768b36871 status=running ip=3.134.100.120
+2026-11-02T15:50:16Z ssh ingress refreshed ip=106.178.125.134
+2026-11-02T15:51:37Z uploaded source, job and flat extra files
+2026-11-02T15:51:40Z launched instance=i-0bdcbfaa768b36871
+2026-11-02T15:51:42Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-2c price=0.311200	2026-11-02T13:00:00+00:00
+2026-11-02T15:51:45Z downloaded results
+2026-11-02T15:56:47Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-2c price=0.311200	2026-11-02T13:00:00+00:00
+2026-11-02T15:56:49Z downloaded results
+2026-11-02T16:01:50Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-2c price=0.311200	2026-11-02T13:00:00+00:00
+2026-11-02T16:01:53Z downloaded results
+2026-11-02T16:04:16Z instance=i-0bdcbfaa768b36871 status=shutting-down ip=3.134.100.120
+2026-11-02T16:04:17Z spot reclaim log: kind=quick region=us-east-2 ran_s=849
+2026-11-02T16:04:17Z instance=i-0bdcbfaa768b36871 interrupted (state=shutting-down); relaunching
+2026-11-02T16:04:20Z packed the downloaded results into resume.tgz
+2026-11-02T16:04:23Z skipping region=sa-east-1 until 2026-11-03T00:02:59Z: consecutive quick Spot reclaims (/c/Users/PC_User/.cache/p2-aws/spot-reclaims.log)
+2026-11-02T16:04:24Z skipping region=us-east-2 until 2026-11-03T00:04:16Z: consecutive quick Spot reclaims (/c/Users/PC_User/.cache/p2-aws/spot-reclaims.log)
+2026-11-02T16:04:27Z ranked regions: placement-score cheapest-USD/hour region
+2026-11-02T16:04:27Z 9 0.493700 us-east-1
+2026-11-02T16:04:53Z created launch template=p2-1793634236-46536-2185 region=us-east-1 ami=ami-0d6dd9e8265d48906
+2026-11-02T16:04:53Z requesting instant fleet region=us-east-1 placement-score=9 types=c6a.8xlarge c6i.8xlarge c7a.8xlarge c7i.8xlarge subnets=6
+2026-11-02T16:05:08Z using region=us-east-1 instance=i-02846788f7ce7d324 az=us-east-1f type=c6a.8xlarge spot-price-usd-per-hour=0.496700 placement-score=9
+2026-11-02T16:05:11Z instance=i-02846788f7ce7d324 status=running ip=100.53.201.28
+2026-11-02T16:05:22Z ssh ingress refreshed ip=106.178.125.134
+2026-11-02T16:06:45Z uploaded source, job and flat extra files
+2026-11-02T16:06:47Z launched instance=i-02846788f7ce7d324
+2026-11-02T16:06:50Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-1f price=0.496700	2026-11-02T14:00:00+00:00
+2026-11-02T16:06:52Z downloaded results
+2026-11-02T16:12:00Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-1f price=0.496700	2026-11-02T14:00:00+00:00
+2026-11-02T16:12:03Z downloaded results
+2026-11-02T16:17:09Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-1f price=0.496700	2026-11-02T14:00:00+00:00
+2026-11-02T16:17:12Z downloaded results
+2026-11-02T16:22:16Z spot-price-usd-per-hour type=c6a.8xlarge az=us-east-1f price=0.496700	2026-11-02T14:00:00+00:00
+2026-11-02T16:22:20Z downloaded results
+2026-11-02T16:24:10Z deleted launch template=p2-1793634236-46536-2185 region=sa-east-1
+2026-11-02T16:24:16Z deleted launch template=p2-1793634236-46536-2185 region=us-east-2
+2026-11-02T16:24:55Z deleted instance=i-02846788f7ce7d324
+2026-11-02T16:24:58Z deleted launch template=p2-1793634236-46536-2185 region=us-east-1

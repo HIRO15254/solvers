@@ -1,0 +1,23 @@
+	Command being timed: "target/release/examples/trunk_solve --config /home/PC_User/b4s-gtow-geo50.toml --leaf-model l1 --ehs2-cache /home/PC_User/ehs2/v2-f32-t32-r32.postcard --l1-relative 8x2:/home/PC_User/ehs2/v2-f128-t128-r128.postcard --l1-relative-prior 10 --solver-k4-samples 256 --solver-k4-min-samples 16 --l1-eval-boards 1024 --iterations 1000000 --eval-every 1000 --print-every 100 --max-seconds 2400 --state /home/PC_User/state/tgeo50+p10.state --state-every 1200 --snapshot-dir /home/PC_User/snap-tgeo50+p10 --output /home/PC_User/results/tgeo50+p10.json --output-profile /home/PC_User/final/tgeo50+p10.profile.json --output-postflop /home/PC_User/final/tgeo50+p10.postflop.bin"
+	User time (seconds): 70867.03
+	System time (seconds): 234.71
+	Percent of CPU this job got: 2888%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 41:01.84
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 2137388
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 853191
+	Voluntary context switches: 7955528
+	Involuntary context switches: 219909
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 311600
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

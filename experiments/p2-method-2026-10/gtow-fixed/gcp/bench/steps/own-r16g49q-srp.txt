@@ -1,0 +1,1 @@
+python3 $X/p1_classes.py ~/r16g49q.profile.json ~/tasks-raise-srp.txt ~ ~/out/p1/p1-r16g49q/out --solvers $S --min-weight 0.0001

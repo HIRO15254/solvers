@@ -1,0 +1,1253 @@
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7410.5 MiB (f32) / 3709.9 MiB (i16) / 5560.2 MiB (i16-f32avg)
+memory estimate: 7930.5 MiB (f32) / 4230.0 MiB (i16) / 6080.2 MiB (i16-f32avg)
+iter=      25 expl_p0=1.239e0 expl_p1=9.252e-1 nash_conv=2.164e0
+iter=      50 expl_p0=3.986e-1 expl_p1=3.814e-1 nash_conv=7.800e-1
+iter=     100 expl_p0=8.533e-2 expl_p1=9.843e-2 nash_conv=1.838e-1
+iter=     150 expl_p0=3.573e-2 expl_p1=3.666e-2 nash_conv=7.239e-2
+iter=     199 expl_p0=1.954e-2 expl_p1=1.840e-2 nash_conv=3.794e-2
+iter=     210 expl_p0=1.739e-2 expl_p1=1.613e-2 nash_conv=3.352e-2
+iter=     213 expl_p0=1.687e-2 expl_p1=1.561e-2 nash_conv=3.248e-2
+done: iterations=213 wall=38.97s ev_p0=1.799237 ev_p1=3.092588 nash_conv=3.248e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (10.60 MB, 3036 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.45s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.42s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 3c Td Jc wall_s=39.0 it=213 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7279.3 MiB (f32) / 3644.4 MiB (i16) / 5461.9 MiB (i16-f32avg)
+memory estimate: 7799.4 MiB (f32) / 4164.4 MiB (i16) / 5981.9 MiB (i16-f32avg)
+iter=      25 expl_p0=1.453e0 expl_p1=9.023e-1 nash_conv=2.356e0
+iter=      50 expl_p0=4.186e-1 expl_p1=3.732e-1 nash_conv=7.918e-1
+iter=     100 expl_p0=8.690e-2 expl_p1=9.740e-2 nash_conv=1.843e-1
+iter=     150 expl_p0=4.320e-2 expl_p1=4.379e-2 nash_conv=8.699e-2
+iter=     200 expl_p0=2.289e-2 expl_p1=2.057e-2 nash_conv=4.345e-2
+iter=     220 expl_p0=1.836e-2 expl_p1=1.614e-2 nash_conv=3.450e-2
+iter=     224 expl_p0=1.762e-2 expl_p1=1.543e-2 nash_conv=3.305e-2
+iter=     227 expl_p0=1.714e-2 expl_p1=1.500e-2 nash_conv=3.214e-2
+done: iterations=227 wall=45.84s ev_p0=2.055359 ev_p1=2.832433 nash_conv=3.214e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (10.57 MB, 3036 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.54s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.51s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 5c Jd Qc wall_s=45.8 it=227 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7166.1 MiB (f32) / 3587.7 MiB (i16) / 5376.9 MiB (i16-f32avg)
+memory estimate: 7686.1 MiB (f32) / 4107.7 MiB (i16) / 5896.9 MiB (i16-f32avg)
+iter=      25 expl_p0=1.203e0 expl_p1=9.742e-1 nash_conv=2.177e0
+iter=      50 expl_p0=4.890e-1 expl_p1=4.384e-1 nash_conv=9.275e-1
+iter=     100 expl_p0=1.221e-1 expl_p1=1.005e-1 nash_conv=2.226e-1
+iter=     150 expl_p0=6.509e-2 expl_p1=4.897e-2 nash_conv=1.141e-1
+iter=     200 expl_p0=3.075e-2 expl_p1=2.303e-2 nash_conv=5.379e-2
+iter=     233 expl_p0=2.091e-2 expl_p1=1.567e-2 nash_conv=3.658e-2
+iter=     241 expl_p0=1.934e-2 expl_p1=1.448e-2 nash_conv=3.383e-2
+iter=     244 expl_p0=1.881e-2 expl_p1=1.413e-2 nash_conv=3.294e-2
+done: iterations=244 wall=54.03s ev_p0=1.940458 ev_p1=2.972367 nash_conv=3.294e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (9.76 MB, 3036 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.56s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.56s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise Jc Qd Kc wall_s=54.0 it=244 cap=0
+tree: nodes=2761036 terminals=1746272 rank_tables=1176 storage=12352.7 MiB (f32) / 6184.0 MiB (i16) / 9268.4 MiB (i16-f32avg)
+memory estimate: 12872.7 MiB (f32) / 6704.1 MiB (i16) / 9788.4 MiB (i16-f32avg)
+iter=      25 expl_p0=1.809e0 expl_p1=1.091e0 nash_conv=2.900e0
+iter=      50 expl_p0=5.543e-1 expl_p1=3.890e-1 nash_conv=9.433e-1
+iter=     100 expl_p0=1.239e-1 expl_p1=1.044e-1 nash_conv=2.283e-1
+iter=     150 expl_p0=5.114e-2 expl_p1=4.307e-2 nash_conv=9.421e-2
+iter=     200 expl_p0=2.820e-2 expl_p1=2.353e-2 nash_conv=5.172e-2
+iter=     239 expl_p0=1.975e-2 expl_p1=1.633e-2 nash_conv=3.609e-2
+iter=     248 expl_p0=1.827e-2 expl_p1=1.516e-2 nash_conv=3.342e-2
+iter=     251 expl_p0=1.789e-2 expl_p1=1.475e-2 nash_conv=3.264e-2
+done: iterations=251 wall=85.42s ev_p0=2.449889 ev_p1=2.384036 nash_conv=3.264e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (15.69 MB, 4128 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 2.32s (2761036 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 2.31s (2761036 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 4c 5d Qh wall_s=85.4 it=251 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7672.8 MiB (f32) / 3841.1 MiB (i16) / 5757.0 MiB (i16-f32avg)
+memory estimate: 8192.8 MiB (f32) / 4361.1 MiB (i16) / 6277.0 MiB (i16-f32avg)
+iter=      25 expl_p0=1.450e0 expl_p1=1.016e0 nash_conv=2.466e0
+iter=      50 expl_p0=4.226e-1 expl_p1=3.707e-1 nash_conv=7.933e-1
+iter=     100 expl_p0=9.698e-2 expl_p1=1.047e-1 nash_conv=2.017e-1
+iter=     150 expl_p0=4.080e-2 expl_p1=4.077e-2 nash_conv=8.157e-2
+iter=     200 expl_p0=2.238e-2 expl_p1=2.071e-2 nash_conv=4.309e-2
+iter=     221 expl_p0=1.820e-2 expl_p1=1.667e-2 nash_conv=3.488e-2
+iter=     226 expl_p0=1.742e-2 expl_p1=1.597e-2 nash_conv=3.339e-2
+iter=     229 expl_p0=1.705e-2 expl_p1=1.564e-2 nash_conv=3.270e-2
+done: iterations=229 wall=44.30s ev_p0=2.124760 ev_p1=2.775092 nash_conv=3.270e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (10.35 MB, 3036 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.44s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.44s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 3c 4d Kc wall_s=44.3 it=229 cap=0
+tree: nodes=1734172 terminals=1096316 rank_tables=810 storage=7943.5 MiB (f32) / 3976.6 MiB (i16) / 5960.0 MiB (i16-f32avg)
+memory estimate: 8463.5 MiB (f32) / 4496.6 MiB (i16) / 6480.0 MiB (i16-f32avg)
+iter=      25 expl_p0=1.812e0 expl_p1=1.253e0 nash_conv=3.065e0
+iter=      50 expl_p0=5.998e-1 expl_p1=5.058e-1 nash_conv=1.106e0
+iter=     100 expl_p0=1.741e-1 expl_p1=1.816e-1 nash_conv=3.558e-1
+iter=     150 expl_p0=7.635e-2 expl_p1=8.762e-2 nash_conv=1.640e-1
+iter=     200 expl_p0=4.358e-2 expl_p1=4.862e-2 nash_conv=9.220e-2
+iter=     250 expl_p0=2.945e-2 expl_p1=3.133e-2 nash_conv=6.078e-2
+iter=     300 expl_p0=2.017e-2 expl_p1=2.088e-2 nash_conv=4.105e-2
+iter=     326 expl_p0=1.702e-2 expl_p1=1.742e-2 nash_conv=3.444e-2
+iter=     332 expl_p0=1.629e-2 expl_p1=1.676e-2 nash_conv=3.305e-2
+iter=     335 expl_p0=1.596e-2 expl_p1=1.648e-2 nash_conv=3.243e-2
+done: iterations=335 wall=63.36s ev_p0=1.902767 ev_p1=2.922457 nash_conv=3.243e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (11.77 MB, 3120 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.46s (1734172 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.46s (1734172 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 2c 6d 6h wall_s=63.4 it=335 cap=0
+tree: nodes=1734172 terminals=1096316 rank_tables=810 storage=7420.0 MiB (f32) / 3714.9 MiB (i16) / 5567.5 MiB (i16-f32avg)
+memory estimate: 7940.1 MiB (f32) / 4234.9 MiB (i16) / 6087.5 MiB (i16-f32avg)
+iter=      25 expl_p0=1.452e0 expl_p1=1.072e0 nash_conv=2.523e0
+iter=      50 expl_p0=4.865e-1 expl_p1=4.183e-1 nash_conv=9.048e-1
+iter=     100 expl_p0=1.261e-1 expl_p1=1.195e-1 nash_conv=2.456e-1
+iter=     150 expl_p0=6.186e-2 expl_p1=5.071e-2 nash_conv=1.126e-1
+iter=     200 expl_p0=4.247e-2 expl_p1=3.453e-2 nash_conv=7.700e-2
+iter=     250 expl_p0=2.409e-2 expl_p1=1.911e-2 nash_conv=4.320e-2
+iter=     272 expl_p0=1.954e-2 expl_p1=1.537e-2 nash_conv=3.491e-2
+iter=     277 expl_p0=1.861e-2 expl_p1=1.466e-2 nash_conv=3.327e-2
+iter=     280 expl_p0=1.804e-2 expl_p1=1.428e-2 nash_conv=3.232e-2
+done: iterations=280 wall=50.49s ev_p0=1.994180 ev_p1=2.949148 nash_conv=3.232e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (10.45 MB, 3120 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.46s (1734172 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.47s (1734172 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise Qc Qd Kh wall_s=50.5 it=280 cap=0
+tree: nodes=2761036 terminals=1746272 rank_tables=1176 storage=12362.5 MiB (f32) / 6189.0 MiB (i16) / 9275.7 MiB (i16-f32avg)
+memory estimate: 12882.5 MiB (f32) / 6709.0 MiB (i16) / 9795.7 MiB (i16-f32avg)
+iter=      25 expl_p0=1.509e0 expl_p1=8.749e-1 nash_conv=2.384e0
+iter=      50 expl_p0=4.879e-1 expl_p1=4.466e-1 nash_conv=9.345e-1
+iter=     100 expl_p0=1.183e-1 expl_p1=1.319e-1 nash_conv=2.502e-1
+iter=     150 expl_p0=5.290e-2 expl_p1=5.524e-2 nash_conv=1.081e-1
+iter=     200 expl_p0=2.829e-2 expl_p1=2.769e-2 nash_conv=5.598e-2
+iter=     242 expl_p0=1.931e-2 expl_p1=1.809e-2 nash_conv=3.740e-2
+iter=     254 expl_p0=1.767e-2 expl_p1=1.623e-2 nash_conv=3.391e-2
+iter=     257 expl_p0=1.725e-2 expl_p1=1.585e-2 nash_conv=3.310e-2
+iter=     260 expl_p0=1.684e-2 expl_p1=1.543e-2 nash_conv=3.227e-2
+done: iterations=260 wall=75.17s ev_p0=1.915411 ev_p1=2.905348 nash_conv=3.227e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (16.07 MB, 4128 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 2.26s (2761036 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 2.28s (2761036 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 4c 6d Th wall_s=75.2 it=260 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7637.1 MiB (f32) / 3823.2 MiB (i16) / 5730.1 MiB (i16-f32avg)
+memory estimate: 8157.1 MiB (f32) / 4343.2 MiB (i16) / 6250.1 MiB (i16-f32avg)
+iter=      25 expl_p0=1.401e0 expl_p1=1.094e0 nash_conv=2.495e0
+iter=      50 expl_p0=4.760e-1 expl_p1=4.155e-1 nash_conv=8.915e-1
+iter=     100 expl_p0=1.024e-1 expl_p1=9.627e-2 nash_conv=1.987e-1
+iter=     150 expl_p0=4.245e-2 expl_p1=3.615e-2 nash_conv=7.860e-2
+iter=     200 expl_p0=2.357e-2 expl_p1=1.859e-2 nash_conv=4.216e-2
+iter=     220 expl_p0=1.944e-2 expl_p1=1.508e-2 nash_conv=3.452e-2
+iter=     224 expl_p0=1.873e-2 expl_p1=1.451e-2 nash_conv=3.324e-2
+iter=     227 expl_p0=1.819e-2 expl_p1=1.407e-2 nash_conv=3.226e-2
+done: iterations=227 wall=42.11s ev_p0=2.387736 ev_p1=2.393355 nash_conv=3.226e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (10.94 MB, 3036 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.43s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.43s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 4c 6d 7d wall_s=42.1 it=227 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7476.1 MiB (f32) / 3742.7 MiB (i16) / 5609.4 MiB (i16-f32avg)
+memory estimate: 7996.1 MiB (f32) / 4262.7 MiB (i16) / 6129.4 MiB (i16-f32avg)
+iter=      25 expl_p0=1.239e0 expl_p1=9.571e-1 nash_conv=2.197e0
+iter=      50 expl_p0=3.846e-1 expl_p1=3.704e-1 nash_conv=7.550e-1
+iter=     100 expl_p0=8.734e-2 expl_p1=1.075e-1 nash_conv=1.948e-1
+iter=     150 expl_p0=3.942e-2 expl_p1=3.884e-2 nash_conv=7.826e-2
+iter=     200 expl_p0=2.128e-2 expl_p1=1.925e-2 nash_conv=4.053e-2
+iter=     216 expl_p0=1.811e-2 expl_p1=1.608e-2 nash_conv=3.419e-2
+iter=     219 expl_p0=1.765e-2 expl_p1=1.571e-2 nash_conv=3.336e-2
+iter=     222 expl_p0=1.719e-2 expl_p1=1.521e-2 nash_conv=3.240e-2
+done: iterations=222 wall=40.91s ev_p0=1.863446 ev_p1=3.050544 nash_conv=3.240e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (10.33 MB, 3036 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.43s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.45s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 5c 8d Kd wall_s=40.9 it=222 cap=0
+tree: nodes=2761036 terminals=1746272 rank_tables=1176 storage=12166.4 MiB (f32) / 6090.9 MiB (i16) / 9128.7 MiB (i16-f32avg)
+memory estimate: 12686.4 MiB (f32) / 6610.9 MiB (i16) / 9648.7 MiB (i16-f32avg)
+iter=      25 expl_p0=1.512e0 expl_p1=9.910e-1 nash_conv=2.503e0
+iter=      50 expl_p0=4.485e-1 expl_p1=3.860e-1 nash_conv=8.345e-1
+iter=     100 expl_p0=1.080e-1 expl_p1=1.083e-1 nash_conv=2.163e-1
+iter=     150 expl_p0=5.027e-2 expl_p1=4.884e-2 nash_conv=9.911e-2
+iter=     200 expl_p0=2.647e-2 expl_p1=2.423e-2 nash_conv=5.070e-2
+iter=     233 expl_p0=1.909e-2 expl_p1=1.708e-2 nash_conv=3.617e-2
+iter=     241 expl_p0=1.775e-2 expl_p1=1.573e-2 nash_conv=3.348e-2
+iter=     244 expl_p0=1.731e-2 expl_p1=1.529e-2 nash_conv=3.260e-2
+done: iterations=244 wall=70.00s ev_p0=1.989287 ev_p1=2.884658 nash_conv=3.260e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (15.62 MB, 4128 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 2.29s (2761036 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 2.30s (2761036 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 7c 8d Qh wall_s=70.0 it=244 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7213.8 MiB (f32) / 3611.6 MiB (i16) / 5412.7 MiB (i16-f32avg)
+memory estimate: 7733.8 MiB (f32) / 4131.6 MiB (i16) / 5932.7 MiB (i16-f32avg)
+iter=      25 expl_p0=1.664e0 expl_p1=8.515e-1 nash_conv=2.515e0
+iter=      50 expl_p0=4.473e-1 expl_p1=4.663e-1 nash_conv=9.136e-1
+iter=     100 expl_p0=9.726e-2 expl_p1=1.182e-1 nash_conv=2.155e-1
+iter=     150 expl_p0=4.247e-2 expl_p1=4.466e-2 nash_conv=8.713e-2
+iter=     200 expl_p0=2.397e-2 expl_p1=2.321e-2 nash_conv=4.718e-2
+iter=     230 expl_p0=1.820e-2 expl_p1=1.681e-2 nash_conv=3.501e-2
+iter=     236 expl_p0=1.740e-2 expl_p1=1.587e-2 nash_conv=3.328e-2
+iter=     239 expl_p0=1.704e-2 expl_p1=1.544e-2 nash_conv=3.247e-2
+done: iterations=239 wall=43.24s ev_p0=2.142142 ev_p1=2.755200 nash_conv=3.247e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (10.02 MB, 3036 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.43s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.45s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 7c Qc Ad wall_s=43.2 it=239 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7499.9 MiB (f32) / 3754.7 MiB (i16) / 5627.3 MiB (i16-f32avg)
+memory estimate: 8019.9 MiB (f32) / 4274.7 MiB (i16) / 6147.3 MiB (i16-f32avg)
+iter=      25 expl_p0=1.307e0 expl_p1=8.405e-1 nash_conv=2.148e0
+iter=      50 expl_p0=3.770e-1 expl_p1=4.306e-1 nash_conv=8.077e-1
+iter=     100 expl_p0=8.329e-2 expl_p1=1.155e-1 nash_conv=1.988e-1
+iter=     150 expl_p0=4.414e-2 expl_p1=5.384e-2 nash_conv=9.797e-2
+iter=     200 expl_p0=2.470e-2 expl_p1=2.506e-2 nash_conv=4.977e-2
+iter=     231 expl_p0=1.778e-2 expl_p1=1.756e-2 nash_conv=3.534e-2
+iter=     237 expl_p0=1.652e-2 expl_p1=1.656e-2 nash_conv=3.308e-2
+iter=     240 expl_p0=1.599e-2 expl_p1=1.600e-2 nash_conv=3.199e-2
+done: iterations=240 wall=44.31s ev_p0=1.736669 ev_p1=3.083025 nash_conv=3.199e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (10.68 MB, 3036 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.45s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.42s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 4c 8c Td wall_s=44.3 it=240 cap=0
+tree: nodes=2761036 terminals=1746272 rank_tables=1176 storage=12078.2 MiB (f32) / 6046.8 MiB (i16) / 9062.5 MiB (i16-f32avg)
+memory estimate: 12598.2 MiB (f32) / 6566.8 MiB (i16) / 9582.5 MiB (i16-f32avg)
+iter=      25 expl_p0=1.214e0 expl_p1=5.602e-1 nash_conv=1.774e0
+iter=      50 expl_p0=3.642e-1 expl_p1=3.509e-1 nash_conv=7.151e-1
+iter=     100 expl_p0=8.068e-2 expl_p1=9.413e-2 nash_conv=1.748e-1
+iter=     150 expl_p0=3.300e-2 expl_p1=3.593e-2 nash_conv=6.893e-2
+iter=     196 expl_p0=2.103e-2 expl_p1=1.905e-2 nash_conv=4.008e-2
+iter=     212 expl_p0=1.829e-2 expl_p1=1.563e-2 nash_conv=3.392e-2
+iter=     215 expl_p0=1.758e-2 expl_p1=1.518e-2 nash_conv=3.277e-2
+done: iterations=215 wall=60.96s ev_p0=1.290863 ev_p1=3.580514 nash_conv=3.277e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (15.21 MB, 4128 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 2.28s (2761036 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 2.31s (2761036 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 8c Td Kh wall_s=61.0 it=215 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7744.4 MiB (f32) / 3876.9 MiB (i16) / 5810.6 MiB (i16-f32avg)
+memory estimate: 8264.4 MiB (f32) / 4396.9 MiB (i16) / 6330.6 MiB (i16-f32avg)
+iter=      25 expl_p0=1.493e0 expl_p1=9.052e-1 nash_conv=2.398e0
+iter=      50 expl_p0=5.077e-1 expl_p1=4.948e-1 nash_conv=1.003e0
+iter=     100 expl_p0=1.069e-1 expl_p1=1.325e-1 nash_conv=2.394e-1
+iter=     150 expl_p0=4.447e-2 expl_p1=5.218e-2 nash_conv=9.665e-2
+iter=     200 expl_p0=2.477e-2 expl_p1=2.632e-2 nash_conv=5.110e-2
+iter=     235 expl_p0=1.796e-2 expl_p1=1.825e-2 nash_conv=3.621e-2
+iter=     244 expl_p0=1.679e-2 expl_p1=1.678e-2 nash_conv=3.357e-2
+iter=     247 expl_p0=1.624e-2 expl_p1=1.642e-2 nash_conv=3.266e-2
+done: iterations=247 wall=47.17s ev_p0=1.803380 ev_p1=3.036054 nash_conv=3.266e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (10.80 MB, 3036 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.45s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.43s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 2c 2d 9c wall_s=47.2 it=247 cap=0
+tree: nodes=2761036 terminals=1746272 rank_tables=1176 storage=12450.7 MiB (f32) / 6233.1 MiB (i16) / 9341.9 MiB (i16-f32avg)
+memory estimate: 12970.7 MiB (f32) / 6753.1 MiB (i16) / 9861.9 MiB (i16-f32avg)
+iter=      25 expl_p0=1.199e0 expl_p1=8.875e-1 nash_conv=2.087e0
+iter=      50 expl_p0=3.995e-1 expl_p1=3.759e-1 nash_conv=7.754e-1
+iter=     100 expl_p0=1.062e-1 expl_p1=1.138e-1 nash_conv=2.201e-1
+iter=     150 expl_p0=4.222e-2 expl_p1=4.100e-2 nash_conv=8.322e-2
+iter=     200 expl_p0=2.300e-2 expl_p1=2.083e-2 nash_conv=4.383e-2
+iter=     222 expl_p0=1.856e-2 expl_p1=1.638e-2 nash_conv=3.495e-2
+iter=     227 expl_p0=1.774e-2 expl_p1=1.563e-2 nash_conv=3.337e-2
+iter=     230 expl_p0=1.717e-2 expl_p1=1.511e-2 nash_conv=3.228e-2
+done: iterations=230 wall=65.83s ev_p0=1.580534 ev_p1=3.320699 nash_conv=3.228e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (15.50 MB, 4128 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 2.30s (2761036 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 2.30s (2761036 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 2c 8d Kh wall_s=65.8 it=230 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7494.0 MiB (f32) / 3751.7 MiB (i16) / 5622.8 MiB (i16-f32avg)
+memory estimate: 8014.0 MiB (f32) / 4271.7 MiB (i16) / 6142.8 MiB (i16-f32avg)
+iter=      25 expl_p0=1.364e0 expl_p1=8.892e-1 nash_conv=2.253e0
+iter=      50 expl_p0=4.048e-1 expl_p1=4.056e-1 nash_conv=8.104e-1
+iter=     100 expl_p0=8.849e-2 expl_p1=1.043e-1 nash_conv=1.928e-1
+iter=     150 expl_p0=3.685e-2 expl_p1=3.878e-2 nash_conv=7.562e-2
+iter=     200 expl_p0=2.017e-2 expl_p1=1.934e-2 nash_conv=3.951e-2
+iter=     214 expl_p0=1.744e-2 expl_p1=1.647e-2 nash_conv=3.391e-2
+iter=     217 expl_p0=1.702e-2 expl_p1=1.596e-2 nash_conv=3.298e-2
+done: iterations=217 wall=40.14s ev_p0=1.794764 ev_p1=3.060824 nash_conv=3.298e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (10.83 MB, 3036 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.42s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.43s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 3c 8c Jd wall_s=40.1 it=217 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7380.7 MiB (f32) / 3695.0 MiB (i16) / 5537.9 MiB (i16-f32avg)
+memory estimate: 7900.7 MiB (f32) / 4215.0 MiB (i16) / 6057.9 MiB (i16-f32avg)
+iter=      25 expl_p0=1.485e0 expl_p1=1.086e0 nash_conv=2.571e0
+iter=      50 expl_p0=4.239e-1 expl_p1=4.174e-1 nash_conv=8.413e-1
+iter=     100 expl_p0=1.158e-1 expl_p1=1.133e-1 nash_conv=2.291e-1
+iter=     150 expl_p0=4.674e-2 expl_p1=4.106e-2 nash_conv=8.780e-2
+iter=     200 expl_p0=2.444e-2 expl_p1=2.100e-2 nash_conv=4.544e-2
+iter=     224 expl_p0=1.920e-2 expl_p1=1.624e-2 nash_conv=3.544e-2
+iter=     230 expl_p0=1.808e-2 expl_p1=1.533e-2 nash_conv=3.341e-2
+iter=     233 expl_p0=1.764e-2 expl_p1=1.488e-2 nash_conv=3.251e-2
+done: iterations=233 wall=42.58s ev_p0=2.253130 ev_p1=2.674701 nash_conv=3.251e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (10.09 MB, 3036 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.45s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.45s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 5c 6d Ac wall_s=42.6 it=233 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7720.5 MiB (f32) / 3864.9 MiB (i16) / 5792.7 MiB (i16-f32avg)
+memory estimate: 8240.5 MiB (f32) / 4385.0 MiB (i16) / 6312.7 MiB (i16-f32avg)
+iter=      25 expl_p0=1.421e0 expl_p1=1.024e0 nash_conv=2.445e0
+iter=      50 expl_p0=4.340e-1 expl_p1=3.931e-1 nash_conv=8.271e-1
+iter=     100 expl_p0=1.241e-1 expl_p1=1.440e-1 nash_conv=2.682e-1
+iter=     150 expl_p0=5.900e-2 expl_p1=6.720e-2 nash_conv=1.262e-1
+iter=     200 expl_p0=2.950e-2 expl_p1=2.968e-2 nash_conv=5.918e-2
+iter=     240 expl_p0=1.933e-2 expl_p1=1.848e-2 nash_conv=3.781e-2
+iter=     251 expl_p0=1.746e-2 expl_p1=1.653e-2 nash_conv=3.399e-2
+iter=     254 expl_p0=1.703e-2 expl_p1=1.608e-2 nash_conv=3.311e-2
+iter=     257 expl_p0=1.658e-2 expl_p1=1.563e-2 nash_conv=3.221e-2
+done: iterations=257 wall=49.43s ev_p0=2.109974 ev_p1=2.795508 nash_conv=3.221e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (10.41 MB, 3036 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.49s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.44s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 2c 3d Kd wall_s=49.4 it=257 cap=0
+tree: nodes=794513 terminals=501795 rank_tables=422 storage=3442.0 MiB (f32) / 1723.2 MiB (i16) / 2582.6 MiB (i16-f32avg)
+memory estimate: 3962.0 MiB (f32) / 2243.2 MiB (i16) / 3102.6 MiB (i16-f32avg)
+iter=      25 expl_p0=1.469e0 expl_p1=1.143e0 nash_conv=2.612e0
+iter=      50 expl_p0=5.453e-1 expl_p1=4.307e-1 nash_conv=9.761e-1
+iter=     100 expl_p0=1.495e-1 expl_p1=1.298e-1 nash_conv=2.793e-1
+iter=     150 expl_p0=7.099e-2 expl_p1=5.790e-2 nash_conv=1.289e-1
+iter=     200 expl_p0=4.106e-2 expl_p1=2.802e-2 nash_conv=6.908e-2
+iter=     250 expl_p0=2.525e-2 expl_p1=1.821e-2 nash_conv=4.346e-2
+iter=     279 expl_p0=1.962e-2 expl_p1=1.445e-2 nash_conv=3.407e-2
+iter=     283 expl_p0=1.906e-2 expl_p1=1.407e-2 nash_conv=3.313e-2
+iter=     286 expl_p0=1.863e-2 expl_p1=1.378e-2 nash_conv=3.242e-2
+done: iterations=286 wall=27.13s ev_p0=2.057364 ev_p1=2.870694 nash_conv=3.242e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (5.77 MB, 1944 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.68s (794513 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.68s (794513 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 8c 9c Ac wall_s=27.1 it=286 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7178.0 MiB (f32) / 3593.7 MiB (i16) / 5385.8 MiB (i16-f32avg)
+memory estimate: 7698.0 MiB (f32) / 4113.7 MiB (i16) / 5905.9 MiB (i16-f32avg)
+iter=      25 expl_p0=1.408e0 expl_p1=9.821e-1 nash_conv=2.390e0
+iter=      50 expl_p0=4.916e-1 expl_p1=5.553e-1 nash_conv=1.047e0
+iter=     100 expl_p0=1.121e-1 expl_p1=1.440e-1 nash_conv=2.561e-1
+iter=     150 expl_p0=4.494e-2 expl_p1=5.205e-2 nash_conv=9.699e-2
+iter=     200 expl_p0=2.427e-2 expl_p1=2.506e-2 nash_conv=4.933e-2
+iter=     230 expl_p0=1.845e-2 expl_p1=1.767e-2 nash_conv=3.611e-2
+iter=     238 expl_p0=1.734e-2 expl_p1=1.621e-2 nash_conv=3.355e-2
+iter=     241 expl_p0=1.691e-2 expl_p1=1.567e-2 nash_conv=3.257e-2
+done: iterations=241 wall=44.57s ev_p0=1.757496 ev_p1=3.141033 nash_conv=3.257e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (10.03 MB, 3036 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.44s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.42s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 9c Td Ac wall_s=44.6 it=241 cap=0
+tree: nodes=2761036 terminals=1746272 rank_tables=1176 storage=12156.6 MiB (f32) / 6086.0 MiB (i16) / 9121.3 MiB (i16-f32avg)
+memory estimate: 12676.6 MiB (f32) / 6606.0 MiB (i16) / 9641.3 MiB (i16-f32avg)
+iter=      25 expl_p0=1.321e0 expl_p1=7.237e-1 nash_conv=2.045e0
+iter=      50 expl_p0=3.986e-1 expl_p1=4.204e-1 nash_conv=8.189e-1
+iter=     100 expl_p0=8.796e-2 expl_p1=1.086e-1 nash_conv=1.966e-1
+iter=     150 expl_p0=3.988e-2 expl_p1=3.580e-2 nash_conv=7.568e-2
+iter=     200 expl_p0=5.032e-2 expl_p1=2.262e-2 nash_conv=7.294e-2
+iter=     250 expl_p0=2.911e-2 expl_p1=1.189e-2 nash_conv=4.100e-2
+iter=     268 expl_p0=2.379e-2 expl_p1=9.991e-3 nash_conv=3.378e-2
+iter=     271 expl_p0=2.313e-2 expl_p1=9.725e-3 nash_conv=3.286e-2
+done: iterations=271 wall=75.42s ev_p0=1.469095 ev_p1=3.372974 nash_conv=3.286e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (15.62 MB, 4128 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 2.28s (2761036 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 2.30s (2761036 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 6c 9d Kh wall_s=75.4 it=271 cap=0
+tree: nodes=1734172 terminals=1096316 rank_tables=810 storage=7666.4 MiB (f32) / 3838.0 MiB (i16) / 5752.2 MiB (i16-f32avg)
+memory estimate: 8186.4 MiB (f32) / 4358.0 MiB (i16) / 6272.2 MiB (i16-f32avg)
+iter=      25 expl_p0=1.271e0 expl_p1=7.839e-1 nash_conv=2.055e0
+iter=      50 expl_p0=3.814e-1 expl_p1=3.353e-1 nash_conv=7.166e-1
+iter=     100 expl_p0=9.729e-2 expl_p1=1.014e-1 nash_conv=1.987e-1
+iter=     150 expl_p0=4.542e-2 expl_p1=4.183e-2 nash_conv=8.725e-2
+iter=     200 expl_p0=2.591e-2 expl_p1=2.236e-2 nash_conv=4.826e-2
+iter=     233 expl_p0=1.966e-2 expl_p1=1.658e-2 nash_conv=3.624e-2
+iter=     243 expl_p0=1.822e-2 expl_p1=1.516e-2 nash_conv=3.338e-2
+iter=     246 expl_p0=1.777e-2 expl_p1=1.487e-2 nash_conv=3.264e-2
+done: iterations=246 wall=44.58s ev_p0=1.305017 ev_p1=3.553627 nash_conv=3.264e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (11.32 MB, 3120 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.46s (1734172 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.47s (1734172 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 8c 8d Th wall_s=44.6 it=246 cap=0
+tree: nodes=1678994 terminals=1061419 rank_tables=799 storage=7309.2 MiB (f32) / 3659.3 MiB (i16) / 5484.2 MiB (i16-f32avg)
+memory estimate: 7829.2 MiB (f32) / 4179.3 MiB (i16) / 6004.2 MiB (i16-f32avg)
+iter=      25 expl_p0=1.185e0 expl_p1=8.474e-1 nash_conv=2.032e0
+iter=      50 expl_p0=3.877e-1 expl_p1=4.280e-1 nash_conv=8.157e-1
+iter=     100 expl_p0=1.325e-1 expl_p1=1.545e-1 nash_conv=2.871e-1
+iter=     150 expl_p0=5.198e-2 expl_p1=5.100e-2 nash_conv=1.030e-1
+iter=     200 expl_p0=2.583e-2 expl_p1=2.475e-2 nash_conv=5.058e-2
+iter=     231 expl_p0=1.884e-2 expl_p1=1.775e-2 nash_conv=3.659e-2
+iter=     240 expl_p0=1.727e-2 expl_p1=1.632e-2 nash_conv=3.359e-2
+iter=     243 expl_p0=1.683e-2 expl_p1=1.592e-2 nash_conv=3.275e-2
+done: iterations=243 wall=43.22s ev_p0=1.631657 ev_p1=3.239638 nash_conv=3.275e-2
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/solution.sol (9.95 MB, 3036 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.45s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.45s (1678994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L04-raise/tmp/summary.csv
+FLOP L04-raise 9c 9d Tc wall_s=43.2 it=243 cap=0
+TASK L04-raise flops=24
+tree: nodes=359994 terminals=225443 rank_tables=799 storage=536.2 MiB (f32) / 269.1 MiB (i16) / 402.7 MiB (i16-f32avg)
+memory estimate: 1056.2 MiB (f32) / 847.5 MiB (i16) / 981.1 MiB (i16-f32avg)
+iter=      25 expl_p0=1.745e0 expl_p1=1.265e0 nash_conv=3.010e0
+iter=      50 expl_p0=4.126e-1 expl_p1=2.921e-1 nash_conv=7.048e-1
+iter=      94 expl_p0=1.123e-1 expl_p1=8.942e-2 nash_conv=2.017e-1
+iter=     106 expl_p0=8.898e-2 expl_p1=7.193e-2 nash_conv=1.609e-1
+iter=     110 expl_p0=8.179e-2 expl_p1=6.755e-2 nash_conv=1.493e-1
+done: iterations=110 wall=2.31s ev_p0=10.304813 ev_p1=12.467960 nash_conv=1.493e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (2.08 MB, 1596 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 3c Td Jc wall_s=2.3 it=110 cap=0
+tree: nodes=359994 terminals=225443 rank_tables=799 storage=520.2 MiB (f32) / 261.1 MiB (i16) / 390.6 MiB (i16-f32avg)
+memory estimate: 1040.2 MiB (f32) / 840.2 MiB (i16) / 969.7 MiB (i16-f32avg)
+iter=      25 expl_p0=1.723e0 expl_p1=1.520e0 nash_conv=3.243e0
+iter=      50 expl_p0=6.468e-1 expl_p1=2.875e-1 nash_conv=9.343e-1
+iter=     100 expl_p0=1.746e-1 expl_p1=1.270e-1 nash_conv=3.016e-1
+iter=     143 expl_p0=9.032e-2 expl_p1=5.442e-2 nash_conv=1.447e-1
+done: iterations=143 wall=2.81s ev_p0=11.963156 ev_p1=10.669304 nash_conv=1.447e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (1.91 MB, 1596 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.28s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 5c Jd Qc wall_s=2.8 it=143 cap=0
+tree: nodes=359994 terminals=225443 rank_tables=799 storage=485.7 MiB (f32) / 243.9 MiB (i16) / 364.8 MiB (i16-f32avg)
+memory estimate: 1005.7 MiB (f32) / 824.0 MiB (i16) / 944.9 MiB (i16-f32avg)
+iter=      25 expl_p0=2.636e0 expl_p1=9.384e-1 nash_conv=3.574e0
+iter=      50 expl_p0=8.894e-1 expl_p1=2.552e-1 nash_conv=1.145e0
+iter=     100 expl_p0=2.008e-1 expl_p1=9.838e-2 nash_conv=2.992e-1
+iter=     135 expl_p0=9.467e-2 expl_p1=6.334e-2 nash_conv=1.580e-1
+iter=     138 expl_p0=9.007e-2 expl_p1=5.921e-2 nash_conv=1.493e-1
+done: iterations=138 wall=2.63s ev_p0=11.591398 ev_p1=11.336186 nash_conv=1.493e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (1.76 MB, 1596 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.28s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.28s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise Jc Qd Kc wall_s=2.6 it=138 cap=0
+tree: nodes=591316 terminals=370744 rank_tables=1176 storage=869.3 MiB (f32) / 436.3 MiB (i16) / 652.8 MiB (i16-f32avg)
+memory estimate: 1389.3 MiB (f32) / 1008.9 MiB (i16) / 1225.4 MiB (i16-f32avg)
+iter=      25 expl_p0=1.481e0 expl_p1=1.950e0 nash_conv=3.431e0
+iter=      50 expl_p0=4.184e-1 expl_p1=4.962e-1 nash_conv=9.146e-1
+iter=     100 expl_p0=9.330e-2 expl_p1=9.985e-2 nash_conv=1.932e-1
+iter=     110 expl_p0=6.823e-2 expl_p1=8.179e-2 nash_conv=1.500e-1
+done: iterations=110 wall=3.05s ev_p0=14.967473 ev_p1=7.789293 nash_conv=1.500e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (3.19 MB, 2168 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.45s (591316 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.45s (591316 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 4c 5d Qh wall_s=3.1 it=110 cap=0
+tree: nodes=359994 terminals=225443 rank_tables=799 storage=524.8 MiB (f32) / 263.4 MiB (i16) / 394.1 MiB (i16-f32avg)
+memory estimate: 1044.8 MiB (f32) / 842.0 MiB (i16) / 972.7 MiB (i16-f32avg)
+iter=      25 expl_p0=1.172e0 expl_p1=1.109e0 nash_conv=2.281e0
+iter=      50 expl_p0=3.066e-1 expl_p1=1.930e-1 nash_conv=4.996e-1
+iter=      80 expl_p0=5.870e-1 expl_p1=1.094e-1 nash_conv=6.964e-1
+iter=     105 expl_p0=2.768e-1 expl_p1=6.793e-2 nash_conv=3.447e-1
+iter=     137 expl_p0=1.279e-1 expl_p1=3.340e-2 nash_conv=1.613e-1
+iter=     140 expl_p0=1.221e-1 expl_p1=3.151e-2 nash_conv=1.536e-1
+iter=     143 expl_p0=1.073e-1 expl_p1=3.006e-2 nash_conv=1.374e-1
+done: iterations=143 wall=2.81s ev_p0=17.179884 ev_p1=5.832225 nash_conv=1.374e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (2.14 MB, 1596 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 3c 4d Kc wall_s=2.8 it=143 cap=0
+tree: nodes=371812 terminals=232852 rank_tables=810 storage=563.3 MiB (f32) / 282.7 MiB (i16) / 423.0 MiB (i16-f32avg)
+memory estimate: 1083.3 MiB (f32) / 860.3 MiB (i16) / 1000.6 MiB (i16-f32avg)
+iter=      25 expl_p0=2.108e0 expl_p1=2.043e0 nash_conv=4.151e0
+iter=      50 expl_p0=4.625e-1 expl_p1=6.510e-1 nash_conv=1.113e0
+iter=     100 expl_p0=9.410e-2 expl_p1=1.462e-1 nash_conv=2.403e-1
+iter=     119 expl_p0=7.684e-2 expl_p1=1.115e-1 nash_conv=1.884e-1
+iter=     136 expl_p0=5.751e-2 expl_p1=8.480e-2 nash_conv=1.423e-1
+done: iterations=136 wall=2.78s ev_p0=14.221881 ev_p1=8.520320 nash_conv=1.423e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (2.18 MB, 1640 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.30s (371812 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (371812 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 2c 6d 6h wall_s=2.8 it=136 cap=0
+tree: nodes=371812 terminals=232852 rank_tables=810 storage=487.4 MiB (f32) / 244.8 MiB (i16) / 366.1 MiB (i16-f32avg)
+memory estimate: 1007.4 MiB (f32) / 825.1 MiB (i16) / 946.4 MiB (i16-f32avg)
+iter=      25 expl_p0=1.351e0 expl_p1=1.484e0 nash_conv=2.835e0
+iter=      50 expl_p0=2.740e-1 expl_p1=2.911e-1 nash_conv=5.651e-1
+iter=      81 expl_p0=6.079e-2 expl_p1=9.987e-2 nash_conv=1.607e-1
+iter=      84 expl_p0=5.557e-2 expl_p1=1.003e-1 nash_conv=1.559e-1
+iter=      87 expl_p0=5.240e-2 expl_p1=9.080e-2 nash_conv=1.432e-1
+done: iterations=87 wall=1.64s ev_p0=20.740955 ev_p1=2.767831 nash_conv=1.432e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (1.87 MB, 1640 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (371812 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (371812 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise Qc Qd Kh wall_s=1.6 it=87 cap=0
+tree: nodes=591316 terminals=370744 rank_tables=1176 storage=876.9 MiB (f32) / 440.1 MiB (i16) / 658.5 MiB (i16-f32avg)
+memory estimate: 1396.9 MiB (f32) / 1012.4 MiB (i16) / 1230.7 MiB (i16-f32avg)
+iter=      25 expl_p0=1.741e0 expl_p1=1.672e0 nash_conv=3.412e0
+iter=      50 expl_p0=4.030e-1 expl_p1=4.806e-1 nash_conv=8.836e-1
+iter=     100 expl_p0=9.416e-2 expl_p1=1.351e-1 nash_conv=2.293e-1
+iter=     120 expl_p0=6.997e-2 expl_p1=9.221e-2 nash_conv=1.622e-1
+iter=     124 expl_p0=6.235e-2 expl_p1=8.459e-2 nash_conv=1.469e-1
+done: iterations=124 wall=3.52s ev_p0=9.907125 ev_p1=12.899526 nash_conv=1.469e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (3.12 MB, 2168 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.46s (591316 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.45s (591316 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 4c 6d Th wall_s=3.5 it=124 cap=0
+tree: nodes=359994 terminals=225443 rank_tables=799 storage=540.8 MiB (f32) / 271.4 MiB (i16) / 406.1 MiB (i16-f32avg)
+memory estimate: 1060.8 MiB (f32) / 849.6 MiB (i16) / 984.3 MiB (i16-f32avg)
+iter=      25 expl_p0=1.492e0 expl_p1=1.818e0 nash_conv=3.309e0
+iter=      50 expl_p0=3.409e-1 expl_p1=4.667e-1 nash_conv=8.076e-1
+iter=     100 expl_p0=6.712e-2 expl_p1=9.807e-2 nash_conv=1.652e-1
+iter=     104 expl_p0=6.119e-2 expl_p1=9.014e-2 nash_conv=1.513e-1
+iter=     107 expl_p0=5.760e-2 expl_p1=8.478e-2 nash_conv=1.424e-1
+done: iterations=107 wall=2.22s ev_p0=9.331713 ev_p1=13.601178 nash_conv=1.424e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (2.05 MB, 1596 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 4c 6d 7d wall_s=2.2 it=107 cap=0
+tree: nodes=359994 terminals=225443 rank_tables=799 storage=509.8 MiB (f32) / 255.9 MiB (i16) / 382.9 MiB (i16-f32avg)
+memory estimate: 1029.8 MiB (f32) / 835.1 MiB (i16) / 962.1 MiB (i16-f32avg)
+iter=      25 expl_p0=2.427e0 expl_p1=1.435e0 nash_conv=3.862e0
+iter=      50 expl_p0=6.980e-1 expl_p1=4.002e-1 nash_conv=1.098e0
+iter=     100 expl_p0=1.714e-1 expl_p1=9.045e-2 nash_conv=2.618e-1
+iter=     125 expl_p0=1.071e-1 expl_p1=6.247e-2 nash_conv=1.695e-1
+iter=     132 expl_p0=1.038e-1 expl_p1=5.518e-2 nash_conv=1.590e-1
+iter=     137 expl_p0=8.862e-2 expl_p1=5.200e-2 nash_conv=1.406e-1
+done: iterations=137 wall=2.68s ev_p0=12.397600 ev_p1=10.303626 nash_conv=1.406e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (1.91 MB, 1596 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 5c 8d Kd wall_s=2.7 it=137 cap=0
+tree: nodes=591316 terminals=370744 rank_tables=1176 storage=842.9 MiB (f32) / 423.1 MiB (i16) / 633.0 MiB (i16-f32avg)
+memory estimate: 1362.9 MiB (f32) / 996.5 MiB (i16) / 1206.4 MiB (i16-f32avg)
+iter=      25 expl_p0=1.263e0 expl_p1=2.215e0 nash_conv=3.478e0
+iter=      50 expl_p0=4.429e-1 expl_p1=4.322e-1 nash_conv=8.751e-1
+iter=     100 expl_p0=9.009e-2 expl_p1=7.743e-2 nash_conv=1.675e-1
+iter=     104 expl_p0=9.210e-2 expl_p1=7.016e-2 nash_conv=1.623e-1
+iter=     113 expl_p0=6.502e-2 expl_p1=5.786e-2 nash_conv=1.229e-1
+done: iterations=113 wall=3.06s ev_p0=14.767039 ev_p1=7.898604 nash_conv=1.229e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (3.08 MB, 2168 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.46s (591316 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.45s (591316 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 7c 8d Qh wall_s=3.1 it=113 cap=0
+tree: nodes=359994 terminals=225443 rank_tables=799 storage=476.5 MiB (f32) / 239.3 MiB (i16) / 357.9 MiB (i16-f32avg)
+memory estimate: 996.5 MiB (f32) / 819.9 MiB (i16) / 938.6 MiB (i16-f32avg)
+iter=      25 expl_p0=3.130e0 expl_p1=1.850e0 nash_conv=4.980e0
+iter=      50 expl_p0=6.254e-1 expl_p1=5.165e-1 nash_conv=1.142e0
+iter=     100 expl_p0=1.230e-1 expl_p1=1.023e-1 nash_conv=2.253e-1
+iter=     116 expl_p0=9.368e-2 expl_p1=7.350e-2 nash_conv=1.672e-1
+iter=     121 expl_p0=8.412e-2 expl_p1=6.908e-2 nash_conv=1.532e-1
+iter=     124 expl_p0=8.059e-2 expl_p1=6.519e-2 nash_conv=1.458e-1
+done: iterations=124 wall=2.33s ev_p0=12.781541 ev_p1=10.119092 nash_conv=1.458e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (1.82 MB, 1596 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.28s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 7c Qc Ad wall_s=2.3 it=124 cap=0
+tree: nodes=359994 terminals=225443 rank_tables=799 storage=533.9 MiB (f32) / 268.0 MiB (i16) / 401.0 MiB (i16-f32avg)
+memory estimate: 1053.9 MiB (f32) / 846.5 MiB (i16) / 979.4 MiB (i16-f32avg)
+iter=      25 expl_p0=1.762e0 expl_p1=1.585e0 nash_conv=3.347e0
+iter=      50 expl_p0=3.701e-1 expl_p1=4.488e-1 nash_conv=8.189e-1
+iter=     100 expl_p0=8.102e-2 expl_p1=1.027e-1 nash_conv=1.837e-1
+iter=     108 expl_p0=6.953e-2 expl_p1=8.906e-2 nash_conv=1.586e-1
+iter=     111 expl_p0=6.539e-2 expl_p1=8.397e-2 nash_conv=1.494e-1
+done: iterations=111 wall=2.26s ev_p0=8.436716 ev_p1=14.457436 nash_conv=1.494e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (2.05 MB, 1596 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 4c 8c Td wall_s=2.3 it=111 cap=0
+tree: nodes=591316 terminals=370744 rank_tables=1176 storage=818.4 MiB (f32) / 410.9 MiB (i16) / 614.7 MiB (i16-f32avg)
+memory estimate: 1338.4 MiB (f32) / 985.0 MiB (i16) / 1188.7 MiB (i16-f32avg)
+iter=      25 expl_p0=2.256e0 expl_p1=1.184e0 nash_conv=3.441e0
+iter=      50 expl_p0=1.298e0 expl_p1=3.484e-1 nash_conv=1.647e0
+iter=     100 expl_p0=4.572e-1 expl_p1=1.015e-1 nash_conv=5.587e-1
+iter=     150 expl_p0=1.470e-1 expl_p1=4.585e-2 nash_conv=1.928e-1
+iter=     162 expl_p0=1.534e-1 expl_p1=3.888e-2 nash_conv=1.923e-1
+iter=     187 expl_p0=9.705e-2 expl_p1=2.877e-2 nash_conv=1.258e-1
+done: iterations=187 wall=4.95s ev_p0=13.277504 ev_p1=9.392280 nash_conv=1.258e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (2.80 MB, 2168 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.45s (591316 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.45s (591316 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 8c Td Kh wall_s=4.9 it=187 cap=0
+tree: nodes=359994 terminals=225443 rank_tables=799 storage=554.6 MiB (f32) / 278.3 MiB (i16) / 416.5 MiB (i16-f32avg)
+memory estimate: 1074.6 MiB (f32) / 855.9 MiB (i16) / 994.1 MiB (i16-f32avg)
+iter=      25 expl_p0=1.695e0 expl_p1=1.565e0 nash_conv=3.260e0
+iter=      50 expl_p0=3.851e-1 expl_p1=4.489e-1 nash_conv=8.339e-1
+iter=     100 expl_p0=8.113e-2 expl_p1=1.107e-1 nash_conv=1.918e-1
+iter=     110 expl_p0=6.834e-2 expl_p1=8.925e-2 nash_conv=1.576e-1
+iter=     113 expl_p0=6.635e-2 expl_p1=8.402e-2 nash_conv=1.504e-1
+done: iterations=113 wall=2.37s ev_p0=13.194311 ev_p1=9.493933 nash_conv=1.504e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (2.13 MB, 1596 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 2c 2d 9c wall_s=2.4 it=113 cap=0
+tree: nodes=591316 terminals=370744 rank_tables=1176 storage=846.7 MiB (f32) / 425.0 MiB (i16) / 635.9 MiB (i16-f32avg)
+memory estimate: 1366.7 MiB (f32) / 998.1 MiB (i16) / 1208.9 MiB (i16-f32avg)
+iter=      25 expl_p0=1.619e0 expl_p1=1.932e0 nash_conv=3.552e0
+iter=      50 expl_p0=5.800e-1 expl_p1=5.306e-1 nash_conv=1.111e0
+iter=     100 expl_p0=6.622e-2 expl_p1=1.144e-1 nash_conv=1.806e-1
+iter=     106 expl_p0=5.706e-2 expl_p1=1.000e-1 nash_conv=1.571e-1
+iter=     109 expl_p0=5.160e-2 expl_p1=9.338e-2 nash_conv=1.450e-1
+done: iterations=109 wall=2.90s ev_p0=17.295056 ev_p1=5.793672 nash_conv=1.450e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (3.03 MB, 2168 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.45s (591316 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.45s (591316 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 2c 8d Kh wall_s=2.9 it=109 cap=0
+tree: nodes=359994 terminals=225443 rank_tables=799 storage=540.8 MiB (f32) / 271.4 MiB (i16) / 406.1 MiB (i16-f32avg)
+memory estimate: 1060.8 MiB (f32) / 849.6 MiB (i16) / 984.3 MiB (i16-f32avg)
+iter=      25 expl_p0=1.806e0 expl_p1=1.589e0 nash_conv=3.395e0
+iter=      50 expl_p0=3.705e-1 expl_p1=4.009e-1 nash_conv=7.714e-1
+iter=      96 expl_p0=8.802e-2 expl_p1=1.081e-1 nash_conv=1.961e-1
+iter=     107 expl_p0=7.113e-2 expl_p1=8.646e-2 nash_conv=1.576e-1
+iter=     110 expl_p0=6.814e-2 expl_p1=8.147e-2 nash_conv=1.496e-1
+done: iterations=110 wall=2.25s ev_p0=9.633235 ev_p1=13.205988 nash_conv=1.496e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (2.07 MB, 1596 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 3c 8c Jd wall_s=2.2 it=110 cap=0
+tree: nodes=359994 terminals=225443 rank_tables=799 storage=499.5 MiB (f32) / 250.8 MiB (i16) / 375.1 MiB (i16-f32avg)
+memory estimate: 1019.5 MiB (f32) / 830.6 MiB (i16) / 955.0 MiB (i16-f32avg)
+iter=      25 expl_p0=1.987e0 expl_p1=2.261e0 nash_conv=4.248e0
+iter=      50 expl_p0=4.312e-1 expl_p1=6.904e-1 nash_conv=1.122e0
+iter=     100 expl_p0=8.166e-2 expl_p1=1.212e-1 nash_conv=2.029e-1
+iter=     111 expl_p0=6.593e-2 expl_p1=9.376e-2 nash_conv=1.597e-1
+iter=     114 expl_p0=6.207e-2 expl_p1=8.709e-2 nash_conv=1.492e-1
+done: iterations=114 wall=2.21s ev_p0=7.987029 ev_p1=15.121591 nash_conv=1.492e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (1.87 MB, 1596 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.28s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.28s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 5c 6d Ac wall_s=2.2 it=114 cap=0
+tree: nodes=359994 terminals=225443 rank_tables=799 storage=528.2 MiB (f32) / 265.1 MiB (i16) / 396.7 MiB (i16-f32avg)
+memory estimate: 1048.2 MiB (f32) / 843.5 MiB (i16) / 975.1 MiB (i16-f32avg)
+iter=      25 expl_p0=1.022e0 expl_p1=1.139e0 nash_conv=2.161e0
+iter=      50 expl_p0=6.151e-1 expl_p1=2.118e-1 nash_conv=8.269e-1
+iter=     100 expl_p0=1.433e-1 expl_p1=5.105e-2 nash_conv=1.943e-1
+iter=     111 expl_p0=1.036e-1 expl_p1=3.954e-2 nash_conv=1.431e-1
+done: iterations=111 wall=2.05s ev_p0=18.299195 ev_p1=4.812332 nash_conv=1.431e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (2.12 MB, 1596 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 2c 3d Kd wall_s=2.0 it=111 cap=0
+tree: nodes=170753 terminals=106675 rank_tables=422 storage=233.2 MiB (f32) / 117.1 MiB (i16) / 175.1 MiB (i16-f32avg)
+memory estimate: 759.7 MiB (f32) / 701.6 MiB (i16) / 759.7 MiB (i16-f32avg)
+iter=      25 expl_p0=1.890e0 expl_p1=1.914e0 nash_conv=3.804e0
+iter=      50 expl_p0=4.246e-1 expl_p1=5.051e-1 nash_conv=9.297e-1
+iter=     100 expl_p0=1.131e-1 expl_p1=1.283e-1 nash_conv=2.414e-1
+iter=     122 expl_p0=7.605e-2 expl_p1=8.932e-2 nash_conv=1.654e-1
+iter=     127 expl_p0=6.879e-2 expl_p1=8.403e-2 nash_conv=1.528e-1
+iter=     130 expl_p0=6.607e-2 expl_p1=7.996e-2 nash_conv=1.460e-1
+done: iterations=130 wall=1.50s ev_p0=10.344969 ev_p1=12.555959 nash_conv=1.460e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (1.11 MB, 1024 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.14s (170753 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.14s (170753 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 8c 9c Ac wall_s=1.5 it=130 cap=0
+tree: nodes=359994 terminals=225443 rank_tables=799 storage=485.7 MiB (f32) / 243.9 MiB (i16) / 364.8 MiB (i16-f32avg)
+memory estimate: 1005.7 MiB (f32) / 824.3 MiB (i16) / 945.2 MiB (i16-f32avg)
+iter=      25 expl_p0=2.587e0 expl_p1=1.295e0 nash_conv=3.883e0
+iter=      50 expl_p0=4.700e-1 expl_p1=4.286e-1 nash_conv=8.986e-1
+iter=     100 expl_p0=8.456e-2 expl_p1=9.632e-2 nash_conv=1.809e-1
+iter=     107 expl_p0=7.351e-2 expl_p1=8.245e-2 nash_conv=1.560e-1
+iter=     110 expl_p0=6.845e-2 expl_p1=7.805e-2 nash_conv=1.465e-1
+done: iterations=110 wall=2.04s ev_p0=7.646860 ev_p1=15.138432 nash_conv=1.465e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (1.91 MB, 1596 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 9c Td Ac wall_s=2.0 it=110 cap=0
+tree: nodes=591316 terminals=370744 rank_tables=1176 storage=826.0 MiB (f32) / 414.7 MiB (i16) / 620.3 MiB (i16-f32avg)
+memory estimate: 1346.0 MiB (f32) / 988.4 MiB (i16) / 1194.1 MiB (i16-f32avg)
+iter=      25 expl_p0=1.157e0 expl_p1=1.488e0 nash_conv=2.644e0
+iter=      50 expl_p0=7.110e-1 expl_p1=3.711e-1 nash_conv=1.082e0
+iter=     100 expl_p0=1.430e-1 expl_p1=9.360e-2 nash_conv=2.366e-1
+iter=     119 expl_p0=9.293e-2 expl_p1=6.081e-2 nash_conv=1.537e-1
+iter=     122 expl_p0=9.415e-2 expl_p1=5.750e-2 nash_conv=1.516e-1
+iter=     125 expl_p0=8.577e-2 expl_p1=5.412e-2 nash_conv=1.399e-1
+done: iterations=125 wall=3.22s ev_p0=18.019091 ev_p1=5.078736 nash_conv=1.399e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (2.99 MB, 2168 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.45s (591316 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.45s (591316 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 6c 9d Kh wall_s=3.2 it=125 cap=0
+tree: nodes=371812 terminals=232852 rank_tables=810 storage=544.3 MiB (f32) / 273.2 MiB (i16) / 408.8 MiB (i16-f32avg)
+memory estimate: 1064.4 MiB (f32) / 851.6 MiB (i16) / 987.2 MiB (i16-f32avg)
+iter=      25 expl_p0=1.429e0 expl_p1=1.943e0 nash_conv=3.372e0
+iter=      50 expl_p0=3.590e-1 expl_p1=4.606e-1 nash_conv=8.196e-1
+iter=     100 expl_p0=8.540e-2 expl_p1=1.351e-1 nash_conv=2.205e-1
+iter=     118 expl_p0=6.226e-2 expl_p1=9.536e-2 nash_conv=1.576e-1
+iter=     121 expl_p0=5.910e-2 expl_p1=9.102e-2 nash_conv=1.501e-1
+done: iterations=121 wall=2.30s ev_p0=12.458875 ev_p1=10.170782 nash_conv=1.501e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (2.12 MB, 1640 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (371812 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (371812 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 8c 8d Th wall_s=2.3 it=121 cap=0
+tree: nodes=359994 terminals=225443 rank_tables=799 storage=525.9 MiB (f32) / 264.0 MiB (i16) / 394.9 MiB (i16-f32avg)
+memory estimate: 1045.9 MiB (f32) / 842.7 MiB (i16) / 973.7 MiB (i16-f32avg)
+iter=      25 expl_p0=1.396e0 expl_p1=1.719e0 nash_conv=3.115e0
+iter=      50 expl_p0=3.469e-1 expl_p1=3.547e-1 nash_conv=7.016e-1
+iter=      92 expl_p0=8.297e-2 expl_p1=1.021e-1 nash_conv=1.851e-1
+iter=     100 expl_p0=7.806e-2 expl_p1=8.736e-2 nash_conv=1.654e-1
+iter=     106 expl_p0=6.692e-2 expl_p1=7.822e-2 nash_conv=1.451e-1
+done: iterations=106 wall=2.17s ev_p0=10.776400 ev_p1=11.930372 nash_conv=1.451e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/solution.sol (1.97 MB, 1596 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.29s (359994 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L13-raise/tmp/summary.csv
+FLOP L13-raise 9c 9d Tc wall_s=2.2 it=106 cap=0
+TASK L13-raise flops=24
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=159.5 MiB (f32) / 80.6 MiB (i16) / 120.0 MiB (i16-f32avg)
+memory estimate: 710.6 MiB (f32) / 671.1 MiB (i16) / 710.6 MiB (i16-f32avg)
+iter=      25 expl_p0=1.362e0 expl_p1=2.567e0 nash_conv=3.929e0
+iter=      50 expl_p0=5.319e-1 expl_p1=1.468e0 nash_conv=2.000e0
+iter=     100 expl_p0=1.491e-1 expl_p1=3.376e-1 nash_conv=4.866e-1
+iter=     135 expl_p0=8.011e-2 expl_p1=1.627e-1 nash_conv=2.428e-1
+iter=     138 expl_p0=6.929e-2 expl_p1=1.530e-1 nash_conv=2.223e-1
+done: iterations=138 wall=1.16s ev_p0=14.820273 ev_p1=21.410004 nash_conv=2.223e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (688.9 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.21s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 3c Td Jc wall_s=1.2 it=138 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=158.5 MiB (f32) / 80.1 MiB (i16) / 119.3 MiB (i16-f32avg)
+memory estimate: 709.6 MiB (f32) / 670.4 MiB (i16) / 709.6 MiB (i16-f32avg)
+iter=      25 expl_p0=1.291e0 expl_p1=2.558e0 nash_conv=3.850e0
+iter=      50 expl_p0=4.286e-1 expl_p1=1.124e0 nash_conv=1.553e0
+iter=     100 expl_p0=1.198e-1 expl_p1=2.457e-1 nash_conv=3.655e-1
+iter=     120 expl_p0=9.108e-2 expl_p1=1.660e-1 nash_conv=2.571e-1
+iter=     125 expl_p0=8.100e-2 expl_p1=1.525e-1 nash_conv=2.335e-1
+done: iterations=125 wall=1.04s ev_p0=9.758092 ev_p1=26.716610 nash_conv=2.335e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (679.0 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.21s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 5c Jd Qc wall_s=1.0 it=125 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=147.3 MiB (f32) / 74.5 MiB (i16) / 110.9 MiB (i16-f32avg)
+memory estimate: 701.6 MiB (f32) / 665.1 MiB (i16) / 701.6 MiB (i16-f32avg)
+iter=      25 expl_p0=1.073e0 expl_p1=2.210e0 nash_conv=3.283e0
+iter=      50 expl_p0=2.515e-1 expl_p1=1.096e0 nash_conv=1.348e0
+iter=     100 expl_p0=6.620e-2 expl_p1=3.719e-1 nash_conv=4.381e-1
+iter=     138 expl_p0=4.387e-2 expl_p1=2.192e-1 nash_conv=2.630e-1
+iter=     147 expl_p0=3.954e-2 expl_p1=1.880e-1 nash_conv=2.275e-1
+done: iterations=147 wall=1.09s ev_p0=6.780636 ev_p1=29.854870 nash_conv=2.275e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (573.6 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.21s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise Jc Qd Kc wall_s=1.1 it=147 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=271.2 MiB (f32) / 136.9 MiB (i16) / 204.0 MiB (i16-f32avg)
+memory estimate: 793.5 MiB (f32) / 726.4 MiB (i16) / 793.5 MiB (i16-f32avg)
+iter=      25 expl_p0=2.409e0 expl_p1=1.340e0 nash_conv=3.748e0
+iter=      50 expl_p0=6.918e-1 expl_p1=3.934e-1 nash_conv=1.085e0
+iter=     100 expl_p0=2.100e-1 expl_p1=1.084e-1 nash_conv=3.184e-1
+iter=     116 expl_p0=1.701e-1 expl_p1=1.178e-1 nash_conv=2.878e-1
+iter=     150 expl_p0=7.879e-2 expl_p1=1.378e-1 nash_conv=2.166e-1
+done: iterations=150 wall=1.85s ev_p0=6.023504 ev_p1=30.591928 nash_conv=2.166e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (1010.0 KB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 4c 5d Qh wall_s=1.8 it=150 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=157.6 MiB (f32) / 79.6 MiB (i16) / 118.6 MiB (i16-f32avg)
+memory estimate: 709.0 MiB (f32) / 670.0 MiB (i16) / 709.0 MiB (i16-f32avg)
+iter=      25 expl_p0=8.647e-1 expl_p1=1.607e0 nash_conv=2.472e0
+iter=      50 expl_p0=7.621e-2 expl_p1=3.785e-1 nash_conv=4.547e-1
+iter=      63 expl_p0=4.320e-2 expl_p1=2.335e-1 nash_conv=2.767e-1
+iter=      68 expl_p0=3.387e-2 expl_p1=2.163e-1 nash_conv=2.501e-1
+iter=      71 expl_p0=3.126e-2 expl_p1=1.937e-1 nash_conv=2.250e-1
+done: iterations=71 wall=0.59s ev_p0=7.739168 ev_p1=28.907814 nash_conv=2.250e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (693.8 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.21s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.21s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 3c 4d Kc wall_s=0.6 it=71 cap=0
+tree: nodes=303022 terminals=191300 rank_tables=810 storage=170.5 MiB (f32) / 86.1 MiB (i16) / 128.3 MiB (i16-f32avg)
+memory estimate: 718.8 MiB (f32) / 676.6 MiB (i16) / 718.8 MiB (i16-f32avg)
+iter=      25 expl_p0=4.249e0 expl_p1=2.163e0 nash_conv=6.412e0
+iter=      50 expl_p0=1.740e0 expl_p1=6.826e-1 nash_conv=2.422e0
+iter=     100 expl_p0=4.285e-1 expl_p1=2.305e-1 nash_conv=6.590e-1
+iter=     150 expl_p0=1.684e-1 expl_p1=1.132e-1 nash_conv=2.816e-1
+iter=     162 expl_p0=1.410e-1 expl_p1=9.718e-2 nash_conv=2.382e-1
+iter=     165 expl_p0=1.327e-1 expl_p1=9.284e-2 nash_conv=2.256e-1
+done: iterations=165 wall=1.42s ev_p0=16.463135 ev_p1=19.468231 nash_conv=2.256e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (702.8 KB, 1268 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (303022 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (303022 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 2c 6d 6h wall_s=1.4 it=165 cap=0
+tree: nodes=303022 terminals=191300 rank_tables=810 storage=152.1 MiB (f32) / 76.9 MiB (i16) / 114.5 MiB (i16-f32avg)
+memory estimate: 705.0 MiB (f32) / 667.4 MiB (i16) / 705.0 MiB (i16-f32avg)
+iter=      25 expl_p0=7.085e-1 expl_p1=1.656e0 nash_conv=2.365e0
+iter=      50 expl_p0=1.531e-1 expl_p1=6.808e-1 nash_conv=8.339e-1
+iter=     100 expl_p0=2.745e-2 expl_p1=2.001e-1 nash_conv=2.276e-1
+done: iterations=100 wall=0.75s ev_p0=3.008506 ev_p1=33.845668 nash_conv=2.276e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (588.7 KB, 1268 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (303022 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (303022 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise Qc Qd Kh wall_s=0.8 it=100 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=268.1 MiB (f32) / 135.4 MiB (i16) / 201.7 MiB (i16-f32avg)
+memory estimate: 791.8 MiB (f32) / 725.5 MiB (i16) / 791.8 MiB (i16-f32avg)
+iter=      25 expl_p0=3.955e0 expl_p1=1.731e0 nash_conv=5.685e0
+iter=      50 expl_p0=1.672e0 expl_p1=5.808e-1 nash_conv=2.253e0
+iter=     100 expl_p0=3.852e-1 expl_p1=1.225e-1 nash_conv=5.077e-1
+iter=     135 expl_p0=1.777e-1 expl_p1=7.089e-2 nash_conv=2.486e-1
+iter=     138 expl_p0=1.713e-1 expl_p1=6.644e-2 nash_conv=2.377e-1
+iter=     141 expl_p0=1.592e-1 expl_p1=6.156e-2 nash_conv=2.208e-1
+done: iterations=141 wall=1.80s ev_p0=9.160734 ev_p1=26.880845 nash_conv=2.208e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (978.0 KB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 4c 6d Th wall_s=1.8 it=141 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=163.2 MiB (f32) / 82.4 MiB (i16) / 122.8 MiB (i16-f32avg)
+memory estimate: 713.3 MiB (f32) / 672.9 MiB (i16) / 713.3 MiB (i16-f32avg)
+iter=      25 expl_p0=3.740e0 expl_p1=1.458e0 nash_conv=5.198e0
+iter=      50 expl_p0=1.103e0 expl_p1=4.590e-1 nash_conv=1.562e0
+iter=     100 expl_p0=2.123e-1 expl_p1=1.221e-1 nash_conv=3.344e-1
+iter=     114 expl_p0=1.538e-1 expl_p1=9.492e-2 nash_conv=2.487e-1
+iter=     117 expl_p0=1.465e-1 expl_p1=8.994e-2 nash_conv=2.365e-1
+iter=     120 expl_p0=1.367e-1 expl_p1=8.603e-2 nash_conv=2.227e-1
+done: iterations=120 wall=1.03s ev_p0=14.459095 ev_p1=21.564369 nash_conv=2.227e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (623.2 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.21s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.21s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 4c 6d 7d wall_s=1.0 it=120 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=155.7 MiB (f32) / 78.7 MiB (i16) / 117.2 MiB (i16-f32avg)
+memory estimate: 707.4 MiB (f32) / 668.9 MiB (i16) / 707.4 MiB (i16-f32avg)
+iter=      25 expl_p0=4.940e-1 expl_p1=1.226e0 nash_conv=1.720e0
+iter=      50 expl_p0=1.119e-1 expl_p1=2.475e-1 nash_conv=3.594e-1
+iter=      59 expl_p0=7.713e-2 expl_p1=1.699e-1 nash_conv=2.470e-1
+iter=      62 expl_p0=6.364e-2 expl_p1=1.589e-1 nash_conv=2.225e-1
+done: iterations=62 wall=0.50s ev_p0=3.492138 ev_p1=33.297177 nash_conv=2.225e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (631.9 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.21s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 5c 8d Kd wall_s=0.5 it=62 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=255.8 MiB (f32) / 129.2 MiB (i16) / 192.5 MiB (i16-f32avg)
+memory estimate: 782.8 MiB (f32) / 719.5 MiB (i16) / 782.8 MiB (i16-f32avg)
+iter=      25 expl_p0=1.995e0 expl_p1=1.597e0 nash_conv=3.592e0
+iter=      50 expl_p0=5.696e-1 expl_p1=5.134e-1 nash_conv=1.083e0
+iter=     100 expl_p0=2.469e-1 expl_p1=2.404e-1 nash_conv=4.873e-1
+iter=     150 expl_p0=1.009e-1 expl_p1=7.017e-2 nash_conv=1.710e-1
+done: iterations=150 wall=1.82s ev_p0=6.552561 ev_p1=30.001705 nash_conv=1.710e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (937.0 KB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 7c 8d Qh wall_s=1.8 it=150 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=150.1 MiB (f32) / 75.9 MiB (i16) / 113.0 MiB (i16-f32avg)
+memory estimate: 703.6 MiB (f32) / 666.5 MiB (i16) / 703.6 MiB (i16-f32avg)
+iter=      25 expl_p0=1.080e0 expl_p1=2.005e0 nash_conv=3.085e0
+iter=      50 expl_p0=2.526e-1 expl_p1=5.827e-1 nash_conv=8.353e-1
+iter=      89 expl_p0=7.796e-2 expl_p1=2.081e-1 nash_conv=2.860e-1
+iter=      98 expl_p0=6.386e-2 expl_p1=1.607e-1 nash_conv=2.246e-1
+done: iterations=98 wall=0.76s ev_p0=5.346405 ev_p1=31.340455 nash_conv=2.246e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (607.2 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.21s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.21s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 7c Qc Ad wall_s=0.8 it=98 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=162.3 MiB (f32) / 82.0 MiB (i16) / 122.1 MiB (i16-f32avg)
+memory estimate: 712.4 MiB (f32) / 672.3 MiB (i16) / 712.4 MiB (i16-f32avg)
+iter=      25 expl_p0=2.207e0 expl_p1=1.573e0 nash_conv=3.780e0
+iter=      50 expl_p0=7.164e-1 expl_p1=3.869e-1 nash_conv=1.103e0
+iter=     100 expl_p0=1.591e-1 expl_p1=9.359e-2 nash_conv=2.527e-1
+iter=     103 expl_p0=1.471e-1 expl_p1=8.911e-2 nash_conv=2.362e-1
+iter=     106 expl_p0=1.384e-1 expl_p1=8.373e-2 nash_conv=2.222e-1
+done: iterations=106 wall=0.87s ev_p0=9.993346 ev_p1=26.162481 nash_conv=2.222e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (671.1 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 4c 8c Td wall_s=0.9 it=106 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=246.5 MiB (f32) / 124.6 MiB (i16) / 185.6 MiB (i16-f32avg)
+memory estimate: 776.0 MiB (f32) / 715.1 MiB (i16) / 776.0 MiB (i16-f32avg)
+iter=      25 expl_p0=3.260e-1 expl_p1=9.553e-1 nash_conv=1.281e0
+iter=      50 expl_p0=5.719e-2 expl_p1=3.197e-1 nash_conv=3.769e-1
+iter=      63 expl_p0=2.996e-2 expl_p1=1.601e-1 nash_conv=1.900e-1
+done: iterations=63 wall=0.73s ev_p0=2.147330 ev_p1=34.804444 nash_conv=1.900e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (876.1 KB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 8c Td Kh wall_s=0.7 it=63 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=167.0 MiB (f32) / 84.3 MiB (i16) / 125.6 MiB (i16-f32avg)
+memory estimate: 715.7 MiB (f32) / 674.4 MiB (i16) / 715.7 MiB (i16-f32avg)
+iter=      25 expl_p0=3.230e0 expl_p1=1.776e0 nash_conv=5.006e0
+iter=      50 expl_p0=1.175e0 expl_p1=4.494e-1 nash_conv=1.624e0
+iter=     100 expl_p0=1.892e-1 expl_p1=1.000e-1 nash_conv=2.892e-1
+iter=     108 expl_p0=1.545e-1 expl_p1=8.642e-2 nash_conv=2.409e-1
+iter=     111 expl_p0=1.470e-1 expl_p1=8.286e-2 nash_conv=2.299e-1
+done: iterations=111 wall=0.94s ev_p0=10.247558 ev_p1=25.823661 nash_conv=2.299e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (715.8 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.21s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 2c 2d 9c wall_s=0.9 it=111 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=252.7 MiB (f32) / 127.7 MiB (i16) / 190.2 MiB (i16-f32avg)
+memory estimate: 780.4 MiB (f32) / 717.9 MiB (i16) / 780.4 MiB (i16-f32avg)
+iter=      25 expl_p0=3.134e0 expl_p1=3.902e0 nash_conv=7.036e0
+iter=      50 expl_p0=6.533e-1 expl_p1=1.153e0 nash_conv=1.806e0
+iter=     100 expl_p0=8.738e-2 expl_p1=3.012e-1 nash_conv=3.886e-1
+iter=     121 expl_p0=5.424e-2 expl_p1=1.950e-1 nash_conv=2.492e-1
+iter=     124 expl_p0=5.293e-2 expl_p1=1.845e-1 nash_conv=2.374e-1
+iter=     127 expl_p0=5.343e-2 expl_p1=1.765e-1 nash_conv=2.299e-1
+done: iterations=127 wall=1.56s ev_p0=8.872895 ev_p1=27.776612 nash_conv=2.299e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (978.8 KB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 2c 8d Kh wall_s=1.6 it=127 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=159.5 MiB (f32) / 80.6 MiB (i16) / 120.0 MiB (i16-f32avg)
+memory estimate: 710.6 MiB (f32) / 671.1 MiB (i16) / 710.6 MiB (i16-f32avg)
+iter=      25 expl_p0=3.229e0 expl_p1=2.336e0 nash_conv=5.566e0
+iter=      50 expl_p0=9.652e-1 expl_p1=7.125e-1 nash_conv=1.678e0
+iter=     100 expl_p0=2.365e-1 expl_p1=2.895e-1 nash_conv=5.259e-1
+iter=     150 expl_p0=8.862e-2 expl_p1=1.347e-1 nash_conv=2.233e-1
+done: iterations=150 wall=1.26s ev_p0=19.188287 ev_p1=16.894336 nash_conv=2.233e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (682.2 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 3c 8c Jd wall_s=1.3 it=150 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=158.5 MiB (f32) / 80.1 MiB (i16) / 119.3 MiB (i16-f32avg)
+memory estimate: 709.6 MiB (f32) / 670.4 MiB (i16) / 709.6 MiB (i16-f32avg)
+iter=      25 expl_p0=1.611e0 expl_p1=2.686e0 nash_conv=4.297e0
+iter=      50 expl_p0=4.866e-1 expl_p1=6.771e-1 nash_conv=1.164e0
+iter=     100 expl_p0=7.909e-2 expl_p1=1.293e-1 nash_conv=2.084e-1
+done: iterations=100 wall=0.81s ev_p0=7.698735 ev_p1=28.758854 nash_conv=2.084e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (652.6 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.21s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 5c 6d Ac wall_s=0.8 it=100 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=157.6 MiB (f32) / 79.6 MiB (i16) / 118.6 MiB (i16-f32avg)
+memory estimate: 709.0 MiB (f32) / 670.0 MiB (i16) / 709.0 MiB (i16-f32avg)
+iter=      25 expl_p0=1.991e0 expl_p1=3.165e0 nash_conv=5.157e0
+iter=      50 expl_p0=4.258e-1 expl_p1=1.213e0 nash_conv=1.639e0
+iter=     100 expl_p0=1.275e-1 expl_p1=3.181e-1 nash_conv=4.456e-1
+iter=     133 expl_p0=9.678e-2 expl_p1=1.709e-1 nash_conv=2.676e-1
+iter=     142 expl_p0=8.964e-2 expl_p1=1.448e-1 nash_conv=2.344e-1
+iter=     145 expl_p0=8.847e-2 expl_p1=1.388e-1 nash_conv=2.272e-1
+done: iterations=145 wall=1.21s ev_p0=12.216718 ev_p1=24.257940 nash_conv=2.272e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (640.9 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.21s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 2c 3d Kd wall_s=1.2 it=145 cap=0
+tree: nodes=139145 terminals=87635 rank_tables=422 storage=72.1 MiB (f32) / 36.4 MiB (i16) / 54.3 MiB (i16-f32avg)
+memory estimate: 643.9 MiB (f32) / 626.1 MiB (i16) / 643.9 MiB (i16-f32avg)
+iter=      25 expl_p0=1.768e0 expl_p1=1.507e0 nash_conv=3.275e0
+iter=      50 expl_p0=3.584e-1 expl_p1=3.125e-1 nash_conv=6.710e-1
+iter=      74 expl_p0=1.523e-1 expl_p1=1.338e-1 nash_conv=2.861e-1
+iter=      80 expl_p0=1.281e-1 expl_p1=1.287e-1 nash_conv=2.568e-1
+iter=      85 expl_p0=1.104e-1 expl_p1=1.246e-1 nash_conv=2.350e-1
+iter=      88 expl_p0=1.048e-1 expl_p1=1.117e-1 nash_conv=2.165e-1
+done: iterations=88 wall=0.45s ev_p0=5.482430 ev_p1=30.894662 nash_conv=2.165e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (403.5 KB, 792 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.10s (139145 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.10s (139145 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 8c 9c Ac wall_s=0.5 it=88 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=152.0 MiB (f32) / 76.8 MiB (i16) / 114.4 MiB (i16-f32avg)
+memory estimate: 704.9 MiB (f32) / 667.3 MiB (i16) / 704.9 MiB (i16-f32avg)
+iter=      25 expl_p0=1.366e0 expl_p1=2.430e0 nash_conv=3.796e0
+iter=      50 expl_p0=4.625e-1 expl_p1=7.677e-1 nash_conv=1.230e0
+iter=     100 expl_p0=8.306e-2 expl_p1=1.560e-1 nash_conv=2.391e-1
+iter=     103 expl_p0=7.830e-2 expl_p1=1.461e-1 nash_conv=2.244e-1
+done: iterations=103 wall=0.80s ev_p0=4.982798 ev_p1=31.588233 nash_conv=2.244e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (599.6 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.21s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.21s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 9c Td Ac wall_s=0.8 it=103 cap=0
+tree: nodes=481942 terminals=304592 rank_tables=1176 storage=248.1 MiB (f32) / 125.4 MiB (i16) / 186.7 MiB (i16-f32avg)
+memory estimate: 777.3 MiB (f32) / 716.0 MiB (i16) / 777.3 MiB (i16-f32avg)
+iter=      25 expl_p0=4.484e-1 expl_p1=1.622e0 nash_conv=2.070e0
+iter=      50 expl_p0=2.098e-1 expl_p1=4.253e-1 nash_conv=6.351e-1
+iter=      82 expl_p0=2.537e-2 expl_p1=1.066e-1 nash_conv=1.320e-1
+done: iterations=82 wall=0.97s ev_p0=3.081565 ev_p1=33.812701 nash_conv=1.320e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (928.0 KB, 1676 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.35s (481942 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 6c 9d Kh wall_s=1.0 it=82 cap=0
+tree: nodes=303022 terminals=191300 rank_tables=810 storage=165.7 MiB (f32) / 83.7 MiB (i16) / 124.7 MiB (i16-f32avg)
+memory estimate: 714.9 MiB (f32) / 673.9 MiB (i16) / 714.9 MiB (i16-f32avg)
+iter=      25 expl_p0=9.950e-1 expl_p1=2.100e0 nash_conv=3.095e0
+iter=      50 expl_p0=9.265e-1 expl_p1=9.777e-1 nash_conv=1.904e0
+iter=     100 expl_p0=4.550e-1 expl_p1=4.321e-1 nash_conv=8.871e-1
+iter=     150 expl_p0=3.347e-1 expl_p1=1.839e-1 nash_conv=5.186e-1
+iter=     200 expl_p0=1.661e-1 expl_p1=8.793e-2 nash_conv=2.541e-1
+iter=     206 expl_p0=1.155e-1 expl_p1=7.873e-2 nash_conv=1.942e-1
+done: iterations=206 wall=1.68s ev_p0=4.656191 ev_p1=31.696535 nash_conv=1.942e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (711.6 KB, 1268 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (303022 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (303022 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 8c 8d Th wall_s=1.7 it=206 cap=0
+tree: nodes=293390 terminals=185213 rank_tables=799 storage=160.4 MiB (f32) / 81.0 MiB (i16) / 120.7 MiB (i16-f32avg)
+memory estimate: 711.0 MiB (f32) / 671.3 MiB (i16) / 711.0 MiB (i16-f32avg)
+iter=      25 expl_p0=9.620e-1 expl_p1=1.859e0 nash_conv=2.821e0
+iter=      50 expl_p0=5.042e-1 expl_p1=6.238e-1 nash_conv=1.128e0
+iter=     100 expl_p0=1.777e-1 expl_p1=1.561e-1 nash_conv=3.338e-1
+iter=     118 expl_p0=1.568e-1 expl_p1=2.771e-1 nash_conv=4.339e-1
+iter=     143 expl_p0=2.039e-1 expl_p1=2.680e-1 nash_conv=4.718e-1
+iter=     168 expl_p0=1.815e-1 expl_p1=1.721e-1 nash_conv=3.536e-1
+iter=     203 expl_p0=1.233e-1 expl_p1=9.592e-2 nash_conv=2.192e-1
+done: iterations=203 wall=1.63s ev_p0=5.607941 ev_p1=30.739224 nash_conv=2.192e-1
+sol: wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/solution.sol (674.1 KB, 1234 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 0.21s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 0.22s (293390 nodes)
+wrote /home/ubuntu/out/pilot/p1-e2-24/L23-raise/tmp/summary.csv
+FLOP L23-raise 9c 9d Tc wall_s=1.6 it=203 cap=0
+TASK L23-raise flops=24
+	Command being timed: "bash -c python3 $X/p1_classes.py ~/e2.profile.json ~/tasks24.txt ~ ~/out/pilot/p1-e2-24 --solvers $S --min-weight 0.0001"
+	User time (seconds): 42804.41
+	System time (seconds): 293.12
+	Percent of CPU this job got: 2748%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 26:07.79
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 14102928
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 79297427
+	Voluntary context switches: 930043
+	Involuntary context switches: 224289
+	Swaps: 0
+	File system inputs: 47632
+	File system outputs: 724088
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

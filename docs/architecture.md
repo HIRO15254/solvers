@@ -39,7 +39,7 @@
 | `hu-postflop` | P1のlower・木・payoff・資源preflight・solve/resume、checkpoint、`.sol`、typed queryとboard report。payoffを通すtoy gameはunit testまたは`test-support` feature限定 |
 | `mw-preflop` | P2のlower・session・資源preflight・EHS²・dense arena・sampled solve・停止評価、checkpoint、`.mwsol`、typed query |
 | `runfiles` | run directoryの共通DTO・manifest・events・HU metrics・config hash |
-| `cli` | `solvers`の引数・dispatch・cache policy・signal、run lifecycle、符号化と表示、P1 REPL、exit code |
+| `cli` | `solvers`の引数・dispatch・cache policy・signal、run lifecycle、符号化と表示、P1 REPL、P2 `browse` REPL、exit code |
 | `protocol` | daemonのHTTP request/responseとrun wire型 |
 | `daemon` | `solversd`の認証・queue・子process管理・監視・artifact配信 |
 | `cfr-ref` | 凍結した独立CFR/BR oracle。test専用 |
@@ -89,6 +89,10 @@ P2のcache利用APIはpathを受け取り、場所の選択はCLIに残す。P1�
 `views`の確率lookupを共有する。`spot::derive`はline再生、baseの共通条件照合とdocument組立てを行う。
 CLIの`derive` adapterはmanifest・solution hash・入出力・警告表示を担当し、
 P1の`prepare`で検証した正規化Inputだけを書き出す。
+
+`mw_preflop::browse`は保存解のindex・到達rangeを所有する。class-profileの任意configは
+`trunk::l0::game_from_config`とL1 trunk treeで検証し、正規化入力のposition・rangeと
+各edgeのbetting state再生から得るpot・残stackを補う。CLIはREPLとterminal描画を担当する。
 
 ## 3. コア表現(hu-engine crate)
 
@@ -278,7 +282,8 @@ cacheのbuild/loadと互換性検証は製品側にある。CLIはcache rootを�
 実験中の`trunk` module（[P2方式の再設計計画](plans/p2-method-redesign.jp.md)のS4-1a、製品契約の外）は、
 169 hand classと、L0モデルの2人showdown表（厳密）・3人の順位表（Monte Carlo）を持つ。`trunk::l0`はPostflopに
 判断の無い木で、class単位のprofileに対するseat別の最適応答の利得と`NashConv`をL0モデルの中で計算する
-（example `l0_eval`）。CLIからは使わない。
+（example `l0_eval`）。`trunk::l1`はFlopで木を切り、leafにPostflopの抽象化木を付ける。
+CLIは`browse --config`でclass-profile JSONをtrunk treeと照合するときだけ使う（第2節）。
 
 ## 7. 正当性検証
 

@@ -185,6 +185,7 @@ Preflop-only exportは未達である。これを完全な全street profileと�
 | `export ev` | 選択nodeのclass別到達weight。class別EVは保存されないためnull |
 | `evaluate` | artifactの保存averageを再評価し、baseline utility、候補gain・CI、coverageを報告 |
 | `inspect` | root/historyのnode、summary、169 class matrix、strategy/range。未訪問はunvisited/null |
+| `browse` | 保存P2 Preflopの対話閲覧。class strategy、席自身のactionで条件付けたrangeとcombo加重頻度、保存root評価。action labelとhistoryは`export`と同じ表示表記、node・action指定も`export --node`と同じ形式を受ける。実験用class-profile v1 JSONは任意の`--config`でtrunk構造を照合しposition・開始range・pot/stack・`bb_chips`・丸め方式を補う。設定なしはfull開始rangeと既定の`bb_chips`を明示して仮定。操作は[CLI reference](cli-reference.jp.md#solvers-browse) |
 | `inspect ev` | rootはformal-average-profileの再評価、後続nodeはnode-conditioned-profileの条件付き再評価 |
 
 P2の`export`はP1と共通の行・field名を使い、額をBBで返す。Preflopのnodeは

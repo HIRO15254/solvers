@@ -14,11 +14,24 @@ use crate::{ExternalSamplingGame, FeatureHashAbstraction, HoldemGame};
 /// T2 is unnormalized (sums to K); T3 is hero/first/second oriented, including
 /// the opponent swap convention of `ThreeWayTable::p3`.
 pub trait Tables: Sync {
+    /// Stable identity of table semantics/data for experimental L1 resume.
+    /// Stateful implementations must override this with a content identity.
+    fn state_identity(&self) -> [u8; 32] {
+        *blake3::hash(std::any::type_name::<Self>().as_bytes()).as_bytes()
+    }
+
     fn t2(&self, c: usize, d: usize) -> Result<[f64; 3]>;
     fn p3(&self, c: usize, d: usize, e: usize) -> Result<[f64; 13]>;
 }
 
 impl Tables for (&HuShowdownTable, &ThreeWayTable) {
+    fn state_identity(&self) -> [u8; 32] {
+        let mut hash = blake3::Hasher::new();
+        hash.update(self.0.payload_hash().as_bytes());
+        hash.update(self.1.payload_hash().as_bytes());
+        *hash.finalize().as_bytes()
+    }
+
     fn t2(&self, c: usize, d: usize) -> Result<[f64; 3]> {
         self.0.t2(c, d)
     }
@@ -225,16 +238,16 @@ pub struct PhaseTimings {
     pub backward: f64,
 }
 
-pub(crate) struct Reach {
-    pi: Vec<f64>,
-    mass: Vec<f64>,
+pub struct Reach {
+    pub(crate) pi: Vec<f64>,
+    pub(crate) mass: Vec<f64>,
 }
 
 impl Reach {
-    pub(crate) fn pi(&self, seat: usize, c: usize) -> f64 {
+    pub fn pi(&self, seat: usize, c: usize) -> f64 {
         self.pi[seat * 169 + c]
     }
-    pub(crate) fn mass(&self, seat: usize, c: usize) -> f64 {
+    pub fn mass(&self, seat: usize, c: usize) -> f64 {
         self.mass[seat * 169 + c]
     }
     pub(crate) fn rho(&self, model: &Model<'_>, seat: usize) -> Vec<(usize, f64)> {
@@ -248,7 +261,7 @@ impl Reach {
     }
 }
 
-pub(crate) fn reaches(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Vec<Reach> {
+pub fn reaches(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Vec<Reach> {
     let mut reaches: Vec<Reach> = Vec::with_capacity(tree.nodes.len());
     for n in &tree.nodes {
         let mut pi = if let Some((p, _)) = n.parent {
@@ -339,6 +352,55 @@ pub(crate) fn update_reach(
             }
         }
     });
+}
+
+/// Counterfactual profile values at every node for one seat, using the same
+/// terminal contractions and backward pass as the trunk solver. Supplied L1
+/// values replace the checkdown baseline; they exclude the hero's own reach
+/// and include every opponent's reach, just like the L0 terminal values.
+pub fn profile_values(
+    tree: &Tree,
+    profile: &Profile,
+    model: &Model<'_>,
+    reach: &[Reach],
+    hero: usize,
+    l1_values: &[(usize, [f64; 169])],
+) -> Result<Vec<[f64; 169]>> {
+    profile.validate(tree)?;
+    ensure!(hero < tree.seats, "seat outside tree");
+    ensure!(
+        tree.game_fingerprint == model.game().game_fingerprint(),
+        "model/tree mismatch"
+    );
+    ensure!(
+        reach.len() == tree.nodes.len(),
+        "reach/tree length mismatch"
+    );
+    let mut leaves = super::leaves::leaf_values(
+        tree,
+        model,
+        reach,
+        &[hero],
+        super::leaves::K4Plan::model(model),
+    )?;
+    for &(z, values) in l1_values {
+        ensure!(
+            tree.nodes
+                .get(z)
+                .and_then(|n| n.terminal.as_ref())
+                .is_some_and(|t| t.l1.is_some() && t.active.contains(&hero)),
+            "node {z} is not an L1 leaf for seat {hero}"
+        );
+        leaves.values[hero][z] = values;
+    }
+    super::solve::backward_values(
+        tree,
+        profile,
+        &model.support[hero],
+        hero,
+        &mut leaves.values[hero],
+    );
+    Ok(std::mem::take(&mut *leaves.values[hero]))
 }
 
 pub fn evaluate(tree: &Tree, profile: &Profile, model: &Model<'_>) -> Result<Evaluation> {

@@ -1,0 +1,41 @@
+# notes/30-abs-level.md §10: line 13 on one flop at a time, longest runs first (python3 fine_sched.py FILE 8 LOG_DIR)
+fd128x8b128-2c4dQh	TRAIN_ARGS='--l1-boards 128' bash ~/run_fine_cloud.sh fd128x8b128 '2c 4d Qh' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fd128x8b128-3c4d5h	TRAIN_ARGS='--l1-boards 128' bash ~/run_fine_cloud.sh fd128x8b128 '3c 4d 5h' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fd128x8b128-4c8cAd	TRAIN_ARGS='--l1-boards 128' bash ~/run_fine_cloud.sh fd128x8b128 '4c 8c Ad' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fd128x8b128-5cTdJd	TRAIN_ARGS='--l1-boards 128' bash ~/run_fine_cloud.sh fd128x8b128 '5c Td Jd' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fd128x8b128-6c8c9c	TRAIN_ARGS='--l1-boards 128' bash ~/run_fine_cloud.sh fd128x8b128 '6c 8c 9c' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fd128x8b128-TcTdKh	TRAIN_ARGS='--l1-boards 128' bash ~/run_fine_cloud.sh fd128x8b128 'Tc Td Kh' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fd128x8b128-3cJdKh	TRAIN_ARGS='--l1-boards 128' bash ~/run_fine_cloud.sh fd128x8b128 '3c Jd Kh' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fd128x8b128-7cKcAd	TRAIN_ARGS='--l1-boards 128' bash ~/run_fine_cloud.sh fd128x8b128 '7c Kc Ad' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fe128x8ro-2c4dQh	bash ~/run_fine_cloud.sh fe128x8ro '2c 4d Qh' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024 --l1-runout flush,pair,straight,over
+fe128x8ro-3c4d5h	bash ~/run_fine_cloud.sh fe128x8ro '3c 4d 5h' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024 --l1-runout flush,pair,straight,over
+fe128x8ro-4c8cAd	bash ~/run_fine_cloud.sh fe128x8ro '4c 8c Ad' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024 --l1-runout flush,pair,straight,over
+fe128x8ro-5cTdJd	bash ~/run_fine_cloud.sh fe128x8ro '5c Td Jd' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024 --l1-runout flush,pair,straight,over
+fe128x8ro-6c8c9c	bash ~/run_fine_cloud.sh fe128x8ro '6c 8c 9c' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024 --l1-runout flush,pair,straight,over
+fe128x8ro-TcTdKh	bash ~/run_fine_cloud.sh fe128x8ro 'Tc Td Kh' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024 --l1-runout flush,pair,straight,over
+fe128x8ro-3cJdKh	bash ~/run_fine_cloud.sh fe128x8ro '3c Jd Kh' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024 --l1-runout flush,pair,straight,over
+fe128x8ro-7cKcAd	bash ~/run_fine_cloud.sh fe128x8ro '7c Kc Ad' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024 --l1-runout flush,pair,straight,over
+fc128x8-2c4dQh	bash ~/run_fine_cloud.sh fc128x8 '2c 4d Qh' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fc128x8-3c4d5h	bash ~/run_fine_cloud.sh fc128x8 '3c 4d 5h' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fc128x8-4c8cAd	bash ~/run_fine_cloud.sh fc128x8 '4c 8c Ad' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fc128x8-5cTdJd	bash ~/run_fine_cloud.sh fc128x8 '5c Td Jd' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fc128x8-6c8c9c	bash ~/run_fine_cloud.sh fc128x8 '6c 8c 9c' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fc128x8-TcTdKh	bash ~/run_fine_cloud.sh fc128x8 'Tc Td Kh' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fc128x8-3cJdKh	bash ~/run_fine_cloud.sh fc128x8 '3c Jd Kh' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fc128x8-7cKcAd	bash ~/run_fine_cloud.sh fc128x8 '7c Kc Ad' --l1-relative 128x8:$EHS2_DIR/v2-f1024-t1024-r1024.postcard --l1-strength-buckets 1024
+fb32x8-2c4dQh	bash ~/run_fine_cloud.sh fb32x8 '2c 4d Qh' --l1-relative 32x8:$EHS2_DIR/v2-f128-t128-r128.postcard
+fb32x8-3c4d5h	bash ~/run_fine_cloud.sh fb32x8 '3c 4d 5h' --l1-relative 32x8:$EHS2_DIR/v2-f128-t128-r128.postcard
+fb32x8-4c8cAd	bash ~/run_fine_cloud.sh fb32x8 '4c 8c Ad' --l1-relative 32x8:$EHS2_DIR/v2-f128-t128-r128.postcard
+fb32x8-5cTdJd	bash ~/run_fine_cloud.sh fb32x8 '5c Td Jd' --l1-relative 32x8:$EHS2_DIR/v2-f128-t128-r128.postcard
+fb32x8-6c8c9c	bash ~/run_fine_cloud.sh fb32x8 '6c 8c 9c' --l1-relative 32x8:$EHS2_DIR/v2-f128-t128-r128.postcard
+fb32x8-TcTdKh	bash ~/run_fine_cloud.sh fb32x8 'Tc Td Kh' --l1-relative 32x8:$EHS2_DIR/v2-f128-t128-r128.postcard
+fb32x8-3cJdKh	bash ~/run_fine_cloud.sh fb32x8 '3c Jd Kh' --l1-relative 32x8:$EHS2_DIR/v2-f128-t128-r128.postcard
+fb32x8-7cKcAd	bash ~/run_fine_cloud.sh fb32x8 '7c Kc Ad' --l1-relative 32x8:$EHS2_DIR/v2-f128-t128-r128.postcard
+fa16x4-2c4dQh	bash ~/run_fine_cloud.sh fa16x4 '2c 4d Qh'
+fa16x4-3c4d5h	bash ~/run_fine_cloud.sh fa16x4 '3c 4d 5h'
+fa16x4-4c8cAd	bash ~/run_fine_cloud.sh fa16x4 '4c 8c Ad'
+fa16x4-5cTdJd	bash ~/run_fine_cloud.sh fa16x4 '5c Td Jd'
+fa16x4-6c8c9c	bash ~/run_fine_cloud.sh fa16x4 '6c 8c 9c'
+fa16x4-TcTdKh	bash ~/run_fine_cloud.sh fa16x4 'Tc Td Kh'
+fa16x4-3cJdKh	bash ~/run_fine_cloud.sh fa16x4 '3c Jd Kh'
+fa16x4-7cKcAd	bash ~/run_fine_cloud.sh fa16x4 '7c Kc Ad'

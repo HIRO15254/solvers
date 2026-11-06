@@ -1,0 +1,1 @@
+DUMP=informed TAG=-inf bash ~/sc_l1.sh flop1ro base

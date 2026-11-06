@@ -1,0 +1,198 @@
+{
+  "ehs2": {
+    "blake3": "55df69080ecc8a308eaecffb00c227a231c93923f0ff015ad6eed30ef8e40f87",
+    "bucket_counts": {
+      "flop_buckets": 32,
+      "river_buckets": 32,
+      "turn_buckets": 32
+    },
+    "bytes": 357378844,
+    "low_spr": null,
+    "path": "/home/ubuntu/ehs2/v2-f32-t32-r32.postcard",
+    "refinement": {
+      "recall": 1,
+      "texture": 0
+    },
+    "relative": {
+      "buckets": 16,
+      "flop_groups": "/home/ubuntu/k49-groups.txt",
+      "hand": "HandSplit { made: 1, draws: true, potential: 1, category: 0, flop_draws: false, pairs: true }",
+      "levels": 2,
+      "prior": 10.0,
+      "prior_fraction": 0.0,
+      "reach": "current",
+      "runout": "Runout { kinds: 0 }",
+      "strength_buckets": 128,
+      "strength_table": "/home/ubuntu/ehs2/v2-f128-t128-r128.postcard"
+    }
+  },
+  "evaluation": {
+    "auxiliary_held_nash_conv": 9.180069565803972,
+    "auxiliary_nash_conv": 9.186042322116755,
+    "evaluation_seconds": 24.56435906,
+    "held_nash_conv": 0.14417841219933622,
+    "nash_conv": 0.15818189197566057,
+    "seats": [
+      {
+        "auxiliary_best_response": 1.8247670572068382,
+        "auxiliary_gain": 1.6175601102343111,
+        "auxiliary_held_a_to_b": 1.5866566736459986,
+        "auxiliary_held_b_to_a": 1.648234540007723,
+        "auxiliary_held_gain": 1.6174456068268608,
+        "auxiliary_telescoping_residual": -3.952393967665557e-14,
+        "best_response": 0.2233488143596458,
+        "gain": 0.01614186738711884,
+        "held_a_to_b": 0.01408486119310956,
+        "held_b_to_a": 0.01458667929052268,
+        "held_gain": 0.01433577024181612,
+        "l1_reach_share": 0.2825307720739306,
+        "seat": 0,
+        "telescoping_residual": 0.0,
+        "value": 0.20720694697252695,
+        "value_a": 0.2072014903506102,
+        "value_b": 0.20721240359444326
+      },
+      {
+        "auxiliary_best_response": 1.1216910458955884,
+        "auxiliary_gain": 1.407094857640971,
+        "auxiliary_held_a_to_b": 1.3814680579916363,
+        "auxiliary_held_b_to_a": 1.4318081036166501,
+        "auxiliary_held_gain": 1.4066380808041432,
+        "auxiliary_telescoping_residual": -3.530509218307998e-14,
+        "best_response": -0.2749643936472141,
+        "gain": 0.010439418098168396,
+        "held_a_to_b": 0.008916738032632654,
+        "held_b_to_a": 0.009116385880130695,
+        "held_gain": 0.009016561956381675,
+        "l1_reach_share": 0.2826348797065677,
+        "seat": 1,
+        "telescoping_residual": -5.551115123125783e-17,
+        "value": -0.2854038117453825,
+        "value_a": -0.285441671527499,
+        "value_b": -0.285365951963266
+      },
+      {
+        "auxiliary_best_response": 0.8141456296864191,
+        "auxiliary_gain": 1.3598317627748204,
+        "auxiliary_held_a_to_b": 1.3377705416836496,
+        "auxiliary_held_b_to_a": 1.3720331782996935,
+        "auxiliary_held_gain": 1.3549018599916716,
+        "auxiliary_telescoping_residual": -4.085620730620576e-14,
+        "best_response": -0.4681595267405491,
+        "gain": 0.0775266063478523,
+        "held_a_to_b": 0.06885660171798241,
+        "held_b_to_a": 0.0750501584348055,
+        "held_gain": 0.07195338007639396,
+        "l1_reach_share": 0.2807374251156852,
+        "seat": 2,
+        "telescoping_residual": -1.0547118733938987e-15,
+        "value": -0.5456861330884014,
+        "value_a": -0.5454038211887856,
+        "value_b": -0.5459684449880174
+      },
+      {
+        "auxiliary_best_response": 1.531426590365876,
+        "auxiliary_gain": 1.4216818346391122,
+        "auxiliary_held_a_to_b": 1.3858498499852023,
+        "auxiliary_held_b_to_a": 1.4570254797315478,
+        "auxiliary_held_gain": 1.421437664858375,
+        "auxiliary_telescoping_residual": -3.774758283725532e-15,
+        "best_response": 0.12780231899727368,
+        "gain": 0.018057563270510044,
+        "held_a_to_b": 0.016365670607199415,
+        "held_b_to_a": 0.017370634924373365,
+        "held_gain": 0.01686815276578639,
+        "l1_reach_share": 0.2822796828035738,
+        "seat": 3,
+        "telescoping_residual": -2.5673907444456745e-16,
+        "value": 0.10974475572676363,
+        "value_a": 0.10978798027358823,
+        "value_b": 0.10970153117993904
+      },
+      {
+        "auxiliary_best_response": 1.7519507970879402,
+        "auxiliary_gain": 1.6147184740680645,
+        "auxiliary_held_a_to_b": 1.5869811830062082,
+        "auxiliary_held_b_to_a": 1.6423699422668827,
+        "auxiliary_held_gain": 1.6146755626365454,
+        "auxiliary_telescoping_residual": -4.8405723873656825e-14,
+        "best_response": 0.1565281435024995,
+        "gain": 0.019295820482623766,
+        "held_a_to_b": 0.0166673462014299,
+        "held_b_to_a": 0.01827492168722944,
+        "held_gain": 0.01747113394432967,
+        "l1_reach_share": 0.28279067710770084,
+        "seat": 4,
+        "telescoping_residual": -1.249000902703301e-16,
+        "value": 0.13723232301987573,
+        "value_a": 0.1372581680718052,
+        "value_b": 0.13720647796794622
+      },
+      {
+        "auxiliary_best_response": 1.9228449203011881,
+        "auxiliary_gain": 1.7651552827594748,
+        "auxiliary_held_a_to_b": 1.7398267558158924,
+        "auxiliary_held_b_to_a": 1.790114825556859,
+        "auxiliary_held_gain": 1.7649707906863759,
+        "auxiliary_telescoping_residual": -5.928590951498336e-14,
+        "best_response": 0.17441025393110055,
+        "gain": 0.01672061638938721,
+        "held_a_to_b": 0.014013673204751137,
+        "held_b_to_a": 0.01505315322450565,
+        "held_gain": 0.014533413214628393,
+        "l1_reach_share": 0.2826648727188083,
+        "seat": 5,
+        "telescoping_residual": -7.28583859910259e-17,
+        "value": 0.15768963754171333,
+        "value_a": 0.15767548940724002,
+        "value_b": 0.1577037856761867
+      }
+    ]
+  },
+  "evaluation_options": {
+    "boards": 1024,
+    "control": true,
+    "regression": true,
+    "sampling": "random",
+    "seed": 0
+  },
+  "format": "p2-trunk-evaluation",
+  "game_fingerprint": "ee8eae1a9a9a73198baff92ff6e3c4c057ede4093c3f9a6df75488fb17ce1848",
+  "k4": {
+    "samples": 2048,
+    "seed": 0
+  },
+  "leaf_model": "l1",
+  "override": {
+    "blake3": "e6cc51a820803f97c4eaa44bc451d45300c96f9de21870867460e8760279fe66",
+    "entries": 72,
+    "path": "/home/ubuntu/truth-multi.json"
+  },
+  "postflop": {
+    "blake3": "c73d733d00f6fe2b7045e1122d7fb1fb4d7f4fe5298cf903ed342c975785f475",
+    "path": "/home/ubuntu/final/traise5+p10+g49+hdq+rel16x2.postflop.bin"
+  },
+  "profile": {
+    "blake3": "36b64bf04df8d4e0aa0e8a39d65cb35b360ba5a145ca29257203ca17c99d9b5c",
+    "path": "/home/ubuntu/final/traise5+p10+g49+hdq+rel16x2.profile.json"
+  },
+  "source": "/home/ubuntu/b4s-gtow-raise5.toml",
+  "tables": {
+    "t2": {
+      "payload_blake3": "885e99f5307de34fb311d4075ed9fc9d9ecb72ec15db36ee896704239b70da87"
+    },
+    "t3": {
+      "payload_blake3": "bdafa5c526d0b7207abe93b6281bd8e7cb9316fe2fb32e917f6c433ef7a044b8"
+    }
+  },
+  "timings": {
+    "boards": 0.017387952,
+    "evaluation": 24.56435906,
+    "load": 6.574178174,
+    "model": 0.002561098,
+    "tables": 0.246044672,
+    "total": 43.415652229,
+    "tree": 10.206630574
+  },
+  "version": 1
+}

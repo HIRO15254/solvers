@@ -10,6 +10,7 @@ use std::{
 pub(crate) struct Reused<T: 'static> {
     value: Option<T>,
     pool: Option<&'static LocalKey<RefCell<Vec<T>>>>,
+    limit: usize,
 }
 
 impl<T: Default> Reused<T> {
@@ -21,6 +22,7 @@ impl<T: Default> Reused<T> {
         Self {
             value: Some(T::default()),
             pool: None,
+            limit: POOL_LIMIT,
         }
     }
 }
@@ -28,6 +30,7 @@ impl<T: Default> Reused<T> {
 impl<T: Default + Clone> Clone for Reused<T> {
     fn clone(&self) -> Self {
         let mut copy = self.pool.map_or_else(Self::empty, Self::take);
+        copy.limit = self.limit;
         copy.deref_mut().clone_from(self);
         copy
     }
@@ -41,7 +44,22 @@ impl<T> Reused<T> {
         Self {
             value: Some(pool.with(|p| p.borrow_mut().pop()).unwrap_or_else(create)),
             pool: Some(pool),
+            limit: POOL_LIMIT,
         }
+    }
+
+    /// Like `take_with`, but the pool keeps at most `limit` values: for
+    /// buffers as large as a whole leaf's strategy, which a nested job can
+    /// drop on another worker, so that with up to `POOL_LIMIT` such buffers
+    /// per worker the pools would grow with the leaves and the threads.
+    pub(crate) fn take_bounded(
+        pool: &'static LocalKey<RefCell<Vec<T>>>,
+        limit: usize,
+        create: impl FnOnce() -> T,
+    ) -> Self {
+        let mut taken = Self::take_with(pool, create);
+        taken.limit = limit;
+        taken
     }
 }
 
@@ -71,7 +89,7 @@ impl<T> Drop for Reused<T> {
             // TLS teardown, when there is no pool left to retain it.
             let _ = pool.try_with(|p| {
                 let mut p = p.borrow_mut();
-                if p.len() < POOL_LIMIT {
+                if p.len() < self.limit {
                     p.push(self.value.take().unwrap());
                 }
             });

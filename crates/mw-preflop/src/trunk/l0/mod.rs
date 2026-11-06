@@ -11,7 +11,10 @@ mod real;
 pub(crate) mod solve;
 mod tree;
 
-pub use eval::{Evaluation, EvaluationOptions, LocalGain, Model, SeatEvaluation, Tables, evaluate};
+pub use eval::{
+    Evaluation, EvaluationOptions, LocalGain, Model, Reach, SeatEvaluation, Tables, evaluate,
+    profile_values, reaches,
+};
 pub use profile::{ClassProfileDocument, Profile, ProfileNode};
 pub use real::{
     Estimate, FOLLOW, FittedResponses, FittedSeat, GatedResponse, GatedSeat, RealEvaluation,

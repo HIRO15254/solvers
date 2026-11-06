@@ -1,0 +1,25 @@
+--- cloud/crates/mw-preflop/src/trunk/l1/solve.rs
++++ final/crates/mw-preflop/src/trunk/l1/solve.rs
+@@ -691,9 +691,8 @@
+     }
+     let rows = storage.profile(subtree, false);
+     let mapping_inputs = mapping.map(|reach| inputs(tree, model, &reach[z], z, p));
+-    let mapping_rows = mapping
+-        .is_some()
+-        .then(|| storage.profile(subtree, mapping_average));
++    let mapping_rows =
++        (mapping.is_some() && mapping_average).then(|| storage.profile(subtree, true));
+     if let Some(training) = training_own {
+         for (h, weight) in own.iter_mut().enumerate() {
+             let c = crate::trunk::classes::class(h);
+@@ -725,7 +724,9 @@
+                         mapping: mapping_inputs.as_ref().map(|(opponent, own, _)| Mapping {
+                             opponent,
+                             own,
+-                            rows: mapping_rows.as_ref().unwrap(),
++                            rows: mapping_rows
++                                .as_ref()
++                                .map_or(rows.as_slice(), |r| r.as_slice()),
+                         }),
+                     },
+                     Some((&mut increments, &mut additions, weight)),

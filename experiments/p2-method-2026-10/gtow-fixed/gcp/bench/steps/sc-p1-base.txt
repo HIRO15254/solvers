@@ -1,0 +1,1 @@
+python3 $X/p1_classes.py ~/base.profile.json ~/tasks-sc.txt ~ ~/out/sc/p1/base --solvers $S --min-weight 0.0001

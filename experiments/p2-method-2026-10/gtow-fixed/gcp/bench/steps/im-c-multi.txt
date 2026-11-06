@@ -1,0 +1,2 @@
+bash ~/override_solve.sh ~/out/ruler ovm-truth-sd0 0 ~/truth-multi.json ~/truth-multi.json
+bash ~/override_solve.sh ~/out/ruler ovm-e2-sd0 0 ~/xm-e2.json ~/truth-multi.json

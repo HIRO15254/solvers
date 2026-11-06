@@ -1,0 +1,59 @@
+{
+  "ehs2": {
+    "blake3": "55df69080ecc8a308eaecffb00c227a231c93923f0ff015ad6eed30ef8e40f87",
+    "bucket_counts": {
+      "flop_buckets": 32,
+      "river_buckets": 32,
+      "turn_buckets": 32
+    },
+    "bytes": 357378844,
+    "path": "C:\\Users\\PC_User\\AppData\\Local/solvers/ehs2/v2-f32-t32-r32.postcard",
+    "refinement": {
+      "recall": 1,
+      "texture": 0
+    },
+    "relative": {
+      "buckets": 8,
+      "levels": 2,
+      "prior": 10.0,
+      "reach": "current",
+      "strength_table": "C:\\Users\\PC_User\\AppData\\Local/solvers/ehs2/v2-f128-t128-r128.postcard"
+    }
+  },
+  "format": "p2-trunk-fixed-postflop",
+  "game_fingerprint": "ae04d69fc4a756f6a0f3ca4d6b01641a82d28b981a608976f3fc8afaf4f1bbf6",
+  "leaves": [
+    852,
+    468,
+    697,
+    849,
+    30
+  ],
+  "lines": "raise-to:2000/fold/raise-to:6500/fold/fold/fold/raise-to:18000/call:11500;fold/raise-to:2000/raise-to:6500/fold/fold/fold/raise-to:19000/call:12500;raise-to:2000/fold/fold/fold/raise-to:10000/fold/raise-to:19000/call:9000;raise-to:2000/fold/raise-to:6500/fold/fold/fold/call:4500;fold/fold/fold/raise-to:2500/fold/call:1500",
+  "options": {
+    "alpha": 1.5,
+    "beta": 1.0,
+    "eval_every": 100,
+    "gamma": 2.0,
+    "iterations": 3000,
+    "k4_min_samples": null,
+    "k4_samples": null,
+    "l1_boards": 32,
+    "l1_eval_boards": 1024,
+    "l1_eval_control": true,
+    "l1_eval_regression": true,
+    "l1_eval_sampling": "random",
+    "l1_eval_seed": 0,
+    "l1_postflop_beta": 0.0,
+    "l1_sampling": "stratified",
+    "l1_seed": 0,
+    "l1_train_control": true,
+    "l1_train_regression": true,
+    "max_seconds": null,
+    "target_nash_conv": null
+  },
+  "profile": "../_goal/fixed/run/gtow.profile.json",
+  "seconds": 317.0350952,
+  "source": "experiments/p2-method-2026-10/b4s-8h/b4s-gtow.toml",
+  "version": 1
+}

@@ -1,0 +1,8 @@
+5157203090f9f43898d87f7eb915e39db836f143d899e1efb84715871962a890  crates/mw-preflop/src/trunk/l1/qre.rs
+8202afe7d0086a132183da860f366622c75bb9a06b2f5e818d96b17f44b119b1  crates/mw-preflop/src/trunk/l1/solve.rs
+af63997d69a6f89b1ffc64c557022c3a783cf70f4c19d504df7aa84b4c2e0123  crates/mw-preflop/src/trunk/l1/state.rs
+5b8f9764f8618c3c5f1782b84e0654b8323c68a51c269a7a4ca83071742ca350  crates/mw-preflop/src/trunk/l1/mod.rs
+c68ee22ff9c3ad26674a91b12b27f6d4602addee23ae63d9d50948623c1fd0d6  crates/mw-preflop/src/trunk/l1/tests.rs
+99bd5c6738aa34ec31db51c078e60dca4b432988eae819177134b53b06b06d54  crates/mw-preflop/examples/trunk_solve.rs
+a28f185665b60456bec85a9acc3e738317736f033627188f3fc3e9e7e922321f  experiments/p2-method-2026-10/relative-reach/gcp/job.sh
+fa7e560f8f59583f2d4b0ac030e317f1ede477273c104eaf0a53b89c774e820b  experiments/p2-method-2026-10/gtow-fixed/tokens.sh

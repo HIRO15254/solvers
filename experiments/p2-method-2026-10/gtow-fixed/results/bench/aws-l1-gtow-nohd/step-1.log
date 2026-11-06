@@ -1,0 +1,27 @@
+skip srp rel8x2@raise5+g25+sd1
+skip 3bet rel8x2@raise5+g25+sd1
+rel8x2@raise5+g25+sd1 313s 
+rel8x2@raise5+g25+sd1 20s 
+	Command being timed: "bash -c DIAG_RIVERS=4 DIAG_JOBS=1 bash $X/bench_diag.sh ~/gtow.profile.json ~/rel8x2@raise5+g25+sd1.bin ~/out/l1/gtow rel8x2@raise5+g25+sd1 ~/bands.txt"
+	User time (seconds): 1534.74
+	System time (seconds): 34.23
+	Percent of CPU this job got: 471%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 5:32.49
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 2284836
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 40
+	Minor (reclaiming a frame) page faults: 12947673
+	Voluntary context switches: 410347
+	Involuntary context switches: 65214
+	Swaps: 0
+	File system inputs: 1924760
+	File system outputs: 43048
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

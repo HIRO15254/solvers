@@ -1,0 +1,338 @@
+{
+  "checkpoints": [
+    {
+      "auxiliary_held_nash_conv": 6.118263497964922,
+      "auxiliary_nash_conv": 6.118263497964923,
+      "evaluation_seconds": 7.3512433999999995,
+      "held_nash_conv": 2.4093420497049776,
+      "iteration": 0,
+      "nash_conv": 2.409343795790175,
+      "seats": [
+        {
+          "auxiliary_best_response": 3.025441391115025,
+          "auxiliary_gain": 3.244752173200176,
+          "auxiliary_held_a_to_b": 3.2472456442860045,
+          "auxiliary_held_b_to_a": 3.2422587021143454,
+          "auxiliary_held_gain": 3.244752173200175,
+          "auxiliary_telescoping_residual": -8.881784197001252e-16,
+          "best_response": 1.1880705666765212,
+          "gain": 1.407381348761672,
+          "held_a_to_b": 1.4073846108361834,
+          "held_b_to_a": 1.4073780866871608,
+          "held_gain": 1.407381348761672,
+          "l1_reach_share": 0.19444444444444423,
+          "seat": 0,
+          "telescoping_residual": -2.220446049250313e-16,
+          "value": -0.21931078208515078,
+          "value_a": -0.21932489398296257,
+          "value_b": -0.21929667018733923
+        },
+        {
+          "auxiliary_best_response": 3.0928221068498805,
+          "auxiliary_gain": 2.8735113247647477,
+          "auxiliary_held_a_to_b": 2.8746923906533466,
+          "auxiliary_held_b_to_a": 2.8723302588761483,
+          "auxiliary_held_gain": 2.8735113247647472,
+          "auxiliary_telescoping_residual": 1.3322676295501878e-15,
+          "best_response": 1.221273229113636,
+          "gain": 1.0019624470285031,
+          "held_a_to_b": 1.0019551465880348,
+          "held_b_to_a": 1.0019662552985769,
+          "held_gain": 1.0019607009433058,
+          "l1_reach_share": 0.19444444444444423,
+          "seat": 1,
+          "telescoping_residual": 1.1102230246251565e-15,
+          "value": 0.2193107820851328,
+          "value_a": 0.21932489398294538,
+          "value_b": 0.21929667018732135
+        }
+      ],
+      "seconds": 7.4924685
+    },
+    {
+      "auxiliary_held_nash_conv": 1.0325089379876111,
+      "auxiliary_nash_conv": 1.0325307391843097,
+      "evaluation_seconds": 9.0497313,
+      "held_nash_conv": 0.02438577462452609,
+      "iteration": 500,
+      "nash_conv": 0.026586780389463854,
+      "seats": [
+        {
+          "auxiliary_best_response": 0.5140955831220863,
+          "auxiliary_gain": 0.4687034926674713,
+          "auxiliary_held_a_to_b": 0.465691917291362,
+          "auxiliary_held_b_to_a": 0.47169108077615807,
+          "auxiliary_held_gain": 0.46869149903376006,
+          "auxiliary_telescoping_residual": 4.440892098500626e-16,
+          "best_response": 0.06738192335601535,
+          "gain": 0.021989832901400393,
+          "held_a_to_b": 0.021626385163891516,
+          "held_b_to_a": 0.021409546489732346,
+          "held_gain": 0.02151796582681193,
+          "l1_reach_share": 0.7291376276116606,
+          "seat": 0,
+          "telescoping_residual": -8.673617379884035e-17,
+          "value": 0.04539209045461496,
+          "value_a": 0.044888149072165436,
+          "value_b": 0.04589603183706443
+        },
+        {
+          "auxiliary_best_response": 0.516928286555707,
+          "auxiliary_gain": 0.5638272465168384,
+          "auxiliary_held_a_to_b": 0.5590349386751541,
+          "auxiliary_held_b_to_a": 0.5685999392325478,
+          "auxiliary_held_gain": 0.563817438953851,
+          "auxiliary_telescoping_residual": 0.0,
+          "best_response": -0.042302012473067946,
+          "gain": 0.004596947488063462,
+          "held_a_to_b": 0.0026722300660927123,
+          "held_b_to_a": 0.003063387529335604,
+          "held_gain": 0.002867808797714158,
+          "l1_reach_share": 0.7291376276116603,
+          "seat": 1,
+          "telescoping_residual": -1.3877787807814457e-16,
+          "value": -0.04689895996113141,
+          "value_a": -0.04849050804274272,
+          "value_b": -0.04530741187951987
+        }
+      ],
+      "seconds": 50.5460995
+    },
+    {
+      "auxiliary_held_nash_conv": 1.085264697269393,
+      "auxiliary_nash_conv": 1.085349176309348,
+      "evaluation_seconds": 7.1650807,
+      "held_nash_conv": 0.004244490511966896,
+      "iteration": 1000,
+      "nash_conv": 0.006591978199536608,
+      "seats": [
+        {
+          "auxiliary_best_response": 0.545062937247929,
+          "auxiliary_gain": 0.501147291193338,
+          "auxiliary_held_a_to_b": 0.4994120177513643,
+          "auxiliary_held_b_to_a": 0.5028130798199616,
+          "auxiliary_held_gain": 0.5011125487856629,
+          "auxiliary_telescoping_residual": -7.771561172376096e-16,
+          "best_response": 0.04784577251867276,
+          "gain": 0.0039301264640818,
+          "held_a_to_b": 0.0036304313407377192,
+          "held_b_to_a": 0.0037356718737721686,
+          "held_gain": 0.003683051607254944,
+          "l1_reach_share": 0.7432520655397584,
+          "seat": 0,
+          "telescoping_residual": 3.2959746043559335e-17,
+          "value": 0.04391564605459096,
+          "value_a": 0.04337459442748634,
+          "value_b": 0.044456697681695516
+        },
+        {
+          "auxiliary_best_response": 0.538624158774266,
+          "auxiliary_gain": 0.58420188511601,
+          "auxiliary_held_a_to_b": 0.5785107023306604,
+          "auxiliary_held_b_to_a": 0.5897935946367996,
+          "auxiliary_held_gain": 0.58415214848373,
+          "auxiliary_telescoping_residual": -1.2212453270876722e-15,
+          "best_response": -0.04291587460628923,
+          "gain": 0.002661851735454808,
+          "held_a_to_b": 0.0005594326601403021,
+          "held_b_to_a": 0.0005634451492836021,
+          "held_gain": 0.0005614389047119521,
+          "l1_reach_share": 0.7432520655397573,
+          "seat": 1,
+          "telescoping_residual": -5.681219383824043e-17,
+          "value": -0.045577726341744035,
+          "value_a": -0.0471536236719909,
+          "value_b": -0.044001829011496935
+        }
+      ],
+      "seconds": 92.9710726
+    },
+    {
+      "auxiliary_held_nash_conv": 1.1041132363602846,
+      "auxiliary_nash_conv": 1.104200229440501,
+      "evaluation_seconds": 6.5314633,
+      "held_nash_conv": 0.002976750755222121,
+      "iteration": 1500,
+      "nash_conv": 0.005876513763214478,
+      "seats": [
+        {
+          "auxiliary_best_response": 0.5658306190080215,
+          "auxiliary_gain": 0.5219441097876788,
+          "auxiliary_held_a_to_b": 0.5204237497100991,
+          "auxiliary_held_b_to_a": 0.5234644698652594,
+          "auxiliary_held_gain": 0.5219441097876792,
+          "auxiliary_telescoping_residual": 4.440892098500626e-16,
+          "best_response": 0.04743539520430202,
+          "gain": 0.0035488859839593392,
+          "held_a_to_b": 0.003314098555437378,
+          "held_b_to_a": 0.0032423636926363422,
+          "held_gain": 0.00327823112403686,
+          "l1_reach_share": 0.7466547092897234,
+          "seat": 0,
+          "telescoping_residual": 2.9967348047499343e-16,
+          "value": 0.04388650922034268,
+          "value_a": 0.043294015754799936,
+          "value_b": 0.04447900268588498
+        },
+        {
+          "auxiliary_best_response": 0.5367364621651951,
+          "auxiliary_gain": 0.5822561196528222,
+          "auxiliary_held_a_to_b": 0.5766015346837781,
+          "auxiliary_held_b_to_a": 0.5877367184614327,
+          "auxiliary_held_gain": 0.5821691265726054,
+          "auxiliary_telescoping_residual": -6.661338147750939e-16,
+          "best_response": -0.043192029708371965,
+          "gain": 0.0023276277792551384,
+          "held_a_to_b": -0.00020339906793722523,
+          "held_b_to_a": -0.0003995616696922527,
+          "held_gain": -0.00030148036881473897,
+          "l1_reach_share": 0.74665470928972,
+          "seat": 1,
+          "telescoping_residual": 9.974659986866641e-18,
+          "value": -0.0455196574876271,
+          "value_a": -0.047058699120882466,
+          "value_b": -0.04398061585437184
+        }
+      ],
+      "seconds": 128.3092721
+    },
+    {
+      "auxiliary_held_nash_conv": 1.1259395107108812,
+      "auxiliary_nash_conv": 1.1260782988057572,
+      "evaluation_seconds": 7.164906,
+      "held_nash_conv": 0.002049321929723638,
+      "iteration": 2000,
+      "nash_conv": 0.004655081212317828,
+      "seats": [
+        {
+          "auxiliary_best_response": 0.5802421934212345,
+          "auxiliary_gain": 0.536529754999507,
+          "auxiliary_held_a_to_b": 0.5350130797128083,
+          "auxiliary_held_b_to_a": 0.5380096718985331,
+          "auxiliary_held_gain": 0.5365113758056708,
+          "auxiliary_telescoping_residual": 0.0,
+          "best_response": 0.04602236357727055,
+          "gain": 0.0023099251555430203,
+          "held_a_to_b": 0.0018712833398852602,
+          "held_b_to_a": 0.001990143526963452,
+          "held_gain": 0.001930713433424356,
+          "l1_reach_share": 0.74393214746948,
+          "seat": 0,
+          "telescoping_residual": -8.760353553682876e-17,
+          "value": 0.04371243842172753,
+          "value_a": 0.04307936217455397,
+          "value_b": 0.04434551466890086
+        },
+        {
+          "auxiliary_best_response": 0.5442104526755817,
+          "auxiliary_gain": 0.5895485438062502,
+          "auxiliary_held_a_to_b": 0.5838909875398044,
+          "auxiliary_held_b_to_a": 0.5949652822706163,
+          "auxiliary_held_gain": 0.5894281349052104,
+          "auxiliary_telescoping_residual": -1.5543122344752192e-15,
+          "best_response": -0.04299293507389373,
+          "gain": 0.002345156056774808,
+          "held_a_to_b": -0.00015635321537045554,
+          "held_b_to_a": 0.0003935702079690198,
+          "held_gain": 0.00011860849629928213,
+          "l1_reach_share": 0.743932147469482,
+          "seat": 1,
+          "telescoping_residual": 4.9439619065339e-17,
+          "value": -0.045338091130668536,
+          "value_a": -0.04685138013386508,
+          "value_b": -0.043824802127472154
+        }
+      ],
+      "seconds": 166.5994041
+    }
+  ],
+  "ehs2": {
+    "blake3": "55df69080ecc8a308eaecffb00c227a231c93923f0ff015ad6eed30ef8e40f87",
+    "bucket_counts": {
+      "flop_buckets": 32,
+      "river_buckets": 32,
+      "turn_buckets": 32
+    },
+    "bytes": 357378844,
+    "path": "C:\\Users\\PC_User\\AppData\\Local/solvers/ehs2/v2-f32-t32-r32.postcard",
+    "refinement": {
+      "recall": 1,
+      "texture": 0
+    },
+    "relative": {
+      "buckets": 32,
+      "strength_table": "C:\\Users\\PC_User\\AppData\\Local/solvers/ehs2/v2-f128-t128-r128.postcard"
+    }
+  },
+  "format": "p2-trunk-solve",
+  "game_fingerprint": "a7e9ad90f312f1760d0ab75d3d625f7e48ab58352785240207d3517b41df080f",
+  "iterations": 2000,
+  "k4": {
+    "samples": 2048,
+    "seed": 0
+  },
+  "l1": {
+    "leaves": 5,
+    "postflop_nodes": 302,
+    "slots": 21696,
+    "storage_bytes": 347136
+  },
+  "leaf_model": "l1",
+  "options": {
+    "alpha": 1.5,
+    "beta": 1.0,
+    "eval_every": 500,
+    "gamma": 2.0,
+    "iterations": 2000,
+    "k4_min_samples": null,
+    "k4_samples": null,
+    "l1_boards": 32,
+    "l1_eval_boards": 4096,
+    "l1_eval_control": true,
+    "l1_eval_regression": true,
+    "l1_eval_sampling": "stratified",
+    "l1_eval_seed": 0,
+    "l1_postflop_beta": 0.0,
+    "l1_sampling": "stratified",
+    "l1_seed": 0,
+    "l1_train_control": true,
+    "l1_train_regression": true,
+    "target_nash_conv": null
+  },
+  "reached_target": false,
+  "source": "examples/bench/hu_20bb_postflop.toml",
+  "tables": {
+    "t2": {
+      "payload_blake3": "885e99f5307de34fb311d4075ed9fc9d9ecb72ec15db36ee896704239b70da87"
+    },
+    "t3": {
+      "payload_blake3": "bdafa5c526d0b7207abe93b6281bd8e7cb9316fe2fb32e917f6c433ef7a044b8"
+    }
+  },
+  "terminals": {
+    "counts_by_k": [
+      0,
+      11,
+      11
+    ]
+  },
+  "timings": {
+    "model": 0.0062326,
+    "solve": {
+      "board_preparation": 1.9467179999999997,
+      "evaluation": 37.262424700000004,
+      "evaluation_board_preparation": 0.141003,
+      "k4": 0.009585500000000047,
+      "postflop": 124.42833870000008,
+      "reaches": 0.5745516000000007,
+      "t2": 2.0452691000000005,
+      "t3": 0.000730699999999976,
+      "update": 0.1600100000000001
+    },
+    "tables": 0.1824917,
+    "total": 169.1126012,
+    "tree": 0.0014514
+  },
+  "version": 2,
+  "warnings": []
+}

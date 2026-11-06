@@ -1,0 +1,43 @@
+Tree: 6845 decisions, 7801 terminals (1.408s)
+Tables: 0.287s; model: 0.003s
+L1: 304 leaves; 20748 postflop decisions; 25830400 slots; 413286400 storage bytes
+Checkpoint 0: NashConv 66.292658069568; held 66.292655379267; auxiliary 73.147066552885; auxiliary held 73.145859846970; gains [11.180454561773105, 10.372061474272238, 9.826474899300813, 11.454264016129912, 11.683542156658003, 11.775860961433814]; held gains [11.180454561773107, 10.372061436744858, 9.826472721516833, 11.454263731135931, 11.683541966662002, 11.775860961433814]; auxiliary gains [12.05739153734789, 11.806423015010557, 12.060345880102728, 12.294824831070315, 12.653003267085486, 12.275078022267921]; auxiliary held gains [12.057366325158622, 11.806385803657978, 12.060211457769961, 12.294660331769471, 12.65217227489876, 12.275063653715197]; evaluation 71.499496s
+Iteration 50: wall 1.984658s; reaches 0.071783; t2 0.018876; t3 0.174048; k4 0.434410; update 0.043186; board preparation 0.000487; postflop 1.235892; evaluation 0.000000
+Iteration 100: wall 1.872606s; reaches 0.069126; t2 0.018719; t3 0.131880; k4 0.358758; update 0.043781; board preparation 0.000609; postflop 1.243451; evaluation 0.000000
+Iteration 150: wall 1.886109s; reaches 0.066256; t2 0.018257; t3 0.132137; k4 0.366296; update 0.043724; board preparation 0.000451; postflop 1.252865; evaluation 0.000000
+Iteration 200: wall 1.799583s; reaches 0.064687; t2 0.018313; t3 0.120759; k4 0.357869; update 0.043698; board preparation 0.000473; postflop 1.186610; evaluation 0.000000
+Iteration 250: wall 1.760216s; reaches 0.064292; t2 0.017906; t3 0.114980; k4 0.341205; update 0.043700; board preparation 0.000318; postflop 1.171479; evaluation 0.000000
+Iteration 300: wall 1.755072s; reaches 0.062501; t2 0.017689; t3 0.113206; k4 0.336582; update 0.042971; board preparation 0.000461; postflop 1.175658; evaluation 0.000000
+Iteration 350: wall 1.757611s; reaches 0.062742; t2 0.017687; t3 0.113759; k4 0.329840; update 0.043248; board preparation 0.000430; postflop 1.183901; evaluation 0.000000
+Iteration 400: wall 1.760836s; reaches 0.062756; t2 0.017504; t3 0.111860; k4 0.315173; update 0.043539; board preparation 0.000315; postflop 1.203554; evaluation 0.000000
+Iteration 450: wall 1.729054s; reaches 0.062915; t2 0.017260; t3 0.110790; k4 0.311140; update 0.043343; board preparation 0.000514; postflop 1.176999; evaluation 0.000000
+Iteration 500: wall 1.733579s; reaches 0.063214; t2 0.017419; t3 0.110610; k4 0.308020; update 0.043328; board preparation 0.000387; postflop 1.184442; evaluation 0.000000
+Iteration 550: wall 1.712013s; reaches 0.062758; t2 0.017114; t3 0.109379; k4 0.321070; update 0.043398; board preparation 0.000315; postflop 1.151854; evaluation 0.000000
+Iteration 600: wall 1.722929s; reaches 0.061408; t2 0.017412; t3 0.107899; k4 0.317955; update 0.043137; board preparation 0.000310; postflop 1.168860; evaluation 0.000000
+Iteration 650: wall 1.705664s; reaches 0.067698; t2 0.017377; t3 0.106351; k4 0.324213; update 0.043495; board preparation 0.000483; postflop 1.139926; evaluation 0.000000
+Iteration 700: wall 1.683820s; reaches 0.062662; t2 0.017665; t3 0.105384; k4 0.313930; update 0.044051; board preparation 0.000316; postflop 1.133350; evaluation 0.000000
+Iteration 750: wall 1.648160s; reaches 0.061256; t2 0.017449; t3 0.105362; k4 0.302926; update 0.043349; board preparation 0.000312; postflop 1.111493; evaluation 0.000000
+Iteration 800: wall 1.631397s; reaches 0.061354; t2 0.017068; t3 0.107027; k4 0.310915; update 0.043372; board preparation 0.000423; postflop 1.085135; evaluation 0.000000
+Iteration 850: wall 1.624614s; reaches 0.061385; t2 0.017243; t3 0.104667; k4 0.303690; update 0.042987; board preparation 0.000552; postflop 1.088093; evaluation 0.000000
+Iteration 900: wall 1.588584s; reaches 0.061525; t2 0.017502; t3 0.102314; k4 0.291367; update 0.043601; board preparation 0.000313; postflop 1.065827; evaluation 0.000000
+Iteration 950: wall 1.591714s; reaches 0.062582; t2 0.017958; t3 0.103237; k4 0.294946; update 0.043636; board preparation 0.000458; postflop 1.062633; evaluation 0.000000
+Iteration 1000: wall 70.765700s; reaches 0.061800; t2 0.017294; t3 0.104969; k4 0.291773; update 0.043535; board preparation 0.000480; postflop 1.071208; evaluation 69.161020
+Checkpoint 1000: NashConv 0.018909476159; held -0.013818205981; auxiliary 16.660183083709; auxiliary held 16.654479558058; gains [0.0016926884311578017, 0.0018004807701266778, 0.00474641708366097, 0.00256032410764645, 0.0038336369058386555, 0.00427592886014902]; held gains [-0.004115882915992838, -0.0016183236935473355, -0.0020830590064724874, -0.0028658230826588693, -0.0018065920834932636, -0.0013285251987154578]; auxiliary gains [2.634872948792346, 2.5859336318939703, 2.554675552436711, 2.9163834192605416, 3.007756439896185, 2.9605610914293914]; auxiliary held gains [2.634449678623379, 2.585608813347748, 2.5502310726013016, 2.9162733130044964, 3.0075302391953405, 2.9603864412855625]; evaluation 69.161020s
+Iteration 1050: wall 1.607501s; reaches 0.061571; t2 0.017252; t3 0.103395; k4 0.287346; update 0.043238; board preparation 0.000317; postflop 1.088390; evaluation 0.000000
+Iteration 1100: wall 1.603636s; reaches 0.061637; t2 0.017062; t3 0.102305; k4 0.286328; update 0.043084; board preparation 0.000447; postflop 1.086865; evaluation 0.000000
+Iteration 1150: wall 1.565282s; reaches 0.061611; t2 0.017086; t3 0.103656; k4 0.279281; update 0.043257; board preparation 0.000307; postflop 1.054043; evaluation 0.000000
+Iteration 1200: wall 1.546998s; reaches 0.061327; t2 0.017061; t3 0.101265; k4 0.272544; update 0.043408; board preparation 0.000323; postflop 1.044994; evaluation 0.000000
+Iteration 1250: wall 1.554190s; reaches 0.061542; t2 0.017347; t3 0.101774; k4 0.276944; update 0.043167; board preparation 0.000421; postflop 1.046983; evaluation 0.000000
+Iteration 1300: wall 1.584877s; reaches 0.061918; t2 0.017717; t3 0.103028; k4 0.279656; update 0.043859; board preparation 0.000456; postflop 1.071890; evaluation 0.000000
+Iteration 1350: wall 1.572883s; reaches 0.061587; t2 0.017162; t3 0.102052; k4 0.284429; update 0.043267; board preparation 0.000325; postflop 1.057935; evaluation 0.000000
+Iteration 1400: wall 1.540280s; reaches 0.062015; t2 0.017499; t3 0.101238; k4 0.285606; update 0.043769; board preparation 0.000411; postflop 1.023434; evaluation 0.000000
+Iteration 1450: wall 1.526933s; reaches 0.060972; t2 0.017135; t3 0.100453; k4 0.282353; update 0.043454; board preparation 0.000466; postflop 1.016235; evaluation 0.000000
+Iteration 1500: wall 1.546460s; reaches 0.061635; t2 0.017485; t3 0.101828; k4 0.280795; update 0.044245; board preparation 0.000327; postflop 1.032885; evaluation 0.000000
+Iteration 1550: wall 1.549910s; reaches 0.061508; t2 0.017173; t3 0.103619; k4 0.288955; update 0.043169; board preparation 0.000431; postflop 1.029063; evaluation 0.000000
+Iteration 1600: wall 1.543913s; reaches 0.061655; t2 0.017748; t3 0.101540; k4 0.278545; update 0.043270; board preparation 0.000324; postflop 1.034669; evaluation 0.000000
+Iteration 1650: wall 1.540125s; reaches 0.060992; t2 0.017825; t3 0.100309; k4 0.281699; update 0.043223; board preparation 0.000517; postflop 1.029658; evaluation 0.000000
+Iteration 1700: wall 1.481158s; reaches 0.061810; t2 0.018007; t3 0.102492; k4 0.257312; update 0.044117; board preparation 0.000314; postflop 0.991000; evaluation 0.000000
+Iteration 1750: wall 1.520941s; reaches 0.061829; t2 0.017585; t3 0.100850; k4 0.282126; update 0.043823; board preparation 0.000382; postflop 1.007968; evaluation 0.000000
+Iteration 1800: wall 1.533573s; reaches 0.060655; t2 0.017508; t3 0.100319; k4 0.280466; update 0.043285; board preparation 0.000435; postflop 1.024853; evaluation 0.000000
+Iteration 1850: wall 1.502795s; reaches 0.061061; t2 0.017682; t3 0.100991; k4 0.285819; update 0.043157; board preparation 0.000310; postflop 0.987924; evaluation 0.000000
+Iteration 1900: wall 1.554225s; reaches 0.061274; t2 0.016924; t3 0.105121; k4 0.282963; update 0.043065; board preparation 0.000314; postflop 1.038450; evaluation 0.000000

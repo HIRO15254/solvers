@@ -1,0 +1,1 @@
+TRAIN_ARGS='--l1-boards 128' bash ~/run_own_cloud.sh b128s <(awk -F'\t' '$1=="srp" && $2==2' ~/plan-sb.tsv)

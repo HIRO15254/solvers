@@ -1,12 +1,13 @@
 # Heads-up 20-BB benchmark B6 of docs/plans/p2-method-redesign.jp.md: preflop limps, opens and all-ins with
 # postflop betting, for checking the L1 leaf model (abstracted heads-up postflop) on a small tree.
 # The postflop menus are those of 6max_20bb.toml (benchmark B7): one bet of half the pot or all in per street.
+# Migrated to the v0.2 input syntax on 2026-11-05; its [tree] equals main's migration of examples/bench/hu_20bb_postflop.toml.
 schema = "solvers.nlh/v1"
 
 [table]
 players = 2
 
-[table.stacks_bb]
+[table.stacks]
 BTN = 20.0
 BB = 20.0
 
@@ -19,23 +20,24 @@ BB = "random"
 
 [tree]
 script = '''
+preflop, flop, turn, river {
+  add bet [a]
+  add raise [a]
+}
 preflop when unopened { replace raise [2.5x, a] }
 preflop when !unopened { replace raise [3x, a] }
 preflop when aggressions >= 2 { replace raise [a] }
-flop when unopened { replace bet [50, a] }
-flop when !unopened { replace raise [75, a] }
-turn when unopened { replace bet [50, a] }
-turn when !unopened { replace raise [75, a] }
-river when unopened { replace bet [50, a] }
-river when !unopened { replace raise [75, a] }
+flop when unopened { replace bet [50%, a] }
+flop when !unopened { replace raise [75%, a] }
+turn when unopened { replace bet [50%, a] }
+turn when !unopened { replace raise [75%, a] }
+river when unopened { replace bet [50%, a] }
+river when !unopened { replace raise [75%, a] }
+preflop when aggressions >= 3 { remove raise }
+flop when aggressions >= 1 { remove raise }
+turn when aggressions >= 1 { remove raise }
+river when aggressions >= 1 { remove raise }
 '''
-include_allin = true
-
-[tree.max_aggressive_actions]
-preflop = 3
-flop = 1
-turn = 1
-river = 1
 
 [solver]
 kind = "range-vector"

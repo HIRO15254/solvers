@@ -1,0 +1,4 @@
+bash ~/override_solve.sh ~/out/ruler ov-truth-sd0 0 ~/truth-p1.json ~/truth-p1.json
+bash ~/override_solve.sh ~/out/ruler ov-truth-sd1 1 ~/truth-p1.json ~/truth-p1.json
+bash ~/trunk_eval.sh ~/out/ruler-eval/e2 e2 ~/e2.profile.json ~/e2.postflop.bin 0 ~/truth-p1.json ~/truth-multi.json
+bash ~/trunk_eval.sh ~/out/ruler-eval/e2sd1 e2sd1 ~/e2sd1.profile.json ~/e2sd1.postflop.bin 1 ~/truth-p1.json ~/truth-multi.json

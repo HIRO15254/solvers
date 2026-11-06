@@ -1,0 +1,2 @@
+bash ~/run_own_cloud.sh own ~/plan-own.tsv
+bash ~/run_own_cloud.sh own-ro ~/plan-ro.tsv

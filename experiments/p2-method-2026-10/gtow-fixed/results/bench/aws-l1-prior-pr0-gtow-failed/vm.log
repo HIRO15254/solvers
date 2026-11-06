@@ -1,0 +1,133 @@
+2026-10-18T03:27:08Z ranked candidates: score=USD/hour/relative-speed region AZ type USD/hour speed
+2026-10-18T03:27:08Z 0.216666667 us-east-2 us-east-2b c7a.8xlarge 0.325000 1.5
+2026-10-18T03:27:08Z 0.223000000 us-east-2 us-east-2c c7a.8xlarge 0.334500 1.5
+2026-10-18T03:27:08Z 0.250600000 us-east-2 us-east-2a c7a.8xlarge 0.375900 1.5
+2026-10-18T03:27:08Z 0.296900000 us-east-2 us-east-2c c6i.8xlarge 0.296900 1.0
+2026-10-18T03:27:08Z 0.301000000 us-east-2 us-east-2b c6i.8xlarge 0.301000 1.0
+2026-10-18T03:27:08Z 0.303700000 us-east-2 us-east-2a c6i.8xlarge 0.303700 1.0
+2026-10-18T03:27:08Z 0.306800000 us-east-2 us-east-2c c6a.8xlarge 0.306800 1.0
+2026-10-18T03:27:08Z 0.320800000 us-east-2 us-east-2b c6a.8xlarge 0.320800 1.0
+2026-10-18T03:27:08Z 0.323200000 us-east-2 us-east-2a c6a.8xlarge 0.323200 1.0
+2026-10-18T03:27:08Z 0.346500000 us-east-2 us-east-2c c7i.8xlarge 0.346500 1.0
+2026-10-18T03:27:08Z 0.375300000 us-east-2 us-east-2a c7i.8xlarge 0.375300 1.0
+2026-10-18T03:27:09Z 0.409066667 us-east-1 us-east-1a c7a.8xlarge 0.613600 1.5
+2026-10-18T03:27:09Z 0.410600000 us-east-1 us-east-1b c7a.8xlarge 0.615900 1.5
+2026-10-18T03:27:09Z 0.421066667 us-east-1 us-east-1d c7a.8xlarge 0.631600 1.5
+2026-10-18T03:27:09Z 0.421466667 us-east-1 us-east-1c c7a.8xlarge 0.632200 1.5
+2026-10-18T03:27:09Z 0.431500000 us-east-2 us-east-2b c7i.8xlarge 0.431500 1.0
+2026-10-18T03:27:09Z 0.444066667 us-east-1 us-east-1f c7a.8xlarge 0.666100 1.5
+2026-10-18T03:27:09Z 0.515900000 us-east-1 us-east-1b c6a.8xlarge 0.515900 1.0
+2026-10-18T03:27:09Z 0.546300000 us-east-1 us-east-1d c6a.8xlarge 0.546300 1.0
+2026-10-18T03:27:09Z 0.548300000 us-east-1 us-east-1f c6a.8xlarge 0.548300 1.0
+2026-10-18T03:27:09Z 0.602300000 us-east-1 us-east-1a c6a.8xlarge 0.602300 1.0
+2026-10-18T03:27:09Z 0.644400000 us-east-1 us-east-1c c6a.8xlarge 0.644400 1.0
+2026-10-18T03:27:09Z 0.670800000 us-east-1 us-east-1f c6i.8xlarge 0.670800 1.0
+2026-10-18T03:27:09Z 0.711000000 us-east-1 us-east-1a c7i.8xlarge 0.711000 1.0
+2026-10-18T03:27:09Z 0.744300000 us-east-1 us-east-1f c7i.8xlarge 0.744300 1.0
+2026-10-18T03:27:10Z 0.777100000 us-east-1 us-east-1d c7i.8xlarge 0.777100 1.0
+2026-10-18T03:27:10Z 0.799700000 us-east-1 us-east-1b c7i.8xlarge 0.799700 1.0
+2026-10-18T03:27:10Z 0.829200000 us-east-1 us-east-1c c7i.8xlarge 0.829200 1.0
+2026-10-18T03:27:10Z 0.895800000 us-east-1 us-east-1b c6i.8xlarge 0.895800 1.0
+2026-10-18T03:27:10Z 0.998000000 us-east-1 us-east-1a c6i.8xlarge 0.998000 1.0
+2026-10-18T03:27:10Z 1.170000000 us-east-1 us-east-1d c6i.8xlarge 1.170000 1.0
+2026-10-18T03:27:10Z 1.226000000 us-east-1 us-east-1c c6i.8xlarge 1.226000 1.0
+2026-10-18T03:27:26Z requesting region=us-east-2 az=us-east-2b type=c7a.8xlarge ami=ami-02ad619be5bc165df
+2026-10-18T03:27:31Z request=sir-gn4qq2vg status=fulfilled state=active
+2026-10-18T03:27:34Z using region=us-east-2 instance=i-00fc4c441f03c6fa1 request=sir-gn4qq2vg az=us-east-2b type=c7a.8xlarge spot-price-usd-per-hour=0.325000 speed=1.5 score=0.216666667
+2026-10-18T03:27:36Z instance=i-00fc4c441f03c6fa1 status=running ip=18.191.43.181
+2026-10-18T03:28:34Z uploaded source, job and flat extra files
+2026-10-18T03:28:36Z launched instance=i-00fc4c441f03c6fa1
+2026-10-18T03:28:39Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.325000	2026-10-18T01:00:00+00:00
+2026-10-18T03:28:41Z downloaded results
+2026-10-18T03:33:41Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.325000	2026-10-18T01:00:00+00:00
+2026-10-18T03:33:44Z downloaded results
+2026-10-18T03:38:41Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.325000	2026-10-18T01:00:00+00:00
+2026-10-18T03:38:44Z downloaded results
+2026-10-18T03:42:44Z instance=i-00fc4c441f03c6fa1 status=stopping ip=18.191.43.181
+2026-10-18T03:42:44Z spot reclaim log: kind=quick region=us-east-2 ran_s=908
+2026-10-18T03:43:01Z instance=i-00fc4c441f03c6fa1 status=stopped ip=None
+2026-10-18T03:43:36Z instance=i-00fc4c441f03c6fa1 status=running ip=3.128.160.195
+2026-10-18T03:43:44Z launched instance=i-00fc4c441f03c6fa1
+2026-10-18T03:43:46Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.325000	2026-10-18T01:00:00+00:00
+2026-10-18T03:43:49Z downloaded results
+2026-10-18T03:49:01Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.325000	2026-10-18T01:00:00+00:00
+2026-10-18T03:49:03Z downloaded results
+2026-10-18T03:54:14Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.325000	2026-10-18T01:00:00+00:00
+2026-10-18T03:54:17Z downloaded results
+2026-10-18T03:59:28Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.325000	2026-10-18T01:00:00+00:00
+2026-10-18T03:59:31Z downloaded results
+2026-10-18T04:00:05Z instance=i-00fc4c441f03c6fa1 status=stopped ip=None
+2026-10-18T04:00:05Z spot reclaim log: kind=quick region=us-east-2 ran_s=989
+2026-10-18T04:04:06Z instance=i-00fc4c441f03c6fa1 status=running ip=52.14.73.152
+2026-10-18T04:04:18Z launched instance=i-00fc4c441f03c6fa1
+2026-10-18T04:04:21Z downloaded results
+2026-10-18T04:04:40Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.325000	2026-10-18T01:00:00+00:00
+2026-10-18T04:09:34Z downloaded results
+2026-10-18T04:09:54Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.325000	2026-10-18T01:00:00+00:00
+2026-10-18T04:14:49Z downloaded results
+2026-10-18T04:15:08Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-2b price=0.325000	2026-10-18T01:00:00+00:00
+2026-10-18T04:17:43Z instance=i-00fc4c441f03c6fa1 status=stopping ip=52.14.73.152
+2026-10-18T04:17:44Z spot reclaim log: kind=quick region=us-east-2 ran_s=817
+2026-10-18T04:17:44Z region=us-east-2 reached 3 consecutive quick Spot reclaims; moving to another market
+2026-10-18T04:18:05Z abandoned region=us-east-2 request=sir-gn4qq2vg instance=i-00fc4c441f03c6fa1; the job restarts from scratch elsewhere
+2026-10-18T04:18:06Z skipping region=us-east-2 until 2026-10-18T12:18:01Z: consecutive quick Spot reclaims (/c/Users/PC_User/.cache/p2-aws/spot-reclaims.log)
+2026-10-18T04:18:09Z ranked candidates: score=USD/hour/relative-speed region AZ type USD/hour speed
+2026-10-18T04:18:09Z 0.409066667 us-east-1 us-east-1a c7a.8xlarge 0.613600 1.5
+2026-10-18T04:18:09Z 0.410600000 us-east-1 us-east-1b c7a.8xlarge 0.615900 1.5
+2026-10-18T04:18:09Z 0.421200000 us-east-1 us-east-1d c7a.8xlarge 0.631800 1.5
+2026-10-18T04:18:09Z 0.421466667 us-east-1 us-east-1c c7a.8xlarge 0.632200 1.5
+2026-10-18T04:18:10Z 0.444066667 us-east-1 us-east-1f c7a.8xlarge 0.666100 1.5
+2026-10-18T04:18:10Z 0.515900000 us-east-1 us-east-1b c6a.8xlarge 0.515900 1.0
+2026-10-18T04:18:10Z 0.548300000 us-east-1 us-east-1f c6a.8xlarge 0.548300 1.0
+2026-10-18T04:18:10Z 0.548700000 us-east-1 us-east-1d c6a.8xlarge 0.548700 1.0
+2026-10-18T04:18:10Z 0.602300000 us-east-1 us-east-1a c6a.8xlarge 0.602300 1.0
+2026-10-18T04:18:10Z 0.644400000 us-east-1 us-east-1c c6a.8xlarge 0.644400 1.0
+2026-10-18T04:18:10Z 0.670800000 us-east-1 us-east-1f c6i.8xlarge 0.670800 1.0
+2026-10-18T04:18:10Z 0.711000000 us-east-1 us-east-1a c7i.8xlarge 0.711000 1.0
+2026-10-18T04:18:10Z 0.744300000 us-east-1 us-east-1f c7i.8xlarge 0.744300 1.0
+2026-10-18T04:18:10Z 0.777100000 us-east-1 us-east-1d c7i.8xlarge 0.777100 1.0
+2026-10-18T04:18:10Z 0.799700000 us-east-1 us-east-1b c7i.8xlarge 0.799700 1.0
+2026-10-18T04:18:10Z 0.829200000 us-east-1 us-east-1c c7i.8xlarge 0.829200 1.0
+2026-10-18T04:18:10Z 0.901400000 us-east-1 us-east-1b c6i.8xlarge 0.901400 1.0
+2026-10-18T04:18:10Z 0.991500000 us-east-1 us-east-1a c6i.8xlarge 0.991500 1.0
+2026-10-18T04:18:11Z 1.170000000 us-east-1 us-east-1d c6i.8xlarge 1.170000 1.0
+2026-10-18T04:18:11Z 1.226000000 us-east-1 us-east-1c c6i.8xlarge 1.226000 1.0
+2026-10-18T04:18:27Z requesting region=us-east-1 az=us-east-1a type=c7a.8xlarge ami=ami-02a9cdd4e98bc3c78
+2026-10-18T04:18:33Z request=sir-m45zq8fh status=fulfilled state=active
+2026-10-18T04:18:35Z using region=us-east-1 instance=i-0d525ff241843e565 request=sir-m45zq8fh az=us-east-1a type=c7a.8xlarge spot-price-usd-per-hour=0.613600 speed=1.5 score=0.409066667
+2026-10-18T04:18:38Z instance=i-0d525ff241843e565 status=running ip=44.222.137.80
+2026-10-18T04:19:36Z uploaded source, job and flat extra files
+2026-10-18T04:19:39Z launched instance=i-0d525ff241843e565
+2026-10-18T04:19:41Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.613600	2026-10-18T03:00:00+00:00
+2026-10-18T04:19:43Z downloaded results
+2026-10-18T04:24:56Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.613600	2026-10-18T03:00:00+00:00
+2026-10-18T04:24:59Z downloaded results
+2026-10-18T04:30:10Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.613600	2026-10-18T03:00:00+00:00
+2026-10-18T04:30:13Z downloaded results
+2026-10-18T04:35:23Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.613600	2026-10-18T03:00:00+00:00
+2026-10-18T04:35:26Z downloaded results
+2026-10-18T04:40:37Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.613600	2026-10-18T03:00:00+00:00
+2026-10-18T04:40:39Z downloaded results
+2026-10-18T04:45:50Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.613600	2026-10-18T03:00:00+00:00
+2026-10-18T04:45:52Z downloaded results
+2026-10-18T04:48:44Z spot reclaim log: kind=ok region=us-east-1 ran_s=1806
+2026-10-18T04:51:06Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.613600	2026-10-18T03:00:00+00:00
+2026-10-18T04:51:10Z downloaded results
+2026-10-18T04:56:21Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.613600	2026-10-18T03:00:00+00:00
+2026-10-18T04:56:38Z downloaded results
+2026-10-18T05:01:35Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.613600	2026-10-18T03:00:00+00:00
+2026-10-18T05:02:31Z results download unavailable (see ssh.log); retrying at next interval
+2026-10-18T05:06:40Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.613600	2026-10-18T03:00:00+00:00
+2026-10-18T05:06:55Z results download unavailable (see ssh.log); retrying at next interval
+2026-10-18T05:11:56Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.613600	2026-10-18T03:00:00+00:00
+2026-10-18T05:12:11Z results download unavailable (see ssh.log); retrying at next interval
+2026-10-18T05:16:56Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.613600	2026-10-18T03:00:00+00:00
+2026-10-18T05:17:11Z results download unavailable (see ssh.log); retrying at next interval
+2026-10-18T05:21:57Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.613600	2026-10-18T03:00:00+00:00
+2026-10-18T05:22:12Z results download unavailable (see ssh.log); retrying at next interval
+2026-10-18T05:26:58Z spot-price-usd-per-hour type=c7a.8xlarge az=us-east-1a price=0.613600	2026-10-18T03:00:00+00:00
+2026-10-18T05:27:13Z results download unavailable (see ssh.log); retrying at next interval
+2026-10-18T05:27:28Z deadline passed
+2026-10-18T05:27:37Z canceled request=sir-gn4qq2vg
+2026-10-18T05:27:41Z canceled request=sir-m45zq8fh
+2026-10-18T05:28:19Z deleted instance=i-0d525ff241843e565 request=sir-m45zq8fh

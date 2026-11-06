@@ -1,0 +1,23 @@
+	Command being timed: "target/release/examples/trunk_solve --config /home/PC_User/b4s-gtow-raise.toml --leaf-model l1 --ehs2-cache /home/PC_User/ehs2/v2-f32-t32-r32.postcard --l1-relative 8x2:/home/PC_User/ehs2/v2-f128-t128-r128.postcard --l1-relative-prior 10 --l1-flop-groups /home/PC_User/k25-groups.txt --l1-hand draws --solver-k4-samples 256 --solver-k4-min-samples 16 --l1-eval-boards 1024 --iterations 1000000 --eval-every 1000 --print-every 100 --max-seconds 14400 --state /home/PC_User/state/traise+p10+g25+hd.state --state-every 1200 --snapshot-dir /home/PC_User/snap-traise+p10+g25+hd --output /home/PC_User/results/traise+p10+g25+hd.json --output-profile /home/PC_User/final/traise+p10+g25+hd.profile.json --output-postflop /home/PC_User/final/traise+p10+g25+hd.postflop.bin"
+	User time (seconds): 328204.97
+	System time (seconds): 1404.92
+	Percent of CPU this job got: 2280%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 4:00:56
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 4516312
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 60920421
+	Voluntary context switches: 43419203
+	Involuntary context switches: 6426649
+	Swaps: 0
+	File system inputs: 168
+	File system outputs: 18905312
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

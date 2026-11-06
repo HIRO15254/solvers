@@ -1,0 +1,1 @@
+srp	1	fold/raise-to:2000/fold/fold/fold/call:1000	--l1-flop-groups none --l1-leaf-flop-groups ../ll-own-L01.txt

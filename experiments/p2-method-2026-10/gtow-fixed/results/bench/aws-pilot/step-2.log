@@ -1,0 +1,303 @@
+tree: nodes=3471804 terminals=2211404 rank_tables=1176 storage=5620.8 MiB (f32) / 2819.9 MiB (i16) / 4220.3 MiB (i16-f32avg)
+memory estimate: 6140.8 MiB (f32) / 3339.9 MiB (i16) / 4740.3 MiB (i16-f32avg)
+warning: unmatched Flop tree rule 5
+iter=      25 expl_p0=1.944e0 expl_p1=2.783e0 nash_conv=4.727e0
+iter=      50 expl_p0=6.658e-1 expl_p1=7.597e-1 nash_conv=1.426e0
+iter=     100 expl_p0=3.612e-1 expl_p1=1.681e-1 nash_conv=5.293e-1
+iter=     150 expl_p0=1.934e-1 expl_p1=7.277e-2 nash_conv=2.661e-1
+iter=     198 expl_p0=1.125e-1 expl_p1=3.960e-2 nash_conv=1.521e-1
+iter=     201 expl_p0=9.538e-2 expl_p1=3.911e-2 nash_conv=1.345e-1
+done: iterations=201 wall=53.24s ev_p0=16.467816 ev_p1=6.198025 nash_conv=1.345e-1
+sol: wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/solution.sol (15.77 MB, 9248 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 2.82s (3471804 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 2.82s (3471804 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/summary.csv
+FLOP L13-gt3bet 2c 4s Kh wall_s=53.2 it=201 cap=0
+tree: nodes=3471804 terminals=2211404 rank_tables=1176 storage=5655.4 MiB (f32) / 2837.2 MiB (i16) / 4246.3 MiB (i16-f32avg)
+memory estimate: 6175.4 MiB (f32) / 3357.2 MiB (i16) / 4766.3 MiB (i16-f32avg)
+warning: unmatched Flop tree rule 5
+iter=      25 expl_p0=3.519e0 expl_p1=3.132e0 nash_conv=6.651e0
+iter=      50 expl_p0=1.037e0 expl_p1=7.798e-1 nash_conv=1.817e0
+iter=     100 expl_p0=2.029e-1 expl_p1=1.526e-1 nash_conv=3.556e-1
+iter=     136 expl_p0=1.012e-1 expl_p1=7.900e-2 nash_conv=1.802e-1
+iter=     146 expl_p0=8.623e-2 expl_p1=7.066e-2 nash_conv=1.569e-1
+iter=     149 expl_p0=8.035e-2 expl_p1=7.053e-2 nash_conv=1.509e-1
+iter=     152 expl_p0=7.838e-2 expl_p1=7.070e-2 nash_conv=1.491e-1
+done: iterations=152 wall=43.77s ev_p0=11.181046 ev_p1=11.534787 nash_conv=1.491e-1
+sol: wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/solution.sol (15.10 MB, 9248 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 2.87s (3471804 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 2.89s (3471804 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/summary.csv
+FLOP L13-gt3bet 2h Qd 8c wall_s=43.8 it=152 cap=0
+tree: nodes=2112706 terminals=1344551 rank_tables=799 storage=3413.8 MiB (f32) / 1712.7 MiB (i16) / 2563.2 MiB (i16-f32avg)
+memory estimate: 3933.8 MiB (f32) / 2232.7 MiB (i16) / 3083.2 MiB (i16-f32avg)
+warning: unmatched Flop tree rule 5
+iter=      25 expl_p0=2.299e0 expl_p1=2.286e0 nash_conv=4.586e0
+iter=      50 expl_p0=9.849e-1 expl_p1=6.565e-1 nash_conv=1.641e0
+iter=     100 expl_p0=3.088e-1 expl_p1=1.739e-1 nash_conv=4.828e-1
+iter=     150 expl_p0=1.570e-1 expl_p1=7.553e-2 nash_conv=2.325e-1
+iter=     183 expl_p0=1.058e-1 expl_p1=5.286e-2 nash_conv=1.587e-1
+iter=     188 expl_p0=1.043e-1 expl_p1=4.957e-2 nash_conv=1.539e-1
+iter=     191 expl_p0=9.857e-2 expl_p1=4.805e-2 nash_conv=1.466e-1
+done: iterations=191 wall=33.96s ev_p0=14.697049 ev_p1=7.937767 nash_conv=1.466e-1
+sol: wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/solution.sol (10.76 MB, 6804 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.77s (2112706 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.75s (2112706 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/summary.csv
+FLOP L13-gt3bet 3h Kc 6c wall_s=34.0 it=191 cap=0
+tree: nodes=2112706 terminals=1344551 rank_tables=799 storage=3491.1 MiB (f32) / 1751.3 MiB (i16) / 2621.2 MiB (i16-f32avg)
+memory estimate: 4011.1 MiB (f32) / 2271.3 MiB (i16) / 3141.2 MiB (i16-f32avg)
+warning: unmatched Flop tree rule 5
+iter=      25 expl_p0=2.944e0 expl_p1=3.214e0 nash_conv=6.158e0
+iter=      50 expl_p0=7.372e-1 expl_p1=8.425e-1 nash_conv=1.580e0
+iter=     100 expl_p0=1.940e-1 expl_p1=1.718e-1 nash_conv=3.658e-1
+iter=     142 expl_p0=1.049e-1 expl_p1=9.006e-2 nash_conv=1.950e-1
+iter=     160 expl_p0=7.958e-2 expl_p1=6.983e-2 nash_conv=1.494e-1
+done: iterations=160 wall=28.99s ev_p0=11.053360 ev_p1=11.710680 nash_conv=1.494e-1
+sol: wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/solution.sol (10.96 MB, 6804 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.75s (2112706 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.76s (2112706 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/summary.csv
+FLOP L13-gt3bet 4h 6h 9d wall_s=29.0 it=160 cap=0
+tree: nodes=2182092 terminals=1388744 rank_tables=810 storage=3482.4 MiB (f32) / 1747.2 MiB (i16) / 2614.8 MiB (i16-f32avg)
+memory estimate: 4002.4 MiB (f32) / 2267.2 MiB (i16) / 3134.8 MiB (i16-f32avg)
+warning: unmatched Flop tree rule 5
+iter=      25 expl_p0=2.603e0 expl_p1=2.802e0 nash_conv=5.405e0
+iter=      50 expl_p0=6.799e-1 expl_p1=6.536e-1 nash_conv=1.333e0
+iter=     100 expl_p0=3.945e-1 expl_p1=3.466e-1 nash_conv=7.411e-1
+iter=     150 expl_p0=1.451e-1 expl_p1=1.335e-1 nash_conv=2.787e-1
+iter=     185 expl_p0=8.091e-2 expl_p1=7.092e-2 nash_conv=1.518e-1
+iter=     188 expl_p0=7.675e-2 expl_p1=6.699e-2 nash_conv=1.437e-1
+done: iterations=188 wall=31.99s ev_p0=16.413019 ev_p1=6.340469 nash_conv=1.437e-1
+sol: wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/solution.sol (10.93 MB, 6992 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.80s (2182092 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.79s (2182092 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/summary.csv
+FLOP L13-gt3bet 5d 5s Kc wall_s=32.0 it=188 cap=0
+tree: nodes=2182092 terminals=1388744 rank_tables=810 storage=3627.5 MiB (f32) / 1819.7 MiB (i16) / 2723.6 MiB (i16-f32avg)
+memory estimate: 4147.5 MiB (f32) / 2339.7 MiB (i16) / 3243.6 MiB (i16-f32avg)
+warning: unmatched Flop tree rule 5
+iter=      25 expl_p0=3.344e0 expl_p1=3.363e0 nash_conv=6.708e0
+iter=      50 expl_p0=1.004e0 expl_p1=1.106e0 nash_conv=2.110e0
+iter=     100 expl_p0=2.169e-1 expl_p1=2.054e-1 nash_conv=4.223e-1
+iter=     145 expl_p0=9.387e-2 expl_p1=8.822e-2 nash_conv=1.821e-1
+iter=     156 expl_p0=8.549e-2 expl_p1=7.614e-2 nash_conv=1.616e-1
+iter=     162 expl_p0=8.119e-2 expl_p1=7.356e-2 nash_conv=1.548e-1
+iter=     166 expl_p0=7.989e-2 expl_p1=7.059e-2 nash_conv=1.505e-1
+done: iterations=166 wall=30.89s ev_p0=13.228485 ev_p1=9.412297 nash_conv=1.505e-1
+sol: wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/solution.sol (11.50 MB, 6992 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.79s (2182092 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.80s (2182092 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/summary.csv
+FLOP L13-gt3bet 6c 7d 7s wall_s=30.9 it=166 cap=0
+tree: nodes=2112706 terminals=1344551 rank_tables=799 storage=3498.1 MiB (f32) / 1754.8 MiB (i16) / 2626.5 MiB (i16-f32avg)
+memory estimate: 4018.1 MiB (f32) / 2274.9 MiB (i16) / 3146.5 MiB (i16-f32avg)
+warning: unmatched Flop tree rule 5
+iter=      25 expl_p0=2.996e0 expl_p1=3.016e0 nash_conv=6.012e0
+iter=      50 expl_p0=7.779e-1 expl_p1=8.474e-1 nash_conv=1.625e0
+iter=     100 expl_p0=1.667e-1 expl_p1=1.729e-1 nash_conv=3.396e-1
+iter=     135 expl_p0=1.128e-1 expl_p1=1.060e-1 nash_conv=2.188e-1
+iter=     167 expl_p0=7.306e-2 expl_p1=6.676e-2 nash_conv=1.398e-1
+done: iterations=167 wall=30.59s ev_p0=11.205279 ev_p1=11.542074 nash_conv=1.398e-1
+sol: wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/solution.sol (10.63 MB, 6804 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.76s (2112706 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.75s (2112706 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/summary.csv
+FLOP L13-gt3bet 7c 4c 9s wall_s=30.6 it=167 cap=0
+tree: nodes=2182092 terminals=1388744 rank_tables=810 storage=3344.5 MiB (f32) / 1678.3 MiB (i16) / 2511.4 MiB (i16-f32avg)
+memory estimate: 3864.5 MiB (f32) / 2198.3 MiB (i16) / 3031.4 MiB (i16-f32avg)
+warning: unmatched Flop tree rule 5
+iter=      25 expl_p0=2.552e0 expl_p1=3.750e0 nash_conv=6.303e0
+iter=      50 expl_p0=1.799e0 expl_p1=7.793e-1 nash_conv=2.578e0
+iter=     100 expl_p0=5.616e-1 expl_p1=1.834e-1 nash_conv=7.451e-1
+iter=     150 expl_p0=2.120e-1 expl_p1=1.074e-1 nash_conv=3.195e-1
+iter=     200 expl_p0=1.150e-1 expl_p1=6.051e-2 nash_conv=1.755e-1
+iter=     213 expl_p0=1.035e-1 expl_p1=5.312e-2 nash_conv=1.566e-1
+iter=     217 expl_p0=9.906e-2 expl_p1=5.037e-2 nash_conv=1.494e-1
+done: iterations=217 wall=36.74s ev_p0=12.643165 ev_p1=10.035654 nash_conv=1.494e-1
+sol: wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/solution.sol (10.11 MB, 6992 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.80s (2182092 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.79s (2182092 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L13-gt3bet/tmp/summary.csv
+FLOP L13-gt3bet 7d Ks Kh wall_s=36.7 it=217 cap=0
+TASK L13-gt3bet flops=8
+tree: nodes=3690452 terminals=2314487 rank_tables=1176 storage=2572.8 MiB (f32) / 1296.8 MiB (i16) / 1934.8 MiB (i16-f32avg)
+memory estimate: 3092.8 MiB (f32) / 1858.2 MiB (i16) / 2496.2 MiB (i16-f32avg)
+iter=      25 expl_p0=2.034e0 expl_p1=1.131e0 nash_conv=3.166e0
+iter=      50 expl_p0=6.013e-1 expl_p1=4.136e-1 nash_conv=1.015e0
+iter=     100 expl_p0=1.895e-1 expl_p1=8.631e-2 nash_conv=2.758e-1
+iter=     108 expl_p0=1.506e-1 expl_p1=7.054e-2 nash_conv=2.211e-1
+done: iterations=108 wall=15.26s ev_p0=2.419863 ev_p1=34.278007 nash_conv=2.211e-1
+sol: wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/solution.sol (8.40 MB, 10607 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 2.94s (3690452 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 2.93s (3690452 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/summary.csv
+FLOP L23-gt4bet 2c 4s Kh wall_s=15.3 it=108 cap=0
+tree: nodes=3690452 terminals=2314487 rank_tables=1176 storage=2524.3 MiB (f32) / 1272.5 MiB (i16) / 1898.4 MiB (i16-f32avg)
+memory estimate: 3044.3 MiB (f32) / 1835.7 MiB (i16) / 2461.6 MiB (i16-f32avg)
+iter=      25 expl_p0=4.287e0 expl_p1=2.338e0 nash_conv=6.625e0
+iter=      50 expl_p0=1.618e0 expl_p1=9.741e-1 nash_conv=2.593e0
+iter=     100 expl_p0=5.968e-1 expl_p1=5.090e-1 nash_conv=1.106e0
+iter=     150 expl_p0=2.581e-1 expl_p1=3.444e-1 nash_conv=6.025e-1
+iter=     200 expl_p0=1.109e-1 expl_p1=1.242e-1 nash_conv=2.351e-1
+iter=     203 expl_p0=1.041e-1 expl_p1=1.083e-1 nash_conv=2.124e-1
+done: iterations=203 wall=28.63s ev_p0=8.893884 ev_p1=27.421445 nash_conv=2.124e-1
+sol: wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/solution.sol (8.26 MB, 10607 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 2.94s (3690452 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 2.92s (3690452 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/summary.csv
+FLOP L23-gt4bet 2h Qd 8c wall_s=28.6 it=203 cap=0
+tree: nodes=2246126 terminals=1407425 rank_tables=799 storage=1551.4 MiB (f32) / 782.1 MiB (i16) / 1166.7 MiB (i16-f32avg)
+memory estimate: 2071.4 MiB (f32) / 1356.3 MiB (i16) / 1741.0 MiB (i16-f32avg)
+iter=      25 expl_p0=1.771e0 expl_p1=1.487e0 nash_conv=3.258e0
+iter=      50 expl_p0=4.943e-1 expl_p1=3.840e-1 nash_conv=8.783e-1
+iter=      91 expl_p0=2.064e-1 expl_p1=8.271e-1 nash_conv=1.033e0
+iter=     116 expl_p0=1.331e-1 expl_p1=4.622e-1 nash_conv=5.953e-1
+iter=     164 expl_p0=7.100e-2 expl_p1=1.368e-1 nash_conv=2.078e-1
+done: iterations=164 wall=14.53s ev_p0=4.219070 ev_p1=32.329491 nash_conv=2.078e-1
+sol: wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/solution.sol (6.02 MB, 7799 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.81s (2246126 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.80s (2246126 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/summary.csv
+FLOP L23-gt4bet 3h Kc 6c wall_s=14.5 it=164 cap=0
+tree: nodes=2246126 terminals=1407425 rank_tables=799 storage=1558.8 MiB (f32) / 785.8 MiB (i16) / 1172.3 MiB (i16-f32avg)
+memory estimate: 2078.8 MiB (f32) / 1360.2 MiB (i16) / 1746.7 MiB (i16-f32avg)
+iter=      25 expl_p0=4.190e0 expl_p1=1.776e0 nash_conv=5.966e0
+iter=      50 expl_p0=1.190e0 expl_p1=6.833e-1 nash_conv=1.873e0
+iter=     100 expl_p0=3.371e-1 expl_p1=2.381e-1 nash_conv=5.752e-1
+iter=     150 expl_p0=1.440e-1 expl_p1=1.192e-1 nash_conv=2.632e-1
+iter=     158 expl_p0=1.286e-1 expl_p1=1.079e-1 nash_conv=2.365e-1
+iter=     161 expl_p0=1.232e-1 expl_p1=1.067e-1 nash_conv=2.299e-1
+done: iterations=161 wall=14.90s ev_p0=11.007579 ev_p1=24.858835 nash_conv=2.299e-1
+sol: wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/solution.sol (5.98 MB, 7799 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.81s (2246126 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.79s (2246126 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/summary.csv
+FLOP L23-gt4bet 4h 6h 9d wall_s=14.9 it=161 cap=0
+tree: nodes=2319884 terminals=1453679 rank_tables=810 storage=1556.6 MiB (f32) / 784.8 MiB (i16) / 1170.7 MiB (i16-f32avg)
+memory estimate: 2076.6 MiB (f32) / 1360.5 MiB (i16) / 1746.4 MiB (i16-f32avg)
+iter=      25 expl_p0=3.535e0 expl_p1=2.323e0 nash_conv=5.859e0
+iter=      50 expl_p0=1.529e0 expl_p1=1.359e0 nash_conv=2.888e0
+iter=     100 expl_p0=4.963e-1 expl_p1=6.448e-1 nash_conv=1.141e0
+iter=     150 expl_p0=2.525e-1 expl_p1=4.577e-1 nash_conv=7.102e-1
+iter=     200 expl_p0=1.175e-1 expl_p1=1.872e-1 nash_conv=3.047e-1
+iter=     216 expl_p0=9.126e-2 expl_p1=1.668e-1 nash_conv=2.580e-1
+iter=     225 expl_p0=8.254e-2 expl_p1=9.881e-2 nash_conv=1.814e-1
+done: iterations=225 wall=19.53s ev_p0=5.491019 ev_p1=31.086377 nash_conv=1.814e-1
+sol: wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/solution.sol (5.93 MB, 8015 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.85s (2319884 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.85s (2319884 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/summary.csv
+FLOP L23-gt4bet 5d 5s Kc wall_s=19.5 it=225 cap=0
+tree: nodes=2319884 terminals=1453679 rank_tables=810 storage=1571.9 MiB (f32) / 792.5 MiB (i16) / 1182.2 MiB (i16-f32avg)
+memory estimate: 2091.9 MiB (f32) / 1367.6 MiB (i16) / 1757.3 MiB (i16-f32avg)
+iter=      25 expl_p0=4.142e0 expl_p1=2.305e0 nash_conv=6.447e0
+iter=      50 expl_p0=1.548e0 expl_p1=7.353e-1 nash_conv=2.284e0
+iter=     100 expl_p0=3.730e-1 expl_p1=2.220e-1 nash_conv=5.949e-1
+iter=     150 expl_p0=1.427e-1 expl_p1=9.163e-2 nash_conv=2.343e-1
+iter=     153 expl_p0=1.413e-1 expl_p1=8.932e-2 nash_conv=2.306e-1
+done: iterations=153 wall=13.94s ev_p0=9.415373 ev_p1=26.530021 nash_conv=2.306e-1
+sol: wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/solution.sol (6.01 MB, 8015 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.84s (2319884 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.85s (2319884 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/summary.csv
+FLOP L23-gt4bet 6c 7d 7s wall_s=13.9 it=153 cap=0
+tree: nodes=2246126 terminals=1407425 rank_tables=799 storage=1529.3 MiB (f32) / 771.0 MiB (i16) / 1150.1 MiB (i16-f32avg)
+memory estimate: 2049.3 MiB (f32) / 1346.5 MiB (i16) / 1725.6 MiB (i16-f32avg)
+iter=      25 expl_p0=4.049e0 expl_p1=1.804e0 nash_conv=5.853e0
+iter=      50 expl_p0=1.166e0 expl_p1=6.818e-1 nash_conv=1.847e0
+iter=     100 expl_p0=2.994e-1 expl_p1=2.189e-1 nash_conv=5.183e-1
+iter=     144 expl_p0=1.580e-1 expl_p1=1.329e-1 nash_conv=2.909e-1
+iter=     161 expl_p0=1.216e-1 expl_p1=1.068e-1 nash_conv=2.283e-1
+done: iterations=161 wall=14.48s ev_p0=11.801541 ev_p1=24.079111 nash_conv=2.283e-1
+sol: wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/solution.sol (5.69 MB, 7799 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.82s (2246126 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.80s (2246126 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/summary.csv
+FLOP L23-gt4bet 7c 4c 9s wall_s=14.5 it=161 cap=0
+tree: nodes=2319884 terminals=1453679 rank_tables=810 storage=1487.9 MiB (f32) / 750.5 MiB (i16) / 1119.2 MiB (i16-f32avg)
+memory estimate: 2007.9 MiB (f32) / 1328.4 MiB (i16) / 1697.1 MiB (i16-f32avg)
+iter=      25 expl_p0=4.322e0 expl_p1=2.068e0 nash_conv=6.390e0
+iter=      50 expl_p0=1.944e0 expl_p1=8.520e-1 nash_conv=2.796e0
+iter=     100 expl_p0=5.657e-1 expl_p1=3.930e-1 nash_conv=9.587e-1
+iter=     150 expl_p0=2.174e-1 expl_p1=1.501e-1 nash_conv=3.675e-1
+iter=     176 expl_p0=1.483e-1 expl_p1=1.144e-1 nash_conv=2.627e-1
+iter=     184 expl_p0=1.365e-1 expl_p1=9.310e-2 nash_conv=2.296e-1
+done: iterations=184 wall=16.08s ev_p0=4.869294 ev_p1=31.717606 nash_conv=2.296e-1
+sol: wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/solution.sol (5.30 MB, 8015 blocks, mode=NoRivers)
+rebuilding tree from embedded config...
+tree rebuilt in 1.85s (2319884 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/ev.csv
+rebuilding tree from embedded config...
+tree rebuilt in 1.86s (2319884 nodes)
+wrote /home/ubuntu/out/pilot/basis/out/L23-gt4bet/tmp/summary.csv
+FLOP L23-gt4bet 7d Ks Kh wall_s=16.1 it=184 cap=0
+TASK L23-gt4bet flops=8
+	Command being timed: "bash -c python3 $X/p1_classes.py ~/gtow.profile.json ~/basis-multi.txt ~ ~/out/pilot/basis/out --solvers $S"
+	User time (seconds): 13769.28
+	System time (seconds): 173.13
+	Percent of CPU this job got: 2434%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 9:32.78
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 7116368
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 50821918
+	Voluntary context switches: 329145
+	Involuntary context switches: 40456
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 303944
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

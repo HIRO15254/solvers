@@ -1,0 +1,2 @@
+DUMP=informed TAG=-inf bash ~/sc_l1.sh own base
+DUMP=informed TAG=-inf bash ~/sc_l1.sh own in65

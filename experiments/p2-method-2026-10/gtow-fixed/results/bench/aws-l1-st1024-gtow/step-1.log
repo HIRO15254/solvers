@@ -1,0 +1,28 @@
+Tree: 12 decisions, 22 terminals (0.001s)
+Tables: 0.241s; model: 0.002s
+L1: 5 leaves; 302 postflop decisions; 694272 slots; 11108352 storage bytes
+Iterations: 1; reached target: false; stopped by stop file: false; solve phases Timings { trunk: SolveTimings { reaches: 0.001158182, t2: 0.0025413149999999997, t3: 2.3e-7, k4: 3.3099999999999996e-6, update: 0.00045553200000000003, evaluation: 0.0 }, board_preparation: 0.019074857, postflop: 0.03544408, evaluation_board_preparation: 1.7e-7 }
+cf984a8410cc87c62eb22a6c7ff496540cd0cf5e598bb031c392e404726d428c  /home/ubuntu/ehs2/v2-f1024-t1024-r1024.postcard
+	Command being timed: "bash -c sed -E "/^\[solver\.abstraction\.buckets\]/,/^\[/ s/^(flop|turn|river) = 32$/\1 = 1024/" examples/bench/hu_20bb_postflop.toml > /tmp/b6-1024.toml && target/release/examples/trunk_solve --config /tmp/b6-1024.toml --leaf-model l1 --ehs2-cache ~/ehs2/v2-f1024-t1024-r1024.postcard --iterations 1 --eval-every 0 && sha256sum ~/ehs2/v2-f1024-t1024-r1024.postcard"
+	User time (seconds): 371.75
+	System time (seconds): 2.68
+	Percent of CPU this job got: 1263%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:29.63
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 2487112
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 1027243
+	Voluntary context switches: 2020
+	Involuntary context switches: 1552
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 1071904
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
